@@ -31,7 +31,7 @@ namespace DOL.GS.Trainer
 	    private const string WeaponSlash = "slash_sword_item";
 		private const string WeaponCrush = "crush_sword_item";
 		private const string WeaponThrust = "thrust_sword_item";
-		private const string Weapon2h = "twohand_sword_item";
+		private const string Weapon2H = "twohand_sword_item";
 
 		/// <summary>
 		/// Interact with trainer
@@ -108,7 +108,7 @@ namespace DOL.GS.Trainer
 						break;
 					case "two handed":
 						PromotePlayer(player, (int)eCharacterClass.Paladin, "Here is your Great Sword of the Initiate. Welcome to the Church of Albion.", null);
-						player.ReceiveItem(this,Weapon2h);
+						player.ReceiveItem(this,Weapon2H);
 						break;
 				}
 			}

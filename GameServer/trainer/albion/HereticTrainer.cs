@@ -28,8 +28,6 @@ namespace DOL.GS.Trainer
 	{
 		public override eCharacterClass TrainedClass => eCharacterClass.Heretic;
 
-	    private const string WeaponId1 = "chrush_sword_item";
-
 		/// <summary>
 		/// Interact with trainer
 		/// </summary>
