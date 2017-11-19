@@ -26,19 +26,11 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Fighter Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Fighter Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class FighterTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Fighter; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Fighter;
 
-		/// <summary>
-		/// The practice weapon template ID
-		/// </summary>
-		public const string PRACTICE_WEAPON_ID = "practice_sword";
-		/// <summary>
-		/// The practice shield template ID
-		/// </summary>
-		public const string PRACTICE_SHIELD_ID = "small_training_shield";
+	    // Item Template Ids
+		private const string PracticeWeaponId = "practice_sword";
+		private const string PracticeShieldId = "small_training_shield";
 
 		public FighterTrainer() : base(eChampionTrainerType.Fighter)
 		{
@@ -51,7 +43,10 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
+		    if (!base.Interact(player))
+		    {
+		        return false;
+            }
 			
 			// check if class matches
 			if (player.CharacterClass.ID == (int)TrainedClass)
@@ -67,11 +62,11 @@ namespace DOL.GS.Trainer
 				}
 
 				// ask for basic equipment if player doesnt own it
-				if (player.Inventory.GetFirstItemByID(PRACTICE_WEAPON_ID, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
+				if (player.Inventory.GetFirstItemByID(PracticeWeaponId, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
 				{
 					player.Out.SendMessage(Name + " says, \"Do you require a [practice weapon]?\"",eChatType.CT_Say,eChatLoc.CL_PopupWindow);
 				}
-				if (player.Inventory.GetFirstItemByID(PRACTICE_SHIELD_ID, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
+				if (player.Inventory.GetFirstItemByID(PracticeShieldId, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
 				{
 					player.Out.SendMessage(Name + " says, \"Do you require a [training shield]?\"",eChatType.CT_Say,eChatLoc.CL_PopupWindow);
 				}
@@ -91,10 +86,17 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
+		    if (!base.WhisperReceive(source, text))
+		    {
+		        return false;
+            }
 
-			switch (text) {
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
+
+            switch (text) {
 				case "Armsman":
 					if(player.Race == (int)eRace.Avalonian || player.Race == (int)eRace.Briton || player.Race == (int)eRace.HalfOgre || player.Race == (int)eRace.Highlander || player.Race == (int)eRace.Inconnu || player.Race == (int)eRace.Saracen || player.Race == (int)eRace.AlbionMinotaur)
 					{
@@ -122,15 +124,15 @@ namespace DOL.GS.Trainer
 					}
 					return true;
 				case "practice weapon":
-					if (player.Inventory.GetFirstItemByID(PRACTICE_WEAPON_ID, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
+					if (player.Inventory.GetFirstItemByID(PracticeWeaponId, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
 					{
-						player.ReceiveItem(this,PRACTICE_WEAPON_ID);
+						player.ReceiveItem(this,PracticeWeaponId);
 					}
 					return true;
 				case "training shield":
-					if (player.Inventory.GetFirstItemByID(PRACTICE_SHIELD_ID, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
+					if (player.Inventory.GetFirstItemByID(PracticeShieldId, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
 					{
-						player.ReceiveItem(this, PRACTICE_SHIELD_ID);
+						player.ReceiveItem(this, PracticeShieldId);
 					}
 					return true;
 			}

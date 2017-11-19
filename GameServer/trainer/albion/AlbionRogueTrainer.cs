@@ -26,12 +26,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Rogue Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Rogue Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class AlbionRogueTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.AlbionRogue; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.AlbionRogue;
 
-		public const string PRACTICE_WEAPON_ID = "practice_dirk";
+	    private const string PracticeWeaponId = "practice_dirk";
 		
 		public AlbionRogueTrainer() : base(eChampionTrainerType.AlbionRogue)
 		{
@@ -44,7 +41,10 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
+		    if (!base.Interact(player))
+		    {
+		        return false;
+            }
 			
 			// check if class matches
 			if (player.CharacterClass.ID == (int)TrainedClass)
@@ -60,7 +60,7 @@ namespace DOL.GS.Trainer
 				}
 
 				// ask for basic equipment if player doesnt own it
-				if (player.Inventory.GetFirstItemByID(PRACTICE_WEAPON_ID, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
+				if (player.Inventory.GetFirstItemByID(PracticeWeaponId, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
 				{
 					player.Out.SendMessage(Name + " says, \"Do you require a [practice weapon]?\"",eChatType.CT_Say,eChatLoc.CL_PopupWindow);
 				}
@@ -80,8 +80,15 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
+		    if (!base.WhisperReceive(source, text))
+		    {
+		        return false;
+            }
+
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
 
 			switch (text) {
 				case "Infiltrator":
@@ -109,9 +116,9 @@ namespace DOL.GS.Trainer
 					}
 					return true;
 				case "practice weapon":
-					if (player.Inventory.GetFirstItemByID(PRACTICE_WEAPON_ID, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
+					if (player.Inventory.GetFirstItemByID(PracticeWeaponId, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
 					{
-						player.ReceiveItem(this,PRACTICE_WEAPON_ID);
+						player.ReceiveItem(this,PracticeWeaponId);
 					}
 					return true;
 			}

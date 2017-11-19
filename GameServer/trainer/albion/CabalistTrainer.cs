@@ -26,16 +26,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Cabalist Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Cabalist Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class CabalistTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Cabalist; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Cabalist;
 
-		public const string WEAPON_ID = "cabalist_item";
-
-		public CabalistTrainer() : base()
-		{
-		}
+	    private const string WeaponId = "cabalist_item";
 
 		/// <summary>
 		/// Interact with trainer
@@ -44,7 +37,10 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
+		    if (!base.Interact(player))
+		    {
+		        return false;
+            }
 			
 			// check if class matches.
 			if (player.CharacterClass.ID == (int)TrainedClass)
@@ -78,15 +74,22 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
+		    if (!base.WhisperReceive(source, text))
+		    {
+		        return false;
+            }
+
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
 			
 			switch (text) {
 				case "join the Guild of Shadows":
 					// promote player to other class
 					if (CanPromotePlayer(player)) {
 						PromotePlayer(player, (int)eCharacterClass.Cabalist, "Welcome to our guild! You have much to learn, but I see greatness in your future! Here too is your guild weapon, a Staff of Focus!", null);
-						player.ReceiveItem(this,WEAPON_ID);
+						player.ReceiveItem(this,WeaponId);
 					}
 					break;
 			}

@@ -26,19 +26,12 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Paladin Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Paladin Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class PaladinTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Paladin; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Paladin;
 
-		public const string WEAPON_ID1 = "slash_sword_item";
-		public const string WEAPON_ID2 = "crush_sword_item";
-		public const string WEAPON_ID3 = "thrust_sword_item";
-		public const string WEAPON_ID4 = "twohand_sword_item";
-
-		public PaladinTrainer() : base()
-		{
-		}
+	    private const string WeaponSlash = "slash_sword_item";
+		private const string WeaponCrush = "crush_sword_item";
+		private const string WeaponThrust = "thrust_sword_item";
+		private const string Weapon2h = "twohand_sword_item";
 
 		/// <summary>
 		/// Interact with trainer
@@ -47,10 +40,13 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
-			
-			// check if class matches.
-			if (player.CharacterClass.ID == (int)TrainedClass)
+			if (!base.Interact(player))
+			{
+			    return false;
+			}
+
+            // check if class matches.
+            if (player.CharacterClass.ID == (int)TrainedClass)
 			{
 				OfferTraining(player);
 			}
@@ -81,11 +77,17 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
-			
-			
-			if (CanPromotePlayer(player))
+			if (!base.WhisperReceive(source, text))
+			{
+			    return false;
+			}
+
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
+
+            if (CanPromotePlayer(player))
 			{
 				switch (text)
 				{
@@ -94,19 +96,19 @@ namespace DOL.GS.Trainer
 						break;
 					case "slashing":
 						PromotePlayer(player, (int)eCharacterClass.Paladin, "Here is your Sword of the Initiate. Welcome to the Church of Albion.", null);
-						player.ReceiveItem(this,WEAPON_ID1);
+						player.ReceiveItem(this,WeaponSlash);
 						break;
 					case "crushing":
 						PromotePlayer(player, (int)eCharacterClass.Paladin, "Here is your Mace of the Initiate. Welcome to the Church of Albion.", null);
-						player.ReceiveItem(this,WEAPON_ID2);
+						player.ReceiveItem(this,WeaponCrush);
 						break;
 					case "thrusting":
 						PromotePlayer(player, (int)eCharacterClass.Paladin, "Here is your Rapier of the Initiate. Welcome to the Church of Albion.", null);
-						player.ReceiveItem(this,WEAPON_ID3);
+						player.ReceiveItem(this,WeaponThrust);
 						break;
 					case "two handed":
 						PromotePlayer(player, (int)eCharacterClass.Paladin, "Here is your Great Sword of the Initiate. Welcome to the Church of Albion.", null);
-						player.ReceiveItem(this,WEAPON_ID4);
+						player.ReceiveItem(this,Weapon2h);
 						break;
 				}
 			}

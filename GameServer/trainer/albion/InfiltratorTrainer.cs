@@ -26,19 +26,19 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Infiltrator Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Infiltrator Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class InfiltratorTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Infiltrator; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Infiltrator;
 
-		/// <summary>
+	    /// <summary>
 		/// Interact with trainer
 		/// </summary>
 		/// <param name="player"></param>
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
+		    if (!base.Interact(player))
+		    {
+		        return false;
+            }
 			
 			// check if class matches.
 			if (player.CharacterClass.ID == (int)TrainedClass)
@@ -72,9 +72,16 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
-			
+		    if (!base.WhisperReceive(source, text))
+		    {
+		        return false;
+            }
+
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
+
 			switch (text) {
 				case "join the Guild of Shadows":
 					// promote player to other class

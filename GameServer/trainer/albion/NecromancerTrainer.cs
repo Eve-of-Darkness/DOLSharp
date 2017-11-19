@@ -27,15 +27,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Necromancer Trainer", eRealm.Albion)]
 	public class NecromancerTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Necromancer; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Necromancer;
 
-		public const string WEAPON_ID = "necromancer_item";
-
-		public NecromancerTrainer()
-			: base() { }
+	    private const string WEAPON_ID = "necromancer_item";
 
 		/// <summary>
 		/// Interact with trainer.
@@ -44,11 +38,14 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
-			
-			// If the player is a necromancer, offer training, if it is a disciple,
-			// offer a promotion. Otherwise send them somewhere else.
-			if (player.CharacterClass.ID == (int)TrainedClass)
+			if (!base.Interact(player))
+			{
+			    return false;
+			}
+
+            // If the player is a necromancer, offer training, if it is a disciple,
+            // offer a promotion. Otherwise send them somewhere else.
+            if (player.CharacterClass.ID == (int)TrainedClass)
 			{
 				OfferTraining(player);
 			}
@@ -78,8 +75,15 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
+			if (!base.WhisperReceive(source, text))
+			{
+			    return false;
+			}
+
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
 			
 			switch (text.ToLower())
 			{

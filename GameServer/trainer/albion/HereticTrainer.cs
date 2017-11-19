@@ -26,17 +26,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Heretic Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Heretic Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class HereticTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Heretic; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Heretic;
 
-		public const string WEAPON_ID1 = "chrush_sword_item";
-
-		public HereticTrainer()
-			: base()
-		{
-		}
+	    private const string WeaponId1 = "chrush_sword_item";
 
 		/// <summary>
 		/// Interact with trainer
@@ -45,7 +37,10 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
+		    if (!base.Interact(player))
+		    {
+		        return false;
+            }
 
 			// check if class matches.
 			if (player.CharacterClass.ID == (int)TrainedClass)
@@ -79,10 +74,17 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
+		    if (!base.WhisperReceive(source, text))
+		    {
+		        return false;
+            }
 
-			switch (text)
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
+
+            switch (text)
 			{
 				case "join the Temple of Arawn":
 					// promote player to other class

@@ -26,14 +26,7 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Reaver Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Reaver Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class ReaverTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Reaver; }
-		}
-
-		public ReaverTrainer() : base()
-		{
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Reaver;
 
 		/// <summary>
 		/// Interact with trainer
@@ -42,10 +35,13 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
-			
-			// check if class matches.
-			if (player.CharacterClass.ID == (int)TrainedClass)
+			if (!base.Interact(player))
+			{
+			    return false;
+			}
+
+            // check if class matches.
+            if (player.CharacterClass.ID == (int)TrainedClass)
 			{
 				OfferTraining(player);
 			}
@@ -76,10 +72,17 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
-			
-			switch (text) {
+			if (!base.WhisperReceive(source, text))
+			{
+			    return false;
+			}
+
+            if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
+
+            switch (text) {
 				case "Temple of Arawn":
 					// promote player to other class
 					if (CanPromotePlayer(player))
