@@ -26,22 +26,22 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Minstrel Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Minstrel Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class MinstrelTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Minstrel; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Minstrel;
 
-		/// <summary>
+	    /// <summary>
 		/// Interact with trainer
 		/// </summary>
 		/// <param name="player"></param>
 		/// <returns></returns>
  		public override bool Interact(GamePlayer player)
  		{		
- 			if (!base.Interact(player)) return false;
-								
-			// check if class matches.				
-			if (player.CharacterClass.ID == (int)TrainedClass)
+ 			if (!base.Interact(player))
+			 {
+			     return false;
+			 }
+
+            // check if class matches.				
+            if (player.CharacterClass.ID == (int)TrainedClass)
 			{
 				OfferTraining(player);
 			}
@@ -72,10 +72,17 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{				
-			if (!base.WhisperReceive(source, text)) return false;			
-			GamePlayer player = source as GamePlayer;			
-	
-			switch (text) {
+			if (!base.WhisperReceive(source, text))
+			{
+			    return false;
+			}
+
+            if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
+
+            switch (text) {
 			case "join the Academy":
 				// promote player to other class
 				if (CanPromotePlayer(player)) {

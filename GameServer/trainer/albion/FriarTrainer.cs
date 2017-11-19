@@ -29,17 +29,14 @@ namespace DOL.GS.Trainer
 	[NPCGuildScript("Friar Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Friar Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class FriarTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Friar; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Friar;
 
-		/// <summary>
+	    /// <summary>
 		/// The free starter armor from trainer
 		/// </summary>
-		public const string ARMOR_ID1 = "friar_item";
-		public const string ARMOR_ID2 = "chaplains_robe";
-		public const string ARMOR_ID3 = "robes_of_the_neophyte";
+		private const string ArmorId1 = "friar_item";
+		private const string ArmorId2 = "chaplains_robe";
+		private const string ArmorId3 = "robes_of_the_neophyte";
 
 		/// <summary>
 		/// Interact with trainer
@@ -48,7 +45,10 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
+		    if (!base.Interact(player))
+		    {
+		        return false;
+            }
 			
 			// check if class matches.
 			if (player.CharacterClass.ID == (int)TrainedClass)
@@ -57,12 +57,12 @@ namespace DOL.GS.Trainer
 
 				if (player.Level >= 10 && player.Level < 15)
 				{
-					if (player.Inventory.GetFirstItemByID(ARMOR_ID3, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null)
+					if (player.Inventory.GetFirstItemByID(ArmorId3, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null)
 					{
 						player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "FriarTrainer.Interact.Text4", Name), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-						addGift(ARMOR_ID3, player);
+						addGift(ArmorId3, player);
 					}
-					if (player.Inventory.GetFirstItemByID(ARMOR_ID1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null)
+					if (player.Inventory.GetFirstItemByID(ArmorId1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null)
 					{}
 					else
 					{
@@ -97,17 +97,24 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
-			String lowerCase = text.ToLower();
+		    if (!base.WhisperReceive(source, text))
+		    {
+		        return false;
+            }
 
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
+
+            String lowerCase = text.ToLower();
 			if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "FriarTrainer.WhisperReceiveCase.Text1"))
 			{
 				// promote player to other class
 				if (CanPromotePlayer(player))
 				{
 					PromotePlayer(player, (int)eCharacterClass.Friar, LanguageMgr.GetTranslation(player.Client.Account.Language, "FriarTrainer.WhisperReceive.Text1"), null);
-					addGift(ARMOR_ID1, player);
+					addGift(ArmorId1, player);
 				}
 			}
 			return true;
@@ -121,15 +128,21 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool ReceiveItem(GameLiving source, InventoryItem item)
 		{
-			if (source == null || item == null) return false;
+		    if (source == null || item == null)
+		    {
+		        return false;
+            }
 
-			GamePlayer player = source as GamePlayer;
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
 
-			if (player.Level >= 10 && player.Level < 15 && item.Id_nb == ARMOR_ID1)
+            if (player.Level >= 10 && player.Level < 15 && item.Id_nb == ArmorId1)
 			{
 				player.Inventory.RemoveCountFromStack(item, 1);
 				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "FriarTrainer.ReceiveItem.Text1", Name, player.Name), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-				addGift(ARMOR_ID2, player);
+				addGift(ArmorId2, player);
 			}
 			return base.ReceiveItem(source, item);
 		}

@@ -26,51 +26,47 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Wizard Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Wizard Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class WizardTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Wizard; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.Wizard;
 
-		public const string WEAPON_ID = "wizard_item";
+	    private const string WEAPON_ID = "wizard_item";
 
-		public WizardTrainer() : base()
-		{
-		}
+	    /// <summary>
+	    /// Interact with trainer
+	    /// </summary>
+	    /// <param name="player"></param>
+	    /// <returns></returns>
+	    public override bool Interact(GamePlayer player)
+	    {
+	        if (!base.Interact(player))
+	        {
+	            return false;
+	        }
 
-		/// <summary>
-		/// Interact with trainer
-		/// </summary>
-		/// <param name="player"></param>
-		/// <returns></returns>
- 		public override bool Interact(GamePlayer player)
- 		{		
- 			if (!base.Interact(player)) return false;
-								
-			// check if class matches.				
-			if (player.CharacterClass.ID == (int)TrainedClass)
-			{
-				OfferTraining(player);
-			}
-			else
-			{
-				// perhaps player can be promoted
-				if (CanPromotePlayer(player)) 
-				{
-					player.Out.SendMessage(Name + " says, \"Do you desire to [join the Academy] and summon the power of the elements as a Wizard?\"",eChatType.CT_Say,eChatLoc.CL_PopupWindow);
-					if (!player.IsLevelRespecUsed)
-					{
-						OfferRespecialize(player);
-					}
-				} 
-				else
-				{
-					CheckChampionTraining(player);
-				}
-			}
-			return true;
- 		}
+	        // check if class matches.				
+	        if (player.CharacterClass.ID == (int) TrainedClass)
+	        {
+	            OfferTraining(player);
+	        }
+	        else
+	        {
+	            // perhaps player can be promoted
+	            if (CanPromotePlayer(player))
+	            {
+	                player.Out.SendMessage($"{Name} says, \"Do you desire to [join the Academy] and summon the power of the elements as a Wizard?\"", eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+	                if (!player.IsLevelRespecUsed)
+	                {
+	                    OfferRespecialize(player);
+	                }
+	            }
+	            else
+	            {
+	                CheckChampionTraining(player);
+	            }
+	        }
+	        return true;
+	    }
 
-		/// <summary>
+	    /// <summary>
 		/// Talk to trainer
 		/// </summary>
 		/// <param name="source"></param>
@@ -78,8 +74,15 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{				
-			if (!base.WhisperReceive(source, text)) return false;			
-			GamePlayer player = source as GamePlayer;			
+			if (!base.WhisperReceive(source, text))
+			{
+			    return false;
+			}
+
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
 	
 			switch (text) {
 			case "join the Academy":

@@ -26,12 +26,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Mauler Trainer", eRealm.Albion)]
 	public class AlbionMaulerTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.MaulerAlb; }
-		}
+		public override eCharacterClass TrainedClass => eCharacterClass.MaulerAlb;
 
-		/// <summary>
+	    /// <summary>
 		/// Interact with trainer
 		/// </summary>
 		/// <param name="player"></param>
@@ -72,8 +69,15 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
+		    if (!base.WhisperReceive(source, text))
+		    {
+		        return false;
+            }
+
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
 
 			switch (text)
 			{

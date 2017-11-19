@@ -26,26 +26,13 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Armsman Trainer", eRealm.Albion)]		// this attribute instructs DOL to use this script for all "Fighter Trainer" NPC's in Albion (multiple guilds are possible for one script)
 	public class ArmsmanTrainer : GameTrainer
 	{
-		public override eCharacterClass TrainedClass
-		{
-			get { return eCharacterClass.Armsman; }
-		}
-		/// <summary>
-		/// The slash sword item template ID
-		/// </summary>
-		public const string WEAPON_ID1 = "slash_sword_item";
-		/// <summary>
-		/// The crush sword item template ID
-		/// </summary>
-		public const string WEAPON_ID2 = "crush_sword_item";
-		/// <summary>
-		/// The thrust sword item template ID
-		/// </summary>
-		public const string WEAPON_ID3 = "thrust_sword_item";
-		/// <summary>
-		/// The pike polearm item template ID
-		/// </summary>
-		public const string WEAPON_ID4 = "pike_polearm_item";
+		public override eCharacterClass TrainedClass => eCharacterClass.Armsman;
+        
+        // Item Template Ids
+		private const string WeaponSlash = "slash_sword_item";
+        private const string WeaponCrush = "crush_sword_item";
+        private const string WeaponThrust = "thrust_sword_item";
+        private const string WeaponPole = "pike_polearm_item";
 
 		/// <summary>
 		/// Interact with trainer
@@ -54,7 +41,10 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool Interact(GamePlayer player)
 		{
-			if (!base.Interact(player)) return false;
+		    if (!base.Interact(player))
+		    {
+		        return false;
+            }
 			
 			// check if class matches.
 			if (player.CharacterClass.ID == (int)TrainedClass)
@@ -88,41 +78,39 @@ namespace DOL.GS.Trainer
 		/// <returns></returns>
 		public override bool WhisperReceive(GameLiving source, string text)
 		{
-			if (!base.WhisperReceive(source, text)) return false;
-			GamePlayer player = source as GamePlayer;
+		    if (!base.WhisperReceive(source, text))
+		    {
+		        return false;
+            }
+
+		    if (!(source is GamePlayer player))
+		    {
+		        return false;
+		    }
 			
 			if (CanPromotePlayer(player))
 			{
 				switch (text)
 				{
 					case "join the Defenders of Albion":
-						
 						player.Out.SendMessage(Name + " says, \"Very well. Choose a weapon, and you shall become one of us. Which would you have, [slashing], [crushing], [thrusting] or [polearms]?\"",eChatType.CT_Say,eChatLoc.CL_PopupWindow);
-						
 						break;
 					case "slashing":
-						
 						PromotePlayer(player, (int)eCharacterClass.Armsman, "Here is your Sword of the Initiate. Welcome to the Defenders of Albion.", null);
-						player.ReceiveItem(this,WEAPON_ID1);
-						
+						player.ReceiveItem(this,WeaponSlash);
 						break;
 					case "crushing":
-						
 						PromotePlayer(player, (int)eCharacterClass.Armsman, "Here is your Mace of the Initiate. Welcome to the Defenders of Albion.", null);
-						player.ReceiveItem(this,WEAPON_ID2);
+						player.ReceiveItem(this,WeaponCrush);
 						
 						break;
 					case "thrusting":
-						
 						PromotePlayer(player, (int)eCharacterClass.Armsman, "Here is your Rapier of the Initiate. Welcome to the Defenders of Albion.", null);
-						player.ReceiveItem(this,WEAPON_ID3);
-						
+						player.ReceiveItem(this,WeaponThrust);
 						break;
 					case "polearms":
-						
 						PromotePlayer(player, (int)eCharacterClass.Armsman, "Here is your Pike of the Initiate. Welcome to the Defenders of Albion.", null);
-						player.ReceiveItem(this,WEAPON_ID4);
-						
+						player.ReceiveItem(this,WeaponPole);
 						break;
 				}
 			}
