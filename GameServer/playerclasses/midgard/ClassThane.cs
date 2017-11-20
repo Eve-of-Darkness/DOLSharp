@@ -23,30 +23,30 @@ namespace DOL.GS.PlayerClass
     /// Midgard Thane Class
     /// </summary>
     [CharacterClass((int)eCharacterClass.Thane, "Thane", "Viking")]
-	public class ClassThane : ClassViking
-	{
+    public class ClassThane : ClassViking
+    {
 
-		public ClassThane()
-			: base()
-		{
-			m_profession = "PlayerClass.Profession.HouseofThor";
-			m_specializationMultiplier = 20;
-			m_primaryStat = eStat.STR;
-			m_secondaryStat = eStat.PIE;
-			m_tertiaryStat = eStat.CON;
-			m_manaStat = eStat.PIE;
-			m_wsbase = 360;
-			m_baseHP = 720;
-		}
+        public ClassThane()
+            : base()
+        {
+            m_profession = "PlayerClass.Profession.HouseofThor";
+            m_specializationMultiplier = 20;
+            m_primaryStat = eStat.STR;
+            m_secondaryStat = eStat.PIE;
+            m_tertiaryStat = eStat.CON;
+            m_manaStat = eStat.PIE;
+            m_wsbase = 360;
+            m_baseHP = 720;
+        }
 
-		public override eClassType ClassType
-		{
-			get { return eClassType.Hybrid; }
-		}
+        public override eClassType ClassType
+        {
+            get { return eClassType.Hybrid; }
+        }
 
-		public override bool HasAdvancedFromBaseClass()
-		{
-			return true;
-		}
-	}
+        public override bool HasAdvancedFromBaseClass()
+        {
+            return true;
+        }
+    }
 }

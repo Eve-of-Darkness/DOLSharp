@@ -23,7 +23,9 @@ namespace DOL.GS.Behaviour.Examples
         public static void ScriptLoaded(DOLEvent e, object sender, EventArgs args)
         {
             if (!ServerProperties.Properties.LOAD_EXAMPLES)
+            {
                 return;
+            }
 
             #region defineNPCs
 
@@ -36,7 +38,10 @@ namespace DOL.GS.Behaviour.Examples
                 SirQuait.Model = 40;
                 SirQuait.Name = "Sir Quait";
                 if (log.IsWarnEnabled)
-                    log.Warn("Could not find " + SirQuait.Name + ", creating ...");                
+                {
+                    log.Warn("Could not find " + SirQuait.Name + ", creating ...");
+                }
+
                 SirQuait.Realm = eRealm.Albion;
                 SirQuait.CurrentRegionID = 1;
                 SirQuait.Size = 50;
@@ -50,12 +55,11 @@ namespace DOL.GS.Behaviour.Examples
                 SirQuait.RespawnInterval = 0;
                 SirQuait.BodyType = 0;
 
-
                 StandardMobBrain brain = new StandardMobBrain();
                 brain.AggroLevel = 0;
                 brain.AggroRange = 0;
                 SirQuait.SetOwnBrain(brain);
-                
+
                 SirQuait.AddToWorld();
             }
             else

@@ -53,18 +53,26 @@ namespace DOL.GS.DatabaseUpdate
             foreach (ServerProperty property in properties)
             {
                 if (property.Key != "allowed_custom_language_keys" && property.Key != "use_new_language_system")
+                {
                     continue;
+                }
 
                 if (property.Key == "allowed_custom_language_keys")
+                {
                     aclkFound = true;
+                }
 
                 if (property.Key == "use_new_language_system")
+                {
                     unlsFound = true;
+                }
 
                 GameServer.Database.DeleteObject(property);
 
                 if (aclkFound && unlsFound)
+                {
                     break;
+                }
             }
 
             log.Info("ServerProperty table update complete!");

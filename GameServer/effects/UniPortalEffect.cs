@@ -26,13 +26,13 @@ namespace DOL.GS.Effects
     /// </summary>
     /// <author>Aredhel</author>
     public class UniPortalEffect : GameSpellEffect
-	{
-		/// <summary>
-		/// Create a new portal effect.
-		/// </summary>
-		public UniPortalEffect(ISpellHandler handler, int duration)
-			: base(handler, duration, 0)
-		{
-		}
-	}
+    {
+        /// <summary>
+        /// Create a new portal effect.
+        /// </summary>
+        public UniPortalEffect(ISpellHandler handler, int duration)
+            : base(handler, duration, 0)
+        {
+        }
+    }
 }

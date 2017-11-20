@@ -36,7 +36,7 @@ namespace DOL.GS.Commands
                     break;
             }
 
-            //The first backpack.
+            // The first backpack.
             int FromSlot = 40;
 
             if (int.TryParse(args[2], out FromSlot))
@@ -50,8 +50,8 @@ namespace DOL.GS.Commands
                 DisplaySyntax(client);
                 return;
             }
-
         }
+
         public void SwitchItem(GamePlayer player, eInventorySlot ToSlot, eInventorySlot FromSlot)
         {
             if (player.Inventory.GetItem(FromSlot) != null)

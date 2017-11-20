@@ -25,15 +25,16 @@ namespace DOL.GS.Scripts
     {
         private DesmonaCoin() { }
 
-
         public DesmonaCoin(ItemTemplate template)
             : base(template)
         {
         }
+
         public DesmonaCoin(ItemUnique template)
             : base(template)
         {
         }
+
         public DesmonaCoin(InventoryItem item)
             : base(item)
         {
@@ -43,19 +44,25 @@ namespace DOL.GS.Scripts
         {
             base.Delve(delve, player);
         }
+
         public override void OnReceive(GamePlayer player)
         {
             base.OnReceive(player);
 
             foreach (GameNPC npc in player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
                 npc.BroadcastUpdate();
+            }
         }
+
         public override void OnLose(GamePlayer player)
         {
             base.OnLose(player);
 
             foreach (GameNPC npc in player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
                 npc.BroadcastUpdate();
+            }
         }
     }
 }

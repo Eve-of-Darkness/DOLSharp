@@ -26,209 +26,213 @@ namespace DOL.GS
     /// Enum of all crafting skill (related to client file)
     /// </summary>
     public enum eCraftingSkill : int
-	{
-		NoCrafting = 0,
-		WeaponCrafting = 1,
-		ArmorCrafting = 2,
-		SiegeCrafting = 3,
-		Alchemy = 4,
-		MetalWorking = 6,
-		LeatherCrafting = 7,
-		ClothWorking = 8,
-		GemCutting = 9,
-		HerbalCrafting = 10,
-		Tailoring = 11,
-		Fletching = 12,
-		SpellCrafting = 13,
-		WoodWorking = 14,
-		BasicCrafting = 15,
-		_Last = 15,
-	}
+    {
+        NoCrafting = 0,
+        WeaponCrafting = 1,
+        ArmorCrafting = 2,
+        SiegeCrafting = 3,
+        Alchemy = 4,
+        MetalWorking = 6,
+        LeatherCrafting = 7,
+        ClothWorking = 8,
+        GemCutting = 9,
+        HerbalCrafting = 10,
+        Tailoring = 11,
+        Fletching = 12,
+        SpellCrafting = 13,
+        WoodWorking = 14,
+        BasicCrafting = 15,
+        _Last = 15,
+    }
 
-	/// <summary>
-	/// Description résumée de CraftingMgr.
-	/// </summary>
-	public class CraftingMgr
-	{
-		/// <summary>
-		/// Defines a logger for this class.
-		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    /// <summary>
+    /// Description résumée de CraftingMgr.
+    /// </summary>
+    public class CraftingMgr
+    {
+        /// <summary>
+        /// Defines a logger for this class.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-		/// <summary>
-		/// Hold all crafting skill
-		/// </summary>
-		protected static AbstractCraftingSkill[] m_craftingskills = new AbstractCraftingSkill[(int)eCraftingSkill._Last];
+        /// <summary>
+        /// Hold all crafting skill
+        /// </summary>
+        protected static AbstractCraftingSkill[] m_craftingskills = new AbstractCraftingSkill[(int)eCraftingSkill._Last];
 
-		/// <summary>
-		/// get a crafting skill by the enum index
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <returns></returns>
-		public static AbstractCraftingSkill getSkillbyEnum(eCraftingSkill skill)
-		{
-			if (skill == eCraftingSkill.NoCrafting) return null;
-			return m_craftingskills[(int)skill - 1] as AbstractCraftingSkill;
-		}
+        /// <summary>
+        /// get a crafting skill by the enum index
+        /// </summary>
+        /// <param name="skill"></param>
+        /// <returns></returns>
+        public static AbstractCraftingSkill getSkillbyEnum(eCraftingSkill skill)
+        {
+            if (skill == eCraftingSkill.NoCrafting)
+            {
+                return null;
+            }
 
-		/// <summary>
-		/// Initialize the crafting system
-		/// </summary>
-		/// <returns></returns>
-		public static bool Init()
-		{
-			// skill
-			m_craftingskills[(int)eCraftingSkill.ArmorCrafting - 1] = new ArmorCrafting();
-			m_craftingskills[(int)eCraftingSkill.Fletching - 1] = new Fletching();
-			m_craftingskills[(int)eCraftingSkill.SiegeCrafting - 1] = new SiegeCrafting();
-			m_craftingskills[(int)eCraftingSkill.Tailoring - 1] = new Tailoring();
-			m_craftingskills[(int)eCraftingSkill.WeaponCrafting - 1] = new WeaponCrafting();
+            return m_craftingskills[(int)skill - 1] as AbstractCraftingSkill;
+        }
 
-			m_craftingskills[(int)eCraftingSkill.ClothWorking - 1] = new ClothWorking();
-			m_craftingskills[(int)eCraftingSkill.GemCutting - 1] = new GemCutting();
-			m_craftingskills[(int)eCraftingSkill.HerbalCrafting - 1] = new HerbalCrafting();
-			m_craftingskills[(int)eCraftingSkill.LeatherCrafting - 1] = new LeatherCrafting();
-			m_craftingskills[(int)eCraftingSkill.MetalWorking - 1] = new MetalWorking();
-			m_craftingskills[(int)eCraftingSkill.WoodWorking - 1] = new WoodWorking();
-			m_craftingskills[(int)eCraftingSkill.BasicCrafting - 1] = new BasicCrafting();
+        /// <summary>
+        /// Initialize the crafting system
+        /// </summary>
+        /// <returns></returns>
+        public static bool Init()
+        {
+            // skill
+            m_craftingskills[(int)eCraftingSkill.ArmorCrafting - 1] = new ArmorCrafting();
+            m_craftingskills[(int)eCraftingSkill.Fletching - 1] = new Fletching();
+            m_craftingskills[(int)eCraftingSkill.SiegeCrafting - 1] = new SiegeCrafting();
+            m_craftingskills[(int)eCraftingSkill.Tailoring - 1] = new Tailoring();
+            m_craftingskills[(int)eCraftingSkill.WeaponCrafting - 1] = new WeaponCrafting();
 
-			//Advanced skill
-			m_craftingskills[(int)eCraftingSkill.Alchemy - 1] = new Alchemy();
-			m_craftingskills[(int)eCraftingSkill.SpellCrafting - 1] = new SpellCrafting();
+            m_craftingskills[(int)eCraftingSkill.ClothWorking - 1] = new ClothWorking();
+            m_craftingskills[(int)eCraftingSkill.GemCutting - 1] = new GemCutting();
+            m_craftingskills[(int)eCraftingSkill.HerbalCrafting - 1] = new HerbalCrafting();
+            m_craftingskills[(int)eCraftingSkill.LeatherCrafting - 1] = new LeatherCrafting();
+            m_craftingskills[(int)eCraftingSkill.MetalWorking - 1] = new MetalWorking();
+            m_craftingskills[(int)eCraftingSkill.WoodWorking - 1] = new WoodWorking();
+            m_craftingskills[(int)eCraftingSkill.BasicCrafting - 1] = new BasicCrafting();
 
-			return true;
-		}
+            // Advanced skill
+            m_craftingskills[(int)eCraftingSkill.Alchemy - 1] = new Alchemy();
+            m_craftingskills[(int)eCraftingSkill.SpellCrafting - 1] = new SpellCrafting();
 
-		#region Global craft functions
+            return true;
+        }
 
-		/// <summary>
-		/// Return the crafting skill needed to work on the item
-		/// </summary>
-		public static eCraftingSkill GetSecondaryCraftingSkillToWorkOnItem(InventoryItem item)
-		{
-			switch (item.Object_Type)
-			{
-				case (int)eObjectType.Cloth:
-					return eCraftingSkill.ClothWorking;
+        #region Global craft functions
 
-				case (int)eObjectType.Leather:
-				case (int)eObjectType.Studded:
-					return eCraftingSkill.LeatherCrafting;
+        /// <summary>
+        /// Return the crafting skill needed to work on the item
+        /// </summary>
+        public static eCraftingSkill GetSecondaryCraftingSkillToWorkOnItem(InventoryItem item)
+        {
+            switch (item.Object_Type)
+            {
+                case (int)eObjectType.Cloth:
+                    return eCraftingSkill.ClothWorking;
 
-				// all weapon
-				case (int)eObjectType.Axe:
-				case (int)eObjectType.Blades:
-				case (int)eObjectType.Blunt:
-				case (int)eObjectType.CelticSpear:
-				case (int)eObjectType.CrushingWeapon:
-				case (int)eObjectType.Flexible:
-				case (int)eObjectType.Hammer:
-				case (int)eObjectType.HandToHand:
-				case (int)eObjectType.LargeWeapons:
-				case (int)eObjectType.LeftAxe:
-				case (int)eObjectType.Piercing:
-				case (int)eObjectType.PolearmWeapon:
-				case (int)eObjectType.Scythe:
-				case (int)eObjectType.Shield:
-				case (int)eObjectType.SlashingWeapon:
-				case (int)eObjectType.Spear:
-				case (int)eObjectType.Sword:
-				case (int)eObjectType.ThrustWeapon:
-				case (int)eObjectType.TwoHandedWeapon:
-				// all other armor
-				case (int)eObjectType.Chain:
-				case (int)eObjectType.Plate:
-				case (int)eObjectType.Reinforced:
-				case (int)eObjectType.Scale:
-					return eCraftingSkill.MetalWorking;
+                case (int)eObjectType.Leather:
+                case (int)eObjectType.Studded:
+                    return eCraftingSkill.LeatherCrafting;
 
-				case (int)eObjectType.CompositeBow:
-				case (int)eObjectType.Crossbow:
-				case (int)eObjectType.Fired:
-				case (int)eObjectType.Instrument:
-				case (int)eObjectType.Longbow:
-				case (int)eObjectType.RecurvedBow:
-				case (int)eObjectType.Staff:
-					return eCraftingSkill.WoodWorking;
+                // all weapon
+                case (int)eObjectType.Axe:
+                case (int)eObjectType.Blades:
+                case (int)eObjectType.Blunt:
+                case (int)eObjectType.CelticSpear:
+                case (int)eObjectType.CrushingWeapon:
+                case (int)eObjectType.Flexible:
+                case (int)eObjectType.Hammer:
+                case (int)eObjectType.HandToHand:
+                case (int)eObjectType.LargeWeapons:
+                case (int)eObjectType.LeftAxe:
+                case (int)eObjectType.Piercing:
+                case (int)eObjectType.PolearmWeapon:
+                case (int)eObjectType.Scythe:
+                case (int)eObjectType.Shield:
+                case (int)eObjectType.SlashingWeapon:
+                case (int)eObjectType.Spear:
+                case (int)eObjectType.Sword:
+                case (int)eObjectType.ThrustWeapon:
+                case (int)eObjectType.TwoHandedWeapon:
+                // all other armor
+                case (int)eObjectType.Chain:
+                case (int)eObjectType.Plate:
+                case (int)eObjectType.Reinforced:
+                case (int)eObjectType.Scale:
+                    return eCraftingSkill.MetalWorking;
 
-				default:
-					return eCraftingSkill.NoCrafting;
-			}
-		}
+                case (int)eObjectType.CompositeBow:
+                case (int)eObjectType.Crossbow:
+                case (int)eObjectType.Fired:
+                case (int)eObjectType.Instrument:
+                case (int)eObjectType.Longbow:
+                case (int)eObjectType.RecurvedBow:
+                case (int)eObjectType.Staff:
+                    return eCraftingSkill.WoodWorking;
 
-		/// <summary>
-		/// Return the approximative craft level of the item
-		/// </summary>
-		public static int GetItemCraftLevel(InventoryItem item)
-		{
-			switch (item.Object_Type)
-			{
-				case (int)eObjectType.Cloth:
-				case (int)eObjectType.Leather:
-				case (int)eObjectType.Studded:
-				case (int)eObjectType.Chain:
-				case (int)eObjectType.Plate:
-				case (int)eObjectType.Reinforced:
-				case (int)eObjectType.Scale:
-					{
-						int baseLevel = 15 + item.Level * 20; // gloves
-						switch (item.Item_Type)
-						{
-							case (int)eInventorySlot.HeadArmor: // head
-								return baseLevel + 15;
+                default:
+                    return eCraftingSkill.NoCrafting;
+            }
+        }
 
-							case (int)eInventorySlot.FeetArmor: // feet
-								return baseLevel + 30;
+        /// <summary>
+        /// Return the approximative craft level of the item
+        /// </summary>
+        public static int GetItemCraftLevel(InventoryItem item)
+        {
+            switch (item.Object_Type)
+            {
+                case (int)eObjectType.Cloth:
+                case (int)eObjectType.Leather:
+                case (int)eObjectType.Studded:
+                case (int)eObjectType.Chain:
+                case (int)eObjectType.Plate:
+                case (int)eObjectType.Reinforced:
+                case (int)eObjectType.Scale:
+                    {
+                        int baseLevel = 15 + item.Level * 20; // gloves
+                        switch (item.Item_Type)
+                        {
+                            case (int)eInventorySlot.HeadArmor: // head
+                                return baseLevel + 15;
 
-							case (int)eInventorySlot.LegsArmor: // legs
-								return baseLevel + 50;
+                            case (int)eInventorySlot.FeetArmor: // feet
+                                return baseLevel + 30;
 
-							case (int)eInventorySlot.ArmsArmor: // arms
-								return baseLevel + 65;
+                            case (int)eInventorySlot.LegsArmor: // legs
+                                return baseLevel + 50;
 
-							case (int)eInventorySlot.TorsoArmor: // torso
-								return baseLevel + 80;
+                            case (int)eInventorySlot.ArmsArmor: // arms
+                                return baseLevel + 65;
 
-							default:
-								return baseLevel;
-						}
-					}
+                            case (int)eInventorySlot.TorsoArmor: // torso
+                                return baseLevel + 80;
 
-				case (int)eObjectType.Axe:
-				case (int)eObjectType.Blades:
-				case (int)eObjectType.Blunt:
-				case (int)eObjectType.CelticSpear:
-				case (int)eObjectType.CrushingWeapon:
-				case (int)eObjectType.Flexible:
-				case (int)eObjectType.Hammer:
-				case (int)eObjectType.HandToHand:
-				case (int)eObjectType.LargeWeapons:
-				case (int)eObjectType.LeftAxe:
-				case (int)eObjectType.Piercing:
-				case (int)eObjectType.PolearmWeapon:
-				case (int)eObjectType.Scythe:
-				case (int)eObjectType.Shield:
-				case (int)eObjectType.SlashingWeapon:
-				case (int)eObjectType.Spear:
-				case (int)eObjectType.Sword:
-				case (int)eObjectType.ThrustWeapon:
-				case (int)eObjectType.TwoHandedWeapon:
+                            default:
+                                return baseLevel;
+                        }
+                    }
 
-				case (int)eObjectType.CompositeBow:
-				case (int)eObjectType.Crossbow:
-				case (int)eObjectType.Fired:
-				case (int)eObjectType.Instrument:
-				case (int)eObjectType.Longbow:
-				case (int)eObjectType.RecurvedBow:
-				case (int)eObjectType.Staff:
-					return 15 + (item.Level - 1) * 20;
+                case (int)eObjectType.Axe:
+                case (int)eObjectType.Blades:
+                case (int)eObjectType.Blunt:
+                case (int)eObjectType.CelticSpear:
+                case (int)eObjectType.CrushingWeapon:
+                case (int)eObjectType.Flexible:
+                case (int)eObjectType.Hammer:
+                case (int)eObjectType.HandToHand:
+                case (int)eObjectType.LargeWeapons:
+                case (int)eObjectType.LeftAxe:
+                case (int)eObjectType.Piercing:
+                case (int)eObjectType.PolearmWeapon:
+                case (int)eObjectType.Scythe:
+                case (int)eObjectType.Shield:
+                case (int)eObjectType.SlashingWeapon:
+                case (int)eObjectType.Spear:
+                case (int)eObjectType.Sword:
+                case (int)eObjectType.ThrustWeapon:
+                case (int)eObjectType.TwoHandedWeapon:
 
-				default:
-					return 0;
-			}
-		}
+                case (int)eObjectType.CompositeBow:
+                case (int)eObjectType.Crossbow:
+                case (int)eObjectType.Fired:
+                case (int)eObjectType.Instrument:
+                case (int)eObjectType.Longbow:
+                case (int)eObjectType.RecurvedBow:
+                case (int)eObjectType.Staff:
+                    return 15 + (item.Level - 1) * 20;
 
-		#endregion
+                default:
+                    return 0;
+            }
+        }
 
-	}
+        #endregion
+
+    }
 }

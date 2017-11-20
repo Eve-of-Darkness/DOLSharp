@@ -312,7 +312,6 @@ namespace DOL.GS.Spells
                 return;
             }
 
-
             if (player.CharacterClass.ID == (int)eCharacterClass.Warrior)
             {
                 m_SunCrush = GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Crush") ?? CrushM; //
@@ -465,7 +464,7 @@ namespace DOL.GS.Spells
 
             else
             {
-                player.Out.SendMessage("" + player.CharacterClass.Name + "'s cant Summon Light!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(string.Empty + player.CharacterClass.Name + "'s cant Summon Light!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
         }
@@ -479,7 +478,11 @@ namespace DOL.GS.Spells
                 m_SunCrush = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Crush");
                 if (m_SunCrush == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Crush, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Crush, loading it ...");
+                    }
+
                     m_SunCrush = new ItemTemplate();
                     m_SunCrush.Id_nb = "Sun_Crush";
                     m_SunCrush.Name = "Sun Mace";
@@ -513,8 +516,8 @@ namespace DOL.GS.Spells
                     m_SunCrush.MaxCount = 1;
                     m_SunCrush.PackSize = 1;
                     m_SunCrush.ProcSpellID = 65513;
-
                 }
+
                 return m_SunCrush;
             }
         }
@@ -526,7 +529,11 @@ namespace DOL.GS.Spells
                 m_SunSlash = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Slash");
                 if (m_SunSlash == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Slash, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Slash, loading it ...");
+                    }
+
                     m_SunSlash = new ItemTemplate();
                     m_SunSlash.Id_nb = "Sun_Slash";
                     m_SunSlash.Name = "Sun Sword";
@@ -560,8 +567,8 @@ namespace DOL.GS.Spells
                     m_SunSlash.MaxCount = 1;
                     m_SunSlash.PackSize = 1;
                     m_SunSlash.ProcSpellID = 65513;
-
                 }
+
                 return m_SunSlash;
             }
         }
@@ -573,7 +580,11 @@ namespace DOL.GS.Spells
                 m_SunThrust = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Thrust");
                 if (m_SunThrust == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Thrust, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Thrust, loading it ...");
+                    }
+
                     m_SunThrust = new ItemTemplate();
                     m_SunThrust.Id_nb = "Sun_Thrust";
                     m_SunThrust.Name = "Sun Sword";
@@ -607,8 +618,8 @@ namespace DOL.GS.Spells
                     m_SunThrust.MaxCount = 1;
                     m_SunThrust.PackSize = 1;
                     m_SunThrust.ProcSpellID = 65513;
-
                 }
+
                 return m_SunThrust;
             }
         }
@@ -620,7 +631,11 @@ namespace DOL.GS.Spells
                 m_SunFlexScytheClaw = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Flex");
                 if (m_SunFlexScytheClaw == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Flex, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Flex, loading it ...");
+                    }
+
                     m_SunFlexScytheClaw = new ItemTemplate();
                     m_SunFlexScytheClaw.Id_nb = "Sun_Flex";
                     m_SunFlexScytheClaw.Name = "Sun Spiked Flail";
@@ -654,8 +669,8 @@ namespace DOL.GS.Spells
                     m_SunFlexScytheClaw.MaxCount = 1;
                     m_SunFlexScytheClaw.PackSize = 1;
                     m_SunFlexScytheClaw.ProcSpellID = 65513;
-
                 }
+
                 return m_SunFlexScytheClaw;
             }
         }
@@ -667,7 +682,11 @@ namespace DOL.GS.Spells
                 m_SunPolearmSpear = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Polearm");
                 if (m_SunPolearmSpear == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Polearm, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Polearm, loading it ...");
+                    }
+
                     m_SunPolearmSpear = new ItemTemplate();
                     m_SunPolearmSpear.Id_nb = "Sun_Polearm";
                     m_SunPolearmSpear.Name = "Sun Glaive";
@@ -701,8 +720,8 @@ namespace DOL.GS.Spells
                     m_SunPolearmSpear.MaxCount = 1;
                     m_SunPolearmSpear.PackSize = 1;
                     m_SunPolearmSpear.ProcSpellID = 65513;
-
                 }
+
                 return m_SunPolearmSpear;
             }
         }
@@ -714,7 +733,11 @@ namespace DOL.GS.Spells
                 m_SunTwoHanded = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_TwoHanded");
                 if (m_SunTwoHanded == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_TwoHanded, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_TwoHanded, loading it ...");
+                    }
+
                     m_SunTwoHanded = new ItemTemplate();
                     m_SunTwoHanded.Id_nb = "Sun_TwoHanded";
                     m_SunTwoHanded.Name = "Sun Twohanded Sword";
@@ -748,8 +771,8 @@ namespace DOL.GS.Spells
                     m_SunTwoHanded.MaxCount = 1;
                     m_SunTwoHanded.PackSize = 1;
                     m_SunTwoHanded.ProcSpellID = 65513;
-
                 }
+
                 return m_SunTwoHanded;
             }
         }
@@ -761,7 +784,11 @@ namespace DOL.GS.Spells
                 m_SunBow = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Bow");
                 if (m_SunBow == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Bow, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Bow, loading it ...");
+                    }
+
                     m_SunBow = new ItemTemplate();
                     m_SunBow.Id_nb = "Sun_Bow";
                     m_SunBow.Name = "Sun Bow";
@@ -795,8 +822,8 @@ namespace DOL.GS.Spells
                     m_SunBow.MaxCount = 1;
                     m_SunBow.PackSize = 1;
                     m_SunBow.ProcSpellID = 65513;
-
                 }
+
                 return m_SunBow;
             }
         }
@@ -808,7 +835,11 @@ namespace DOL.GS.Spells
                 m_SunStaff = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Staff");
                 if (m_SunStaff == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Staff, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Staff, loading it ...");
+                    }
+
                     m_SunStaff = new ItemTemplate();
                     m_SunStaff.Id_nb = "Sun_Staff";
                     m_SunStaff.Name = "Sun QuarterStaff";
@@ -842,8 +873,8 @@ namespace DOL.GS.Spells
                     m_SunStaff.MaxCount = 1;
                     m_SunStaff.PackSize = 1;
                     m_SunStaff.ProcSpellID = 65513;
-
                 }
+
                 return m_SunStaff;
             }
         }
@@ -855,7 +886,11 @@ namespace DOL.GS.Spells
                 m_SunMStaff = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_MStaff");
                 if (m_SunMStaff == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_MStaff, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_MStaff, loading it ...");
+                    }
+
                     m_SunMStaff = new ItemTemplate();
                     m_SunMStaff.Id_nb = "Sun_MStaff";
                     m_SunMStaff.Name = "Sun Maulers QuarterStaff";
@@ -889,8 +924,8 @@ namespace DOL.GS.Spells
                     m_SunMStaff.MaxCount = 1;
                     m_SunMStaff.PackSize = 1;
                     m_SunMStaff.ProcSpellID = 65513;
-
                 }
+
                 return m_SunMStaff;
             }
         }
@@ -902,7 +937,11 @@ namespace DOL.GS.Spells
                 m_SunMFist = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_MFist");
                 if (m_SunMFist == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_MFist, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_MFist, loading it ...");
+                    }
+
                     m_SunMFist = new ItemTemplate();
                     m_SunMFist.Id_nb = "Sun_MFist";
                     m_SunMFist.Name = "Sun MFist";
@@ -936,8 +975,8 @@ namespace DOL.GS.Spells
                     m_SunMFist.MaxCount = 1;
                     m_SunMFist.PackSize = 1;
                     m_SunMFist.ProcSpellID = 65513;
-
                 }
+
                 return m_SunMFist;
             }
         }
@@ -951,7 +990,11 @@ namespace DOL.GS.Spells
                 m_SunCrush = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Crush");
                 if (m_SunCrush == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Crush, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Crush, loading it ...");
+                    }
+
                     m_SunCrush = new ItemTemplate();
                     m_SunCrush.Id_nb = "Sun_Crush";
                     m_SunCrush.Name = "Sun Warhammer";
@@ -985,8 +1028,8 @@ namespace DOL.GS.Spells
                     m_SunCrush.MaxCount = 1;
                     m_SunCrush.PackSize = 1;
                     m_SunCrush.ProcSpellID = 65513;
-
                 }
+
                 return m_SunCrush;
             }
         }
@@ -998,7 +1041,11 @@ namespace DOL.GS.Spells
                 m_SunSlash = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Slash");
                 if (m_SunSlash == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Slash, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Slash, loading it ...");
+                    }
+
                     m_SunSlash = new ItemTemplate();
                     m_SunSlash.Id_nb = "Sun_Slash";
                     m_SunSlash.Name = "Sun Sword";
@@ -1032,8 +1079,8 @@ namespace DOL.GS.Spells
                     m_SunSlash.MaxCount = 1;
                     m_SunSlash.PackSize = 1;
                     m_SunSlash.ProcSpellID = 65513;
-
                 }
+
                 return m_SunSlash;
             }
         }
@@ -1045,7 +1092,11 @@ namespace DOL.GS.Spells
                 m_SunAxe = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Axe");
                 if (m_SunAxe == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Axe, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Axe, loading it ...");
+                    }
+
                     m_SunAxe = new ItemTemplate();
                     m_SunAxe.Id_nb = "Sun_Axe";
                     m_SunAxe.Name = "Sun Axe";
@@ -1079,8 +1130,8 @@ namespace DOL.GS.Spells
                     m_SunAxe.MaxCount = 1;
                     m_SunAxe.PackSize = 1;
                     m_SunAxe.ProcSpellID = 65513;
-
                 }
+
                 return m_SunAxe;
             }
         }
@@ -1092,7 +1143,11 @@ namespace DOL.GS.Spells
                 m_SunLeftAxe = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_LeftAxe");
                 if (m_SunLeftAxe == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_LeftAxe, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_LeftAxe, loading it ...");
+                    }
+
                     m_SunLeftAxe = new ItemTemplate();
                     m_SunLeftAxe.Id_nb = "Sun_LeftAxe";
                     m_SunLeftAxe.Name = "Sun LeftAxe";
@@ -1126,8 +1181,8 @@ namespace DOL.GS.Spells
                     m_SunLeftAxe.MaxCount = 1;
                     m_SunLeftAxe.PackSize = 1;
                     m_SunLeftAxe.ProcSpellID = 65513;
-
                 }
+
                 return m_SunLeftAxe;
             }
         }
@@ -1139,7 +1194,11 @@ namespace DOL.GS.Spells
                 m_SunFlexScytheClaw = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Claw");
                 if (m_SunFlexScytheClaw == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Claw, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Claw, loading it ...");
+                    }
+
                     m_SunFlexScytheClaw = new ItemTemplate();
                     m_SunFlexScytheClaw.Id_nb = "Sun_Claw";
                     m_SunFlexScytheClaw.Name = "Sun Claw";
@@ -1173,8 +1232,8 @@ namespace DOL.GS.Spells
                     m_SunFlexScytheClaw.MaxCount = 1;
                     m_SunFlexScytheClaw.PackSize = 1;
                     m_SunFlexScytheClaw.ProcSpellID = 65513;
-
                 }
+
                 return m_SunFlexScytheClaw;
             }
         }
@@ -1186,7 +1245,11 @@ namespace DOL.GS.Spells
                 m_SunPolearmSpear = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Spear");
                 if (m_SunPolearmSpear == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Spear, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Spear, loading it ...");
+                    }
+
                     m_SunPolearmSpear = new ItemTemplate();
                     m_SunPolearmSpear.Id_nb = "Sun_Spear";
                     m_SunPolearmSpear.Name = "Sun Spear";
@@ -1220,8 +1283,8 @@ namespace DOL.GS.Spells
                     m_SunPolearmSpear.MaxCount = 1;
                     m_SunPolearmSpear.PackSize = 1;
                     m_SunPolearmSpear.ProcSpellID = 65513;
-
                 }
+
                 return m_SunPolearmSpear;
             }
         }
@@ -1233,7 +1296,11 @@ namespace DOL.GS.Spells
                 m_SunTwoHanded = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_TwoHanded");
                 if (m_SunTwoHanded == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_TwoHanded, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_TwoHanded, loading it ...");
+                    }
+
                     m_SunTwoHanded = new ItemTemplate();
                     m_SunTwoHanded.Id_nb = "Sun_TwoHanded";
                     m_SunTwoHanded.Name = "Sun Greater Sword";
@@ -1267,8 +1334,8 @@ namespace DOL.GS.Spells
                     m_SunTwoHanded.MaxCount = 1;
                     m_SunTwoHanded.PackSize = 1;
                     m_SunTwoHanded.ProcSpellID = 65513;
-
                 }
+
                 return m_SunTwoHanded;
             }
         }
@@ -1280,7 +1347,11 @@ namespace DOL.GS.Spells
                 m_SunBow = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Bow");
                 if (m_SunBow == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Bow, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Bow, loading it ...");
+                    }
+
                     m_SunBow = new ItemTemplate();
                     m_SunBow.Id_nb = "Sun_Bow";
                     m_SunBow.Name = "Sun Bow";
@@ -1314,8 +1385,8 @@ namespace DOL.GS.Spells
                     m_SunBow.MaxCount = 1;
                     m_SunBow.PackSize = 1;
                     m_SunBow.ProcSpellID = 65513;
-
                 }
+
                 return m_SunBow;
             }
         }
@@ -1327,7 +1398,11 @@ namespace DOL.GS.Spells
                 m_Sun2HCrush = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_2HCrush");
                 if (m_Sun2HCrush == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_2HCrush, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_2HCrush, loading it ...");
+                    }
+
                     m_Sun2HCrush = new ItemTemplate();
                     m_Sun2HCrush.Id_nb = "Sun_2HCrush";
                     m_Sun2HCrush.Name = "Sun Greater Warhammer";
@@ -1361,8 +1436,8 @@ namespace DOL.GS.Spells
                     m_Sun2HCrush.MaxCount = 1;
                     m_Sun2HCrush.PackSize = 1;
                     m_Sun2HCrush.ProcSpellID = 65513;
-
                 }
+
                 return m_Sun2HCrush;
             }
         }
@@ -1374,7 +1449,11 @@ namespace DOL.GS.Spells
                 m_Sun2HAxe = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_2HAxe");
                 if (m_Sun2HAxe == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_2HAxe, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_2HAxe, loading it ...");
+                    }
+
                     m_Sun2HAxe = new ItemTemplate();
                     m_Sun2HAxe.Id_nb = "Sun_2HAxe";
                     m_Sun2HAxe.Name = "Sun Greater Axe";
@@ -1408,8 +1487,8 @@ namespace DOL.GS.Spells
                     m_Sun2HAxe.MaxCount = 1;
                     m_Sun2HAxe.PackSize = 1;
                     m_Sun2HAxe.ProcSpellID = 65513;
-
                 }
+
                 return m_Sun2HAxe;
             }
         }
@@ -1424,7 +1503,11 @@ namespace DOL.GS.Spells
                 m_SunCrush = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Crush");
                 if (m_SunCrush == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Crush, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Crush, loading it ...");
+                    }
+
                     m_SunCrush = new ItemTemplate();
                     m_SunCrush.Id_nb = "Sun_Crush";
                     m_SunCrush.Name = "Sun Hammer";
@@ -1458,8 +1541,8 @@ namespace DOL.GS.Spells
                     m_SunCrush.MaxCount = 1;
                     m_SunCrush.PackSize = 1;
                     m_SunCrush.ProcSpellID = 65513;
-
                 }
+
                 return m_SunCrush;
             }
         }
@@ -1471,7 +1554,11 @@ namespace DOL.GS.Spells
                 m_SunSlash = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Slash");
                 if (m_SunSlash == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Slash, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Slash, loading it ...");
+                    }
+
                     m_SunSlash = new ItemTemplate();
                     m_SunSlash.Id_nb = "Sun_Slash";
                     m_SunSlash.Name = "Sun Blade";
@@ -1505,8 +1592,8 @@ namespace DOL.GS.Spells
                     m_SunSlash.MaxCount = 1;
                     m_SunSlash.PackSize = 1;
                     m_SunSlash.ProcSpellID = 65513;
-
                 }
+
                 return m_SunSlash;
             }
         }
@@ -1518,7 +1605,11 @@ namespace DOL.GS.Spells
                 m_SunThrust = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Thrust");
                 if (m_SunThrust == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Thrust, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Thrust, loading it ...");
+                    }
+
                     m_SunThrust = new ItemTemplate();
                     m_SunThrust.Id_nb = "Sun_Thrust";
                     m_SunThrust.Name = "Sun Sword";
@@ -1552,12 +1643,11 @@ namespace DOL.GS.Spells
                     m_SunThrust.MaxCount = 1;
                     m_SunThrust.PackSize = 1;
                     m_SunThrust.ProcSpellID = 65513;
-
                 }
+
                 return m_SunThrust;
             }
         }
-
 
         private ItemTemplate Scythe
         {
@@ -1566,7 +1656,11 @@ namespace DOL.GS.Spells
                 m_SunFlexScytheClaw = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Scythe");
                 if (m_SunFlexScytheClaw == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Scythe, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Scythe, loading it ...");
+                    }
+
                     m_SunFlexScytheClaw = new ItemTemplate();
                     m_SunFlexScytheClaw.Id_nb = "Sun_Scythe";
                     m_SunFlexScytheClaw.Name = "Sun Scythe";
@@ -1600,8 +1694,8 @@ namespace DOL.GS.Spells
                     m_SunFlexScytheClaw.MaxCount = 1;
                     m_SunFlexScytheClaw.PackSize = 1;
                     m_SunFlexScytheClaw.ProcSpellID = 65513;
-
                 }
+
                 return m_SunFlexScytheClaw;
             }
         }
@@ -1613,7 +1707,11 @@ namespace DOL.GS.Spells
                 m_SunPolearmSpear = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Spear");
                 if (m_SunPolearmSpear == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Spear, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Spear, loading it ...");
+                    }
+
                     m_SunPolearmSpear = new ItemTemplate();
                     m_SunPolearmSpear.Id_nb = "Sun_Spear";
                     m_SunPolearmSpear.Name = "Sun Spear";
@@ -1647,8 +1745,8 @@ namespace DOL.GS.Spells
                     m_SunPolearmSpear.MaxCount = 1;
                     m_SunPolearmSpear.PackSize = 1;
                     m_SunPolearmSpear.ProcSpellID = 65513;
-
                 }
+
                 return m_SunPolearmSpear;
             }
         }
@@ -1660,7 +1758,11 @@ namespace DOL.GS.Spells
                 m_SunTwoHanded = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_TwoHanded");
                 if (m_SunTwoHanded == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_TwoHanded, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_TwoHanded, loading it ...");
+                    }
+
                     m_SunTwoHanded = new ItemTemplate();
                     m_SunTwoHanded.Id_nb = "Sun_TwoHanded";
                     m_SunTwoHanded.Name = "Sun Large Weapon";
@@ -1694,8 +1796,8 @@ namespace DOL.GS.Spells
                     m_SunTwoHanded.MaxCount = 1;
                     m_SunTwoHanded.PackSize = 1;
                     m_SunTwoHanded.ProcSpellID = 65513;
-
                 }
+
                 return m_SunTwoHanded;
             }
         }
@@ -1707,7 +1809,11 @@ namespace DOL.GS.Spells
                 m_SunBow = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Bow");
                 if (m_SunBow == null)
                 {
-                    if (log.IsWarnEnabled) log.Warn("Could not find Sun_Bow, loading it ...");
+                    if (log.IsWarnEnabled)
+                    {
+                        log.Warn("Could not find Sun_Bow, loading it ...");
+                    }
+
                     m_SunBow = new ItemTemplate();
                     m_SunBow.Id_nb = "Sun_Bow";
                     m_SunBow.Name = "Sun Bow";
@@ -1741,14 +1847,13 @@ namespace DOL.GS.Spells
                     m_SunBow.MaxCount = 1;
                     m_SunBow.PackSize = 1;
                     m_SunBow.ProcSpellID = 65513;
-
                 }
+
                 return m_SunBow;
             }
         }
 
         #endregion Hib Weapons
-
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
@@ -1757,11 +1862,12 @@ namespace DOL.GS.Spells
             GameEventMgr.AddHandler(Caster, GamePlayerEvent.Quit, OnPlayerLeft);
         }
 
-
         private static void OnPlayerReleased(DOLEvent e, object sender, EventArgs arguments)
         {
             if (!(sender is GamePlayer))
+            {
                 return;
+            }
 
             GamePlayer player = sender as GamePlayer;
 
@@ -1774,70 +1880,109 @@ namespace DOL.GS.Spells
                     {
 
                         if (invItem.Id_nb.Equals("Sun_Crush"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_Slash"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_Thrust"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_Flex"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_TwoHanded"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_Polearm"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_Bow"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_Staff"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_MFist"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_MStaff"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_Axe"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_LeftAxe"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_Claw"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_2HCrush"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_2HAxe"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_MStaff"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_FlexScythe"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         if (invItem.Id_nb.Equals("Sun_Spear"))
+                        {
                             player.Inventory.RemoveItem(invItem);
+                        }
 
                         player.Out.SendMessage("The Power of Belt of Sun, has left you!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                 }
             }
+
             GameEventMgr.RemoveHandler(sender, GamePlayerEvent.Released, OnPlayerReleased);
         }
 
         private static void OnPlayerLeft(DOLEvent e, object sender, EventArgs arguments)
         {
             if (!(sender is GamePlayer))
+            {
                 return;
+            }
 
             GamePlayer player = sender as GamePlayer;
             lock (player.Inventory)
@@ -1847,61 +1992,97 @@ namespace DOL.GS.Spells
                 {
 
                     if (invItem.Id_nb.Equals("Sun_Crush"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_Slash"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_Thrust"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_Flex"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_TwoHanded"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_Polearm"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_Bow"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_Staff"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_MFist"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_MStaff"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_Axe"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_LeftAxe"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_Claw"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_2HCrush"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_2HAxe"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_MStaff"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_FlexScythe"))
+                    {
                         player.Inventory.RemoveItem(invItem);
+                    }
 
                     if (invItem.Id_nb.Equals("Sun_Spear"))
+                    {
                         player.Inventory.RemoveItem(invItem);
-
+                    }
                 }
             }
+
             GameEventMgr.RemoveHandler(sender, GamePlayerEvent.Quit, OnPlayerLeft);
         }
     }

@@ -23,28 +23,28 @@ namespace DOL.GS.PlayerClass
     /// Midgard Savage Class
     /// </summary>
     [CharacterClass((int)eCharacterClass.Savage, "Savage", "Viking")]
-	public class ClassSavage : ClassViking
-	{
+    public class ClassSavage : ClassViking
+    {
 
-		public ClassSavage()
-			: base()
-		{
-			m_profession = "PlayerClass.Profession.HouseofKelgor";
-			m_specializationMultiplier = 15;
-			m_primaryStat = eStat.DEX;
-			m_secondaryStat = eStat.QUI;
-			m_tertiaryStat = eStat.STR;
-			m_wsbase = 400;
-		}
+        public ClassSavage()
+            : base()
+        {
+            m_profession = "PlayerClass.Profession.HouseofKelgor";
+            m_specializationMultiplier = 15;
+            m_primaryStat = eStat.DEX;
+            m_secondaryStat = eStat.QUI;
+            m_tertiaryStat = eStat.STR;
+            m_wsbase = 400;
+        }
 
-		public override bool CanUseLefthandedWeapon
-		{
-			get { return true; }
-		}
+        public override bool CanUseLefthandedWeapon
+        {
+            get { return true; }
+        }
 
-		public override bool HasAdvancedFromBaseClass()
-		{
-			return true;
-		}
-	}
+        public override bool HasAdvancedFromBaseClass()
+        {
+            return true;
+        }
+    }
 }

@@ -17,7 +17,6 @@
  *
  */
 
-
 namespace DOL.Database
 {
     // data table attribute not set until door translations are supported.

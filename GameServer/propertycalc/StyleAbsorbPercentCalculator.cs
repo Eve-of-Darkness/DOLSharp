@@ -10,11 +10,11 @@ namespace DOL.GS.PropertyCalc
     /// BuffBonusMultCategory1 unused
     /// </summary>
     [PropertyCalculator(eProperty.StyleAbsorb)]
-	public class StyleAbsorbPercentCalculator : PropertyCalculator
-	{
-		public override int CalcValue(GameLiving living, eProperty property)
-		{
+    public class StyleAbsorbPercentCalculator : PropertyCalculator
+    {
+        public override int CalcValue(GameLiving living, eProperty property)
+        {
             return living.ItemBonus[(int)property] + living.BaseBuffBonusCategory[(int)property];
-		}
-	}
+        }
+    }
 }

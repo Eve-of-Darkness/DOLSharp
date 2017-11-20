@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -26,24 +26,24 @@ namespace DOL.GS.Effects
 {
     /// <summary>
     /// Minion Rescue
-    /// </summary> 
+    /// </summary>
     public class MinionRescueEffect : TimedEffect
     {
         // Parameters
-        private const int spiritCount = 8; 			// Max number of spirits to summon
-        private const byte spiritLevel = 50;			// Level of the spirit
-        private const int spiritModel = 908; 		// Model to use for spirit
-        private const int spiritSpeed = 350; 		// Max speed of the spirit
-        private const string spiritName = "Spirit";	// Name of spirit
-        private const int spellDuration = 4;		// Duration of stun in seconds
+        private const int spiritCount = 8;          // Max number of spirits to summon
+        private const byte spiritLevel = 50;            // Level of the spirit
+        private const int spiritModel = 908;        // Model to use for spirit
+        private const int spiritSpeed = 350;        // Max speed of the spirit
+        private const string spiritName = "Spirit"; // Name of spirit
+        private const int spellDuration = 4;        // Duration of stun in seconds
 
         // Objects
-        private GameNPC[] spirits;				// Array containing spirits
-        private RegionTimer[] spiritTimer;			// Array containing spirit timers
-        private Spell spiritSpell;			// The spell to cast
-        private SpellLine spiritSpellLine;	 	// The spell line
-        private ISpellHandler stun;					// The spell handler
-        private GamePlayer EffectOwner;			// Owner of the effect
+        private GameNPC[] spirits;              // Array containing spirits
+        private RegionTimer[] spiritTimer;          // Array containing spirit timers
+        private Spell spiritSpell;          // The spell to cast
+        private SpellLine spiritSpellLine;      // The spell line
+        private ISpellHandler stun;                 // The spell handler
+        private GamePlayer EffectOwner;         // Owner of the effect
 
         public MinionRescueEffect()
             : base(RealmAbilities.MinionRescueAbility.DURATION)
@@ -64,8 +64,8 @@ namespace DOL.GS.Effects
             tSpell.Duration = spellDuration;
             tSpell.Uninterruptible = true;
             tSpell.Type = "Stun";
-			tSpell.ResurrectMana=1;
-			tSpell.ResurrectHealth=1;
+            tSpell.ResurrectMana = 1;
+            tSpell.ResurrectHealth = 1;
             tSpell.Damage = 0;
             tSpell.DamageType = 0;
             tSpell.Value = 0;
@@ -86,7 +86,11 @@ namespace DOL.GS.Effects
                 int targetCount = 0;
                 foreach (GamePlayer targetPlayer in EffectOwner.GetPlayersInRadius((ushort)RealmAbilities.MinionRescueAbility.SpellRadius))
                 {
-                    if (targetCount == spiritCount) return;
+                    if (targetCount == spiritCount)
+                    {
+                        return;
+                    }
+
                     if (targetPlayer.IsAlive && GameServer.ServerRules.IsAllowedToAttack(EffectOwner, targetPlayer, true))
                     {
                         SummonSpirit(targetCount, targetPlayer);
@@ -119,7 +123,7 @@ namespace DOL.GS.Effects
             spirits[spiritId].Model = spiritModel;
             spirits[spiritId].CurrentSpeed = 0;
             spirits[spiritId].MaxSpeedBase = spiritSpeed;
-            spirits[spiritId].GuildName = "";
+            spirits[spiritId].GuildName = string.Empty;
             spirits[spiritId].Size = 50;
             spirits[spiritId].X = EffectOwner.X + Util.Random(20, 40) - Util.Random(20, 40);
             spirits[spiritId].Y = EffectOwner.Y + Util.Random(20, 40) - Util.Random(20, 40);
@@ -153,7 +157,7 @@ namespace DOL.GS.Effects
                 return 0;
             }
 
-            if ( targetPlayer.IsWithinRadius( spirit, 100 ) )
+            if (targetPlayer.IsWithinRadius(spirit, 100))
             {
                 ApplySpiritEffect(spirit, targetPlayer);
                 timer.Stop();
@@ -167,12 +171,17 @@ namespace DOL.GS.Effects
         // Stun target when spirit come in contact
         private void ApplySpiritEffect(GameLiving source, GameLiving target)
         {
-            if (stun != null) stun.StartSpell(target);
+            if (stun != null)
+            {
+                stun.StartSpell(target);
+            }
+
             source.Die(null);
             source.Delete();
         }
 
         public override string Name { get { return "Minion Rescue"; } }
+
         public override ushort Icon { get { return 3048; } }
 
         public override IList<string> DelveInfo

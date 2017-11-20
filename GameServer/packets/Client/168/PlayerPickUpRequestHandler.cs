@@ -21,30 +21,34 @@ using DOL.Language;
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PickUpRequest, "Handles Pick up object request", eClientStatus.PlayerInGame)]
-	public class PlayerPickUpRequestHandler : IPacketHandler
-	{
-		public void HandlePacket(GameClient client, GSPacketIn packet)
-		{
-			if (client.Player == null)
-				return;
-			uint X = packet.ReadInt();
-			uint Y = packet.ReadInt();
-			ushort id =(ushort) packet.ReadShort();
-			ushort obj=(ushort) packet.ReadShort();
+    public class PlayerPickUpRequestHandler : IPacketHandler
+    {
+        public void HandlePacket(GameClient client, GSPacketIn packet)
+        {
+            if (client.Player == null)
+            {
+                return;
+            }
 
-			GameObject target = client.Player.TargetObject;
-			if (target == null)
-			{
-				client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "PlayerPickUpRequestHandler.HandlePacket.Target"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-				return;
-			}
-			if (target.ObjectState != GameObject.eObjectState.Active)
-			{
-				client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "PlayerPickUpRequestHandler.HandlePacket.InvalidTarget"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-				return;
-			}
-			
-			client.Player.PickupObject(target, false);
-		}
-	}
+            uint X = packet.ReadInt();
+            uint Y = packet.ReadInt();
+            ushort id = (ushort)packet.ReadShort();
+            ushort obj = (ushort)packet.ReadShort();
+
+            GameObject target = client.Player.TargetObject;
+            if (target == null)
+            {
+                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "PlayerPickUpRequestHandler.HandlePacket.Target"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            if (target.ObjectState != GameObject.eObjectState.Active)
+            {
+                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "PlayerPickUpRequestHandler.HandlePacket.InvalidTarget"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            client.Player.PickupObject(target, false);
+        }
+    }
 }

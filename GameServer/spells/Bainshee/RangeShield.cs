@@ -8,24 +8,34 @@ namespace DOL.GS.Spells
     /// Summary description for RangeShield.
     /// </summary>
     [SpellHandler("RangeShield")]
-	public class RangeShield : BladeturnSpellHandler 
-	{
+    public class RangeShield : BladeturnSpellHandler
+    {
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
             GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
         }
+
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
             GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
             return base.OnEffectExpires(effect, noMessages);
         }
+
         protected virtual void OnAttacked(DOLEvent e, object sender, EventArgs arguments)
         {
             AttackedByEnemyEventArgs attackArgs = arguments as AttackedByEnemyEventArgs;
             GameLiving living = sender as GameLiving;
-            if (attackArgs == null) return;
-            if (living == null) return;
+            if (attackArgs == null)
+            {
+                return;
+            }
+
+            if (living == null)
+            {
+                return;
+            }
+
             double value = 0;
             switch (attackArgs.AttackData.AttackType)
             {
@@ -39,9 +49,11 @@ namespace DOL.GS.Spells
                         value = Spell.Value * .01;
                         attackArgs.AttackData.Damage *= (int)value;
                     }
+
                     break;
             }
         }
-		public RangeShield(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) {}
-	}
+
+        public RangeShield(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+    }
 }

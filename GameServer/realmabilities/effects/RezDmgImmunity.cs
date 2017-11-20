@@ -43,27 +43,34 @@ namespace DOL.GS.Effects
         private void OnAttacked(DOLEvent e, object sender, EventArgs args)
         {
             AttackedByEnemyEventArgs attackArgs = args as AttackedByEnemyEventArgs;
-            if (attackArgs == null) return;
+            if (attackArgs == null)
+            {
+                return;
+            }
+
             AttackData ad = null;
             ad = attackArgs.AttackData;
 
             int damageAbsorbed = (int)(ad.Damage + ad.CriticalDamage);
 
-            //They shouldn't take any damamge at all
-            //if (m_player.Health < (damageAbsorbed + (int)Math.Round((double)m_player.MaxHealth / 20))) m_player.Health += damageAbsorbed;
+            // They shouldn't take any damamge at all
+            // if (m_player.Health < (damageAbsorbed + (int)Math.Round((double)m_player.MaxHealth / 20))) m_player.Health += damageAbsorbed;
             m_player.Health += damageAbsorbed;
         }
 
         private void OnRemove(DOLEvent e, object sender, EventArgs args)
         {
-            //((GamePlayer)Owner).Out.SendMessage("Sputins Legacy grants you a damage immunity!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-
+            // ((GamePlayer)Owner).Out.SendMessage("Sputins Legacy grants you a damage immunity!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             Stop();
         }
 
         public override void Stop()
         {
-			if (m_player.EffectList.GetOfType<SputinsLegacyEffect>() != null) m_player.EffectList.Remove(this);
+            if (m_player.EffectList.GetOfType<SputinsLegacyEffect>() != null)
+            {
+                m_player.EffectList.Remove(this);
+            }
+
             GameEventMgr.RemoveHandler(m_player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
             GameEventMgr.RemoveHandler(m_player, GameLivingEvent.Dying, new DOLEventHandler(OnRemove));
             GameEventMgr.RemoveHandler(m_player, GamePlayerEvent.Quit, new DOLEventHandler(OnRemove));
@@ -71,14 +78,6 @@ namespace DOL.GS.Effects
             GameEventMgr.RemoveHandler(m_player, GamePlayerEvent.RegionChanged, new DOLEventHandler(OnRemove));
             base.Stop();
         }
-
-
-
-
-
-
-
-
 
         public override string Name { get { return "Resurrection Damage Immunity"; } }
 

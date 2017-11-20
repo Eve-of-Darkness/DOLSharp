@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -57,6 +57,7 @@ namespace DOL.GS.Effects
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
         }
+
         public override void Stop()
         {
             if (EffectOwner != null)
@@ -68,6 +69,7 @@ namespace DOL.GS.Effects
                 GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
                 GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
+
             base.Stop();
         }
 
@@ -83,7 +85,9 @@ namespace DOL.GS.Effects
 
             ShadowShroudEffect ShadowShroud = (ShadowShroudEffect)player.EffectList.GetOfType<ShadowShroudEffect>();
             if (ShadowShroud != null)
+            {
                 ShadowShroud.Cancel(false);
+            }
         }
 
         /// <summary>
@@ -95,18 +99,30 @@ namespace DOL.GS.Effects
         protected void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
             AttackedByEnemyEventArgs args = arguments as AttackedByEnemyEventArgs;
-            if (args == null) return;
-            if (args.AttackData == null) return;
-          
+            if (args == null)
+            {
+                return;
+            }
+
+            if (args.AttackData == null)
+            {
+                return;
+            }
+
             AttackData ad = args.AttackData;
             GameLiving living = sender as GameLiving;
-            if (living == null) return;
+            if (living == null)
+            {
+                return;
+            }
+
             double absorbPercent = ShadowShroudAbility.ABSPERCENT;
             int damageAbsorbed = (int)(0.01 * absorbPercent * (ad.Damage + ad.CriticalDamage));
             if (damageAbsorbed > 0)
             {
                 ad.Damage -= damageAbsorbed;
-                //TODO correct messages
+
+                // TODO correct messages
                 MessageToLiving(ad.Target, string.Format("Shadow Shroud Ability absorbs {0} damage!", damageAbsorbed), eChatType.CT_Spell);
                 MessageToLiving(ad.Attacker, string.Format("A barrier absorbs {0} damage of your attack!", damageAbsorbed), eChatType.CT_Spell);
             }
@@ -125,7 +141,9 @@ namespace DOL.GS.Effects
                 living.MessageToSelf(message, type);
             }
         }
+
         public override string Name { get { return "Shadow Shroud"; } }
+
         public override ushort Icon { get { return 1842; } }
 
         // Delve Info
@@ -139,5 +157,4 @@ namespace DOL.GS.Effects
             }
         }
     }
-
 }

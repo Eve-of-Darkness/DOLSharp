@@ -51,12 +51,10 @@ namespace DOL.GS
         /// </summary>
         public static readonly int MINIMUMSIZE = 256;
 
-
         /// <summary>
         /// This holds all objects inside this region. Their index = their id!
         /// </summary>
         protected GameObject[] m_objects;
-
 
         /// <summary>
         /// Object to lock when changing objects in the array
@@ -104,7 +102,7 @@ namespace DOL.GS
 
         /// <summary>
         /// Holds all the Areas inside this Region
-        /// 
+        ///
         /// ZoneID, AreaID, Area
         ///
         /// Areas can be registed to a reagion via AddArea
@@ -146,7 +144,7 @@ namespace DOL.GS
         /// The region time manager
         /// </summary>
         protected readonly GameTimer.TimeManager m_timeManager;
-        
+
         /// <summary>
         /// The Region Mob's Respawn Timer Collection
         /// </summary>
@@ -159,7 +157,7 @@ namespace DOL.GS
         public RegionData RegionData { get; protected set; }
 
         /// <summary>
-        /// Factory method to create regions.  Will create a region of data.ClassType, or default to Region if 
+        /// Factory method to create regions.  Will create a region of data.ClassType, or default to Region if
         /// an error occurs or ClassType is not specified
         /// </summary>
         /// <param name="time"></param>
@@ -235,7 +233,9 @@ namespace DOL.GS
             List<string> list = null;
 
             if (Properties.DEBUG_LOAD_REGIONS != string.Empty)
+            {
                 list = Properties.DEBUG_LOAD_REGIONS.SplitCSV(true);
+            }
 
             if (list != null && list.Count > 0)
             {
@@ -272,15 +272,13 @@ namespace DOL.GS
             }
         }
 
-
-
         /// <summary>
         /// What to do when the region collapses.
         /// This is called when instanced regions need to be closed
         /// </summary>
         public virtual void OnCollapse()
         {
-            //Delete objects
+            // Delete objects
             foreach (GameObject obj in m_objects)
             {
                 if (obj != null)
@@ -305,7 +303,6 @@ namespace DOL.GS
             GameEventMgr.RemoveAllHandlersForObject(this);
         }
 
-
         #endregion
 
         /// <summary>
@@ -327,21 +324,21 @@ namespace DOL.GS
             {
                 switch (RegionData.Id)
                 {
-                    case 163://new frontiers
-                    case 165://cathal valley
-                    case 233://Sumoner hall
-                    case 234://1to4BG
-                    case 235://5to9BG
-                    case 236://10to14BG
-                    case 237://15to19BG
-                    case 238://20to24BG
-                    case 239://25to29BG
-                    case 240://30to34BG
-                    case 241://35to39BG
-                    case 242://40to44BG and Test BG
-                    case 244://Frontiers RvR dungeon
-                    case 249://Darkness Falls - RvR dungeon
-                    case 489://lvl5-9 Demons breach
+                    case 163:// new frontiers
+                    case 165:// cathal valley
+                    case 233:// Sumoner hall
+                    case 234:// 1to4BG
+                    case 235:// 5to9BG
+                    case 236:// 10to14BG
+                    case 237:// 15to19BG
+                    case 238:// 20to24BG
+                    case 239:// 25to29BG
+                    case 240:// 30to34BG
+                    case 241:// 35to39BG
+                    case 242:// 40to44BG and Test BG
+                    case 244:// Frontiers RvR dungeon
+                    case 249:// Darkness Falls - RvR dungeon
+                    case 489:// lvl5-9 Demons breach
                         return true;
                     default:
                         return false;
@@ -377,13 +374,13 @@ namespace DOL.GS
 
                 if (Zones.Count != zoneCount)
                 {
-                    return false; //Dungeons only have 1 zone!
+                    return false; // Dungeons only have 1 zone!
                 }
 
                 var zone = Zones[0];
                 if (zone.XOffset == dungeonOffset && zone.YOffset == dungeonOffset)
                 {
-                    return true; //Only dungeons got this offset
+                    return true; // Only dungeons got this offset
                 }
 
                 return false;
@@ -399,20 +396,23 @@ namespace DOL.GS
         /// The Region Name eg. Region000
         /// </summary>
         public virtual string Name => RegionData.Name;
-        //Dinberg: Changed this to virtual, so that Instances can take a unique Name, for things like quest instances.
+
+        // Dinberg: Changed this to virtual, so that Instances can take a unique Name, for things like quest instances.
 
         /// <summary>
         /// The Regi on Description eg. Cursed Forest
         /// </summary>
         public virtual string Description => RegionData.Description;
-        //Dinberg: Virtual, so that we can change this if need be, for quests eg 'Hermit Dinbargs Cave'
-        //or for the hell of it, eg Jordheim (Instance).
+
+        // Dinberg: Virtual, so that we can change this if need be, for quests eg 'Hermit Dinbargs Cave'
+        // or for the hell of it, eg Jordheim (Instance).
 
         /// <summary>
         /// The ID of the Region eg. 21
         /// </summary>
         public virtual ushort ID => RegionData.Id;
-        //Dinberg: Changed this to virtual, so that Instances can take a unique ID.
+
+        // Dinberg: Changed this to virtual, so that Instances can take a unique ID.
 
         /// <summary>
         /// The Region Server IP ... for future use
@@ -488,7 +488,7 @@ namespace DOL.GS
         /// </summary>
         public virtual bool LoadObjects => m_loadObjects;
 
-        //Dinberg: Added this for instances.
+        // Dinberg: Added this for instances.
         /// <summary>
         /// Added to allow instances; the 'appearance' of the region, the map the GameClient uses.
         /// </summary>
@@ -500,13 +500,11 @@ namespace DOL.GS
         /// </summary>
         public virtual bool UseTimeManager => true;
 
-
         /// <summary>
         /// Each region can return it's own game time
         /// By default let WorldMgr handle it
         /// </summary>
         public virtual uint GameTime => WorldMgr.GetCurrentGameTime();
-
 
         /// <summary>
         /// Get the day increment for this region.
@@ -579,8 +577,8 @@ namespace DOL.GS
                 }
 
                 if (!pm && hour == 12)
-                { 
-                    //Special Handling for Midnight.
+                {
+                    // Special Handling for Midnight.
                     m_isNightTime = true;
                 }
 
@@ -650,6 +648,7 @@ namespace DOL.GS
                     Array.Copy(m_objectsAllocatedSlots, slotarray, m_objectsAllocatedSlots.Length);
                     m_objectsAllocatedSlots = slotarray;
                 }
+
                 m_objects = newObj;
             }
         }
@@ -691,17 +690,16 @@ namespace DOL.GS
                 {
                     GameNPC myMob = null;
                     string error = string.Empty;
-  
+
                     // Default Classtype
                     string classtype = Properties.GAMENPC_DEFAULT_CLASSTYPE;
-                    
+
                     // load template if any
                     INpcTemplate template = null;
-                    if(mob.NPCTemplateID != -1)
+                    if (mob.NPCTemplateID != -1)
                     {
-                    	template = NpcTemplateMgr.GetTemplate(mob.NPCTemplateID);
+                        template = NpcTemplateMgr.GetTemplate(mob.NPCTemplateID);
                     }
-                    
 
                     if (Properties.USE_NPCGUILDSCRIPTS && mob.Guild.Length > 0 && mob.Realm >= 0 && mob.Realm <= (int)eRealm._Last)
                     {
@@ -722,13 +720,12 @@ namespace DOL.GS
                         }
                     }
 
-  
                     if (myMob == null)
                     {
-                    	if(!string.IsNullOrWhiteSpace(template?.ClassType) && template.ClassType != Mob.DEFAULT_NPC_CLASSTYPE && template.ReplaceMobValues)
-                    	{
-                			classtype = template.ClassType;
-                    	}
+                        if (!string.IsNullOrWhiteSpace(template?.ClassType) && template.ClassType != Mob.DEFAULT_NPC_CLASSTYPE && template.ReplaceMobValues)
+                        {
+                            classtype = template.ClassType;
+                        }
                         else if (!string.IsNullOrWhiteSpace(mob.ClassType) && mob.ClassType != Mob.DEFAULT_NPC_CLASSTYPE)
                         {
                             classtype = mob.ClassType;
@@ -758,7 +755,9 @@ namespace DOL.GS
                                 }
 
                                 if (myMob != null)
+                                {
                                     break;
+                                }
                             }
 
                             if (myMob == null)
@@ -795,6 +794,7 @@ namespace DOL.GS
                             {
                                 log.Error($"Failed: {myMob.GetType().FullName}:LoadFromDatabase({mob.GetType().FullName});", e);
                             }
+
                             throw;
                         }
 
@@ -826,6 +826,7 @@ namespace DOL.GS
                                     break;
                                 }
                             }
+
                             if (myItem == null)
                             {
                                 myItem = new GameStaticItem();
@@ -877,7 +878,7 @@ namespace DOL.GS
         /// <returns>success</returns>
         internal bool AddObject(GameObject obj)
         {
-            //Thread.Sleep(10000);
+            // Thread.Sleep(10000);
             Zone zone = GetZone(obj.X, obj.Y);
             if (zone == null)
             {
@@ -887,7 +888,7 @@ namespace DOL.GS
                 }
             }
 
-            //Assign a new id
+            // Assign a new id
             lock (ObjectsSyncLock)
             {
                 if (obj.ObjectID != -1)
@@ -904,7 +905,7 @@ namespace DOL.GS
 
                 GameObject[] objectsRef = m_objects;
 
-                //*** optimized object management for memory saving primary but keeping it very fast - Blue ***
+                // *** optimized object management for memory saving primary but keeping it very fast - Blue ***
 
                 // find first free slot for the object
                 int objID = m_nextObjectSlot;
@@ -915,8 +916,8 @@ namespace DOL.GS
                     {
                         // yes there are some places left in current object array, try to find them
                         // by using the bit array (can check 32 slots at once!)
-
                         int i = m_objects.Length / 32;
+
                         // INVARIANT: i * 32 is always lower or equal to m_objects.Length (integer division property)
                         if (i * 32 == m_objects.Length)
                         {
@@ -960,7 +961,6 @@ namespace DOL.GS
                             objectsRef = new GameObject[MINIMUMSIZE];
                             Array.Copy(m_objects, objectsRef, m_objects.Length);
                             objID = 0;
-
                         }
                         else if (objectsRef.Length >= Properties.REGION_MAX_OBJECTS)
                         {
@@ -995,7 +995,7 @@ namespace DOL.GS
                         int diff = objectsRef.Length / 32 - m_objectsAllocatedSlots.Length;
                         if (diff >= 0)
                         {
-                            uint[] newBitArray = new uint[Math.Max(m_objectsAllocatedSlots.Length + diff + 50, 100)];	// add at least 100 integers, makes it resize less often, serves 3200 new objects, only 400 bytes
+                            uint[] newBitArray = new uint[Math.Max(m_objectsAllocatedSlots.Length + diff + 50, 100)];   // add at least 100 integers, makes it resize less often, serves 3200 new objects, only 400 bytes
                             Array.Copy(m_objectsAllocatedSlots, newBitArray, m_objectsAllocatedSlots.Length);
                             m_objectsAllocatedSlots = newBitArray;
                         }
@@ -1043,6 +1043,7 @@ namespace DOL.GS
                 {
                     log.Error($"Can\'t add new object - region \'{Description}\' (object: {obj}); OID is used by {oidObj}");
                 }
+
                 return false;
             }
         }
@@ -1083,6 +1084,7 @@ namespace DOL.GS
                     log.Error(new StackTrace().ToString());
                     return;
                 }
+
                 if (obj != inPlace)
                 {
                     log.Error($"RemoveObject conflict! OID{obj.ObjectID} {obj.Name}({obj.CurrentRegionID}) but there was another object already {inPlace.Name} region:{inPlace.CurrentRegionID} state:{inPlace.ObjectState}");
@@ -1100,6 +1102,7 @@ namespace DOL.GS
                     m_nextObjectSlot = index;
                     m_objectsAllocatedSlots[index / 32] &= ~(uint)(1 << (index % 32));
                 }
+
                 obj.ObjectID = -1; // invalidate object id
                 m_objectsInRegion--;
             }
@@ -1150,6 +1153,7 @@ namespace DOL.GS
                     return zone;
                 }
             }
+
             return null;
         }
 
@@ -1220,11 +1224,11 @@ namespace DOL.GS
                 switch (Skin) // use the skin of the region
                 {
                     case 2:
-                        return true; 	// Housing alb
+                        return true;    // Housing alb
                     case 102:
-                        return true; 	// Housing mid
+                        return true;    // Housing mid
                     case 202:
-                        return true; 	// Housing hib
+                        return true;    // Housing hib
                     default:
                         return false;
                 }
@@ -1238,7 +1242,7 @@ namespace DOL.GS
         /// <returns></returns>
         public static bool IsAtlantis(int regionId)
         {
-            return (regionId == 30 || regionId == 73 || regionId == 130);
+            return regionId == 30 || regionId == 73 || regionId == 130;
         }
 
         #endregion
@@ -1270,10 +1274,13 @@ namespace DOL.GS
                 foreach (Zone zone in Zones)
                 {
                     if (area.IsIntersectingZone(zone))
-                    	m_ZoneAreas[zonePos][m_ZoneAreasCount[zonePos]++] = area.ID;
-                    
+                    {
+                        m_ZoneAreas[zonePos][m_ZoneAreasCount[zonePos]++] = area.ID;
+                    }
+
                     zonePos++;
                 }
+
                 return area;
             }
         }
@@ -1407,6 +1414,7 @@ namespace DOL.GS
                         log.Error($"GetArea exception.Area count {m_ZoneAreasCount[zoneIndex]}", e);
                     }
                 }
+
                 return areas;
             }
         }
@@ -1472,7 +1480,7 @@ namespace DOL.GS
                     }
                 }
 
-                //Return required enumerator
+                // Return required enumerator
                 IEnumerable tmp;
                 if (withDistance)
                 {
@@ -1499,6 +1507,7 @@ namespace DOL.GS
                 {
                     tmp = new ObjectEnumerator(res);
                 }
+
                 return tmp;
             }
 
@@ -1506,9 +1515,9 @@ namespace DOL.GS
             {
                 log.Error($"GetInRadius starting zone is null for ({type}, {x}, {y}, {z}, {radius}) in Region ID={ID}");
             }
+
             return new EmptyEnumerator();
         }
-
 
         /// <summary>
         /// get the shortest distance from a point to a zone
@@ -1520,7 +1529,7 @@ namespace DOL.GS
         /// <returns>True if the distance is shorter false either</returns>
         private static bool CheckShortestDistance(Zone zone, int x, int y, uint squareRadius)
         {
-            //  coordinates of zone borders
+            // coordinates of zone borders
             int xLeft = zone.XOffset;
             int xRight = zone.XOffset + zone.Width;
             int yTop = zone.YOffset;
@@ -1678,12 +1687,11 @@ namespace DOL.GS
 
             public ObjectEnumerator(ArrayList objectSet)
             {
-                //objectSet.DumpInfo();
+                // objectSet.DumpInfo();
                 elements = new GameObject[objectSet.Count];
                 objectSet.CopyTo(elements);
                 m_count = elements.Length;
             }
-
 
             /// <summary>
             /// Get the next GameObjcte from the zone subset created in constructor
@@ -1698,13 +1706,14 @@ namespace DOL.GS
                 do
                 {
                     m_current++;
+
                     // break if no more object
                     if (m_current < m_count)
                     {
                         // get the object
-                        //GameObject obj = (GameObject) elements[m_current];
+                        // GameObject obj = (GameObject) elements[m_current];
                         GameObject obj = elements[m_current];
-                        if (found = ((obj != null && ((int)obj.ObjectState) == (int)GameObject.eObjectState.Active)))
+                        if (found = (obj != null && ((int)obj.ObjectState) == (int)GameObject.eObjectState.Active))
                         {
                             Current = obj;
                         }
@@ -1835,12 +1844,12 @@ namespace DOL.GS
 
         public void Relocate()
         {
-        	foreach (var zone in m_zones)
-        	{
-        		zone.Relocate(null);
-        	}
-        	
-        	m_lastRelocationTime = DateTime.Now.Ticks / (10 * 1000);
+            foreach (var zone in m_zones)
+            {
+                zone.Relocate(null);
+            }
+
+            m_lastRelocationTime = DateTime.Now.Ticks / (10 * 1000);
         }
 
         #endregion
@@ -1848,67 +1857,67 @@ namespace DOL.GS
         #endregion
 
     }
-	#region Helpers classes
+    #region Helpers classes
 
-	/// <summary>
-	/// Holds a Object and it's distance towards the center
-	/// </summary>
-	public class PlayerDistEntry
-	{
-		public PlayerDistEntry(GamePlayer o, int distance)
-		{
-			Player = o;
-			Distance = distance;
-		}
+    /// <summary>
+    /// Holds a Object and it's distance towards the center
+    /// </summary>
+    public class PlayerDistEntry
+    {
+        public PlayerDistEntry(GamePlayer o, int distance)
+        {
+            Player = o;
+            Distance = distance;
+        }
 
-		public GamePlayer Player;
-		public int Distance;
-	}
+        public GamePlayer Player;
+        public int Distance;
+    }
 
-	/// <summary>
-	/// Holds a Object and it's distance towards the center
-	/// </summary>
-	public class NPCDistEntry
-	{
-		public NPCDistEntry(GameNPC o, int distance)
-		{
-			NPC = o;
-			Distance = distance;
-		}
+    /// <summary>
+    /// Holds a Object and it's distance towards the center
+    /// </summary>
+    public class NPCDistEntry
+    {
+        public NPCDistEntry(GameNPC o, int distance)
+        {
+            NPC = o;
+            Distance = distance;
+        }
 
-		public GameNPC NPC;
-		public int Distance;
-	}
+        public GameNPC NPC;
+        public int Distance;
+    }
 
-	/// <summary>
-	/// Holds a Object and it's distance towards the center
-	/// </summary>
-	public class ItemDistEntry
-	{
-		public ItemDistEntry(GameStaticItem o, int distance)
-		{
-			Item = o;
-			Distance = distance;
-		}
+    /// <summary>
+    /// Holds a Object and it's distance towards the center
+    /// </summary>
+    public class ItemDistEntry
+    {
+        public ItemDistEntry(GameStaticItem o, int distance)
+        {
+            Item = o;
+            Distance = distance;
+        }
 
-		public GameStaticItem Item;
-		public int Distance;
-	}
+        public GameStaticItem Item;
+        public int Distance;
+    }
 
-	/// <summary>
-	/// Holds a Object and it's distance towards the center
-	/// </summary>
-	public class DoorDistEntry
-	{
-		public DoorDistEntry(IDoor d, int distance)
-		{
-			Door = d;
-			Distance = distance;
-		}
+    /// <summary>
+    /// Holds a Object and it's distance towards the center
+    /// </summary>
+    public class DoorDistEntry
+    {
+        public DoorDistEntry(IDoor d, int distance)
+        {
+            Door = d;
+            Distance = distance;
+        }
 
-		public IDoor Door;
-		public int Distance;
-	}
+        public IDoor Door;
+        public int Distance;
+    }
 
-	#endregion
+    #endregion
 }

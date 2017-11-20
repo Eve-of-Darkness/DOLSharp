@@ -38,7 +38,9 @@ namespace DOL.AI.Brain
             base.OnLivingAttacked(target, attacker);
 
             if (target.IsWithinRadius(Body, AggressionRange))
+            {
                 EngageOn(attacker);
+            }
         }
     }
 }

@@ -26,9 +26,9 @@ using DOL.Database;
 
 namespace DOL.GS.Spells
 {
-    //http://www.camelotherald.com/masterlevels/ma.php?ml=Spymaster
+    // http://www.camelotherald.com/masterlevels/ma.php?ml=Spymaster
     #region Spymaster-1
-    //AbstractServerRules OnPlayerKilled
+    // AbstractServerRules OnPlayerKilled
     #endregion
 
     #region Spymaster-2
@@ -46,6 +46,7 @@ namespace DOL.GS.Spells
             m_caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
+
         public override bool IsOverwritable(GameSpellEffect compare)
         {
             return false;
@@ -63,9 +64,13 @@ namespace DOL.GS.Spells
             base.OnEffectStart(effect);
             m_effect = effect;
             if (effect.Owner == null || !effect.Owner.IsAlive)
+            {
                 return;
+            }
+
             GameEventMgr.AddHandler(decoy, GameLivingEvent.Dying, new DOLEventHandler(DecoyDied));
         }
+
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
             GameEventMgr.RemoveHandler(decoy, GameLivingEvent.Dying, new DOLEventHandler(DecoyDied));
@@ -74,12 +79,18 @@ namespace DOL.GS.Spells
                 decoy.Health = 0;
                 decoy.Delete();
             }
+
             return base.OnEffectExpires(effect, noMessages);
         }
+
         private void DecoyDied(DOLEvent e, object sender, EventArgs args)
         {
             GameNPC kDecoy = sender as GameNPC;
-            if (kDecoy == null) return;
+            if (kDecoy == null)
+            {
+                return;
+            }
+
             if (e == GameLivingEvent.Dying)
             {
                 MessageToCaster("Your Decoy has fallen!", eChatType.CT_SpellExpires);
@@ -87,12 +98,14 @@ namespace DOL.GS.Spells
                 return;
             }
         }
+
         public DecoySpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
             Random m_rnd = new Random();
             decoy = new GameDecoy();
-            //Fill the object variables
+
+            // Fill the object variables
             decoy.CurrentRegion = caster.CurrentRegion;
             decoy.Heading = (ushort)((caster.Heading + 2048) % 4096);
             decoy.Level = 50;
@@ -100,7 +113,7 @@ namespace DOL.GS.Spells
             decoy.X = caster.X;
             decoy.Y = caster.Y;
             decoy.Z = caster.Z;
-            string TemplateId = "";
+            string TemplateId = string.Empty;
             switch (caster.Realm)
             {
                 case eRealm.Albion:
@@ -119,6 +132,7 @@ namespace DOL.GS.Spells
                     TemplateId = "a4c798a2-186a-4bda-99ff-ccef228cb745";
                     break;
             }
+
             GameNpcInventoryTemplate load = new GameNpcInventoryTemplate();
             if (load.LoadFromDatabase(TemplateId))
             {
@@ -126,14 +140,16 @@ namespace DOL.GS.Spells
                 decoy.Inventory = load;
                 decoy.BroadcastLivingEquipmentUpdate();
             }
+
             decoy.CurrentSpeed = 0;
-            decoy.GuildName = "";
+            decoy.GuildName = string.Empty;
         }
     }
     #endregion
 
     #region Spymaster-3
-    //Gameliving - StartWeaponMagicalEffect
+
+    // Gameliving - StartWeaponMagicalEffect
     #endregion
 
     #region Spymaster-4
@@ -155,7 +171,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //shared timer 1
+    // shared timer 1
     #region Spymaster-5
     [SpellHandler("TangleSnare")]
     public class TangleSnareSpellHandler : MineSpellHandler
@@ -166,7 +182,7 @@ namespace DOL.GS.Spells
         {
             Unstealth = false;
 
-            //Construct a new mine.
+            // Construct a new mine.
             mine = new GameMine();
             mine.Model = 2592;
             mine.Name = spell.Name;
@@ -205,7 +221,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //shared timer 1
+    // shared timer 1
     #region Spymaster-6
     [SpellHandler("PoisonSpike")]
     public class PoisonSpikeSpellHandler : MineSpellHandler
@@ -216,7 +232,7 @@ namespace DOL.GS.Spells
         {
             Unstealth = false;
 
-            //Construct a new font.
+            // Construct a new font.
             mine = new GameMine();
             mine.Model = 2589;
             mine.Name = spell.Name;
@@ -253,13 +269,16 @@ namespace DOL.GS.Spells
             trap = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
+
     #region Subspell
     [SpellHandler("PoisonspikeDot")]
     public class Spymaster6DotHandler : DoTSpellHandler
     {
         // constructor
         public Spymaster6DotHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+
         public override int CalculateSpellResistChance(GameLiving target) { return 0; }
+
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
             return new GameSpellEffect(this, m_spell.Duration, m_spellLine.IsBaseLine ? 5000 : 4000, effectiveness);
@@ -276,7 +295,11 @@ namespace DOL.GS.Spells
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
-            if (!(selectedTarget is GamePlayer)) return false;
+            if (!(selectedTarget is GamePlayer))
+            {
+                return false;
+            }
+
             if (!selectedTarget.IsSitting) { MessageToCaster("Target must be sitting!", eChatType.CT_System); return false; }
             return base.CheckBeginCast(selectedTarget);
         }
@@ -284,8 +307,16 @@ namespace DOL.GS.Spells
         public override void OnEffectStart(GameSpellEffect effect)
         {
             m_target = effect.Owner as GamePlayer;
-            if (m_target == null) return;
-            if (!m_target.IsAlive || m_target.ObjectState != GameLiving.eObjectState.Active || !m_target.IsSitting) return;
+            if (m_target == null)
+            {
+                return;
+            }
+
+            if (!m_target.IsAlive || m_target.ObjectState != GameLiving.eObjectState.Active || !m_target.IsSitting)
+            {
+                return;
+            }
+
             Caster.BaseBuffBonusCategory[(int)eProperty.Skill_Stealth] += 100;
             GameEventMgr.AddHandler(m_target, GamePlayerEvent.Moving, new DOLEventHandler(PlayerAction));
             GameEventMgr.AddHandler(Caster, GamePlayerEvent.Moving, new DOLEventHandler(PlayerAction));
@@ -304,19 +335,32 @@ namespace DOL.GS.Spells
         private void PlayerAction(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = (GamePlayer)sender;
-            if (player == null) return;
+            if (player == null)
+            {
+                return;
+            }
+
             MessageToLiving((GameLiving)player, "You are moving. Your concentration fades!", eChatType.CT_SpellResisted);
             GameSpellEffect effect = FindEffectOnTarget(m_target, "Loockout");
-            if (effect != null) effect.Cancel(false);
+            if (effect != null)
+            {
+                effect.Cancel(false);
+            }
+
             IGameEffect effect2 = SpellHandler.FindStaticEffectOnTarget(Caster, typeof(LoockoutOwner));
-            if (effect2 != null) effect2.Cancel(false);
+            if (effect2 != null)
+            {
+                effect2.Cancel(false);
+            }
+
             OnEffectExpires(effect, true);
         }
+
         public LoockoutSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
     #endregion
 
-    //shared timer 1
+    // shared timer 1
     #region Spymaster-8
     [SpellHandler("SiegeWrecker")]
     public class SiegeWreckerSpellHandler : MineSpellHandler
@@ -329,25 +373,34 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (trap == null) return;
+            if (trap == null)
+            {
+                return;
+            }
+
             bool wasstealthed = ((GamePlayer)Caster).IsStealthed;
             foreach (GameNPC npc in mine.GetNPCsInRadius((ushort)s.Range))
             {
                 if (npc is GameSiegeWeapon && npc.IsAlive && GameServer.ServerRules.IsAllowedToAttack(Caster, npc, true))
                 {
                     trap.StartSpell((GameLiving)npc);
-                    if (!Unstealth) ((GamePlayer)Caster).Stealth(wasstealthed);
+                    if (!Unstealth)
+                    {
+                        ((GamePlayer)Caster).Stealth(wasstealthed);
+                    }
+
                     return;
                 }
             }
         }
+
         // constructor
         public SiegeWreckerSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
             Unstealth = false;
 
-            //Construct a new mine.
+            // Construct a new mine.
             mine = new GameMine();
             mine.Model = 2591;
             mine.Name = spell.Name;
@@ -421,9 +474,14 @@ namespace DOL.GS.Spells
 
             public override bool CheckBeginCast(GameLiving selectedTarget)
             {
-                if (selectedTarget == Caster) return false;
-                return base.CheckBeginCast(selectedTarget);
+                if (selectedTarget == Caster)
+            {
+                return false;
             }
+
+            return base.CheckBeginCast(selectedTarget);
+            }
+
             public override void OnEffectStart(GameSpellEffect effect)
             {
                 base.OnEffectStart(effect);
@@ -434,7 +492,7 @@ namespace DOL.GS.Spells
                     playerTarget.Stealth(true);
                     if (effect.Owner != Caster)
                     {
-                        //effect.Owner.BuffBonusCategory1[(int)eProperty.Skill_Stealth] += 80;
+                        // effect.Owner.BuffBonusCategory1[(int)eProperty.Skill_Stealth] += 80;
                         GameEventMgr.AddHandler(playerTarget, GamePlayerEvent.Moving, new DOLEventHandler(PlayerAction));
                         GameEventMgr.AddHandler(playerTarget, GamePlayerEvent.AttackFinished, new DOLEventHandler(PlayerAction));
                         GameEventMgr.AddHandler(playerTarget, GamePlayerEvent.CastStarting, new DOLEventHandler(PlayerAction));
@@ -454,7 +512,7 @@ namespace DOL.GS.Spells
             {
                 if (effect.Owner != Caster && effect.Owner is GamePlayer)
                 {
-                    //effect.Owner.BuffBonusCategory1[(int)eProperty.Skill_Stealth] -= 80;
+                    // effect.Owner.BuffBonusCategory1[(int)eProperty.Skill_Stealth] -= 80;
                     GamePlayer playerTarget = effect.Owner as GamePlayer;
                     GameEventMgr.RemoveHandler(playerTarget, GamePlayerEvent.AttackFinished, new DOLEventHandler(PlayerAction));
                     GameEventMgr.RemoveHandler(playerTarget, GamePlayerEvent.CastStarting, new DOLEventHandler(PlayerAction));
@@ -462,31 +520,43 @@ namespace DOL.GS.Spells
                     GameEventMgr.RemoveHandler(playerTarget, GamePlayerEvent.Dying, new DOLEventHandler(PlayerAction));
                     playerTarget.Stealth(false);
                 }
+
                 return base.OnEffectExpires(effect, noMessages);
             }
+
             private void PlayerAction(DOLEvent e, object sender, EventArgs args)
             {
                 GamePlayer player = (GamePlayer)sender;
-                if (player == null) return;
-                if (args is AttackFinishedEventArgs)
+                if (player == null)
+            {
+                return;
+            }
+
+            if (args is AttackFinishedEventArgs)
                 {
                     MessageToLiving((GameLiving)player, "You are attacking. Your camouflage fades!", eChatType.CT_SpellResisted);
                     OnEffectExpires(m_effect, true);
                     return;
                 }
+
                 if (args is DyingEventArgs)
                 {
                     OnEffectExpires(m_effect, false);
                     return;
                 }
+
                 if (args is CastingEventArgs)
                 {
                     if ((args as CastingEventArgs).SpellHandler.Caster != Caster)
-                        return;
-                    MessageToLiving((GameLiving)player, "You are casting a spell. Your camouflage fades!", eChatType.CT_SpellResisted);
+                {
+                    return;
+                }
+
+                MessageToLiving((GameLiving)player, "You are casting a spell. Your camouflage fades!", eChatType.CT_SpellResisted);
                     OnEffectExpires(m_effect, true);
                     return;
                 }
+
                 if (e == GamePlayerEvent.Moving)
                 {
                     MessageToLiving((GameLiving)player, "You are moving. Your camouflage fades!", eChatType.CT_SpellResisted);
@@ -497,16 +567,22 @@ namespace DOL.GS.Spells
         }
         #endregion
     }
-    //to show an Icon & informations to the caster
+
+    // to show an Icon & informations to the caster
     namespace DOL.GS.Effects
 {
     public class LoockoutOwner : StaticEffect, IGameEffect
         {
             public LoockoutOwner() : base() { }
+
             public void Start(GamePlayer player) { base.Start(player); }
+
             public override void Stop() { base.Stop(); }
+
             public override ushort Icon { get { return 2616; } }
+
             public override string Name { get { return "Loockout"; } }
+
             public override IList<string> DelveInfo
             {
                 get

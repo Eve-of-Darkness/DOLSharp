@@ -24,37 +24,37 @@ namespace DOL.GS.PlayerClass
     /// Midgard Shadowblade Class
     /// </summary>
     [CharacterClass((int)eCharacterClass.Shadowblade, "Shadowblade", "MidgardRogue")]
-	public class ClassShadowblade : ClassMidgardRogue
-	{
-		private static readonly string[] AutotrainableSkills = new[] { Specs.Stealth };
+    public class ClassShadowblade : ClassMidgardRogue
+    {
+        private static readonly string[] AutotrainableSkills = new[] { Specs.Stealth };
 
-		public ClassShadowblade()
-			: base()
-		{
-			m_profession = "PlayerClass.Profession.Loki";
-			m_specializationMultiplier = 22;
-			m_primaryStat = eStat.DEX;
-			m_secondaryStat = eStat.QUI;
-			m_tertiaryStat = eStat.STR;
-			m_baseHP = 760;
-		}
+        public ClassShadowblade()
+            : base()
+        {
+            m_profession = "PlayerClass.Profession.Loki";
+            m_specializationMultiplier = 22;
+            m_primaryStat = eStat.DEX;
+            m_secondaryStat = eStat.QUI;
+            m_tertiaryStat = eStat.STR;
+            m_baseHP = 760;
+        }
 
-		/// <summary>
-		/// Checks whether player has ability to use lefthanded weapons
-		/// </summary>
-		public override bool CanUseLefthandedWeapon
-		{
-			get { return true; }
-		}
+        /// <summary>
+        /// Checks whether player has ability to use lefthanded weapons
+        /// </summary>
+        public override bool CanUseLefthandedWeapon
+        {
+            get { return true; }
+        }
 
-		public override IList<string> GetAutotrainableSkills()
-		{
-			return AutotrainableSkills;
-		}
+        public override IList<string> GetAutotrainableSkills()
+        {
+            return AutotrainableSkills;
+        }
 
-		public override bool HasAdvancedFromBaseClass()
-		{
-			return true;
-		}
-	}
+        public override bool HasAdvancedFromBaseClass()
+        {
+            return true;
+        }
+    }
 }

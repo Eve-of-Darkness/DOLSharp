@@ -1,16 +1,16 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -33,66 +33,67 @@ namespace DOL.GS
     /// Handle Zones and Areas, doesn't Handle Persistence.
     /// </summary>
     public class RegionInstance : BaseInstance
-	{
-		/// <summary>
-		/// Console Logger
-		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-		
-		/// <summary>
-		/// List Containing players in instance
-		/// </summary>
-		private readonly List<GamePlayer> m_players_in;
+    {
+        /// <summary>
+        /// Console Logger
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-	    /// <summary>
-		/// List Containing players in instance
-		/// </summary>
-		protected List<GamePlayer> PlayersInside => m_players_in;
+        /// <summary>
+        /// List Containing players in instance
+        /// </summary>
+        private readonly List<GamePlayer> m_players_in;
 
-	    /// <summary>
-		/// Entrance location of Instance, needed to force exit players.
-		/// </summary>
-		public GameLocation SourceEntrance { get; set; }
+        /// <summary>
+        /// List Containing players in instance
+        /// </summary>
+        protected List<GamePlayer> PlayersInside => m_players_in;
 
-	    /// <summary>
-		/// On Player Enter override to add him to container
-		/// </summary>
-		/// <param name="player"></param>
-		public override void OnPlayerEnterInstance(GamePlayer player)
-		{
-            //Add Player
-            m_players_in.Add(player);
-			//Stop the timer to prevent the region's removal.
-			base.OnPlayerEnterInstance(player);
-		}
-		
-		/// <summary>
-		/// On Player Exit override to remove him from container
-		/// </summary>
-		/// <param name="player"></param>
-		public override void OnPlayerLeaveInstance(GamePlayer player)
+        /// <summary>
+        /// Entrance location of Instance, needed to force exit players.
+        /// </summary>
+        public GameLocation SourceEntrance { get; set; }
+
+        /// <summary>
+        /// On Player Enter override to add him to container
+        /// </summary>
+        /// <param name="player"></param>
+        public override void OnPlayerEnterInstance(GamePlayer player)
         {
-            //Decrease the amount of players
+            // Add Player
+            m_players_in.Add(player);
+
+            // Stop the timer to prevent the region's removal.
+            base.OnPlayerEnterInstance(player);
+        }
+
+        /// <summary>
+        /// On Player Exit override to remove him from container
+        /// </summary>
+        /// <param name="player"></param>
+        public override void OnPlayerLeaveInstance(GamePlayer player)
+        {
+            // Decrease the amount of players
             base.OnPlayerLeaveInstance(player);
             m_players_in.Remove(player);
         }
-		
-		/// <summary>
-		/// RegionInstance Constructor
-		/// </summary>
-		/// <param name="player"></param>
-		public RegionInstance(ushort ID, GameTimer.TimeManager time, RegionData dat)
-			: base(ID, time, dat)
-		{
+
+        /// <summary>
+        /// RegionInstance Constructor
+        /// </summary>
+        /// <param name="player"></param>
+        public RegionInstance(ushort ID, GameTimer.TimeManager time, RegionData dat)
+            : base(ID, time, dat)
+        {
             m_players_in = new List<GamePlayer>();
             DestroyWhenEmpty = false;
-		}
-		
-		/// <summary>
-		/// Load from Database override to clone objects from original Region.
-		/// Loads Objects, Mobs, Areas from Database using "SkinID"
-		/// </summary>
-		public override void LoadFromDatabase(Mob[] mobObjs, ref long mobCount, ref long merchantCount, ref long itemCount, ref long bindCount)
+        }
+
+        /// <summary>
+        /// Load from Database override to clone objects from original Region.
+        /// Loads Objects, Mobs, Areas from Database using "SkinID"
+        /// </summary>
+        public override void LoadFromDatabase(Mob[] mobObjs, ref long mobCount, ref long merchantCount, ref long itemCount, ref long bindCount)
         {
             if (!LoadObjects)
             {
@@ -101,15 +102,18 @@ namespace DOL.GS
 
             Assembly gasm = Assembly.GetAssembly(typeof(GameServer));
             var staticObjs = GameServer.Database.SelectObjects<WorldObject>("`Region` = @Region", new QueryParameter("@Region", Skin));
-            var areaObjs = GameServer.Database.SelectObjects<DBArea>("`Region` = @Region", new QueryParameter("@Region", Skin));            
-            
+            var areaObjs = GameServer.Database.SelectObjects<DBArea>("`Region` = @Region", new QueryParameter("@Region", Skin));
+
             int count = mobObjs.Length + staticObjs.Count;
-            if (count > 0) PreAllocateRegionSpace(count + 100);
-            
+            if (count > 0)
+            {
+                PreAllocateRegionSpace(count + 100);
+            }
+
             int myItemCount = staticObjs.Count;
             int myMobCount = 0;
             int myMerchantCount = 0;
-            
+
             string allErrors = string.Empty;
 
             if (mobObjs.Length > 0)
@@ -118,17 +122,16 @@ namespace DOL.GS
                 {
                     GameNPC myMob = null;
                     string error = string.Empty;
-  
+
                     // Default Classtype
                     string classtype = ServerProperties.Properties.GAMENPC_DEFAULT_CLASSTYPE;
-                    
+
                     // load template if any
                     INpcTemplate template = null;
-                    if(mob.NPCTemplateID != -1)
+                    if (mob.NPCTemplateID != -1)
                     {
-                    	template = NpcTemplateMgr.GetTemplate(mob.NPCTemplateID);
+                        template = NpcTemplateMgr.GetTemplate(mob.NPCTemplateID);
                     }
-                    
 
                     if (mob.Guild.Length > 0 && mob.Realm >= 0 && mob.Realm <= (int)eRealm._Last)
                     {
@@ -137,25 +140,25 @@ namespace DOL.GS
                         {
                             try
                             {
-                                
+
                                 myMob = (GameNPC)type.Assembly.CreateInstance(type.FullName);
-                               	
                             }
                             catch (Exception e)
                             {
                                 if (log.IsErrorEnabled)
+                                {
                                     log.Error("LoadFromDatabase", e);
+                                }
                             }
                         }
                     }
 
-  
                     if (myMob == null)
                     {
-                    	if(template != null && template.ClassType != null && template.ClassType.Length > 0 && template.ClassType != Mob.DEFAULT_NPC_CLASSTYPE && template.ReplaceMobValues)
-                    	{
-                			classtype = template.ClassType;
-                    	}
+                        if (template != null && template.ClassType != null && template.ClassType.Length > 0 && template.ClassType != Mob.DEFAULT_NPC_CLASSTYPE && template.ReplaceMobValues)
+                        {
+                            classtype = template.ClassType;
+                        }
                         else if (!string.IsNullOrWhiteSpace(mob.ClassType) && mob.ClassType != Mob.DEFAULT_NPC_CLASSTYPE)
                         {
                             classtype = mob.ClassType;
@@ -207,12 +210,12 @@ namespace DOL.GS
                     {
                         try
                         {
-                        	Mob clone = (Mob)mob.Clone();
-                        	clone.AllowAdd = false;
-                        	clone.AllowDelete = false;
-                        	clone.Region = ID;
-                        	
-                        	myMob.LoadFromDatabase(clone);
+                            Mob clone = (Mob)mob.Clone();
+                            clone.AllowAdd = false;
+                            clone.AllowDelete = false;
+                            clone.Region = ID;
+
+                            myMob.LoadFromDatabase(clone);
 
                             if (myMob is GameMerchant)
                             {
@@ -229,6 +232,7 @@ namespace DOL.GS
                             {
                                 log.Error($"Failed: {myMob.GetType().FullName}:LoadFromDatabase({mob.GetType().FullName});", e);
                             }
+
                             throw;
                         }
 
@@ -241,11 +245,11 @@ namespace DOL.GS
             {
                 foreach (WorldObject item in staticObjs)
                 {
-                	WorldObject itemclone = (WorldObject)item.Clone();
-                	itemclone.AllowAdd = false;
-                	itemclone.AllowDelete = false;
-                	itemclone.Region = ID;
-                	
+                    WorldObject itemclone = (WorldObject)item.Clone();
+                    itemclone.AllowAdd = false;
+                    itemclone.AllowDelete = false;
+                    itemclone.Region = ID;
+
                     GameStaticItem myItem;
                     if (!string.IsNullOrEmpty(itemclone.ClassType))
                     {
@@ -282,38 +286,39 @@ namespace DOL.GS
             }
 
             int areaCnt = 0;
+
             // Add missing area
-            foreach(DBArea area in areaObjs) 
+            foreach (DBArea area in areaObjs)
             {
                 // Don't bind in instance.
                 if (area.ClassType.Equals("DOL.GS.Area+BindArea"))
                 {
                     continue;
                 }
-            	
-            	// clone DB object.
-            	DBArea newDBArea = ((DBArea)area.Clone());
-            	newDBArea.AllowAdd = false;
-            	newDBArea.Region = ID;
-            	// Instantiate Area with cloned DB object and add to region
-            	try
-            	{
-            		AbstractArea newArea = (AbstractArea)gasm.CreateInstance(newDBArea.ClassType, false);
-            		newArea.LoadFromDatabase(newDBArea);
-					newArea.Sound = newDBArea.Sound;
-					newArea.CanBroadcast = newDBArea.CanBroadcast;
-					newArea.CheckLOS = newDBArea.CheckLOS;
-                    AddArea(newArea);
-					areaCnt++;
-	            }
-            	catch
-            	{
-            		log.Warn($"area type {area.ClassType} cannot be created, skipping");
-            		continue;
-            	}
 
+                // clone DB object.
+                DBArea newDBArea = (DBArea)area.Clone();
+                newDBArea.AllowAdd = false;
+                newDBArea.Region = ID;
+
+                // Instantiate Area with cloned DB object and add to region
+                try
+                {
+                    AbstractArea newArea = (AbstractArea)gasm.CreateInstance(newDBArea.ClassType, false);
+                    newArea.LoadFromDatabase(newDBArea);
+                    newArea.Sound = newDBArea.Sound;
+                    newArea.CanBroadcast = newDBArea.CanBroadcast;
+                    newArea.CheckLOS = newDBArea.CheckLOS;
+                    AddArea(newArea);
+                    areaCnt++;
+                }
+                catch
+                {
+                    log.Warn($"area type {area.ClassType} cannot be created, skipping");
+                    continue;
+                }
             }
-            
+
             if (myMobCount + myItemCount + myMerchantCount > 0)
             {
                 if (log.IsInfoEnabled)
@@ -335,6 +340,5 @@ namespace DOL.GS
             merchantCount += myMerchantCount;
             itemCount += myItemCount;
         }
-
-	}
+    }
 }

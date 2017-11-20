@@ -37,9 +37,9 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         protected override void SendUpdates(GameLiving target)
         {
-        	target.SendLivingStatsAndRegenUpdate();
+            target.SendLivingStatsAndRegenUpdate();
         }
-		
+
         /// <summary>
         /// Apply effect on target or do spell action if non duration spell
         /// </summary>
@@ -48,8 +48,8 @@ namespace DOL.GS.Spells
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             int specLevel = Caster.GetModifiedSpecLevel(m_spellLine.Spec);
-			
-			if (Caster is GamePlayer && ((GamePlayer)Caster).CharacterClass.ClassType != eClassType.ListCaster && Spell.Level > 0 && ((GamePlayer)Caster).CharacterClass.ID != (int)eCharacterClass.Savage)
+
+            if (Caster is GamePlayer && ((GamePlayer)Caster).CharacterClass.ClassType != eClassType.ListCaster && Spell.Level > 0 && ((GamePlayer)Caster).CharacterClass.ID != (int)eCharacterClass.Savage)
             {
                 effectiveness = 0.75; // This section is for self bulfs, cleric buffs etc.
                 if (Spell.Level > 0)
@@ -57,26 +57,26 @@ namespace DOL.GS.Spells
                     effectiveness += (specLevel - 1.0) * 0.5 / Spell.Level;
                     effectiveness = Math.Max(0.75, effectiveness);
                     effectiveness = Math.Min(1.25, effectiveness);
-                    effectiveness *= (1.0 + m_caster.GetModified(eProperty.BuffEffectiveness) * 0.01);
+                    effectiveness *= 1.0 + m_caster.GetModified(eProperty.BuffEffectiveness) * 0.01;
                 }
             }
             else if (Caster is GamePlayer && Spell.Level > 0 && Spell.Target == "Enemy")
             {
-				effectiveness = 0.75; // This section is for list casters stat debuffs.
-				if (((GamePlayer)Caster).CharacterClass.ClassType == eClassType.ListCaster)
-				{
+                effectiveness = 0.75; // This section is for list casters stat debuffs.
+                if (((GamePlayer)Caster).CharacterClass.ClassType == eClassType.ListCaster)
+                {
                     effectiveness += (specLevel - 1.0) * 0.5 / Spell.Level;
                     effectiveness = Math.Max(0.75, effectiveness);
                     effectiveness = Math.Min(1.25, effectiveness);
-                    effectiveness *= (1.0 + m_caster.GetModified(eProperty.BuffEffectiveness) * 0.01);
+                    effectiveness *= 1.0 + m_caster.GetModified(eProperty.BuffEffectiveness) * 0.01;
                 }
-				else
-					{
-						effectiveness = 1.0; // Non list casters debuffs. Reaver curses, Champ debuffs etc.
-						effectiveness *= (1.0 + m_caster.GetModified(eProperty.DebuffEffectivness) * 0.01);
-					}
-			}
-			else
+                else
+                    {
+                        effectiveness = 1.0; // Non list casters debuffs. Reaver curses, Champ debuffs etc.
+                        effectiveness *= 1.0 + m_caster.GetModified(eProperty.DebuffEffectivness) * 0.01;
+                    }
+            }
+            else
             {
                 effectiveness = 1.0;
             }
@@ -94,14 +94,23 @@ namespace DOL.GS.Spells
         public override bool IsOverwritable(GameSpellEffect compare)
         {
             if (Spell.EffectGroup != 0 || compare.Spell.EffectGroup != 0)
+            {
                 return Spell.EffectGroup == compare.Spell.EffectGroup;
-            if (base.IsOverwritable(compare) == false) return false;
+            }
+
+            if (base.IsOverwritable(compare) == false)
+            {
+                return false;
+            }
+
             if (Spell.Duration > 0 && compare.Concentration > 0)
+            {
                 return compare.Spell.Value >= Spell.Value;
+            }
+
             return compare.SpellHandler.SpellLine.IsBaseLine ==
                 SpellLine.IsBaseLine;
         }
-
 
         // constructor
         protected SingleStatBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -120,8 +129,10 @@ namespace DOL.GS.Spells
                 MessageToCaster("Your target already has an effect of that type!", eChatType.CT_Spell);
                 return;
             }
+
             base.ApplyEffectOnTarget(target, effectiveness);
         }
+
         public override eProperty Property1 { get { return eProperty.Strength; } }
 
         // constructor
@@ -141,8 +152,10 @@ namespace DOL.GS.Spells
                 MessageToCaster("Your target already has an effect of that type!", eChatType.CT_Spell);
                 return;
             }
+
             base.ApplyEffectOnTarget(target, effectiveness);
         }
+
         public override eProperty Property1 { get { return eProperty.Dexterity; } }
 
         // constructor
@@ -162,8 +175,10 @@ namespace DOL.GS.Spells
                 MessageToCaster("Your target already has an effect of that type!", eChatType.CT_Spell);
                 return;
             }
+
             base.ApplyEffectOnTarget(target, effectiveness);
         }
+
         public override eProperty Property1 { get { return eProperty.Constitution; } }
 
         // constructor
@@ -180,11 +195,20 @@ namespace DOL.GS.Spells
         {
             get
             {
-            	if (Spell.Target.Equals("Self", StringComparison.OrdinalIgnoreCase)) return eBuffBonusCategory.Other; // no caps for self buffs
-                if (m_spellLine.IsBaseLine) return eBuffBonusCategory.BaseBuff; // baseline cap
+                if (Spell.Target.Equals("Self", StringComparison.OrdinalIgnoreCase))
+                {
+                    return eBuffBonusCategory.Other; // no caps for self buffs
+                }
+
+                if (m_spellLine.IsBaseLine)
+                {
+                    return eBuffBonusCategory.BaseBuff; // baseline cap
+                }
+
                 return eBuffBonusCategory.Other; // no caps for spec line buffs
             }
         }
+
         public override eProperty Property1 { get { return eProperty.ArmorFactor; } }
 
         // constructor
@@ -230,7 +254,7 @@ namespace DOL.GS.Spells
         // constructor
         public CombatSpeedBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    
+
     /// <summary>
     /// Haste Buff stacking with other Combat Speed Buff
     /// </summary>
@@ -311,7 +335,6 @@ namespace DOL.GS.Spells
         public MesmerizeDurationBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
 
-
     /// <summary>
     /// Acuity buff
     /// </summary>
@@ -359,6 +382,7 @@ namespace DOL.GS.Spells
         // constructor
         public EvadeChanceBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
+
     /// <summary>
     /// Parry chance buff
     /// </summary>
@@ -370,6 +394,7 @@ namespace DOL.GS.Spells
         // constructor
         public ParryChanceBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
+
     /// <summary>
     /// WeaponSkill buff
     /// </summary>
@@ -381,6 +406,7 @@ namespace DOL.GS.Spells
         // constructor
         public WeaponSkillBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
+
     /// <summary>
     /// Stealth Skill buff
     /// </summary>
@@ -392,6 +418,7 @@ namespace DOL.GS.Spells
         // constructor
         public StealthSkillBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
+
     /// <summary>
     /// To Hit buff
     /// </summary>
@@ -403,6 +430,7 @@ namespace DOL.GS.Spells
         // constructor
         public ToHitSkillBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
+
     /// <summary>
     /// Magic Resists Buff
     /// </summary>
@@ -419,6 +447,7 @@ namespace DOL.GS.Spells
     public class StyleAbsorbBuff : SingleStatBuff
     {
         public override eProperty Property1 { get { return eProperty.StyleAbsorb; } }
+
         public StyleAbsorbBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
 
@@ -426,6 +455,7 @@ namespace DOL.GS.Spells
     public class ExtraHP : SingleStatBuff
     {
         public override eProperty Property1 { get { return eProperty.ExtraHP; } }
+
         public ExtraHP(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
 
@@ -439,11 +469,20 @@ namespace DOL.GS.Spells
         {
             get
             {
-                if (Spell.Target == "Self") return eBuffBonusCategory.Other; // no caps for self buffs
-                if (m_spellLine.IsBaseLine) return eBuffBonusCategory.BaseBuff; // baseline cap
+                if (Spell.Target == "Self")
+                {
+                    return eBuffBonusCategory.Other; // no caps for self buffs
+                }
+
+                if (m_spellLine.IsBaseLine)
+                {
+                    return eBuffBonusCategory.BaseBuff; // baseline cap
+                }
+
                 return eBuffBonusCategory.Other; // no caps for spec line buffs
             }
         }
+
         public override eProperty Property1 { get { return eProperty.ArmorFactor; } }
 
         // constructor
@@ -457,6 +496,7 @@ namespace DOL.GS.Spells
     public class FelxibleSkillBuff : SingleStatBuff
     {
         public override eProperty Property1 { get { return eProperty.Skill_Flexible_Weapon; } }
+
         public FelxibleSkillBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
 }

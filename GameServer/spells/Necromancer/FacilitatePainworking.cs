@@ -25,17 +25,18 @@ namespace DOL.GS.Spells
     /// </summary>
     /// <author>Aredhel</author>
     [SpellHandler("FacilitatePainworking")]
-	class FacilitatePainworking : SpellHandler
-	{
-		public FacilitatePainworking(GameLiving caster, Spell spell, SpellLine line) 
-			: base(caster, spell, line) 
+    class FacilitatePainworking : SpellHandler
+    {
+        public FacilitatePainworking(GameLiving caster, Spell spell, SpellLine line)
+            : base(caster, spell, line)
         {
         }
 
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
-            return new FacilitatePainworkingEffect(this, 
+            return new FacilitatePainworkingEffect(
+                this,
                 CalculateEffectDuration(target, effectiveness), 0, effectiveness);
         }
-	}
+    }
 }
