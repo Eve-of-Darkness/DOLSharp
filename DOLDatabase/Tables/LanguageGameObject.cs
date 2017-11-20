@@ -45,6 +45,7 @@ namespace DOL.Database
         public string Name
         {
             get { return m_name; }
+
             set
             {
                 Dirty = true;
@@ -54,15 +55,16 @@ namespace DOL.Database
 
         /// <summary>
         /// Gets or sets the translated examine article.
-        /// 
+        ///
         /// You examine the Forge.
-        /// 
+        ///
         /// the = the examine article.
         /// </summary>
         [DataElement(AllowDbNull = true)]
         public string ExamineArticle
         {
             get { return m_examineArticle; }
+
             set
             {
                 Dirty = true;

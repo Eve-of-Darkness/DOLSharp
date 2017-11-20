@@ -17,7 +17,7 @@
  *
  */
 
-//Instance devised by Dinberg
+// Instance devised by Dinberg
 //     - there will probably be questions, direct them to dinberg_darktouch@hotmail.co.uk ;)
 using System;
 using System.Reflection;
@@ -31,166 +31,169 @@ namespace DOL.GS
     /// a template from InstanceXElement.
     /// </summary>
     public class Instance : BaseInstance
-	{
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-		/// <summary>
-		/// Creates an instance object. This shouldn't be used directly - Please use WorldMgr.CreateInstance
-		/// to create an instance.
-		/// </summary>
-		public Instance(ushort ID, GameTimer.TimeManager time, RegionData data) :base(ID, time, data)
-		{
-		}
+        /// <summary>
+        /// Creates an instance object. This shouldn't be used directly - Please use WorldMgr.CreateInstance
+        /// to create an instance.
+        /// </summary>
+        public Instance(ushort ID, GameTimer.TimeManager time, RegionData data) : base(ID, time, data)
+        {
+        }
 
-		~Instance()
-		{
-			log.Debug($"Instance destructor called for {Description}");
-		}
+        ~Instance()
+        {
+            log.Debug($"Instance destructor called for {Description}");
+        }
 
-		#region Entrance
+        #region Entrance
 
-		protected GameLocation m_entranceLocation;
+        protected GameLocation m_entranceLocation;
 
-		/// <summary>
-		/// Returns the entrance location into this instance.
-		/// </summary>
-		public GameLocation InstanceEntranceLocation => m_entranceLocation;
+        /// <summary>
+        /// Returns the entrance location into this instance.
+        /// </summary>
+        public GameLocation InstanceEntranceLocation => m_entranceLocation;
 
-	    #endregion
+        #endregion
 
-		#region LoadFromDatabase
+        #region LoadFromDatabase
 
-		/// <summary>
-		/// Loads elements relating to the given instance keyname from the database and populates the instance.
-		/// </summary>
-		/// <param name="instanceName"></param>
-		public virtual void LoadFromDatabase(string instanceName)
-		{
-			var objects = GameServer.Database.SelectObjects<DBInstanceXElement>("`InstanceID` = @InstanceID", new QueryParameter("@InstanceID", instanceName));
+        /// <summary>
+        /// Loads elements relating to the given instance keyname from the database and populates the instance.
+        /// </summary>
+        /// <param name="instanceName"></param>
+        public virtual void LoadFromDatabase(string instanceName)
+        {
+            var objects = GameServer.Database.SelectObjects<DBInstanceXElement>("`InstanceID` = @InstanceID", new QueryParameter("@InstanceID", instanceName));
 
-			if (objects.Count == 0)
-			{
-			    return;
-			}
+            if (objects.Count == 0)
+            {
+                return;
+            }
 
-			int count = 0;
+            int count = 0;
 
-			//Now we have a list of DBElements, lets create the various entries
-			//associated with them and populate the instance.
-			foreach (DBInstanceXElement entry in objects)
-			{
-				if (entry == null)
+            // Now we have a list of DBElements, lets create the various entries
+            // associated with them and populate the instance.
+            foreach (DBInstanceXElement entry in objects)
+            {
+                if (entry == null)
                 {
-                    continue; //an odd error, but experience knows best.
+                    continue; // an odd error, but experience knows best.
                 }
 
                 GameObject obj = null;
-				string theType = "DOL.GS.GameNPC";
+                string theType = "DOL.GS.GameNPC";
 
-				//Switch the classtype to see what we are making.
-				switch (entry.ClassType)
-				{
-					case "entrance":
-						//create the entrance, then move to the next.
-						m_entranceLocation = new GameLocation($"{instanceName}entranceRegion{ID}", ID, entry.X, entry.Y, entry.Z, entry.Heading);
-						//move to the next entry, nothing more to do here...
-						continue;
-					case "region":
-                        continue; //This is used to save the regionID as NPCTemplate.
-					case "DOL.GS.GameNPC":
+                // Switch the classtype to see what we are making.
+                switch (entry.ClassType)
+                {
+                    case "entrance":
+                        // create the entrance, then move to the next.
+                        m_entranceLocation = new GameLocation($"{instanceName}entranceRegion{ID}", ID, entry.X, entry.Y, entry.Z, entry.Heading);
+
+                        // move to the next entry, nothing more to do here...
+                        continue;
+                    case "region":
+                        continue; // This is used to save the regionID as NPCTemplate.
+                    case "DOL.GS.GameNPC":
                         break;
-					default:
+                    default:
                         theType = entry.ClassType;
                         break;
-				}
+                }
 
-				//Now we have the classtype to create, create it thus!
-				//This is required to ensure we check scripts for the space aswell, such as quests!
-				foreach (Assembly asm in ScriptMgr.GameServerScripts)
-				{
-					obj = (GameObject)asm.CreateInstance(theType, false);
-					if (obj != null)
-					{
-					    break;
-					}
-				}
-				
-				if (obj == null)
-				{
-				    continue;
-				}
+                // Now we have the classtype to create, create it thus!
+                // This is required to ensure we check scripts for the space aswell, such as quests!
+                foreach (Assembly asm in ScriptMgr.GameServerScripts)
+                {
+                    obj = (GameObject)asm.CreateInstance(theType, false);
+                    if (obj != null)
+                    {
+                        break;
+                    }
+                }
 
-				//We now have an object that isnt null. Lets place it at the location, in this region.
-				obj.X = entry.X;
-				obj.Y = entry.Y;
-				obj.Z = entry.Z;
-				obj.Heading = entry.Heading;
-				obj.CurrentRegionID = ID;
+                if (obj == null)
+                {
+                    continue;
+                }
 
-				//If its an npc, load from the npc template about now.
-				//By default, we ignore npctemplate if its set to 0.
-				if (!Util.IsEmpty(entry.NPCTemplate, true))
-				{
-					var listTemplate = entry.NPCTemplate.SplitCSV(true);
+                // We now have an object that isnt null. Lets place it at the location, in this region.
+                obj.X = entry.X;
+                obj.Y = entry.Y;
+                obj.Z = entry.Z;
+                obj.Heading = entry.Heading;
+                obj.CurrentRegionID = ID;
 
-				    if (int.TryParse(listTemplate[Util.Random(listTemplate.Count-1)], out var template) && template > 0)
-					{	
-						INpcTemplate npcTemplate = NpcTemplateMgr.GetTemplate(template);
-						//we only want to load the template if one actually exists, or there could be trouble!
-						if (npcTemplate != null)
-						{
-							((GameNPC)obj).LoadTemplate(npcTemplate);
-						}
-					}
-				}
-				//Finally, add it to the world!
-				obj.AddToWorld();
+                // If its an npc, load from the npc template about now.
+                // By default, we ignore npctemplate if its set to 0.
+                if (!Util.IsEmpty(entry.NPCTemplate, true))
+                {
+                    var listTemplate = entry.NPCTemplate.SplitCSV(true);
 
-				//Keep track of numbers.
-				count++;
-			}
+                    if (int.TryParse(listTemplate[Util.Random(listTemplate.Count - 1)], out var template) && template > 0)
+                    {
+                        INpcTemplate npcTemplate = NpcTemplateMgr.GetTemplate(template);
 
-			log.Info($"Successfully loaded a db entry to {Description} - Region ID {ID}. Loaded Entities: {count}");
-		}
+                        // we only want to load the template if one actually exists, or there could be trouble!
+                        if (npcTemplate != null)
+                        {
+                            ((GameNPC)obj).LoadTemplate(npcTemplate);
+                        }
+                    }
+                }
 
-		#endregion
+                // Finally, add it to the world!
+                obj.AddToWorld();
 
+                // Keep track of numbers.
+                count++;
+            }
 
-		/// <summary>
-		/// This method returns an int representative of an average level for the instance.
-		/// Instances do not scale with level by default, but specific instances like TaskDungeonMission can
-		/// use this for an accurate representation of level.
-		/// </summary>
-		/// <returns></returns>
-		public int GetInstanceLevel()
-		{
-			if (Objects == null)
-			{
-			    return 0;
-			}
+            log.Info($"Successfully loaded a db entry to {Description} - Region ID {ID}. Loaded Entities: {count}");
+        }
 
-			double level = 0;
-			double count = 0;
-			foreach (GameObject obj in Objects)
-			{
-			    GamePlayer player = obj as GamePlayer;
-				if (player == null)
-				{
-				    continue;
-				}
+        #endregion
 
-				//Dinberg: Guess work for now!
-				//I'll guess an appropriate formulae.
-				//100 + 7 times number of players divided by 100, multiplied by E(level)
+        /// <summary>
+        /// This method returns an int representative of an average level for the instance.
+        /// Instances do not scale with level by default, but specific instances like TaskDungeonMission can
+        /// use this for an accurate representation of level.
+        /// </summary>
+        /// <returns></returns>
+        public int GetInstanceLevel()
+        {
+            if (Objects == null)
+            {
+                return 0;
+            }
 
-				//Where E(level) = average level.
-				count++;
-				level += player.Level;
-			}
-			level = Math.Max(1,(level / count)); //double needed needed for lower levels...
+            double level = 0;
+            double count = 0;
+            foreach (GameObject obj in Objects)
+            {
+                GamePlayer player = obj as GamePlayer;
+                if (player == null)
+                {
+                    continue;
+                }
 
-			level *= ((100 + 7 * count) / 100);
-			return (int)level;
-		}
-	}
+                // Dinberg: Guess work for now!
+                // I'll guess an appropriate formulae.
+                // 100 + 7 times number of players divided by 100, multiplied by E(level)
+
+                // Where E(level) = average level.
+                count++;
+                level += player.Level;
+            }
+
+            level = Math.Max(1, level / count); // double needed needed for lower levels...
+
+            level *= (100 + 7 * count) / 100;
+            return (int)level;
+        }
+    }
 }

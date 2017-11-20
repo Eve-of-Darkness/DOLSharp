@@ -7,12 +7,12 @@ namespace DOL.GS.Spells
 {
 
     [SpellHandler("HereticDamageSpeedDecreaseLOP")]
-	public class HereticDamageSpeedDecreaseLostOnPulse : HereticSpeedDecreaseSpellHandler
-	{
+    public class HereticDamageSpeedDecreaseLostOnPulse : HereticSpeedDecreaseSpellHandler
+    {
         protected int m_lastdamage = 0;
         protected int m_pulsedamage = 0;
-        //    protected int m_pulsecount = -1;
 
+        // protected int m_pulsecount = -1;
         public override void FinishSpellCast(GameLiving target)
         {
             BeginEffect();
@@ -26,8 +26,16 @@ namespace DOL.GS.Spells
 
         public override bool IsOverwritable(GameSpellEffect compare)
         {
-            if (base.IsOverwritable(compare) == false) return false;
-            if (compare.Spell.Duration != Spell.Duration) return false;
+            if (base.IsOverwritable(compare) == false)
+            {
+                return false;
+            }
+
+            if (compare.Spell.Duration != Spell.Duration)
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -39,7 +47,6 @@ namespace DOL.GS.Spells
             return ad;
         }
 
-
         public override void CalculateDamageVariance(GameLiving target, out double min, out double max)
         {
             int speclevel = 1;
@@ -47,6 +54,7 @@ namespace DOL.GS.Spells
             {
                 speclevel = ((GamePlayer)m_caster).GetModifiedSpecLevel(m_spellLine.Spec);
             }
+
             min = 1;
             max = 1;
 
@@ -62,14 +70,21 @@ namespace DOL.GS.Spells
                 max += overspecBonus;
             }
 
-            if (min > max) min = max;
-            if (min < 0) min = 0;
-        }
+            if (min > max)
+            {
+                min = max;
+            }
 
+            if (min < 0)
+            {
+                min = 0;
+            }
+        }
 
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
             base.CreateSpellEffect(target, effectiveness);
+
             // damage is not reduced with distance
             return new GameSpellEffect(this, m_spell.Duration, m_spellLine.IsBaseLine ? 3000 : 2000, 1);
         }
@@ -99,7 +114,6 @@ namespace DOL.GS.Spells
             SendEffectAnimation(effect.Owner, 0, false, 1);
         }
 
-
         public override void OnEffectPulse(GameSpellEffect effect)
         {
             GameLiving t = effect.Owner;
@@ -108,17 +122,19 @@ namespace DOL.GS.Spells
             {
                 RemoveEffect();
             }
+
             if (!m_caster.TargetInView)
             {
                 RemoveEffect();
                 return;
             }
+
             if (!m_caster.IsAlive)
             {
                 RemoveEffect();
             }
 
-            if ( !m_caster.IsWithinRadius( effect.Owner, Spell.Range ) )
+            if (!m_caster.IsWithinRadius(effect.Owner, Spell.Range))
             {
                 RemoveEffect();
             }
@@ -133,24 +149,27 @@ namespace DOL.GS.Spells
 
             OnDirectEffect(effect.Owner, effect.Effectiveness);
 
-			// A really lame way to charge the correct amount of power per pulse since this spell is cast and maintained without pulsing. - Tolakram
-			if (m_focusTargets.Count > 1)
-			{
-				double powerPerTarget = (double)(effect.Spell.PulsePower / m_focusTargets.Count);
+            // A really lame way to charge the correct amount of power per pulse since this spell is cast and maintained without pulsing. - Tolakram
+            if (m_focusTargets.Count > 1)
+            {
+                double powerPerTarget = (double)(effect.Spell.PulsePower / m_focusTargets.Count);
 
-				int powerUsed = (int)powerPerTarget;
-				if (Util.ChanceDouble(((double)powerPerTarget - (double)powerUsed)))
-					powerUsed += 1;
+                int powerUsed = (int)powerPerTarget;
+                if (Util.ChanceDouble((double)powerPerTarget - (double)powerUsed))
+                {
+                    powerUsed += 1;
+                }
 
-				if (powerUsed > 0)
-					m_caster.Mana -= powerUsed;
-			}
-			else
-			{
-				m_caster.Mana -= effect.Spell.PulsePower;
-			}
-		}
-
+                if (powerUsed > 0)
+                {
+                    m_caster.Mana -= powerUsed;
+                }
+            }
+            else
+            {
+                m_caster.Mana -= effect.Spell.PulsePower;
+            }
+        }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
@@ -167,13 +186,22 @@ namespace DOL.GS.Spells
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
-            if (target == null) return;
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
+            if (target == null)
+            {
+                return;
+            }
+
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            {
+                return;
+            }
+
             if (Util.Chance(CalculateSpellResistChance(target)))
             {
                 OnSpellResist(target);
                 return;
             }
+
             AttackData ad = CalculateDamageToTarget(target, effectiveness);
 
             if (m_lastdamage <= 0)
@@ -184,7 +212,9 @@ namespace DOL.GS.Spells
             {
                 m_pulsedamage = Convert.ToInt32(m_lastdamage * 0.25);
                 if (target == focustarget)
+                {
                     m_lastdamage += m_pulsedamage;
+                }
             }
 
             ad.Damage = m_lastdamage;
@@ -204,7 +234,8 @@ namespace DOL.GS.Spells
                 if (brain != null)
                 {
                     GamePlayer owner = brain.GetPlayerOwner();
-					//Worthless checks - if these situations happen, we need to fix that instead of ignoring them
+
+                    // Worthless checks - if these situations happen, we need to fix that instead of ignoring them
                     if (owner != null /*&& owner.ControlledNpc != null && target == owner.ControlledNpc.Body*/)
                     {
                         MessageToLiving(owner, "Your " + target.Name + " resists the effect!", eChatType.CT_SpellResisted);
@@ -215,6 +246,7 @@ namespace DOL.GS.Spells
             {
                 MessageToLiving(target, "You resist the effect!", eChatType.CT_SpellResisted);
             }
+
             MessageToCaster(target.GetName(0, true) + " resists the effect!", eChatType.CT_SpellResisted);
 
             if (Spell.Damage != 0)
@@ -225,7 +257,7 @@ namespace DOL.GS.Spells
                 ad.Target = target;
                 ad.AttackType = AttackData.eAttackType.Spell;
                 ad.AttackResult = GameLiving.eAttackResult.Missed;
-				ad.SpellHandler = this;
+                ad.SpellHandler = this;
                 target.OnAttackedByEnemy(ad);
                 target.StartInterruptTimer(target.SpellInterruptDuration, ad.AttackType, Caster);
             }
@@ -238,18 +270,21 @@ namespace DOL.GS.Spells
             {
                 IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
                 if (aggroBrain != null)
+                {
                     aggroBrain.AddToAggroList(Caster, 1);
+                }
             }
-			if (target.Realm == 0 || Caster.Realm == 0)
-			{
-				target.LastAttackedByEnemyTickPvE = target.CurrentRegion.Time;
-				Caster.LastAttackTickPvE = Caster.CurrentRegion.Time;
-			}
-			else
-			{
-				target.LastAttackedByEnemyTickPvP = target.CurrentRegion.Time;
-				Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
-			}
+
+            if (target.Realm == 0 || Caster.Realm == 0)
+            {
+                target.LastAttackedByEnemyTickPvE = target.CurrentRegion.Time;
+                Caster.LastAttackTickPvE = Caster.CurrentRegion.Time;
+            }
+            else
+            {
+                target.LastAttackedByEnemyTickPvP = target.CurrentRegion.Time;
+                Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
+            }
         }
 
         public virtual void DamageTarget(AttackData ad)
@@ -263,7 +298,6 @@ namespace DOL.GS.Spells
             }
         }
 
-
-		public HereticDamageSpeedDecreaseLostOnPulse(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) {}
-	}
+        public HereticDamageSpeedDecreaseLostOnPulse(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+    }
 }

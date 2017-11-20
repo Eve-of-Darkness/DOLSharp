@@ -33,7 +33,11 @@ namespace DOL.GS.Spells
             {
                 GamePlayer casterPlayer = (GamePlayer)Caster;
                 Group group = casterPlayer.Group;
-                if(group == null) return list; // Should not appen since it is checked in ability handler
+                if (group == null)
+                {
+                    return list; // Should not appen since it is checked in ability handler
+                }
+
                 int spellRange = CalculateSpellRange();
                 if (group != null)
                 {
@@ -48,16 +52,22 @@ namespace DOL.GS.Spells
                                     list.Add(groupPlayer);
                                     IControlledBrain npc = groupPlayer.ControlledBrain;
                                     if (npc != null)
-                                        if (casterPlayer.IsWithinRadius( npc.Body, spellRange ))
+                                    {
+                                        if (casterPlayer.IsWithinRadius(npc.Body, spellRange))
+                                        {
                                             list.Add(npc.Body);
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
             return list;
-        }    	    	
+        }
+
         public MetalGuardSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
 }

@@ -14,7 +14,7 @@ namespace DOL.GS.Atlantis
 
         public override void TakeDamage(GameObject source, eDamageType damageType, int damageAmount, int criticalAmount)
         {
-            //Check if this encounter mob is tethered and if so, ignore any damage done both outside of or too far from it's tether range.
+            // Check if this encounter mob is tethered and if so, ignore any damage done both outside of or too far from it's tether range.
             if (TetherRange > 100)
             {
                 // if controlled NPC - do checks for owner instead
@@ -35,6 +35,7 @@ namespace DOL.GS.Atlantis
                         player.Out.SendMessage("The " + Name + " is too far from its encounter area, your damage fails to have an effect on it!", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
                         return;
                     }
+
                     return;
                 }
                 else
@@ -44,17 +45,20 @@ namespace DOL.GS.Atlantis
                         base.TakeDamage(source, damageType, damageAmount, criticalAmount);
                         return;
                     }
+
                     if (source is GamePlayer)
                     {
                         GamePlayer player = source as GamePlayer;
                         player.Out.SendMessage("You are too far from the " + Name + ", your damage fails to effect it!", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
                     }
+
                     return;
                 }
             }
             else
+            {
                 base.TakeDamage(source, damageType, damageAmount, criticalAmount);
+            }
         }
-
     }
 }

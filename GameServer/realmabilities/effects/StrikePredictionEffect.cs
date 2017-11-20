@@ -7,11 +7,11 @@ namespace DOL.GS.Effects
     /// <summary>
     /// Effect handler for Barrier Of Fortitude
     /// </summary>
-	public class StrikePredictionEffect : StaticEffect, IGameEffect
+    public class StrikePredictionEffect : StaticEffect, IGameEffect
     {
-        private const String m_delveString = "Grants all group members a chance to evade all melee and arrow attacks for 30 seconds.";
+        private const string m_delveString = "Grants all group members a chance to evade all melee and arrow attacks for 30 seconds.";
         private GamePlayer m_player;
-        private Int32 m_effectDuration;
+        private int m_effectDuration;
         private RegionTimer m_expireTimer;
         private int m_value;
 
@@ -45,7 +45,7 @@ namespace DOL.GS.Effects
         {
             GamePlayer player = (GamePlayer)sender;
 
-        	StrikePredictionEffect SPEffect = player.EffectList.GetOfType<StrikePredictionEffect>();
+            StrikePredictionEffect SPEffect = player.EffectList.GetOfType<StrikePredictionEffect>();
             if (SPEffect != null)
             {
                 SPEffect.Cancel(false);
@@ -97,7 +97,6 @@ namespace DOL.GS.Effects
             return 0;
         }
 
-
         /// <summary>
         /// Name of the effect
         /// </summary>
@@ -112,13 +111,16 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Remaining time of the effect in milliseconds
         /// </summary>
-        public override Int32 RemainingTime
+        public override int RemainingTime
         {
             get
             {
                 RegionTimer timer = m_expireTimer;
                 if (timer == null || !timer.IsAlive)
+                {
                     return 0;
+                }
+
                 return timer.TimeUntilElapsed;
             }
         }
@@ -126,7 +128,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override UInt16 Icon
+        public override ushort Icon
         {
             get
             {
@@ -141,7 +143,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-				var delveInfoList = new List<string>();
+                var delveInfoList = new List<string>();
                 delveInfoList.Add(m_delveString);
                 delveInfoList.Add(" ");
                 delveInfoList.Add("Value: " + m_value + "%");

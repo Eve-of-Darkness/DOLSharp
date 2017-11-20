@@ -9,7 +9,6 @@ namespace DOL.GS.Effects
 
         public FungalUnionEffect() : base(60000) { }
 
-
         public override void Start(GameLiving target)
         {
             base.Start(target);
@@ -31,12 +30,9 @@ namespace DOL.GS.Effects
             }
         }
 
-
         public override string Name { get { return "Fungal Union"; } }
 
-
         public override ushort Icon { get { return 3061; } }
-
 
         public override IList<string> DelveInfo
         {

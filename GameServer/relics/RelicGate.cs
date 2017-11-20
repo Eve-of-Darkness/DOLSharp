@@ -24,6 +24,6 @@ namespace DOL.GS.Relics
     /// </summary>
     /// <author>Aredhel</author>
     public class RelicGate
-	{
-	}
+    {
+    }
 }

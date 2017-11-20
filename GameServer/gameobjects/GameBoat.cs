@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -22,7 +22,7 @@ using DOL.Database;
 namespace DOL.GS
 {
     public class GameBoat : GameMovingObject
-	{
+    {
         private byte m_boatType = 0;
         protected DBBoat m_dbBoat;
         private string m_boatID;
@@ -31,7 +31,7 @@ namespace DOL.GS
         private ushort m_boatModel;
         private short m_boatMaxSpeedBase;
 
-		private RegionTimer m_removeTimer = null;
+        private RegionTimer m_removeTimer = null;
 
         public GameBoat(byte type)
             : base()
@@ -41,18 +41,19 @@ namespace DOL.GS
         }
 
         public GameBoat()
-			: base()
+            : base()
         {
             base.OwnerID = BoatOwner;
         }
 
-		public override bool AddToWorld()
-		{
+        public override bool AddToWorld()
+        {
             if (!base.AddToWorld())
             {
                 return false;
             }
-            return true;            
+
+            return true;
         }
 
         /// <summary>
@@ -70,18 +71,20 @@ namespace DOL.GS
             {
                 return m_boatID;
             }
+
             set
             {
                 m_boatID = value;
             }
         }
-        
+
         public override string Name
         {
             get
             {
                 return m_boatName;
             }
+
             set
             {
                 m_boatName = value;
@@ -94,6 +97,7 @@ namespace DOL.GS
             {
                 return m_boatModel;
             }
+
             set
             {
                 m_boatModel = value;
@@ -106,6 +110,7 @@ namespace DOL.GS
             {
                 return m_boatMaxSpeedBase;
             }
+
             set
             {
                 m_boatMaxSpeedBase = value;
@@ -118,6 +123,7 @@ namespace DOL.GS
             {
                 return m_boatOwner;
             }
+
             set
             {
                 m_boatOwner = value;
@@ -144,12 +150,12 @@ namespace DOL.GS
             }
         }
 
-		public override int REQUIRED_PASSENGERS
-		{
-			get
-			{
-				switch (m_boatType)
-				{
+        public override int REQUIRED_PASSENGERS
+        {
+            get
+            {
+                switch (m_boatType)
+                {
                     case 0: return 1;
                     case 1: return 1;
                     case 2: return 1;
@@ -160,52 +166,63 @@ namespace DOL.GS
                     case 7: return 1;
                     case 8: return 1;
                     default: return 1;
-				}
-			}
-		}
+                }
+            }
+        }
 
-		public override int SLOT_OFFSET
-		{
-			get
-			{
-				return 1;
-			}
-		}
+        public override int SLOT_OFFSET
+        {
+            get
+            {
+                return 1;
+            }
+        }
 
-		public override bool RiderMount(GamePlayer rider, bool forced)
-		{
-			if (!base.RiderMount(rider, forced))
-				return false;
+        public override bool RiderMount(GamePlayer rider, bool forced)
+        {
+            if (!base.RiderMount(rider, forced))
+            {
+                return false;
+            }
 
-			if (m_removeTimer != null && m_removeTimer.IsAlive)
-				m_removeTimer.Stop();
+            if (m_removeTimer != null && m_removeTimer.IsAlive)
+            {
+                m_removeTimer.Stop();
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		public override bool RiderDismount(bool forced, GamePlayer player)
-		{
-			if (!base.RiderDismount(forced, player))
-				return false;
+        public override bool RiderDismount(bool forced, GamePlayer player)
+        {
+            if (!base.RiderDismount(forced, player))
+            {
+                return false;
+            }
 
-			if (CurrentRiders.Length == 0)
-			{
-				if (m_removeTimer == null)
-					m_removeTimer = new RegionTimer(this, new RegionTimerCallback(RemoveCallback));
-				else if (m_removeTimer.IsAlive)
-					m_removeTimer.Stop();
-				m_removeTimer.Start(15 * 60 * 1000);
-			}
-      
-			return true;
-		}
+            if (CurrentRiders.Length == 0)
+            {
+                if (m_removeTimer == null)
+                {
+                    m_removeTimer = new RegionTimer(this, new RegionTimerCallback(RemoveCallback));
+                }
+                else if (m_removeTimer.IsAlive)
+                {
+                    m_removeTimer.Stop();
+                }
+
+                m_removeTimer.Start(15 * 60 * 1000);
+            }
+
+            return true;
+        }
 
         protected int RemoveCallback(RegionTimer timer)
-		{
-			m_removeTimer.Stop();
-			m_removeTimer = null;
-			Delete();
-			return 0;
+        {
+            m_removeTimer.Stop();
+            m_removeTimer = null;
+            Delete();
+            return 0;
         }
 
         /// <summary>
@@ -216,8 +233,11 @@ namespace DOL.GS
             foreach (GamePlayer plr in boat.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 if (player.Name == plr.Name)
+                {
                     return true;
+                }
             }
+
             return false;
         }
 
@@ -228,12 +248,14 @@ namespace DOL.GS
         /// <returns></returns>
         public override bool Interact(GamePlayer player)
         {
-            if (OwnerID != "")            
+            if (OwnerID != string.Empty)
+            {
                 return false;
-              
- 	        return base.Interact(player);
-        }       
-       
+            }
+
+            return base.Interact(player);
+        }
+
         /// <summary>
         /// Loads this boat from a boat table
         /// </summary>
@@ -241,7 +263,9 @@ namespace DOL.GS
         public override void LoadFromDatabase(DataObject obj)
         {
             if (!(obj is DBBoat))
+            {
                 return;
+            }
 
             m_dbBoat = (DBBoat)obj;
             m_boatID = m_dbBoat.ObjectId;
@@ -261,6 +285,7 @@ namespace DOL.GS
                 case 1613: m_boatType = 7; break;
                 case 1614: m_boatType = 8; break;
             }
+
             theBoatDB = m_dbBoat;
             base.LoadFromDatabase(obj);
         }

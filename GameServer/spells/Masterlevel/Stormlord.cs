@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -26,8 +26,8 @@ using System.Collections.Generic;
 
 namespace DOL.GS.Spells
 {
-    //http://www.camelotherald.com/masterlevels/ma.php?ml=Stormlord
-    //shared timer 1
+    // http://www.camelotherald.com/masterlevels/ma.php?ml=Stormlord
+    // shared timer 1
     #region Stormlord-1
     [SpellHandler("DazzlingArray")]
     public class DazzlingArraySpellHandler : StormSpellHandler
@@ -36,7 +36,7 @@ namespace DOL.GS.Spells
         public DazzlingArraySpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            //Construct a new storm.
+            // Construct a new storm.
             storm = new GameStorm();
             storm.Realm = caster.Realm;
             storm.X = caster.X;
@@ -72,6 +72,7 @@ namespace DOL.GS.Spells
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
+
     [SpellHandler("StormMissHit")]
     public class StormMissHit : MasterlevelBuffHandling
     {
@@ -80,13 +81,22 @@ namespace DOL.GS.Spells
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             GameSpellEffect neweffect = CreateSpellEffect(target, effectiveness);
-            if (target == null) return;
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
+            if (target == null)
+            {
+                return;
+            }
+
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            {
+                return;
+            }
+
             neweffect.Start(target);
 
             if (target is GamePlayer)
+            {
                 ((GamePlayer)target).Out.SendMessage("You're harder to hit!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
-
+            }
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
@@ -106,7 +116,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //no shared timer
+    // no shared timer
     #region Stormlord-2
     [SpellHandler("VacuumVortex")]
     public class VacuumVortexSpellHandler : SpellHandler
@@ -123,18 +133,24 @@ namespace DOL.GS.Spells
 
         public override IList<GameLiving> SelectTargets(GameObject CasterTarget)
         {
-            
+
             var list = new List<GameLiving>(8);
             foreach (GameNPC storms in Caster.GetNPCsInRadius(350))
             {
-                if ((storms is GameStorm) && (GameServer.ServerRules.IsSameRealm(storms, Caster, true))) list.Add(storms);
+                if ((storms is GameStorm) && GameServer.ServerRules.IsSameRealm(storms, Caster, true))
+                {
+                    list.Add(storms);
+                }
             }
+
             return list;
         }
+
         public override int CalculateSpellResistChance(GameLiving target)
         {
             return 0;
         }
+
         /// <summary>
         /// execute non duration spell effect on target
         /// </summary>
@@ -142,10 +158,13 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness"></param>
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
-            //base.OnDirectEffect(target, effectiveness);
+            // base.OnDirectEffect(target, effectiveness);
             var targets = SelectTargets(Caster);
 
-            if (targets == null) return;
+            if (targets == null)
+            {
+                return;
+            }
 
             foreach (GameStorm targetStorm in targets)
             {
@@ -163,7 +182,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //shared timer 2
+    // shared timer 2
     #region Stormlord-3
     [SpellHandler("EnervatingGas")]
     public class EnervatingGasSpellHandler : StormSpellHandler
@@ -172,7 +191,7 @@ namespace DOL.GS.Spells
         public EnervatingGasSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            //Construct a new storm.
+            // Construct a new storm.
             storm = new GameStorm();
             storm.Realm = caster.Realm;
             storm.X = caster.X;
@@ -182,8 +201,6 @@ namespace DOL.GS.Spells
             storm.Heading = caster.Heading;
             storm.Owner = (GamePlayer)caster;
             storm.Movable = true;
-
-
 
             // Construct the storm spell
             dbs = new DBSpell();
@@ -196,7 +213,7 @@ namespace DOL.GS.Spells
             dbs.Radius = 0;
             dbs.Type = "StormEnduDrain";
             dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth; //should be 2
+            dbs.Duration = spell.ResurrectHealth; // should be 2
             dbs.Frequency = spell.ResurrectMana;
             dbs.Pulse = 0;
             dbs.PulsePower = 0;
@@ -210,6 +227,7 @@ namespace DOL.GS.Spells
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
+
     [SpellHandler("StormEnduDrain")]
     public class StormEndudrain : SpellHandler
     {
@@ -222,15 +240,25 @@ namespace DOL.GS.Spells
 
             neweffect.Start(target);
 
-            if (target == null) return;
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
-            //spell damage should 25;
-            int end = (int)(Spell.Damage);
-            target.ChangeEndurance(target, GameLiving.eEnduranceChangeType.Spell, (-end));
+            if (target == null)
+            {
+                return;
+            }
+
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            {
+                return;
+            }
+
+            // spell damage should 25;
+            int end = (int)Spell.Damage;
+            target.ChangeEndurance(target, GameLiving.eEnduranceChangeType.Spell, -end);
 
             if (target is GamePlayer)
+            {
                 ((GamePlayer)target).Out.SendMessage(" You lose " + end + " endurance!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
-            (m_caster as GamePlayer).Out.SendMessage("" + target.Name + " loses " + end + " endurance!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+            } 
+(m_caster as GamePlayer).Out.SendMessage(string.Empty + target.Name + " loses " + end + " endurance!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
@@ -247,7 +275,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //shared timer 1
+    // shared timer 1
     #region Stormlord-4
     [SpellHandler("InebriatingFumes")]
     public class InebriatingFumesSpellHandler : StormSpellHandler
@@ -256,7 +284,7 @@ namespace DOL.GS.Spells
         public InebriatingFumesSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            //Construct a new storm.
+            // Construct a new storm.
             storm = new GameStorm();
             storm.Realm = caster.Realm;
             storm.X = caster.X;
@@ -292,6 +320,7 @@ namespace DOL.GS.Spells
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
+
     /// <summary>
     /// Dex/Qui stat specline debuff
     /// </summary>
@@ -299,18 +328,28 @@ namespace DOL.GS.Spells
     public class StormDexQuickDebuff : DualStatDebuff
     {
         public override eProperty Property1 { get { return eProperty.Dexterity; } }
+
         public override eProperty Property2 { get { return eProperty.Quickness; } }
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             GameSpellEffect neweffect = CreateSpellEffect(target, effectiveness);
-            if (target == null) return;
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
+            if (target == null)
+            {
+                return;
+            }
+
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            {
+                return;
+            }
+
             neweffect.Start(target);
 
             if (target is GamePlayer)
+            {
                 ((GamePlayer)target).Out.SendMessage("Your dexterity and quickness decreased!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
-
+            }
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
@@ -330,7 +369,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //shared timer 2
+    // shared timer 2
     #region Stormlord-5
     [SpellHandler("MentalSiphon")]
     public class MentalSiphonSpellHandler : StormSpellHandler
@@ -339,7 +378,7 @@ namespace DOL.GS.Spells
         public MentalSiphonSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            //Construct a new storm.
+            // Construct a new storm.
             storm = new GameStorm();
             storm.Realm = caster.Realm;
             storm.X = caster.X;
@@ -389,11 +428,19 @@ namespace DOL.GS.Spells
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             GameSpellEffect neweffect = CreateSpellEffect(target, effectiveness);
-            if (target == null) return;
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
+            if (target == null)
+            {
+                return;
+            }
+
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            {
+                return;
+            }
+
             neweffect.Start(target);
-            int mana = (int)(Spell.Damage);
-            target.ChangeMana(target, GameLiving.eManaChangeType.Spell, (-mana));
+            int mana = (int)Spell.Damage;
+            target.ChangeMana(target, GameLiving.eManaChangeType.Spell, -mana);
 
             if (target is GamePlayer)
             {
@@ -401,18 +448,20 @@ namespace DOL.GS.Spells
             }
 
             StealMana(target, mana);
+
             // target.StartInterruptTimer(SPELL_INTERRUPT_DURATION, AttackData.eAttackType.Spell, Caster);
         }
 
-
         public virtual void StealMana(GameLiving target, int mana)
         {
-            if (!m_caster.IsAlive) return;
+            if (!m_caster.IsAlive)
+            {
+                return;
+            }
+
             m_caster.ChangeMana(target, GameLiving.eManaChangeType.Spell, mana);
             SendCasterMessage(target, mana);
-
         }
-
 
         public virtual void SendCasterMessage(GameLiving target, int mana)
         {
@@ -421,11 +470,13 @@ namespace DOL.GS.Spells
             {
                 MessageToCaster("You steal " + mana + " power points" + (mana == 1 ? "." : "s."), eChatType.CT_Spell);
             }
-            //else
-            //{
+
+            // else
+            // {
             //   MessageToCaster("You cannot absorb any more power.", eChatType.CT_SpellResisted);
-            //}
+            // }
         }
+
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
             effect.Owner.EffectList.Remove(effect);
@@ -435,16 +486,18 @@ namespace DOL.GS.Spells
 
     #endregion
 
-    //no shared timer
+    // no shared timer
     #region Stormlord-6
     [SpellHandler("FocusingWinds")]
     public class FocusingWindsSpellHandler : SpellHandler
     {
         private GameSpellEffect m_effect;
+
         public override int CalculateSpellResistChance(GameLiving target)
         {
             return 0;
         }
+
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
@@ -466,13 +519,18 @@ namespace DOL.GS.Spells
                 targetStorm.Movable = true;
                 GameEventMgr.RemoveHandler(m_caster, GameLivingEvent.Moving, new DOLEventHandler(LivingMoves));
             }
+
             return base.OnEffectExpires(effect, noMessages);
         }
 
         public void LivingMoves(DOLEvent e, object sender, EventArgs args)
         {
             GameLiving player = sender as GameLiving;
-            if (player == null) return;
+            if (player == null)
+            {
+                return;
+            }
+
             if (e == GameLivingEvent.Moving)
             {
                 MessageToCaster("You are moving. Your concentration fades", eChatType.CT_SpellExpires);
@@ -480,11 +538,12 @@ namespace DOL.GS.Spells
                 return;
             }
         }
+
         public FocusingWindsSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
     #endregion
 
-    //shared timer 1
+    // shared timer 1
     #region Stormlord-7
     [SpellHandler("ChokingVapors")]
     public class ChokingVaporsSpellHandler : StormSpellHandler
@@ -493,7 +552,7 @@ namespace DOL.GS.Spells
         public ChokingVaporsSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            //Construct a new storm.
+            // Construct a new storm.
             storm = new GameStorm();
             storm.Realm = caster.Realm;
             storm.X = caster.X;
@@ -529,6 +588,7 @@ namespace DOL.GS.Spells
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
+
     /// <summary>
     /// Str/Con stat specline debuff
     /// </summary>
@@ -536,18 +596,28 @@ namespace DOL.GS.Spells
     public class StormStrConstDebuff : DualStatDebuff
     {
         public override eProperty Property1 { get { return eProperty.Strength; } }
+
         public override eProperty Property2 { get { return eProperty.Constitution; } }
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             GameSpellEffect neweffect = CreateSpellEffect(target, effectiveness);
-            if (target == null) return;
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
+            if (target == null)
+            {
+                return;
+            }
+
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            {
+                return;
+            }
+
             neweffect.Start(target);
 
             if (target is GamePlayer)
+            {
                 ((GamePlayer)target).Out.SendMessage("Your strenght and constitution decreased!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
-
+            }
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
@@ -567,7 +637,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //shared timer 1
+    // shared timer 1
     #region Stormlord-8
     [SpellHandler("SenseDullingCloud")]
     public class SenseDullingCloudSpellHandler : StormSpellHandler
@@ -576,7 +646,7 @@ namespace DOL.GS.Spells
         public SenseDullingCloudSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            //Construct a new storm.
+            // Construct a new storm.
             storm = new GameStorm();
             storm.Realm = caster.Realm;
             storm.X = caster.X;
@@ -612,6 +682,7 @@ namespace DOL.GS.Spells
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
+
     /// <summary>
     /// Acuity stat baseline debuff
     /// </summary>
@@ -624,9 +695,20 @@ namespace DOL.GS.Spells
             get
             {
                 eProperty temp = eProperty.Acuity;
-                if (m_spellTarget.Realm == eRealm.Albion) temp = eProperty.Intelligence;
-                if (m_spellTarget.Realm == eRealm.Midgard) temp = eProperty.Piety;
-                if (m_spellTarget.Realm == eRealm.Hibernia) temp = eProperty.Intelligence;
+                if (m_spellTarget.Realm == eRealm.Albion)
+                {
+                    temp = eProperty.Intelligence;
+                }
+
+                if (m_spellTarget.Realm == eRealm.Midgard)
+                {
+                    temp = eProperty.Piety;
+                }
+
+                if (m_spellTarget.Realm == eRealm.Hibernia)
+                {
+                    temp = eProperty.Intelligence;
+                }
 
                 return temp;
             }
@@ -635,13 +717,22 @@ namespace DOL.GS.Spells
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             GameSpellEffect neweffect = CreateSpellEffect(target, effectiveness);
-            if (target == null) return;
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
+            if (target == null)
+            {
+                return;
+            }
+
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            {
+                return;
+            }
+
             neweffect.Start(target);
 
             if (target is GamePlayer)
+            {
                 ((GamePlayer)target).Out.SendMessage("Your acuity decreased!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
-
+            }
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
@@ -661,7 +752,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //no shared timer
+    // no shared timer
     #region Stormlord-9
     [SpellHandler("EnergyTempest")]
     public class EnergyTempestSpellHandler : StormSpellHandler
@@ -670,7 +761,7 @@ namespace DOL.GS.Spells
         public EnergyTempestSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            //Construct a new storm.
+            // Construct a new storm.
             storm = new GameStorm();
             storm.Realm = caster.Realm;
             storm.X = caster.X;
@@ -706,6 +797,7 @@ namespace DOL.GS.Spells
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
+
     [SpellHandler("StormEnergyTempest")]
     public class StormEnergyTempest : SpellHandler
     {
@@ -729,7 +821,9 @@ namespace DOL.GS.Spells
                 }
 
                 if (spellDamage < 0)
+                {
                     spellDamage = 0;
+                }
 
                 return spellDamage;
             }
@@ -746,13 +840,21 @@ namespace DOL.GS.Spells
 
             return base.DamageCap(effectiveness);
         }
+
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             GameSpellEffect neweffect = CreateSpellEffect(target, effectiveness);
-            if (target == null) return;
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
-            neweffect.Start(target);
+            if (target == null)
+            {
+                return;
+            }
 
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            {
+                return;
+            }
+
+            neweffect.Start(target);
 
             // calc damage
             AttackData ad = CalculateDamageToTarget(target, effectiveness);
@@ -778,5 +880,5 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //ML 10 Arcing Power - already handled in another area
+    // ML 10 Arcing Power - already handled in another area
 }

@@ -20,21 +20,25 @@
 namespace DOL.GS.Commands
 {
     [Cmd(
-		"&news",
-		ePrivLevel.Player,
-		"Show news on social interface",
-		"/news")]
-	public class NewsCommandHandler : AbstractCommandHandler, ICommandHandler
-	{
-		public void OnCommand(GameClient client, string[] args)
-		{
-			if (client.Player == null)
-				return;
+        "&news",
+        ePrivLevel.Player,
+        "Show news on social interface",
+        "/news")]
+    public class NewsCommandHandler : AbstractCommandHandler, ICommandHandler
+    {
+        public void OnCommand(GameClient client, string[] args)
+        {
+            if (client.Player == null)
+            {
+                return;
+            }
 
-			if (IsSpammingCommand(client.Player, "news"))
-				return;
+            if (IsSpammingCommand(client.Player, "news"))
+            {
+                return;
+            }
 
-			NewsMgr.DisplayNews(client);
-		}
-	}
+            NewsMgr.DisplayNews(client);
+        }
+    }
 }

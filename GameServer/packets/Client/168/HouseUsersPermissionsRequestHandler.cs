@@ -21,33 +21,39 @@ using DOL.GS.Housing;
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.HouseUserPermissionRequest, "Handles housing Users permissions requests from menu", eClientStatus.PlayerInGame)]
-	public class HouseUsersPermissionsRequestHandler : IPacketHandler
-	{
-		#region IPacketHandler Members
+    public class HouseUsersPermissionsRequestHandler : IPacketHandler
+    {
+        #region IPacketHandler Members
 
-		public void HandlePacket(GameClient client, GSPacketIn packet)
-		{
-			int unk1 = packet.ReadByte();
-			int unk2 = packet.ReadByte();
-			ushort houseNumber = packet.ReadShort();
+        public void HandlePacket(GameClient client, GSPacketIn packet)
+        {
+            int unk1 = packet.ReadByte();
+            int unk2 = packet.ReadByte();
+            ushort houseNumber = packet.ReadShort();
 
-			// house is null, return
-			var house = HouseMgr.GetHouse(houseNumber);
-			if (house == null)
-				return;
+            // house is null, return
+            var house = HouseMgr.GetHouse(houseNumber);
+            if (house == null)
+            {
+                return;
+            }
 
-			// player is null, return
-			if (client.Player == null)
-				return;
+            // player is null, return
+            if (client.Player == null)
+            {
+                return;
+            }
 
-			// player has no owner permissions and isn't a GM or admin, return
-			if (!house.HasOwnerPermissions(client.Player) && client.Account.PrivLevel <= 1)
-				return;
+            // player has no owner permissions and isn't a GM or admin, return
+            if (!house.HasOwnerPermissions(client.Player) && client.Account.PrivLevel <= 1)
+            {
+                return;
+            }
 
-			// build the packet
-			client.Out.SendHouseUsersPermissions(house);
-		}
+            // build the packet
+            client.Out.SendHouseUsersPermissions(house);
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

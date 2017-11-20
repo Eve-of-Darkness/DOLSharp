@@ -18,10 +18,8 @@
  */
 
 // Original code by Dinberg
-
 using System.Collections.Generic;
 using DOL.AI.Brain;
-
 
 namespace DOL.GS.Spells
 {
@@ -34,23 +32,22 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Constructs the spell handler
         /// </summary>
-		public SummonNoveltyPet(GameLiving caster, Spell spell, SpellLine line)
+        public SummonNoveltyPet(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line) { }
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             base.ApplyEffectOnTarget(target, effectiveness);
 
-			if (m_pet != null)
-			{
-				m_pet.Flags |= GameNPC.eFlags.PEACE; //must be peace!
+            if (m_pet != null)
+            {
+                m_pet.Flags |= GameNPC.eFlags.PEACE; // must be peace!
 
-				//No brain for now, so just follow owner.
-				m_pet.Follow(Caster, 100, WorldMgr.VISIBILITY_DISTANCE);
+                // No brain for now, so just follow owner.
+                m_pet.Follow(Caster, 100, WorldMgr.VISIBILITY_DISTANCE);
 
-				Caster.TempProperties.setProperty(NoveltyPetBrain.HAS_PET, true);
-			}
-                        
+                Caster.TempProperties.setProperty(NoveltyPetBrain.HAS_PET, true);
+            }
         }
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
@@ -61,11 +58,11 @@ namespace DOL.GS.Spells
                 return false;
             }
 
-			if (Caster.TempProperties.getProperty<bool>(NoveltyPetBrain.HAS_PET, false))
-			{
-				// no message
-				return false;
-			}
+            if (Caster.TempProperties.getProperty<bool>(NoveltyPetBrain.HAS_PET, false))
+            {
+                // no message
+                return false;
+            }
 
             return base.CheckBeginCast(selectedTarget);
         }
@@ -83,15 +80,15 @@ namespace DOL.GS.Spells
             return new NoveltyPetBrain(owner as GamePlayer);
         }
 
-		public override IList<string> DelveInfo
-		{
-			get
-			{
-				var list = new List<string>();
-				list.Add(string.Format("  {0}", Spell.Description));
+        public override IList<string> DelveInfo
+        {
+            get
+            {
+                var list = new List<string>();
+                list.Add(string.Format("  {0}", Spell.Description));
 
-				return list;
-			}
-		}
+                return list;
+            }
+        }
     }
 }

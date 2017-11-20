@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -47,12 +47,14 @@ namespace DOL.GS.Effects
                 {
                     p.Out.SendSpellEffectAnimation(EffectOwner, EffectOwner, OverwhelmAbility.EFFECT , 0, false, 1);
                 }
+
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
         }
+
         public override void Stop()
         {
             if (EffectOwner != null)
@@ -62,6 +64,7 @@ namespace DOL.GS.Effects
                 GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
                 GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
+
             base.Stop();
         }
 
@@ -77,10 +80,13 @@ namespace DOL.GS.Effects
 
             OverwhelmEffect Overwhelm = (OverwhelmEffect)player.EffectList.GetOfType<OverwhelmEffect>();
             if (Overwhelm != null)
+            {
                 Overwhelm.Cancel(false);
+            }
         }
 
         public override string Name { get { return "Overwhelm"; } }
+
         public override ushort Icon { get { return 1841; } }
 
         // Delve Info
@@ -94,5 +100,4 @@ namespace DOL.GS.Effects
             }
         }
     }
-
 }

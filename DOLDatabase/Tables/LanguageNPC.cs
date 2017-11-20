@@ -48,6 +48,7 @@ namespace DOL.Database
         public string Name
         {
             get { return m_name; }
+
             set
             {
                 Dirty = true;
@@ -57,15 +58,16 @@ namespace DOL.Database
 
         /// <summary>
         /// Gets or sets the name suffix (currently used by necromancer pets).
-        /// 
+        ///
         /// The XYZ spell is no longer in the Death Servant's queue.
-        /// 
+        ///
         /// 's = the suffix.
         /// </summary>
         [DataElement(AllowDbNull = true)]
         public string Suffix
         {
             get { return m_suffix; }
+
             set
             {
                 Dirty = true;
@@ -80,6 +82,7 @@ namespace DOL.Database
         public string GuildName
         {
             get { return m_guildName; }
+
             set
             {
                 Dirty = true;
@@ -89,15 +92,16 @@ namespace DOL.Database
 
         /// <summary>
         /// Gets or sets the translated examine article.
-        /// 
+        ///
         /// You examine the Tree.
-        /// 
+        ///
         /// the = the examine article.
         /// </summary>
         [DataElement(AllowDbNull = true)]
         public string ExamineArticle
         {
             get { return m_examineArticle; }
+
             set
             {
                 Dirty = true;
@@ -107,15 +111,16 @@ namespace DOL.Database
 
         /// <summary>
         /// Gets or sets the translated message article.
-        /// 
+        ///
         /// GamePlayer has been killed by a Tree.
-        /// 
+        ///
         /// a = the message article.
         /// </summary>
         [DataElement(AllowDbNull = true)]
         public string MessageArticle
         {
             get { return m_messageArticle; }
+
             set
             {
                 Dirty = true;

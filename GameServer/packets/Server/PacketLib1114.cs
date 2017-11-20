@@ -20,7 +20,6 @@
 using System.Reflection;
 using log4net;
 
-
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(1114, GameClient.eClientVersion.Version1114)]
@@ -35,7 +34,6 @@ namespace DOL.GS.PacketHandler
         public PacketLib1114(GameClient client)
             : base(client)
         {
-
         }
     }
 }

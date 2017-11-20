@@ -24,88 +24,95 @@ namespace DOL.GS.Relics
     /// </summary>
     /// <author>Aredhel</author>
     public class RelicPad : GameObject
-	{
-		/// <summary>
-		/// The pillar this pad triggers.
-		/// </summary>
-		private RelicPillar m_relicPillar;
+    {
+        /// <summary>
+        /// The pillar this pad triggers.
+        /// </summary>
+        private RelicPillar m_relicPillar;
 
-		public RelicPad(RelicPillar relicPillar)
-		{
-			m_relicPillar = relicPillar;
-		}
+        public RelicPad(RelicPillar relicPillar)
+        {
+            m_relicPillar = relicPillar;
+        }
 
-		/// <summary>
-		/// Relic pad radius.
-		/// </summary>
-		static public int Radius
-		{
-			get { return 200; }
-		}
+        /// <summary>
+        /// Relic pad radius.
+        /// </summary>
+        static public int Radius
+        {
+            get { return 200; }
+        }
 
-		private int m_playersOnPad = 0;
+        private int m_playersOnPad = 0;
 
-		/// <summary>
-		/// The number of players currently on the pad.
-		/// </summary>
-		public int PlayersOnPad
-		{
-			get { return m_playersOnPad; }
-			set 
-			{
-				if (value < 0)
-					return;
+        /// <summary>
+        /// The number of players currently on the pad.
+        /// </summary>
+        public int PlayersOnPad
+        {
+            get { return m_playersOnPad; }
 
-				m_playersOnPad = value;
+            set
+            {
+                if (value < 0)
+                {
+                    return;
+                }
 
-				if (m_playersOnPad >= ServerProperties.Properties.RELIC_PLAYERS_REQUIRED_ON_PAD &&
-					m_relicPillar.State == eDoorState.Closed)
-					m_relicPillar.Open();
-				else if (m_relicPillar.State == eDoorState.Open && m_playersOnPad <= 0)
-					m_relicPillar.Close();
-			}
-		}
+                m_playersOnPad = value;
 
-		/// <summary>
-		/// Called when a players steps on the pad.
-		/// </summary>
-		/// <param name="player"></param>
-		public void OnPlayerEnter(GamePlayer player)
-		{
-			PlayersOnPad++;
-		}
+                if (m_playersOnPad >= ServerProperties.Properties.RELIC_PLAYERS_REQUIRED_ON_PAD &&
+                    m_relicPillar.State == eDoorState.Closed)
+                {
+                    m_relicPillar.Open();
+                }
+                else if (m_relicPillar.State == eDoorState.Open && m_playersOnPad <= 0)
+                {
+                    m_relicPillar.Close();
+                }
+            }
+        }
 
-		/// <summary>
-		/// Called when a player steps off the pad.
-		/// </summary>
-		/// <param name="player"></param>
-		public void OnPlayerLeave(GamePlayer player)
-		{
-			PlayersOnPad--;
-		}
+        /// <summary>
+        /// Called when a players steps on the pad.
+        /// </summary>
+        /// <param name="player"></param>
+        public void OnPlayerEnter(GamePlayer player)
+        {
+            PlayersOnPad++;
+        }
 
-		/// <summary>
-		/// Class to register players entering or leaving the pad.
-		/// </summary>
-		public class Surface : Area.Circle
-		{
-			private RelicPad m_relicPad;
+        /// <summary>
+        /// Called when a player steps off the pad.
+        /// </summary>
+        /// <param name="player"></param>
+        public void OnPlayerLeave(GamePlayer player)
+        {
+            PlayersOnPad--;
+        }
 
-			public Surface(RelicPad relicPad)
-				: base("", relicPad.X, relicPad.Y, relicPad.Z, RelicPad.Radius)
-			{
-				m_relicPad = relicPad;
-			}
+        /// <summary>
+        /// Class to register players entering or leaving the pad.
+        /// </summary>
+        public class Surface : Area.Circle
+        {
+            private RelicPad m_relicPad;
 
-			public override void OnPlayerEnter(GamePlayer player)
-			{
-				m_relicPad.OnPlayerEnter(player);
-			}
+            public Surface(RelicPad relicPad)
+                : base(string.Empty, relicPad.X, relicPad.Y, relicPad.Z, RelicPad.Radius)
+            {
+                m_relicPad = relicPad;
+            }
 
-			public override void OnPlayerLeave(GamePlayer player)
-			{
-				m_relicPad.OnPlayerLeave(player);
-			}
-		}
-	}
+            public override void OnPlayerEnter(GamePlayer player)
+            {
+                m_relicPad.OnPlayerEnter(player);
+            }
+
+            public override void OnPlayerLeave(GamePlayer player)
+            {
+                m_relicPad.OnPlayerLeave(player);
+            }
+        }
+    }
 }

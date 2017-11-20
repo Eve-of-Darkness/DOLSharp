@@ -23,23 +23,25 @@ using DOL.Database;
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.DuplicateNameCheck, "Checks if a character name already exists", eClientStatus.LoggedIn)]
-	public class DupNameCheckRequestHandler : IPacketHandler
-	{
-		private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+    public class DupNameCheckRequestHandler : IPacketHandler
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		public void HandlePacket(GameClient client, GSPacketIn packet)
-		{
-			string name = packet.ReadString(30);
+        public void HandlePacket(GameClient client, GSPacketIn packet)
+        {
+            string name = packet.ReadString(30);
 
-			var character = GameServer.Database.SelectObjects<DOLCharacters>("`Name` = @Name", new QueryParameter("@Name", name)).FirstOrDefault();
-			
-			var nameExists = (character != null);
-			
-			// Bad Name check.
-			if (!nameExists)
-				nameExists = GameServer.Instance.PlayerManager.InvalidNames[name];
-			
-			client.Out.SendDupNameCheckReply(name, nameExists);
-		}
-	}
+            var character = GameServer.Database.SelectObjects<DOLCharacters>("`Name` = @Name", new QueryParameter("@Name", name)).FirstOrDefault();
+
+            var nameExists = character != null;
+
+            // Bad Name check.
+            if (!nameExists)
+            {
+                nameExists = GameServer.Instance.PlayerManager.InvalidNames[name];
+            }
+
+            client.Out.SendDupNameCheckReply(name, nameExists);
+        }
+    }
 }

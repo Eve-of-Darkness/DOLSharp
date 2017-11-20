@@ -24,36 +24,36 @@ namespace DOL.GS.PlayerClass
     /// Albion Reaver Class
     /// </summary>
     [CharacterClass((int)eCharacterClass.Reaver, "Reaver", "Fighter")]
-	public class ClassReaver : ClassFighter
-	{
-		private static readonly string[] AutotrainableSkills = new[] { Specs.Slash, Specs.Flexible };
+    public class ClassReaver : ClassFighter
+    {
+        private static readonly string[] AutotrainableSkills = new[] { Specs.Slash, Specs.Flexible };
 
-		public ClassReaver()
-			: base()
-		{
-			m_profession = "PlayerClass.Profession.TempleofArawn";
-			m_specializationMultiplier = 20;
-			m_primaryStat = eStat.STR;
-			m_secondaryStat = eStat.DEX;
-			m_tertiaryStat = eStat.PIE;
-			m_manaStat = eStat.PIE;
-			m_wsbase = 380;
-			m_baseHP = 760;
-		}
+        public ClassReaver()
+            : base()
+        {
+            m_profession = "PlayerClass.Profession.TempleofArawn";
+            m_specializationMultiplier = 20;
+            m_primaryStat = eStat.STR;
+            m_secondaryStat = eStat.DEX;
+            m_tertiaryStat = eStat.PIE;
+            m_manaStat = eStat.PIE;
+            m_wsbase = 380;
+            m_baseHP = 760;
+        }
 
-		public override eClassType ClassType
-		{
-			get { return eClassType.Hybrid; }
-		}
+        public override eClassType ClassType
+        {
+            get { return eClassType.Hybrid; }
+        }
 
-		public override IList<string> GetAutotrainableSkills()
-		{
-			return AutotrainableSkills;
-		}
+        public override IList<string> GetAutotrainableSkills()
+        {
+            return AutotrainableSkills;
+        }
 
-		public override bool HasAdvancedFromBaseClass()
-		{
-			return true;
-		}
-	}
+        public override bool HasAdvancedFromBaseClass()
+        {
+            return true;
+        }
+    }
 }

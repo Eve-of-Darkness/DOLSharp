@@ -21,33 +21,33 @@ using DOL.AI.Brain;
 namespace DOL.GS
 {
     public class BDSubPet : BDPet
-	{
-		/// <summary>
-		/// Holds the different subpet ids
-		/// </summary>
-		public enum SubPetType : byte
-		{
-			Melee = 0,
-			Healer = 1,
-			Caster = 2,
-			Debuffer = 3,
-			Buffer = 4,
-			Archer = 5
-		}
+    {
+        /// <summary>
+        /// Holds the different subpet ids
+        /// </summary>
+        public enum SubPetType : byte
+        {
+            Melee = 0,
+            Healer = 1,
+            Caster = 2,
+            Debuffer = 3,
+            Buffer = 4,
+            Archer = 5
+        }
 
-		/// <summary>
-		/// Create a commander.
-		/// </summary>
-		/// <param name="npcTemplate"></param>
-		/// <param name="owner"></param>
-		public BDSubPet(INpcTemplate npcTemplate) : base(npcTemplate) { }
+        /// <summary>
+        /// Create a commander.
+        /// </summary>
+        /// <param name="npcTemplate"></param>
+        /// <param name="owner"></param>
+        public BDSubPet(INpcTemplate npcTemplate) : base(npcTemplate) { }
 
-		public override short MaxSpeed
-		{
-			get
-			{
-				return (Brain as IControlledBrain).Owner.MaxSpeed;
-			}
-		}
-	}
+        public override short MaxSpeed
+        {
+            get
+            {
+                return (Brain as IControlledBrain).Owner.MaxSpeed;
+            }
+        }
+    }
 }

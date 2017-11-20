@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -35,12 +35,13 @@ namespace DOL.AI.Brain
     /// <author>Aredhel</author>
     class RetrieverMobBrain : StandardMobBrain
     {
-		/// <summary>
-		/// Defines a logger for this class.
-		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        /// <summary>
+        /// Defines a logger for this class.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private enum State { Passive, GettingHelp, Aggressive };
+
         private State m_state;
 
         /// <summary>
@@ -48,7 +49,11 @@ namespace DOL.AI.Brain
         /// </summary>
         public override void Think()
         {
-            if (m_state != State.Aggressive) return;
+            if (m_state != State.Aggressive)
+            {
+                return;
+            }
+
             base.Think();
         }
 
@@ -60,7 +65,7 @@ namespace DOL.AI.Brain
         public GameNPC Master
         {
             get { return m_master; }
-			set { m_master = value; }
+            set { m_master = value; }
         }
 
         /// <summary>
@@ -75,18 +80,24 @@ namespace DOL.AI.Brain
             // location; once we've arrived we'll tell our master. If someone
             // attacks us before we can get to the target location, we'll do what
             // any other mob would do.
-
             base.Notify(e, sender, args);
             if (e == GameNPCEvent.WalkTo && m_state == State.Passive)
+            {
                 m_state = State.GettingHelp;
+            }
             else if (e == GameNPCEvent.ArriveAtTarget && m_state == State.GettingHelp)
             {
-				if (Master != null && Master.Brain != null)
-					Master.Brain.Notify(GameNPCEvent.ArriveAtTarget, Body, new EventArgs());
+                if (Master != null && Master.Brain != null)
+                {
+                    Master.Brain.Notify(GameNPCEvent.ArriveAtTarget, Body, new EventArgs());
+                }
+
                 m_state = State.Aggressive;
             }
             else if (e == GameNPCEvent.TakeDamage)
+            {
                 m_state = State.Aggressive;
+            }
         }
     }
 }

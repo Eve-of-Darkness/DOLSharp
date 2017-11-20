@@ -24,10 +24,10 @@ namespace DOL.GS.Effects
     /// </summary>
     /// <author>Aredhel</author>
     class MezzRootImmunityEffect : StaticEffect, IGameEffect
-	{
-		/// <summary>
-		/// Creates a new mezz/root immunity effect.
-		/// </summary>
-		public MezzRootImmunityEffect() { }
-	}
+    {
+        /// <summary>
+        /// Creates a new mezz/root immunity effect.
+        /// </summary>
+        public MezzRootImmunityEffect() { }
+    }
 }

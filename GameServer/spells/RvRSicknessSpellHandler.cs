@@ -23,11 +23,11 @@ namespace DOL.GS.Spells
     /// RvR Resurrection Illness Handler
     /// </summary>
     [SpellHandler(GlobalSpells.RvRResurrectionIllnessSpellType)]
-	public class RvrResurrectionIllness : PveResurrectionIllness
-	{
-		// constructor
-		public RvrResurrectionIllness(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
-		{
-		}
-	}
+    public class RvrResurrectionIllness : PveResurrectionIllness
+    {
+        // constructor
+        public RvrResurrectionIllness(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
+        {
+        }
+    }
 }

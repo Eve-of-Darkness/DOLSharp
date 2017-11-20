@@ -1,16 +1,16 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -25,59 +25,61 @@ using log4net;
 
 namespace DOL.GS.GameEvents
 {
-	public class ZonePointEffect
-	{
-		protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+    public class ZonePointEffect
+    {
+        protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		[ScriptLoadedEvent]
-		public static void OnScriptsCompiled(DOLEvent e, object sender, EventArgs args)
-		{
-			// What npctemplate should we use for the zonepoint ?
-		    NpcTemplate zp;
-			try{
-				var model = (ushort)ServerProperties.Properties.ZONEPOINT_NPCTEMPLATE;
-				zp = new NpcTemplate(GameServer.Database.SelectObjects<DBNpcTemplate>("`TemplateId` = @TemplateId", new QueryParameter("@TemplateId", model)).FirstOrDefault());
-				if (model <= 0)
-			    {
-			        throw new ArgumentNullException();
+        [ScriptLoadedEvent]
+        public static void OnScriptsCompiled(DOLEvent e, object sender, EventArgs args)
+        {
+            // What npctemplate should we use for the zonepoint ?
+            NpcTemplate zp;
+            try {
+                var model = (ushort)ServerProperties.Properties.ZONEPOINT_NPCTEMPLATE;
+                zp = new NpcTemplate(GameServer.Database.SelectObjects<DBNpcTemplate>("`TemplateId` = @TemplateId", new QueryParameter("@TemplateId", model)).FirstOrDefault());
+                if (model <= 0)
+                {
+                    throw new ArgumentNullException();
                 }
-			}
-			catch {
-				return;
-			}
-			
-			// processing all the ZP
-			IList<ZonePoint> zonePoints = GameServer.Database.SelectAllObjects<ZonePoint>();
-			foreach (ZonePoint z in zonePoints)
-			{
-				if (z.SourceRegion == 0) continue;
-				
-				// find target region for the current zonepoint
-				Region r = WorldMgr.GetRegion(z.TargetRegion);
-				if (r == null)
-				{
-					log.Warn($"Zonepoint Id ({z.Id}) references an inexistent target region {z.TargetRegion} - skipping, ZP not created");
-					continue;
-				}
+            }
+            catch {
+                return;
+            }
 
-			    GameNPC npc = new GameNPC(zp)
-			    {
-			        CurrentRegionID = z.SourceRegion,
-			        X = z.SourceX,
-			        Y = z.SourceY,
-			        Z = z.SourceZ,
-			        Name = r.Description,
-			        GuildName = "ZonePoint (Open)"
-			    };
-
-
-			    if (r.IsDisabled)
-			    {
-			        npc.GuildName = "ZonePoint (Closed)";
+            // processing all the ZP
+            IList<ZonePoint> zonePoints = GameServer.Database.SelectAllObjects<ZonePoint>();
+            foreach (ZonePoint z in zonePoints)
+            {
+                if (z.SourceRegion == 0)
+                {
+                    continue;
                 }
-				
-				npc.AddToWorld();
-			}
-		}
-	}
+
+                // find target region for the current zonepoint
+                Region r = WorldMgr.GetRegion(z.TargetRegion);
+                if (r == null)
+                {
+                    log.Warn($"Zonepoint Id ({z.Id}) references an inexistent target region {z.TargetRegion} - skipping, ZP not created");
+                    continue;
+                }
+
+                GameNPC npc = new GameNPC(zp)
+                {
+                    CurrentRegionID = z.SourceRegion,
+                    X = z.SourceX,
+                    Y = z.SourceY,
+                    Z = z.SourceZ,
+                    Name = r.Description,
+                    GuildName = "ZonePoint (Open)"
+                };
+
+                if (r.IsDisabled)
+                {
+                    npc.GuildName = "ZonePoint (Closed)";
+                }
+
+                npc.AddToWorld();
+            }
+        }
+    }
 }

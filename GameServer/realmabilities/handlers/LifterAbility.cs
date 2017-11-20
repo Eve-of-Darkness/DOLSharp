@@ -3,19 +3,23 @@ using DOL.Database;
 namespace DOL.GS.RealmAbilities
 {
     public class LifterAbility : RAPropertyEnhancer
-	{
-		public LifterAbility(DBAbility dba, int level)
-			: base(dba, level, eProperty.Undefined)
-		{
-		}
+    {
+        public LifterAbility(DBAbility dba, int level)
+            : base(dba, level, eProperty.Undefined)
+        {
+        }
 
-		protected override string ValueUnit { get { return "%"; } }
+        protected override string ValueUnit { get { return "%"; } }
 
-		public override int GetAmountForLevel(int level)
-		{
+        public override int GetAmountForLevel(int level)
+        {
             if (ServerProperties.Properties.USE_NEW_PASSIVES_RAS_SCALING)
             {
-                if (level < 1) return 0;
+                if (level < 1)
+                {
+                    return 0;
+                }
+
                 switch (level)
                 {
                     case 1: return 10;
@@ -42,6 +46,6 @@ namespace DOL.GS.RealmAbilities
                     default: return 0;
                 }
             }
-		}
-	}
+        }
+    }
 }

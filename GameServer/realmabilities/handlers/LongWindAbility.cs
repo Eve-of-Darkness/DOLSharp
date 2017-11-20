@@ -6,13 +6,13 @@ namespace DOL.GS.RealmAbilities
     /// Long Wind
     /// </summary>
     public class LongWindAbility : RAPropertyEnhancer
-	{
-		public LongWindAbility(DBAbility dba, int level) : base(dba, level, eProperty.Undefined) { }
+    {
+        public LongWindAbility(DBAbility dba, int level) : base(dba, level, eProperty.Undefined) { }
 
         protected override string ValueUnit { get { return "%"; } }
 
-		public override int GetAmountForLevel(int level)
-		{
+        public override int GetAmountForLevel(int level)
+        {
             switch (level)
             {
                 case 1: return 20;
@@ -23,5 +23,5 @@ namespace DOL.GS.RealmAbilities
                 default: return 0;
             }
         }
-	}
+    }
 }

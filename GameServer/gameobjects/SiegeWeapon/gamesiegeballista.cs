@@ -39,51 +39,51 @@ namespace DOL.GS
     /// GameMovingObject is a base class for boats and siege weapons.
     /// </summary>
     public class GameSiegeBallista : GameSiegeWeapon
-	{
-		public GameSiegeBallista()
-			: base()
-		{
-			MeleeDamageType = eDamageType.Thrust;
-			Name = "field ballista";
-			AmmoType = 0x18;
+    {
+        public GameSiegeBallista()
+            : base()
+        {
+            MeleeDamageType = eDamageType.Thrust;
+            Name = "field ballista";
+            AmmoType = 0x18;
             Model = 0x0A55;
             Effect = 0x089A;
-			ActionDelay = new int[]{
-				0,//none
-				5000,//aiming
-				10000,//arming
-				0,//loading
-				1100//fireing
-			};//en ms
-			/*SpellLine siegeWeaponSpellLine = SkillBase.GetSpellLine(GlobalSpellsLines.SiegeWeapon_Spells);
-			IList spells = SkillBase.GetSpellList(siegeWeaponSpellLine.KeyName);
-			if (spells != null)
-			{
-				foreach (Spell spell in spells)
-				{
-					if (spell.ID == 2430) //TODO good id for balista
-					{
-						if(spell.Level <= Level)
-						{
-							m_spellHandler = ScriptMgr.CreateSpellHandler(this, spell, siegeWeaponSpellLine);
-						}
-						break;
-					}
-				}
-			}*/
-		}
+            ActionDelay = new int[] {
+                0,// none
+                5000,// aiming
+                10000,// arming
+                0,// loading
+                1100// fireing
+            };// en ms
+            /*SpellLine siegeWeaponSpellLine = SkillBase.GetSpellLine(GlobalSpellsLines.SiegeWeapon_Spells);
+            IList spells = SkillBase.GetSpellList(siegeWeaponSpellLine.KeyName);
+            if (spells != null)
+            {
+                foreach (Spell spell in spells)
+                {
+                    if (spell.ID == 2430) //TODO good id for balista
+                    {
+                        if(spell.Level <= Level)
+                        {
+                            m_spellHandler = ScriptMgr.CreateSpellHandler(this, spell, siegeWeaponSpellLine);
+                        }
+                        break;
+                    }
+                }
+            }*/
+        }
 
-		public override void DoDamage()
-		{
-			//todo remove ammo + spell in db and uncomment
-			//m_spellHandler.StartSpell(player);
-			base.DoDamage();//anim mut be called after damage
-		}
-		public override bool ReceiveItem(GameLiving source, DOL.Database.InventoryItem item)
-		{
-			//todo check if bullet
-			return base.ReceiveItem(source, item);
-		}
+        public override void DoDamage()
+        {
+            // todo remove ammo + spell in db and uncomment
+            // m_spellHandler.StartSpell(player);
+            base.DoDamage();// anim mut be called after damage
+        }
 
-	}
+        public override bool ReceiveItem(GameLiving source, DOL.Database.InventoryItem item)
+        {
+            // todo check if bullet
+            return base.ReceiveItem(source, item);
+        }
+    }
 }

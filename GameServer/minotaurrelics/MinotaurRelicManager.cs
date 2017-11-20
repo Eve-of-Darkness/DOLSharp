@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -43,7 +43,7 @@ namespace DOL.GS
         /// <summary>
         /// Holds the minimum respawntime
         /// </summary>
-        public const int MIN_RESPAWN_TIMER =300000;
+        public const int MIN_RESPAWN_TIMER = 300000;
         /// <summary>
         /// Holds the maximum respawntime
         /// </summary>
@@ -52,18 +52,20 @@ namespace DOL.GS
         /// Holds the Value which is removed from the XP per tick
         /// </summary>
         public const double XP_LOSS_PER_TICK = 10;
-		
-		[ScriptLoadedEvent]
+
+        [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
         {
             if (ServerProperties.Properties.ENABLE_MINOTAUR_RELICS)
             {
                 if (log.IsDebugEnabled)
+                {
                     log.Debug("Minotaur Relics manager initialized");
+                }
 
                 Init();
             }
-		}
+        }
 
         /// <summary>
         /// Inits the Minotaurrelics
@@ -95,6 +97,7 @@ namespace DOL.GS
 
                     relic.AddToWorld();
                 }
+
                 InitMapUpdate();
                 log.Info("Minotaur Relics properly loaded");
                 return true;
@@ -107,15 +110,20 @@ namespace DOL.GS
         }
 
         static Timer m_mapUpdateTimer;
+
         public static void InitMapUpdate()
         {
-            m_mapUpdateTimer = new Timer(new TimerCallback(MapUpdate), null, 0, 30 * 1000); //30sec Lifeflight change this to 15 seconds
+            m_mapUpdateTimer = new Timer(new TimerCallback(MapUpdate), null, 0, 30 * 1000); // 30sec Lifeflight change this to 15 seconds
         }
+
         public static void StopMapUpdate()
         {
             if (m_mapUpdateTimer != null)
+            {
                 m_mapUpdateTimer.Dispose();
+            }
         }
+
         private static void MapUpdate(object nullValue)
         {
             Dictionary<ushort, IList<MinotaurRelic>> relics = new Dictionary<ushort, IList<MinotaurRelic>>();
@@ -125,22 +133,26 @@ namespace DOL.GS
                 {
                     relics.Add(relic.CurrentRegionID, new List<MinotaurRelic>());
                 }
+
                 relics[relic.CurrentRegionID].Add(relic);
             }
+
             foreach (GameClient clt in WorldMgr.GetAllPlayingClients())
             {
                 if (clt == null || clt.Player == null)
-                    continue;
-
-                if(relics.ContainsKey(clt.Player.CurrentRegionID))
                 {
-                    foreach(MinotaurRelic relic in relics[clt.Player.CurrentRegionID])
+                    continue;
+                }
+
+                if (relics.ContainsKey(clt.Player.CurrentRegionID))
+                {
+                    foreach (MinotaurRelic relic in relics[clt.Player.CurrentRegionID])
                     {
                         clt.Player.Out.SendMinotaurRelicMapUpdate((byte)relic.RelicID, relic.CurrentRegionID, relic.X, relic.Y, relic.Z);
                     }
                 }
             }
-        } 
+        }
 
         #region Helpers
         /// <summary>
@@ -149,7 +161,10 @@ namespace DOL.GS
         /// <param name="relic">The Relic you want to add</param>
         public static bool AddRelic(MinotaurRelic relic)
         {
-            if (m_minotaurrelics.ContainsValue(relic)) return false;
+            if (m_minotaurrelics.ContainsValue(relic))
+            {
+                return false;
+            }
 
             lock (m_minotaurrelics)
             {
@@ -159,14 +174,17 @@ namespace DOL.GS
             return true;
         }
 
-        //Lifeflight: Add
+        // Lifeflight: Add
         /// <summary>
         /// Removes a Relic from the Hashtable
         /// </summary>
         /// <param name="relic">The Relic you want to remove</param>
         public static bool RemoveRelic(MinotaurRelic relic)
         {
-            if (!m_minotaurrelics.ContainsValue(relic)) return false;
+            if (!m_minotaurrelics.ContainsValue(relic))
+            {
+                return false;
+            }
 
             lock (m_minotaurrelics)
             {
@@ -188,7 +206,9 @@ namespace DOL.GS
             lock (m_minotaurrelics)
             {
                 foreach (string id in m_minotaurrelics.Keys)
+                {
                     relics.Add(m_minotaurrelics[id]);
+                }
             }
 
             return relics;
@@ -203,7 +223,9 @@ namespace DOL.GS
             lock (m_minotaurrelics)
             {
                 if (!m_minotaurrelics.ContainsKey(ID))
+                {
                     return null;
+                }
 
                 return m_minotaurrelics[ID] as MinotaurRelic;
             }
@@ -216,9 +238,12 @@ namespace DOL.GS
                 foreach (MinotaurRelic relic in m_minotaurrelics.Values)
                 {
                     if (relic.RelicID == ID)
+                    {
                         return relic;
+                    }
                 }
             }
+
             return null;
         }
         #endregion

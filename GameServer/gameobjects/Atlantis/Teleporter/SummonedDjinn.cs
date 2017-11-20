@@ -1,16 +1,16 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -52,10 +52,14 @@ namespace DOL.GS
             lock (m_syncObject)
             {
                 if (CurrentRegion == null || IsSummoned)
+                {
                     return;
+                }
 
                 if (m_timer == null)
+                {
                     m_timer = new SummonTimer(this);
+                }
 
                 m_summoned = true;
                 m_timer.Start(1, 100, true, DjinnEvent.Summoning);
@@ -72,7 +76,9 @@ namespace DOL.GS
             get
             {
                 lock (m_syncObject)
+                {
                     return m_summoned;
+                }
             }
         }
 
@@ -84,7 +90,9 @@ namespace DOL.GS
         public override bool Interact(GamePlayer player)
         {
             lock (m_syncObject)
+            {
                 m_timer.Restart();
+            }
 
             return base.Interact(player);
         }
@@ -95,10 +103,12 @@ namespace DOL.GS
         /// <param name="source"></param>
         /// <param name="text"></param>
         /// <returns></returns>
-        public override bool WhisperReceive(GameLiving source, String text)
+        public override bool WhisperReceive(GameLiving source, string text)
         {
             lock (m_syncObject)
+            {
                 m_timer.Restart();
+            }
 
             return base.WhisperReceive(source, text);
         }
@@ -123,13 +133,14 @@ namespace DOL.GS
             else if (e == DjinnEvent.Summoned)
             {
                 // Show ourselves.
-
                 lock (m_syncObject)
                 {
                     Model = VisibleModel;
 
                     foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                    {
                         player.Out.SendModelChange(this, Model);
+                    }
 
                     Say("Greetings, great one.");
                     m_timer.Start(150, 1000, false, DjinnEvent.Vanishing);   // 2.5mins to hiding again.
@@ -140,14 +151,15 @@ namespace DOL.GS
             else if (e == DjinnEvent.Vanishing)
             {
                 // Go into hiding and show the smoke again.
-
                 lock (m_syncObject)
                 {
                     Say("My time here is done.");
                     Model = InvisibleModel;
 
                     foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                    {
                         player.Out.SendModelChange(this, Model);
+                    }
 
                     m_timer.Start(5, 1000, true, DjinnEvent.Vanished);
                 }
@@ -243,15 +255,15 @@ namespace DOL.GS
                     if (m_smoke)
                     {
                         // Send smoke animation to players in visibility range.
-
                         foreach (GamePlayer player in m_owner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                        {
                             player.Out.SendSpellEffectAnimation(m_owner, m_owner, SummonSpellEffect, 0, false, 0x01);
+                        }
                     }
                 }
                 else
                 {
                     // We're done, stop the timer and notify owner.
-
                     Stop();
                     IsRunning = false;
                     m_owner.Notify(m_event);
@@ -264,7 +276,7 @@ namespace DOL.GS
         /// </summary>
         private class DjinnEvent : GameLivingEvent
         {
-            protected DjinnEvent(String name) : base(name) { }
+            protected DjinnEvent(string name) : base(name) { }
 
             public static readonly DjinnEvent Summoning = new DjinnEvent("DjinnEvent.Summoning");
             public static readonly DjinnEvent Summoned = new DjinnEvent("DjinnEvent.Summoned");

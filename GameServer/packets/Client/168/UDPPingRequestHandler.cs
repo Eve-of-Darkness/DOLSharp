@@ -22,30 +22,31 @@ using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
-	/// <summary>
-	/// Handles the ping packet
-	/// </summary>
-	[PacketHandler(PacketHandlerType.UDP, eClientPackets.UDPPingRequest, "Sends the UDP Init reply", eClientStatus.None)]
-	public class UDPPingRequestHandler : IPacketHandler
-	{
-		/// <summary>
-		/// Defines a logger for this class.
-		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    /// <summary>
+    /// Handles the ping packet
+    /// </summary>
+    [PacketHandler(PacketHandlerType.UDP, eClientPackets.UDPPingRequest, "Sends the UDP Init reply", eClientStatus.None)]
+    public class UDPPingRequestHandler : IPacketHandler
+    {
+        /// <summary>
+        /// Defines a logger for this class.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-		/// <summary>
-		/// Called when the packet has been received
-		/// </summary>
-		/// <param name="client">Client that sent the packet</param>
-		/// <param name="packet">Packet data</param>
-		/// <returns>Non zero if function was successfull</returns>
-		public void HandlePacket(GameClient client, GSPacketIn packet)
-		{
-			string localIP = packet.ReadString(22);
-			ushort localPort = packet.ReadShort();
-			// TODO check changed localIP
-			client.LocalIP = localIP;
-			client.UdpPingTime = DateTime.Now.Ticks;
-		}
-	}
+        /// <summary>
+        /// Called when the packet has been received
+        /// </summary>
+        /// <param name="client">Client that sent the packet</param>
+        /// <param name="packet">Packet data</param>
+        /// <returns>Non zero if function was successfull</returns>
+        public void HandlePacket(GameClient client, GSPacketIn packet)
+        {
+            string localIP = packet.ReadString(22);
+            ushort localPort = packet.ReadShort();
+
+            // TODO check changed localIP
+            client.LocalIP = localIP;
+            client.UdpPingTime = DateTime.Now.Ticks;
+        }
+    }
 }

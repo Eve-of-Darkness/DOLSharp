@@ -32,953 +32,960 @@ using log4net;
 
 namespace DOL.GS
 {
-	/// <summary>
-	/// The WorldMgr is used to retrieve information and objects from
-	/// the world. It contains lots of functions that can be used. It
-	/// is a static class.
-	/// </summary>
-	public static class WorldMgr
-	{
-		/// <summary>
-		/// Defines a logger for this class.
-		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    /// <summary>
+    /// The WorldMgr is used to retrieve information and objects from
+    /// the world. It contains lots of functions that can be used. It
+    /// is a static class.
+    /// </summary>
+    public static class WorldMgr
+    {
+        /// <summary>
+        /// Defines a logger for this class.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-		/// <summary>
-		/// Ping timeout definition in seconds
-		/// </summary>
-		public const long PING_TIMEOUT = 360; // 6 min default ping timeout (ticks are 100 nano seconds)
-		/// <summary>
-		/// Holds the distance which player get experience from a living object
-		/// </summary>
-		public const int MAX_EXPFORKILL_DISTANCE = 16384;
-		/// <summary>
-		/// Is the distance a whisper can be heard
-		/// </summary>
-		public const int WHISPER_DISTANCE = 512; // tested
-		/// <summary>
-		/// Is the distance a say is broadcast
-		/// </summary>
-		public const int SAY_DISTANCE = 512; // tested
-		/// <summary>
-		/// Is the distance info messages are broadcast (player attacks, spell cast, player stunned/rooted/mezzed, loot dropped)
-		/// </summary>
-		public const int INFO_DISTANCE = 512; // tested for player attacks, think it's same for rest
-		/// <summary>
-		/// Is the distance a death message is broadcast when player dies
-		/// </summary>
-		public const ushort DEATH_MESSAGE_DISTANCE = ushort.MaxValue; // unknown
-		/// <summary>
-		/// Is the distance a yell is broadcast
-		/// </summary>
-		public const int YELL_DISTANCE = 1024; // tested
-		/// <summary>
-		/// Is the distance at which livings can give a item
-		/// </summary>
-		public const int GIVE_ITEM_DISTANCE = 128;  // tested
-		/// <summary>
-		/// Is the distance at which livings can interact
-		/// </summary>
-		public const int INTERACT_DISTANCE = 192;  // tested
-		/// <summary>
-		/// Is the distance an player can see
-		/// </summary>
-		public const int VISIBILITY_DISTANCE = 3600;
-		/// <summary>
-		/// Moving greater than this distance requires the player to do a full world refresh
-		/// </summary>
-		public const int REFRESH_DISTANCE = 1000;
-		/// <summary>
-		/// Is the square distance a player can see
-		/// </summary>
-		public const int VISIBILITY_SQUARE_DISTANCE = 12960000;
-		/// <summary>
-		/// Holds the distance at which objects are updated
-		/// </summary>
-		public const int OBJ_UPDATE_DISTANCE = 4096;
+        /// <summary>
+        /// Ping timeout definition in seconds
+        /// </summary>
+        public const long PING_TIMEOUT = 360; // 6 min default ping timeout (ticks are 100 nano seconds)
+        /// <summary>
+        /// Holds the distance which player get experience from a living object
+        /// </summary>
+        public const int MAX_EXPFORKILL_DISTANCE = 16384;
+        /// <summary>
+        /// Is the distance a whisper can be heard
+        /// </summary>
+        public const int WHISPER_DISTANCE = 512; // tested
+        /// <summary>
+        /// Is the distance a say is broadcast
+        /// </summary>
+        public const int SAY_DISTANCE = 512; // tested
+        /// <summary>
+        /// Is the distance info messages are broadcast (player attacks, spell cast, player stunned/rooted/mezzed, loot dropped)
+        /// </summary>
+        public const int INFO_DISTANCE = 512; // tested for player attacks, think it's same for rest
+        /// <summary>
+        /// Is the distance a death message is broadcast when player dies
+        /// </summary>
+        public const ushort DEATH_MESSAGE_DISTANCE = ushort.MaxValue; // unknown
+        /// <summary>
+        /// Is the distance a yell is broadcast
+        /// </summary>
+        public const int YELL_DISTANCE = 1024; // tested
+        /// <summary>
+        /// Is the distance at which livings can give a item
+        /// </summary>
+        public const int GIVE_ITEM_DISTANCE = 128;  // tested
+        /// <summary>
+        /// Is the distance at which livings can interact
+        /// </summary>
+        public const int INTERACT_DISTANCE = 192;  // tested
+        /// <summary>
+        /// Is the distance an player can see
+        /// </summary>
+        public const int VISIBILITY_DISTANCE = 3600;
+        /// <summary>
+        /// Moving greater than this distance requires the player to do a full world refresh
+        /// </summary>
+        public const int REFRESH_DISTANCE = 1000;
+        /// <summary>
+        /// Is the square distance a player can see
+        /// </summary>
+        public const int VISIBILITY_SQUARE_DISTANCE = 12960000;
+        /// <summary>
+        /// Holds the distance at which objects are updated
+        /// </summary>
+        public const int OBJ_UPDATE_DISTANCE = 4096;
 
-		/// <summary>
-		/// This will store available teleport destinations as read from the 'teleport' table.  These are
-		/// stored in a dictionary of dictionaries because the name of the teleport destination (the
-		/// 'TeleportID' field from the table) does not have to be unique across realms.  Duplicate
-		/// 'TeleportID' fields are permitted so long as the 'Realm' field is different for each.
-		/// </summary>
-		private static Dictionary<eRealm, Dictionary<string, Teleport>> m_teleportLocations;
-		private static object m_syncTeleport = new object();
+        /// <summary>
+        /// This will store available teleport destinations as read from the 'teleport' table.  These are
+        /// stored in a dictionary of dictionaries because the name of the teleport destination (the
+        /// 'TeleportID' field from the table) does not have to be unique across realms.  Duplicate
+        /// 'TeleportID' fields are permitted so long as the 'Realm' field is different for each.
+        /// </summary>
+        private static Dictionary<eRealm, Dictionary<string, Teleport>> m_teleportLocations;
+        private static object m_syncTeleport = new object();
 
-		// this is used to hold the player ids with timestamp of ld, that ld near an enemy keep structure, to allow grace period relog
-		public static Dictionary<string, DateTime> RvRLinkDeadPlayers = new Dictionary<string, DateTime>();
+        // this is used to hold the player ids with timestamp of ld, that ld near an enemy keep structure, to allow grace period relog
+        public static Dictionary<string, DateTime> RvRLinkDeadPlayers = new Dictionary<string, DateTime>();
 
-		/// <summary>
-		/// Returns the teleport given an ID and a realm
-		/// </summary>
-		/// <param name="realm">
-		/// The home realm identifier of the NPC doing the teleporting.  Whether or not a teleport is
-		/// permitted is determined by the home realm of the teleporter NPC, not the home realm of
-		/// the player who is teleporting.  A teleport will be allowed so long as the 'Realm' field in
-		/// the 'teleport' table matches the 'Realm' field for the teleporter's record in the 'mob' table.
-		/// For example, a Lurikeen teleporter with a 'mob' table entry that has the Realm field set to 3
-		/// (Hibernia), will happily teleport an Albion player to Jordheim so long as the Jordheim record
-		/// in the 'teleport' table is also tagged as Realm 3.  So, the Realm field in the 'teleport'
-		/// table is not the realm of the destination, but the realm of the NPCs that are allowed to
-		/// teleport a player to that location.
-		/// </param>
-		/// <param name="teleportKey">Composite key into teleport dictionary.</param>
-		/// <returns></returns>
-		public static Teleport GetTeleportLocation(eRealm realm, String teleportKey)
-		{
-			lock (m_syncTeleport)
-			{
-			    if (m_teleportLocations.ContainsKey(realm) && m_teleportLocations[realm].ContainsKey(teleportKey))
-			    {
-			        return m_teleportLocations[realm][teleportKey];
-			    }
+        /// <summary>
+        /// Returns the teleport given an ID and a realm
+        /// </summary>
+        /// <param name="realm">
+        /// The home realm identifier of the NPC doing the teleporting.  Whether or not a teleport is
+        /// permitted is determined by the home realm of the teleporter NPC, not the home realm of
+        /// the player who is teleporting.  A teleport will be allowed so long as the 'Realm' field in
+        /// the 'teleport' table matches the 'Realm' field for the teleporter's record in the 'mob' table.
+        /// For example, a Lurikeen teleporter with a 'mob' table entry that has the Realm field set to 3
+        /// (Hibernia), will happily teleport an Albion player to Jordheim so long as the Jordheim record
+        /// in the 'teleport' table is also tagged as Realm 3.  So, the Realm field in the 'teleport'
+        /// table is not the realm of the destination, but the realm of the NPCs that are allowed to
+        /// teleport a player to that location.
+        /// </param>
+        /// <param name="teleportKey">Composite key into teleport dictionary.</param>
+        /// <returns></returns>
+        public static Teleport GetTeleportLocation(eRealm realm, string teleportKey)
+        {
+            lock (m_syncTeleport)
+            {
+                if (m_teleportLocations.ContainsKey(realm) && m_teleportLocations[realm].ContainsKey(teleportKey))
+                {
+                    return m_teleportLocations[realm][teleportKey];
+                }
 
-			    return null;
-			}
-		}
+                return null;
+            }
+        }
 
-		/// <summary>
-		/// Add a new teleport destination (used by /teleport add).
-		/// </summary>
-		/// <param name="teleport"></param>
-		/// <returns></returns>
-		public static bool AddTeleportLocation(Teleport teleport)
-		{
-			eRealm realm = (eRealm)teleport.Realm;
-			String teleportKey = $"{teleport.Type}:{teleport.TeleportID}";
+        /// <summary>
+        /// Add a new teleport destination (used by /teleport add).
+        /// </summary>
+        /// <param name="teleport"></param>
+        /// <returns></returns>
+        public static bool AddTeleportLocation(Teleport teleport)
+        {
+            eRealm realm = (eRealm)teleport.Realm;
+            string teleportKey = $"{teleport.Type}:{teleport.TeleportID}";
 
-			lock (m_syncTeleport)
-			{
-				Dictionary<String, Teleport> teleports = null;
-				if (m_teleportLocations.ContainsKey(realm))
-				{
-				    if (m_teleportLocations[realm].ContainsKey(teleportKey))
-				    {
-				        return false;   // Double entry.
+            lock (m_syncTeleport)
+            {
+                Dictionary<string, Teleport> teleports = null;
+                if (m_teleportLocations.ContainsKey(realm))
+                {
+                    if (m_teleportLocations[realm].ContainsKey(teleportKey))
+                    {
+                        return false;   // Double entry.
                     }
 
-					teleports = m_teleportLocations[realm];
-				}
+                    teleports = m_teleportLocations[realm];
+                }
 
-				if (teleports == null)
-				{
-					teleports = new Dictionary<String, Teleport>();
-					m_teleportLocations.Add(realm, teleports);
-				}
+                if (teleports == null)
+                {
+                    teleports = new Dictionary<string, Teleport>();
+                    m_teleportLocations.Add(realm, teleports);
+                }
 
-				teleports.Add(teleportKey, teleport);
-				return true;
-			}
-		}
+                teleports.Add(teleportKey, teleport);
+                return true;
+            }
+        }
 
-		/// <summary>
-		/// This hashtable holds all regions in the world
-		/// </summary>
-		private static readonly ReaderWriterDictionary<ushort, Region> m_regions = new ReaderWriterDictionary<ushort, Region>();
+        /// <summary>
+        /// This hashtable holds all regions in the world
+        /// </summary>
+        private static readonly ReaderWriterDictionary<ushort, Region> m_regions = new ReaderWriterDictionary<ushort, Region>();
 
-		public static IDictionary<ushort, Region> Regions => m_regions;
+        public static IDictionary<ushort, Region> Regions => m_regions;
 
-	    /// <summary>
-		/// This hashtable holds all zones in the world, for easy access
-		/// </summary>
-		private static readonly ReaderWriterDictionary<ushort, Zone> m_zones = new ReaderWriterDictionary<ushort, Zone>();
+        /// <summary>
+        /// This hashtable holds all zones in the world, for easy access
+        /// </summary>
+        private static readonly ReaderWriterDictionary<ushort, Zone> m_zones = new ReaderWriterDictionary<ushort, Zone>();
 
-		public static IDictionary<ushort, Zone> Zones => m_zones;
+        public static IDictionary<ushort, Zone> Zones => m_zones;
 
-	    /// <summary>
-		/// This array holds all gameclients connected to the game
-		/// </summary>
-		private static GameClient[] m_clients = new GameClient[0];
+        /// <summary>
+        /// This array holds all gameclients connected to the game
+        /// </summary>
+        private static GameClient[] m_clients = new GameClient[0];
 
-		/// <summary>
-		/// Timer for ping timeout checks
-		/// </summary>
-		private static Timer m_pingCheckTimer;
+        /// <summary>
+        /// Timer for ping timeout checks
+        /// </summary>
+        private static Timer m_pingCheckTimer;
 
-		/// <summary>
-		/// This thread is used to update the NPCs around a player
-		/// as fast as possible
-		/// </summary>
-		private static Thread m_WorldUpdateThread;
+        /// <summary>
+        /// This thread is used to update the NPCs around a player
+        /// as fast as possible
+        /// </summary>
+        private static Thread m_WorldUpdateThread;
 
-		/// <summary>
-		/// This constant defines the day constant
-		/// </summary>
-		private const int DAY = 77760000;
+        /// <summary>
+        /// This constant defines the day constant
+        /// </summary>
+        private const int DAY = 77760000;
 
-		/// <summary>
-		/// This holds the tick when the day started
-		/// </summary>
-		private static int m_dayStartTick;
+        /// <summary>
+        /// This holds the tick when the day started
+        /// </summary>
+        private static int m_dayStartTick;
 
-		/// <summary>
-		/// This holds the speed of our days
-		/// </summary>
-		private static uint m_dayIncrement;
+        /// <summary>
+        /// This holds the speed of our days
+        /// </summary>
+        private static uint m_dayIncrement;
 
-		/// <summary>
-		/// A timer that will send the daytime to all playing
-		/// clients after a certain intervall;
-		/// </summary>
-		private static Timer m_dayResetTimer;
+        /// <summary>
+        /// A timer that will send the daytime to all playing
+        /// clients after a certain intervall;
+        /// </summary>
+        private static Timer m_dayResetTimer;
 
-		/// <summary>
-		/// Relocation threads for relocation of zones
-		/// </summary>
-		private static Thread m_relocationThread;
+        /// <summary>
+        /// Relocation threads for relocation of zones
+        /// </summary>
+        private static Thread m_relocationThread;
 
-		/// <summary>
-		/// Holds all region timers
-		/// </summary>
-		private static GameTimer.TimeManager[] m_regionTimeManagers;
+        /// <summary>
+        /// Holds all region timers
+        /// </summary>
+        private static GameTimer.TimeManager[] m_regionTimeManagers;
 
-		/// <summary>
-		/// Initializes the most important things that is needed for some code
-		/// </summary>
-		/// <param name="regionsData">The loaded regions data</param>
-		public static bool EarlyInit(out RegionData[] regionsData)
-		{
-			log.Debug(GC.GetTotalMemory(true) / 1024 / 1024 + "MB - World Manager: EarlyInit");
+        /// <summary>
+        /// Initializes the most important things that is needed for some code
+        /// </summary>
+        /// <param name="regionsData">The loaded regions data</param>
+        public static bool EarlyInit(out RegionData[] regionsData)
+        {
+            log.Debug(GC.GetTotalMemory(true) / 1024 / 1024 + "MB - World Manager: EarlyInit");
 
-			m_regions.Clear();
-			m_zones.Clear();
+            m_regions.Clear();
+            m_zones.Clear();
 
-			#region Instances
+            #region Instances
 
-			//Dinberg: We now need to save regionData, indexed by regionID, for instances.
-			//The information generated here is oddly ordered by number of mbos in the region,
-			//so I'm contriving to generate this list myself.
-			m_regionData = new Dictionary<ushort, RegionData>();
+            // Dinberg: We now need to save regionData, indexed by regionID, for instances.
+            // The information generated here is oddly ordered by number of mbos in the region,
+            // so I'm contriving to generate this list myself.
+            m_regionData = new Dictionary<ushort, RegionData>();
 
-			//We also will need to store zones, because we need at least one zone per region - hence
-			//we will create zones inside our instances or the player gets banned by anti-telehack scripts.
-			m_zonesData = new Dictionary<ushort, List<ZoneData>>();
+            // We also will need to store zones, because we need at least one zone per region - hence
+            // we will create zones inside our instances or the player gets banned by anti-telehack scripts.
+            m_zonesData = new Dictionary<ushort, List<ZoneData>>();
 
-			#endregion
+            #endregion
 
-			log.Info(LoadTeleports());
+            log.Info(LoadTeleports());
 
-			// sort the regions by mob count
+            // sort the regions by mob count
+            log.Debug("loading mobs from DB...");
 
-			log.Debug("loading mobs from DB...");
+            var mobList = new List<Mob>();
+            if (ServerProperties.Properties.DEBUG_LOAD_REGIONS != string.Empty)
+            {
+                foreach (string loadRegion in ServerProperties.Properties.DEBUG_LOAD_REGIONS.SplitCSV(true))
+                {
+                    mobList.AddRange(GameServer.Database.SelectObjects<Mob>("`Region` = @Region", new QueryParameter("@Region", loadRegion)));
+                }
+            }
+            else
+            {
+                mobList.AddRange(GameServer.Database.SelectAllObjects<Mob>());
+            }
 
-			var mobList = new List<Mob>();
-			if (ServerProperties.Properties.DEBUG_LOAD_REGIONS != string.Empty)
-			{
-				foreach (string loadRegion in ServerProperties.Properties.DEBUG_LOAD_REGIONS.SplitCSV(true))
-				{
-					mobList.AddRange(GameServer.Database.SelectObjects<Mob>("`Region` = @Region", new QueryParameter("@Region", loadRegion)));
-				}
-			}
-			else
-			{
-				mobList.AddRange(GameServer.Database.SelectAllObjects<Mob>());
-			}
+            var mobsByRegionId = new Dictionary<ushort, List<Mob>>(512);
+            foreach (Mob mob in mobList)
+            {
+                List<Mob> list;
 
-			var mobsByRegionId = new Dictionary<ushort, List<Mob>>(512);
-			foreach (Mob mob in mobList)
-			{
-				List<Mob> list;
+                if (!mobsByRegionId.TryGetValue(mob.Region, out list))
+                {
+                    list = new List<Mob>(1024);
+                    mobsByRegionId.Add(mob.Region, list);
+                }
 
-				if (!mobsByRegionId.TryGetValue(mob.Region, out list))
-				{
-					list = new List<Mob>(1024);
-					mobsByRegionId.Add(mob.Region, list);
-				}
+                list.Add(mob);
+            }
 
-				list.Add(mob);
-			}
+            bool hasFrontierRegion = false;
 
-			bool hasFrontierRegion = false;
+            var regions = new List<RegionData>(512);
+            foreach (DBRegions dbRegion in GameServer.Database.SelectAllObjects<DBRegions>())
+            {
+                var data = new RegionData();
 
-			var regions = new List<RegionData>(512);
-			foreach (DBRegions dbRegion in GameServer.Database.SelectAllObjects<DBRegions>())
-			{
-				var data = new RegionData();
+                data.Id = dbRegion.RegionID;
+                data.Name = dbRegion.Name;
+                data.Description = dbRegion.Description;
+                data.Ip = dbRegion.IP;
+                data.Port = dbRegion.Port;
+                data.Expansion = dbRegion.Expansion;
+                data.HousingEnabled = dbRegion.HousingEnabled;
+                data.DivingEnabled = dbRegion.DivingEnabled;
+                data.WaterLevel = dbRegion.WaterLevel;
+                data.ClassType = dbRegion.ClassType;
+                data.IsFrontier = dbRegion.IsFrontier;
 
-				data.Id = dbRegion.RegionID;
-				data.Name = dbRegion.Name;
-				data.Description = dbRegion.Description;
-				data.Ip = dbRegion.IP;
-				data.Port = dbRegion.Port;
-				data.Expansion = dbRegion.Expansion;
-				data.HousingEnabled = dbRegion.HousingEnabled;
-				data.DivingEnabled = dbRegion.DivingEnabled;
-				data.WaterLevel = dbRegion.WaterLevel;
-				data.ClassType = dbRegion.ClassType;
-				data.IsFrontier = dbRegion.IsFrontier;
+                hasFrontierRegion |= data.IsFrontier;
 
-				hasFrontierRegion |= data.IsFrontier;
-
-				List<Mob> mobs;
-			    if (!mobsByRegionId.TryGetValue(data.Id, out mobs))
-			    {
-			        data.Mobs = new Mob[0];
+                List<Mob> mobs;
+                if (!mobsByRegionId.TryGetValue(data.Id, out mobs))
+                {
+                    data.Mobs = new Mob[0];
                 }
                 else
-			    {
-			        data.Mobs = mobs.ToArray();
-			    }
+                {
+                    data.Mobs = mobs.ToArray();
+                }
 
-				regions.Add(data);
+                regions.Add(data);
 
-				//Dinberg - save the data by ID.
-				if (m_regionData.ContainsKey(data.Id))
-				{
-				    log.Error($"Duplicate key in region table - {data.Id}, EarlyInit in WorldMgr failed.");
-				}
+                // Dinberg - save the data by ID.
+                if (m_regionData.ContainsKey(data.Id))
+                {
+                    log.Error($"Duplicate key in region table - {data.Id}, EarlyInit in WorldMgr failed.");
+                }
                 else
-				{
-				    m_regionData.Add(data.Id, data);
-				}
-			}
+                {
+                    m_regionData.Add(data.Id, data);
+                }
+            }
 
-			regions.Sort();
+            regions.Sort();
 
-			log.Debug($"{GC.GetTotalMemory(true) / 1024 / 1024}MB - Region Data Loaded");
+            log.Debug($"{GC.GetTotalMemory(true) / 1024 / 1024}MB - Region Data Loaded");
 
-			int cpuCount = GameServer.Instance.Configuration.CPUUse;
-			if (cpuCount < 1)
-				cpuCount = 1;
+            int cpuCount = GameServer.Instance.Configuration.CPUUse;
+            if (cpuCount < 1)
+            {
+                cpuCount = 1;
+            }
 
-			GameTimer.TimeManager[] timers = new GameTimer.TimeManager[cpuCount];
-			for (int i = 0; i < cpuCount; i++)
-			{
-				timers[i] = new GameTimer.TimeManager($"RegionTime{(i + 1)}");
-			}
+            GameTimer.TimeManager[] timers = new GameTimer.TimeManager[cpuCount];
+            for (int i = 0; i < cpuCount; i++)
+            {
+                timers[i] = new GameTimer.TimeManager($"RegionTime{i + 1}");
+            }
 
-			m_regionTimeManagers = timers;
+            m_regionTimeManagers = timers;
 
-			for (int i = 0; i < regions.Count; i++)
-			{
-				var region = regions[i];
-				RegisterRegion(timers[FastMath.Abs(i % (cpuCount * 2) - cpuCount) % cpuCount], region);
-			}
+            for (int i = 0; i < regions.Count; i++)
+            {
+                var region = regions[i];
+                RegisterRegion(timers[FastMath.Abs(i % (cpuCount * 2) - cpuCount) % cpuCount], region);
+            }
 
-			log.Debug($"{GC.GetTotalMemory(true) / 1024 / 1024}MB - {m_regions.Count} Regions Loaded");
+            log.Debug($"{GC.GetTotalMemory(true) / 1024 / 1024}MB - {m_regions.Count} Regions Loaded");
 
-			// if we don't have at least one frontier region add the default
-			if (hasFrontierRegion == false)
-			{
-				Region frontier;
-				if (m_regions.TryGetValue(Keeps.DefaultKeepManager.DEFAULT_FRONTIERS_REGION, out frontier))
-				{
-					frontier.IsFrontier = true;
-				}
-				else
-				{
-					log.Error($"Can't find default Frontier region {Keeps.DefaultKeepManager.DEFAULT_FRONTIERS_REGION}!");
-				}
-			}
+            // if we don't have at least one frontier region add the default
+            if (hasFrontierRegion == false)
+            {
+                Region frontier;
+                if (m_regions.TryGetValue(Keeps.DefaultKeepManager.DEFAULT_FRONTIERS_REGION, out frontier))
+                {
+                    frontier.IsFrontier = true;
+                }
+                else
+                {
+                    log.Error($"Can't find default Frontier region {Keeps.DefaultKeepManager.DEFAULT_FRONTIERS_REGION}!");
+                }
+            }
 
-			foreach (Zones dbZone in GameServer.Database.SelectAllObjects<Zones>())
-			{
-				ZoneData zoneData = new ZoneData();
-				zoneData.Height = (byte)dbZone.Height;
-				zoneData.Width = (byte)dbZone.Width;
-				zoneData.OffY = (byte)dbZone.OffsetY;
-				zoneData.OffX = (byte)dbZone.OffsetX;
-				zoneData.Description = dbZone.Name;
-				zoneData.RegionID = dbZone.RegionID;
-				zoneData.ZoneID = (ushort)dbZone.ZoneID;
-				zoneData.WaterLevel = dbZone.WaterLevel;
-				zoneData.DivingFlag = dbZone.DivingFlag;
-				zoneData.IsLava = dbZone.IsLava;
-			    RegisterZone(zoneData, zoneData.ZoneID, zoneData.RegionID, zoneData.Description,
-			        dbZone.Experience, dbZone.Realmpoints, dbZone.Bountypoints, dbZone.Coin, dbZone.Realm);
+            foreach (Zones dbZone in GameServer.Database.SelectAllObjects<Zones>())
+            {
+                ZoneData zoneData = new ZoneData();
+                zoneData.Height = (byte)dbZone.Height;
+                zoneData.Width = (byte)dbZone.Width;
+                zoneData.OffY = (byte)dbZone.OffsetY;
+                zoneData.OffX = (byte)dbZone.OffsetX;
+                zoneData.Description = dbZone.Name;
+                zoneData.RegionID = dbZone.RegionID;
+                zoneData.ZoneID = (ushort)dbZone.ZoneID;
+                zoneData.WaterLevel = dbZone.WaterLevel;
+                zoneData.DivingFlag = dbZone.DivingFlag;
+                zoneData.IsLava = dbZone.IsLava;
+                RegisterZone(zoneData, zoneData.ZoneID, zoneData.RegionID, zoneData.Description,
+                    dbZone.Experience, dbZone.Realmpoints, dbZone.Bountypoints, dbZone.Coin, dbZone.Realm);
 
-				//Save the zonedata.
-				if (!m_zonesData.ContainsKey(zoneData.RegionID))
-				{
-				    m_zonesData.Add(zoneData.RegionID, new List<ZoneData>());
-				}
+                // Save the zonedata.
+                if (!m_zonesData.ContainsKey(zoneData.RegionID))
+                {
+                    m_zonesData.Add(zoneData.RegionID, new List<ZoneData>());
+                }
 
-				m_zonesData[zoneData.RegionID].Add(zoneData);
-			}
+                m_zonesData[zoneData.RegionID].Add(zoneData);
+            }
 
+            log.Debug($"{GC.GetTotalMemory(true) / 1024 / 1024}MB - Zones Loaded for All Regions");
 
-			log.Debug($"{GC.GetTotalMemory(true) / 1024 / 1024}MB - Zones Loaded for All Regions");
+            regionsData = regions.ToArray();
+            return true;
+        }
 
-			regionsData = regions.ToArray();
-			return true;
-		}
+        /// <summary>
+        /// Load available teleport locations.
+        /// </summary>
+        public static string LoadTeleports()
+        {
+            var objs = GameServer.Database.SelectAllObjects<Teleport>();
+            m_teleportLocations = new Dictionary<eRealm, Dictionary<string, Teleport>>();
+            int[] numTeleports = new int[3];
+            foreach (Teleport teleport in objs)
+            {
+                Dictionary<string, Teleport> teleportList;
+                if (m_teleportLocations.ContainsKey((eRealm)teleport.Realm))
+                {
+                    teleportList = m_teleportLocations[(eRealm)teleport.Realm];
+                }
+                else
+                {
+                    teleportList = new Dictionary<string, Teleport>();
+                    m_teleportLocations.Add((eRealm)teleport.Realm, teleportList);
+                }
 
+                string teleportKey = $"{teleport.Type}:{teleport.TeleportID}";
+                if (teleportList.ContainsKey(teleportKey))
+                {
+                    log.Error($"WorldMgr.EarlyInit teleporters - Cannot add {teleportKey} already exists");
+                    continue;
+                }
 
-		/// <summary>
-		/// Load available teleport locations.
-		/// </summary>
-		public static string LoadTeleports()
-		{
-			var objs = GameServer.Database.SelectAllObjects<Teleport>();
-			m_teleportLocations = new Dictionary<eRealm, Dictionary<string, Teleport>>();
-			int[] numTeleports = new int[3];
-			foreach (Teleport teleport in objs)
-			{
-				Dictionary<string, Teleport> teleportList;
-				if (m_teleportLocations.ContainsKey((eRealm)teleport.Realm))
-				{
-				    teleportList = m_teleportLocations[(eRealm)teleport.Realm];
-				}
-				else
-				{
-					teleportList = new Dictionary<string, Teleport>();
-					m_teleportLocations.Add((eRealm)teleport.Realm, teleportList);
-				}
+                teleportList.Add(teleportKey, teleport);
 
-				String teleportKey = $"{teleport.Type}:{teleport.TeleportID}";
-				if (teleportList.ContainsKey(teleportKey))
-				{
-					log.Error($"WorldMgr.EarlyInit teleporters - Cannot add {teleportKey} already exists");
-					continue;
-				}
+                if (teleport.Realm >= 1 && teleport.Realm <= 3)
+                {
+                    numTeleports[teleport.Realm - 1]++;
+                }
+            }
 
-				teleportList.Add(teleportKey, teleport);
+            return $"Loaded {numTeleports[0]} Albion, {numTeleports[1]} Midgard and {numTeleports[2]} Hibernia teleport locations";
+        }
 
-				if (teleport.Realm >= 1 && teleport.Realm <= 3)
-				{
-				    numTeleports[teleport.Realm - 1]++;
-				}
-			}
+        /// <summary>
+        /// Initializes the WorldMgr. This function must be called
+        /// before the WorldMgr can be used!
+        /// </summary>
+        public static bool Init(RegionData[] regionsData)
+        {
+            try
+            {
+                m_clients = new GameClient[GameServer.Instance.Configuration.MaxClientCount];
 
-			return $"Loaded {numTeleports[0]} Albion, {numTeleports[1]} Midgard and {numTeleports[2]} Hibernia teleport locations";
-		}
+                LootMgr.Init();
 
+                long mobs = 0;
+                long merchants = 0;
+                long items = 0;
+                long bindpoints = 0;
+                regionsData.AsParallel().WithDegreeOfParallelism(GameServer.Instance.Configuration.CPUUse << 2).ForAll(data => {
+                                                    Region reg;
+                                                    if (m_regions.TryGetValue(data.Id, out reg))
+                    {
+                        reg.LoadFromDatabase(data.Mobs, ref mobs, ref merchants, ref items, ref bindpoints);
+                    }
+                });
 
-		/// <summary>
-		/// Initializes the WorldMgr. This function must be called
-		/// before the WorldMgr can be used!
-		/// </summary>
-		public static bool Init(RegionData[] regionsData)
-		{
-			try
-			{
-				m_clients = new GameClient[GameServer.Instance.Configuration.MaxClientCount];
+                if (log.IsInfoEnabled)
+                {
+                    log.Info($"Total Mobs: {mobs}");
+                    log.Info($"Total Merchants: {merchants}");
+                    log.Info($"Total Items: {items}");
+                    log.Info($"Total Bind Points: {bindpoints}");
+                }
 
-				LootMgr.Init();
+                m_WorldUpdateThread = new Thread(new ThreadStart(WorldUpdateThread.WorldUpdateThreadStart));
+                m_WorldUpdateThread.Priority = ThreadPriority.AboveNormal;
+                m_WorldUpdateThread.Name = "NpcUpdate";
+                m_WorldUpdateThread.IsBackground = true;
+                m_WorldUpdateThread.Start();
 
-				long mobs = 0;
-				long merchants = 0;
-				long items = 0;
-				long bindpoints = 0;
-				regionsData.AsParallel().WithDegreeOfParallelism(GameServer.Instance.Configuration.CPUUse << 2).ForAll(data => {
-				                                	Region reg;
-				                                	if (m_regions.TryGetValue(data.Id, out reg))
-				                                		reg.LoadFromDatabase(data.Mobs, ref mobs, ref merchants, ref items, ref bindpoints);
-				                                });
+                m_dayIncrement = Math.Max(0, Math.Min(1000, ServerProperties.Properties.WORLD_DAY_INCREMENT)); // increments > 1000 do not render smoothly on clients
+                m_dayStartTick = Environment.TickCount - (int)(DAY / Math.Max(1, m_dayIncrement) / 2); // set start time to 12pm
+                m_dayResetTimer = new Timer(new TimerCallback(DayReset), null, DAY / Math.Max(1, m_dayIncrement) / 2, DAY / Math.Max(1, m_dayIncrement));
 
-				if (log.IsInfoEnabled)
-				{
-					log.Info($"Total Mobs: {mobs}");
-					log.Info($"Total Merchants: {merchants}");
-					log.Info($"Total Items: {items}");
-					log.Info($"Total Bind Points: {bindpoints}");
-				}
+                m_pingCheckTimer = new Timer(new TimerCallback(PingCheck), null, 10 * 1000, 0); // every 10s a check
 
-				m_WorldUpdateThread = new Thread(new ThreadStart(WorldUpdateThread.WorldUpdateThreadStart));
-				m_WorldUpdateThread.Priority = ThreadPriority.AboveNormal;
-				m_WorldUpdateThread.Name = "NpcUpdate";
-				m_WorldUpdateThread.IsBackground = true;
-				m_WorldUpdateThread.Start();
+                m_relocationThread = new Thread(new ThreadStart(RelocateRegions));
+                m_relocationThread.Name = "RelocateReg";
+                m_relocationThread.IsBackground = true;
+                m_relocationThread.Start();
+            }
+            catch (Exception e)
+            {
+                if (log.IsErrorEnabled)
+                {
+                    log.Error("Init", e);
+                }
 
-				m_dayIncrement = Math.Max(0, Math.Min(1000, ServerProperties.Properties.WORLD_DAY_INCREMENT)); // increments > 1000 do not render smoothly on clients
-				m_dayStartTick = Environment.TickCount - (int)(DAY / Math.Max(1, m_dayIncrement) / 2); // set start time to 12pm
-				m_dayResetTimer = new Timer(new TimerCallback(DayReset), null, DAY / Math.Max(1, m_dayIncrement) / 2, DAY / Math.Max(1, m_dayIncrement));
+                return false;
+            }
 
-				m_pingCheckTimer = new Timer(new TimerCallback(PingCheck), null, 10 * 1000, 0); // every 10s a check
+            return true;
+        }
 
-				m_relocationThread = new Thread(new ThreadStart(RelocateRegions));
-				m_relocationThread.Name = "RelocateReg";
-				m_relocationThread.IsBackground = true;
-				m_relocationThread.Start();
-			}
-			catch (Exception e)
-			{
-				if (log.IsErrorEnabled)
-				{
-				    log.Error("Init", e);
-				}
-				return false;
-			}
-			return true;
-		}
+        /// <summary>
+        /// Gets all region time managers
+        /// </summary>
+        /// <returns>A copy of region time managers array</returns>
+        public static GameTimer.TimeManager[] GetRegionTimeManagers()
+        {
+            GameTimer.TimeManager[] timers = m_regionTimeManagers;
+            if (timers == null)
+            {
+                return new GameTimer.TimeManager[0];
+            }
 
-		/// <summary>
-		/// Gets all region time managers
-		/// </summary>
-		/// <returns>A copy of region time managers array</returns>
-		public static GameTimer.TimeManager[] GetRegionTimeManagers()
-		{
-			GameTimer.TimeManager[] timers = m_regionTimeManagers;
-		    if (timers == null)
-		    {
-		        return new GameTimer.TimeManager[0];
-		    }
+            return (GameTimer.TimeManager[])timers.Clone();
+        }
 
-			return (GameTimer.TimeManager[])timers.Clone();
-		}
-
-		/// <summary>
-		/// perform the ping timeout check and disconnect clients that timed out
-		/// </summary>
-		/// <param name="sender"></param>
-		private static void PingCheck(object sender)
-		{
-			try
-			{
-				foreach (GameClient client in GetAllClients())
-				{
-					try
-					{
-						// check ping timeout if we are in charscreen or in playing state
-						if (client.ClientState == GameClient.eClientState.CharScreen ||
-						    client.ClientState == GameClient.eClientState.Playing)
-						{
-							if (client.PingTime + PING_TIMEOUT * 1000 * 1000 * 10 < DateTime.Now.Ticks)
-							{
-								if (log.IsWarnEnabled)
-								{
-								    log.Warn($"Ping timeout for client {client.Account.Name}");
-								}
-
-								GameServer.Instance.Disconnect(client);
-							}
-						}
-						else
-						{
-							// in all other cases client gets 10min to get wether in charscreen or playing state
-							if (client.PingTime + 10 * 60 * 10000000L < DateTime.Now.Ticks)
-							{
-							    if (log.IsWarnEnabled)
-							    {
-							        log.Warn($"Hard timeout for client {client.Account.Name} ({client.ClientState})");
+        /// <summary>
+        /// perform the ping timeout check and disconnect clients that timed out
+        /// </summary>
+        /// <param name="sender"></param>
+        private static void PingCheck(object sender)
+        {
+            try
+            {
+                foreach (GameClient client in GetAllClients())
+                {
+                    try
+                    {
+                        // check ping timeout if we are in charscreen or in playing state
+                        if (client.ClientState == GameClient.eClientState.CharScreen ||
+                            client.ClientState == GameClient.eClientState.Playing)
+                        {
+                            if (client.PingTime + PING_TIMEOUT * 1000 * 1000 * 10 < DateTime.Now.Ticks)
+                            {
+                                if (log.IsWarnEnabled)
+                                {
+                                    log.Warn($"Ping timeout for client {client.Account.Name}");
                                 }
 
-								GameServer.Instance.Disconnect(client);
-							}
-						}
-					}
-					catch (Exception ex)
-					{
-						if (log.IsErrorEnabled)
-						{
-						    log.Error("PingCheck", ex);
-						}
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				if (log.IsErrorEnabled)
-				{
-				    log.Error("PingCheck callback", e);
-				}
-			}
-			finally
-			{
-				m_pingCheckTimer.Change(10 * 1000, Timeout.Infinite);
-			}
-		}
+                                GameServer.Instance.Disconnect(client);
+                            }
+                        }
+                        else
+                        {
+                            // in all other cases client gets 10min to get wether in charscreen or playing state
+                            if (client.PingTime + 10 * 60 * 10000000L < DateTime.Now.Ticks)
+                            {
+                                if (log.IsWarnEnabled)
+                                {
+                                    log.Warn($"Hard timeout for client {client.Account.Name} ({client.ClientState})");
+                                }
 
-		/// <summary>
-		/// Gets the RelocateRegions() thread stacktrace
-		/// </summary>
-		/// <returns></returns>
-		public static StackTrace GetRelocateRegionsStacktrace()
-		{
-			return Util.GetThreadStack(m_relocationThread);
-		}
+                                GameServer.Instance.Disconnect(client);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (log.IsErrorEnabled)
+                        {
+                            log.Error("PingCheck", ex);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                if (log.IsErrorEnabled)
+                {
+                    log.Error("PingCheck callback", e);
+                }
+            }
+            finally
+            {
+                m_pingCheckTimer.Change(10 * 1000, Timeout.Infinite);
+            }
+        }
 
-		private static void RelocateRegions()
-		{
-			log.Info($"started RelocateRegions() thread ID:{Thread.CurrentThread.ManagedThreadId}");
-			while (m_relocationThread != null && m_relocationThread.IsAlive)
-			{
-				try
-				{
-					Thread.Sleep(200); // check every 200ms for needed relocs
-					int start = Environment.TickCount;
+        /// <summary>
+        /// Gets the RelocateRegions() thread stacktrace
+        /// </summary>
+        /// <returns></returns>
+        public static StackTrace GetRelocateRegionsStacktrace()
+        {
+            return Util.GetThreadStack(m_relocationThread);
+        }
 
-					var regionsClone = m_regions.Values;
+        private static void RelocateRegions()
+        {
+            log.Info($"started RelocateRegions() thread ID:{Thread.CurrentThread.ManagedThreadId}");
+            while (m_relocationThread != null && m_relocationThread.IsAlive)
+            {
+                try
+                {
+                    Thread.Sleep(200); // check every 200ms for needed relocs
+                    int start = Environment.TickCount;
 
-					foreach (Region region in regionsClone)
-					{
-						if (region.NumPlayers > 0 && (region.LastRelocationTime + Zone.MAX_REFRESH_INTERVAL) * 10 * 1000 < DateTime.Now.Ticks)
-						{
-							region.Relocate();
-						}
-					}
-					int took = Environment.TickCount - start;
-					if (took > 500)
-					{
-						if (log.IsWarnEnabled)
-						{
-						    log.Warn($"RelocateRegions() took {took}ms");
-						}
-					}
-				}
-				catch (ThreadAbortException)
-				{
-					//On Threadabort exit!
-					return;
-				}
-				catch (ThreadInterruptedException)
-				{
-					//On sleep interrupt do nothing
-				}
-				catch (Exception e)
-				{
-					log.Error(e.ToString());
-				}
-			}
+                    var regionsClone = m_regions.Values;
 
-			log.Info($"stopped RelocateRegions() thread ID:{Thread.CurrentThread.ManagedThreadId}");
-		}
+                    foreach (Region region in regionsClone)
+                    {
+                        if (region.NumPlayers > 0 && (region.LastRelocationTime + Zone.MAX_REFRESH_INTERVAL) * 10 * 1000 < DateTime.Now.Ticks)
+                        {
+                            region.Relocate();
+                        }
+                    }
 
-		/// <summary>
-		/// This timer callback resets the day on all clients
-		/// </summary>
-		/// <param name="sender"></param>
-		private static void DayReset(object sender)
-		{
-			m_dayStartTick = Environment.TickCount;
-			foreach (GameClient client in GetAllPlayingClients())
-			{
-				if (client.Player?.CurrentRegion != null && client.Player.CurrentRegion.UseTimeManager)
-				{
-					client.Out.SendTime();
-				}
-			}
-		}
+                    int took = Environment.TickCount - start;
+                    if (took > 500)
+                    {
+                        if (log.IsWarnEnabled)
+                        {
+                            log.Warn($"RelocateRegions() took {took}ms");
+                        }
+                    }
+                }
+                catch (ThreadAbortException)
+                {
+                    // On Threadabort exit!
+                    return;
+                }
+                catch (ThreadInterruptedException)
+                {
+                    // On sleep interrupt do nothing
+                }
+                catch (Exception e)
+                {
+                    log.Error(e.ToString());
+                }
+            }
 
-		/// <summary>
-		/// Starts a new day with a certain increment
-		/// </summary>
-		/// <param name="dayInc"></param>
-		/// <param name="dayStart"></param>
-		public static void StartDay(uint dayInc, uint dayStart)
-		{
-			m_dayIncrement = dayInc;
+            log.Info($"stopped RelocateRegions() thread ID:{Thread.CurrentThread.ManagedThreadId}");
+        }
 
-			if (m_dayIncrement == 0)
-			{
-				// day should stand still so pause the timer
-				m_dayStartTick = (int)dayStart;
-				m_dayResetTimer.Change(Timeout.Infinite, Timeout.Infinite);
-			}
-			else
-			{
-				m_dayStartTick = Environment.TickCount - (int)(dayStart / m_dayIncrement); // set start time to ...
-				m_dayResetTimer.Change((DAY - dayStart) / m_dayIncrement, Timeout.Infinite);
-			}
+        /// <summary>
+        /// This timer callback resets the day on all clients
+        /// </summary>
+        /// <param name="sender"></param>
+        private static void DayReset(object sender)
+        {
+            m_dayStartTick = Environment.TickCount;
+            foreach (GameClient client in GetAllPlayingClients())
+            {
+                if (client.Player?.CurrentRegion != null && client.Player.CurrentRegion.UseTimeManager)
+                {
+                    client.Out.SendTime();
+                }
+            }
+        }
 
-			foreach (GameClient client in GetAllPlayingClients())
-			{
-				if (client.Player?.CurrentRegion != null && client.Player.CurrentRegion.UseTimeManager)
-				{
-					client.Out.SendTime();
-				}
-			}
-		}
+        /// <summary>
+        /// Starts a new day with a certain increment
+        /// </summary>
+        /// <param name="dayInc"></param>
+        /// <param name="dayStart"></param>
+        public static void StartDay(uint dayInc, uint dayStart)
+        {
+            m_dayIncrement = dayInc;
 
+            if (m_dayIncrement == 0)
+            {
+                // day should stand still so pause the timer
+                m_dayStartTick = (int)dayStart;
+                m_dayResetTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
+            else
+            {
+                m_dayStartTick = Environment.TickCount - (int)(dayStart / m_dayIncrement); // set start time to ...
+                m_dayResetTimer.Change((DAY - dayStart) / m_dayIncrement, Timeout.Infinite);
+            }
 
-		/// <summary>
-		/// Gets the game time for a players current region
-		/// </summary>
-		/// <param name="client"></param>
-		/// <returns></returns>
-		public static uint GetCurrentGameTime(GamePlayer player)
-		{
-			if (player.CurrentRegion != null)
-			{
-			    return player.CurrentRegion.GameTime;
-			}
+            foreach (GameClient client in GetAllPlayingClients())
+            {
+                if (client.Player?.CurrentRegion != null && client.Player.CurrentRegion.UseTimeManager)
+                {
+                    client.Out.SendTime();
+                }
+            }
+        }
 
-			return GetCurrentGameTime();
-		}
+        /// <summary>
+        /// Gets the game time for a players current region
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
+        public static uint GetCurrentGameTime(GamePlayer player)
+        {
+            if (player.CurrentRegion != null)
+            {
+                return player.CurrentRegion.GameTime;
+            }
 
-		/// <summary>
-		/// Gets the current game time
-		/// </summary>
-		/// <returns>current time</returns>
-		public static uint GetCurrentGameTime()
-		{
-			if (m_dayIncrement == 0)
-			{
-				return (uint)m_dayStartTick;
-			}
+            return GetCurrentGameTime();
+        }
 
-			long diff = Environment.TickCount - m_dayStartTick;
-			long curTime = diff * m_dayIncrement;
-			return (uint)(curTime % DAY);
-		}
+        /// <summary>
+        /// Gets the current game time
+        /// </summary>
+        /// <returns>current time</returns>
+        public static uint GetCurrentGameTime()
+        {
+            if (m_dayIncrement == 0)
+            {
+                return (uint)m_dayStartTick;
+            }
 
-		/// <summary>
-		/// Returns the day increment
-		/// </summary>
-		/// <returns>the day increment</returns>
-		public static uint GetDayIncrement(GamePlayer player)
-		{
-			if (player.CurrentRegion != null)
-			{
-			    return player.CurrentRegion.DayIncrement;
-			}
+            long diff = Environment.TickCount - m_dayStartTick;
+            long curTime = diff * m_dayIncrement;
+            return (uint)(curTime % DAY);
+        }
 
-			return GetDayIncrement();
-		}
+        /// <summary>
+        /// Returns the day increment
+        /// </summary>
+        /// <returns>the day increment</returns>
+        public static uint GetDayIncrement(GamePlayer player)
+        {
+            if (player.CurrentRegion != null)
+            {
+                return player.CurrentRegion.DayIncrement;
+            }
 
+            return GetDayIncrement();
+        }
 
-		public static uint GetDayIncrement()
-		{
-			return m_dayIncrement;
-		}
+        public static uint GetDayIncrement()
+        {
+            return m_dayIncrement;
+        }
 
-		/// <summary>
-		/// Gets the world update thread stacktrace
-		/// </summary>
-		/// <returns></returns>
-		public static StackTrace GetWorldUpdateStacktrace()
-		{
-			return Util.GetThreadStack(m_WorldUpdateThread);
-		}
+        /// <summary>
+        /// Gets the world update thread stacktrace
+        /// </summary>
+        /// <returns></returns>
+        public static StackTrace GetWorldUpdateStacktrace()
+        {
+            return Util.GetThreadStack(m_WorldUpdateThread);
+        }
 
-		/// <summary>
-		/// Cleans up and stops all the RegionMgr tasks inside
-		/// the regions.
-		/// </summary>
-		public static void Exit()
-		{
-			try
-			{
-				if (m_pingCheckTimer != null)
-				{
-					m_pingCheckTimer.Dispose();
-					m_pingCheckTimer = null;
-				}
+        /// <summary>
+        /// Cleans up and stops all the RegionMgr tasks inside
+        /// the regions.
+        /// </summary>
+        public static void Exit()
+        {
+            try
+            {
+                if (m_pingCheckTimer != null)
+                {
+                    m_pingCheckTimer.Dispose();
+                    m_pingCheckTimer = null;
+                }
 
-				if (m_dayResetTimer != null)
-				{
-					m_dayResetTimer.Dispose();
-					m_dayResetTimer = null;
-				}
+                if (m_dayResetTimer != null)
+                {
+                    m_dayResetTimer.Dispose();
+                    m_dayResetTimer = null;
+                }
 
-				if (m_WorldUpdateThread != null)
-				{
-					m_WorldUpdateThread.Abort();
-					m_WorldUpdateThread = null;
-				}
+                if (m_WorldUpdateThread != null)
+                {
+                    m_WorldUpdateThread.Abort();
+                    m_WorldUpdateThread = null;
+                }
 
-				if (m_relocationThread != null)
-				{
-					m_relocationThread.Abort();
-					m_relocationThread = null;
-				}
+                if (m_relocationThread != null)
+                {
+                    m_relocationThread.Abort();
+                    m_relocationThread = null;
+                }
 
-				//Stop all mobMgrs
-				StopRegionMgrs();
-			}
-			catch (Exception e)
-			{
-				if (log.IsErrorEnabled)
-				{
-				    log.Error("Exit", e);
-				}
-			}
-		}
+                // Stop all mobMgrs
+                StopRegionMgrs();
+            }
+            catch (Exception e)
+            {
+                if (log.IsErrorEnabled)
+                {
+                    log.Error("Exit", e);
+                }
+            }
+        }
 
-		/// <summary>
-		/// Creates and adds a new region to the WorldMgr
-		/// </summary>
-		/// <param name="time">Time manager for the region</param>
-		/// <param name="data">The region data</param>
-		/// <returns>Registered region</returns>
-		public static Region RegisterRegion(GameTimer.TimeManager time, RegionData data)
-		{
-			Region region =  Region.Create(time, data);
-			m_regions.Add(data.Id, region);
-			return region;
-		}
+        /// <summary>
+        /// Creates and adds a new region to the WorldMgr
+        /// </summary>
+        /// <param name="time">Time manager for the region</param>
+        /// <param name="data">The region data</param>
+        /// <returns>Registered region</returns>
+        public static Region RegisterRegion(GameTimer.TimeManager time, RegionData data)
+        {
+            Region region = Region.Create(time, data);
+            m_regions.Add(data.Id, region);
+            return region;
+        }
 
-		/// <summary>
-		/// Creates an array of region entries
-		/// </summary>
-		/// <returns>An array of regions available on the server</returns>
-		public static RegionEntry[] GetRegionList()
-		{
-			string ip = GameServer.Instance.Configuration.RegionIP.ToString();
-			string port = $"{GameServer.Instance.Configuration.RegionPort:D00000}";
-		    return m_regions
-		        .Select(r => new RegionEntry
-		        {
-		            id = r.Value.ID,
-		            ip = ip,
-		            toPort = port,
-		            name = r.Value.Name,
-		            fromPort = port,
-		            expansion = r.Value.Expansion,
-		        }).ToArray();
-		}
+        /// <summary>
+        /// Creates an array of region entries
+        /// </summary>
+        /// <returns>An array of regions available on the server</returns>
+        public static RegionEntry[] GetRegionList()
+        {
+            string ip = GameServer.Instance.Configuration.RegionIP.ToString();
+            string port = $"{GameServer.Instance.Configuration.RegionPort:D00000}";
+            return m_regions
+                .Select(r => new RegionEntry
+                {
+                    id = r.Value.ID,
+                    ip = ip,
+                    toPort = port,
+                    name = r.Value.Name,
+                    fromPort = port,
+                    expansion = r.Value.Expansion,
+                }).ToArray();
+        }
 
-		/// <summary>
-		/// Returns all the regions of the world
-		/// </summary>
-		/// <returns></returns>
-		public static ICollection<Region> GetAllRegions()
-		{
-			return m_regions.Values;
-		}
+        /// <summary>
+        /// Returns all the regions of the world
+        /// </summary>
+        /// <returns></returns>
+        public static ICollection<Region> GetAllRegions()
+        {
+            return m_regions.Values;
+        }
 
-		/// <summary>
-		/// Registers a Zone into a Region
-		/// </summary>
-		public static void RegisterZone(ZoneData zoneData, ushort zoneID, ushort regionID, string zoneName, int xpBonus, int rpBonus, int bpBonus, int coinBonus, byte realm)
-		{
-			Region region = GetRegion(regionID);
-			if (region == null)
-			{
-				if (log.IsWarnEnabled)
-				{
-					log.Warn($"Could not find Region {regionID} for Zone {zoneData.Description}");
-				}
+        /// <summary>
+        /// Registers a Zone into a Region
+        /// </summary>
+        public static void RegisterZone(ZoneData zoneData, ushort zoneID, ushort regionID, string zoneName, int xpBonus, int rpBonus, int bpBonus, int coinBonus, byte realm)
+        {
+            Region region = GetRegion(regionID);
+            if (region == null)
+            {
+                if (log.IsWarnEnabled)
+                {
+                    log.Warn($"Could not find Region {regionID} for Zone {zoneData.Description}");
+                }
 
-				return;
-			}
-			
-			// Making an assumption that a zone waterlevel of 0 means it is not set and we should use the regions waterlevel - Tolakram
-			if (zoneData.WaterLevel == 0)
-			{
-				zoneData.WaterLevel = region.WaterLevel;
-			}
+                return;
+            }
 
-			bool isDivingEnabled = region.IsRegionDivingEnabled;
+            // Making an assumption that a zone waterlevel of 0 means it is not set and we should use the regions waterlevel - Tolakram
+            if (zoneData.WaterLevel == 0)
+            {
+                zoneData.WaterLevel = region.WaterLevel;
+            }
 
-			if (zoneData.DivingFlag == 1)
-			{
-			    isDivingEnabled = true;
-			}
-			else if (zoneData.DivingFlag == 2)
-			{
-			    isDivingEnabled = false;
-			}
+            bool isDivingEnabled = region.IsRegionDivingEnabled;
 
-		    Zone zone = new Zone(region,
-		        zoneID,
-		        zoneName,
-		        zoneData.OffX * 8192,
-		        zoneData.OffY * 8192,
-		        zoneData.Width * 8192,
-		        zoneData.Height * 8192,
-		        zoneData.ZoneID,
-		        isDivingEnabled,
-		        zoneData.WaterLevel,
-		        zoneData.IsLava,
-		        xpBonus,
-		        rpBonus,
-		        bpBonus,
-		        coinBonus,
-		        realm);
+            if (zoneData.DivingFlag == 1)
+            {
+                isDivingEnabled = true;
+            }
+            else if (zoneData.DivingFlag == 2)
+            {
+                isDivingEnabled = false;
+            }
 
-			region.Zones.Add(zone);
-			m_zones.AddOrReplace(zoneID, zone);
-			log.Info($"Added a zone, {zoneData.Description}, to region {region.Name}");
-		}
+            Zone zone = new Zone(
+                region,
+                zoneID,
+                zoneName,
+                zoneData.OffX * 8192,
+                zoneData.OffY * 8192,
+                zoneData.Width * 8192,
+                zoneData.Height * 8192,
+                zoneData.ZoneID,
+                isDivingEnabled,
+                zoneData.WaterLevel,
+                zoneData.IsLava,
+                xpBonus,
+                rpBonus,
+                bpBonus,
+                coinBonus,
+                realm);
 
-		/// <summary>
-		/// Starts all RegionMgrs inside the Regions
-		/// </summary>
-		/// <returns>true</returns>
-		public static bool StartRegionMgrs()
-		{
-		    m_regions.FreezeWhile(dict =>
-		    {
-		        foreach (Region reg in dict.Values)
-		            reg.StartRegionMgr();
-		    });
+            region.Zones.Add(zone);
+            m_zones.AddOrReplace(zoneID, zone);
+            log.Info($"Added a zone, {zoneData.Description}, to region {region.Name}");
+        }
 
-			return true;
-		}
+        /// <summary>
+        /// Starts all RegionMgrs inside the Regions
+        /// </summary>
+        /// <returns>true</returns>
+        public static bool StartRegionMgrs()
+        {
+            m_regions.FreezeWhile(dict =>
+            {
+                foreach (Region reg in dict.Values)
+                {
+                    reg.StartRegionMgr();
+                }
+            });
 
-		/// <summary>
-		/// Stops all Regionmgrs inside the Regions
-		/// </summary>
-		public static void StopRegionMgrs()
-		{
-			if (log.IsDebugEnabled)
-			{
-			    log.Debug("Stopping region managers...");
-			}
+            return true;
+        }
 
-		    m_regions.FreezeWhile(dict =>
-		    {
-		        foreach (Region reg in dict.Values)
-		            reg.StopRegionMgr();
-		    });
+        /// <summary>
+        /// Stops all Regionmgrs inside the Regions
+        /// </summary>
+        public static void StopRegionMgrs()
+        {
+            if (log.IsDebugEnabled)
+            {
+                log.Debug("Stopping region managers...");
+            }
 
-			if (log.IsDebugEnabled)
-			{
-			    log.Debug("Region managers stopped.");
-			}
-		}
+            m_regions.FreezeWhile(dict =>
+            {
+                foreach (Region reg in dict.Values)
+                {
+                    reg.StopRegionMgr();
+                }
+            });
 
-		/// <summary>
-		/// Fetch a Region by it's ID
-		/// </summary>
-		/// <param name="regionID">ID to search</param>
-		/// <returns>Region or null if not found</returns>
-		public static Region GetRegion(ushort regionID)
-		{
-		    if (m_regions.TryGetValue(regionID, out var reg))
-			{
-			    return reg;
-			}
-			
-			return null;
-		}
+            if (log.IsDebugEnabled)
+            {
+                log.Debug("Region managers stopped.");
+            }
+        }
 
-		public static ushort m_lastZoneError;
+        /// <summary>
+        /// Fetch a Region by it's ID
+        /// </summary>
+        /// <param name="regionID">ID to search</param>
+        /// <returns>Region or null if not found</returns>
+        public static Region GetRegion(ushort regionID)
+        {
+            if (m_regions.TryGetValue(regionID, out var reg))
+            {
+                return reg;
+            }
 
-		/// <summary>
-		/// Gets a Zone object by it's ID
-		/// </summary>
-		/// <param name="zoneID">the zoneID</param>
-		/// <returns>the zone object or null</returns>
-		public static Zone GetZone(ushort zoneID)
-		{
-		    if (m_zones.TryGetValue(zoneID, out var z))
-			{
-			    return z;
-			}
-			
-			if (m_lastZoneError != zoneID)
-			{
-				log.Error($"Trying to access inexistent ZoneID {zoneID} {Environment.StackTrace}");
-				m_lastZoneError = zoneID;
-			}
+            return null;
+        }
 
-			return null;
-		}
+        public static ushort m_lastZoneError;
 
+        /// <summary>
+        /// Gets a Zone object by it's ID
+        /// </summary>
+        /// <param name="zoneID">the zoneID</param>
+        /// <returns>the zone object or null</returns>
+        public static Zone GetZone(ushort zoneID)
+        {
+            if (m_zones.TryGetValue(zoneID, out var z))
+            {
+                return z;
+            }
 
-		/// <summary>
-		/// Creates a new SessionID for a GameClient object
-		/// </summary>
-		/// <param name="obj">The GameClient for which we need an ID</param>
-		/// <returns>The new ID or -1 if none free</returns>
-		public static int CreateSessionID(GameClient obj)
-		{
-			lock (m_clients.SyncRoot)
-			{
-				for (int i = 0; i < m_clients.Length; i++)
-			        if (m_clients[i] == null)
-			        {
-			            m_clients[i] = obj;
-			            obj.SessionID = i + 1;
-			            return i + 1;
-			        }
-			}
+            if (m_lastZoneError != zoneID)
+            {
+                log.Error($"Trying to access inexistent ZoneID {zoneID} {Environment.StackTrace}");
+                m_lastZoneError = zoneID;
+            }
 
-			return -1;
-	    }
+            return null;
+        }
+
+        /// <summary>
+        /// Creates a new SessionID for a GameClient object
+        /// </summary>
+        /// <param name="obj">The GameClient for which we need an ID</param>
+        /// <returns>The new ID or -1 if none free</returns>
+        public static int CreateSessionID(GameClient obj)
+        {
+            lock (m_clients.SyncRoot)
+            {
+                for (int i = 0; i < m_clients.Length; i++)
+                {
+                    if (m_clients[i] == null)
+                    {
+                        m_clients[i] = obj;
+                        obj.SessionID = i + 1;
+                        return i + 1;
+                    }
+                }
+            }
+
+            return -1;
+        }
 
         /// <summary>
         /// Searches for all objects from a specific region
@@ -990,793 +997,800 @@ namespace DOL.GS
             where T : GameObject
         {
             if (!m_regions.TryGetValue(regionId, out var reg))
-		    {
-		        return new T[0];
+            {
+                return new T[0];
             }
 
-			return reg.Objects.Where(obj => obj != null).OfType<T>().ToArray();
-		}
+            return reg.Objects.Where(obj => obj != null).OfType<T>().ToArray();
+        }
 
-		/// <summary>
-		/// Searches for all objects with the given name, from a specific region and realm
-		/// </summary>
-		/// <param name="name">The name of the object to search</param>
-		/// <param name="regionId">The region to search</param>
-		/// <param name="realm">The realm of the object we search!</param>
-		/// <param name="objectType">The type of the object you search</param>
-		/// <returns>All objects with the specified parameters</returns>
-		public static T[] GetObjectsByNameFromRegion<T>(string name, ushort regionId, eRealm realm)
+        /// <summary>
+        /// Searches for all objects with the given name, from a specific region and realm
+        /// </summary>
+        /// <param name="name">The name of the object to search</param>
+        /// <param name="regionId">The region to search</param>
+        /// <param name="realm">The realm of the object we search!</param>
+        /// <param name="objectType">The type of the object you search</param>
+        /// <returns>All objects with the specified parameters</returns>
+        public static T[] GetObjectsByNameFromRegion<T>(string name, ushort regionId, eRealm realm)
             where T : GameObject
-		{
-			return GetobjectsFromRegion<T>(regionId)
+        {
+            return GetobjectsFromRegion<T>(regionId)
                 .Where(obj => obj.Realm == realm && obj.Name == name)
                 .ToArray();
-		}
+        }
 
-		/// <summary>
-		/// Searches for all objects with the given name and realm in ALL regions!
-		/// </summary>
-		/// <param name="name">The name of the object to search</param>
-		/// <param name="realm">The realm of the object we search!</param>
-		/// <param name="objectType">The type of the object you search</param>
-		/// <returns>All objects with the specified parameters</returns>b
-		public static T[] GetObjectsByName<T>(string name, eRealm realm)
+        /// <summary>
+        /// Searches for all objects with the given name and realm in ALL regions!
+        /// </summary>
+        /// <param name="name">The name of the object to search</param>
+        /// <param name="realm">The realm of the object we search!</param>
+        /// <param name="objectType">The type of the object you search</param>
+        /// <returns>All objects with the specified parameters</returns>b
+        public static T[] GetObjectsByName<T>(string name, eRealm realm)
             where T : GameObject
-		{
-			return m_regions.Values
+        {
+            return m_regions.Values
                 .Select(reg => GetObjectsByNameFromRegion<T>(name, reg.ID, realm))
-				.SelectMany(objs => objs)
+                .SelectMany(objs => objs)
                 .ToArray();
-		}
+        }
 
-		/// <summary>
-		/// Fetch a GameClient based on it's ID
-		/// </summary>
-		/// <param name="id">ID to search</param>
-		/// <returns>The found GameClient or null if not found</returns>
-		public static GameClient GetClientFromID(int id)
-		{
-			int i = id;
-			if (i <= 0 || i > m_clients.Length)
-			{
-			    return null;
-			}
+        /// <summary>
+        /// Fetch a GameClient based on it's ID
+        /// </summary>
+        /// <param name="id">ID to search</param>
+        /// <returns>The found GameClient or null if not found</returns>
+        public static GameClient GetClientFromID(int id)
+        {
+            int i = id;
+            if (i <= 0 || i > m_clients.Length)
+            {
+                return null;
+            }
 
-			return m_clients[i - 1];
-		}
+            return m_clients[i - 1];
+        }
 
-		/// <summary>
-		/// Removes a GameClient and free's it's ID again!
-		/// </summary>
-		/// <param name="entry">The GameClient to be removed</param>
-		public static void RemoveClient(GameClient entry)
-		{
-			if (entry == null)
-			{
-			    return;
-			}
+        /// <summary>
+        /// Removes a GameClient and free's it's ID again!
+        /// </summary>
+        /// <param name="entry">The GameClient to be removed</param>
+        public static void RemoveClient(GameClient entry)
+        {
+            if (entry == null)
+            {
+                return;
+            }
 
-			int sessionid = -1;
-			int i = 1;
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client == entry)
-					{
-						sessionid = i;
-						break;
-					}
+            int sessionid = -1;
+            int i = 1;
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client == entry)
+                    {
+                        sessionid = i;
+                        break;
+                    }
 
-					i++;
-				}
-			}
+                    i++;
+                }
+            }
 
-			// do NOT remove sessionid in lock of clients
-			// or a deadlock can occur under certain circumstances!
-			if (sessionid > 0)
-			{
-				RemoveSessionID(sessionid);
-			}
-		}
+            // do NOT remove sessionid in lock of clients
+            // or a deadlock can occur under certain circumstances!
+            if (sessionid > 0)
+            {
+                RemoveSessionID(sessionid);
+            }
+        }
 
-		/// <summary>
-		/// Removes a GameClient based on it's ID
-		/// </summary>
-		/// <param name="id">The SessionID to free</param>
-		public static void RemoveSessionID(int id)
-		{
-			GameClient client;
-			lock (m_clients.SyncRoot)
-			{
-				client = m_clients[id - 1];
-				m_clients[id - 1] = null;
-			}
-            
-			client?.Player?.Delete();
-		}
+        /// <summary>
+        /// Removes a GameClient based on it's ID
+        /// </summary>
+        /// <param name="id">The SessionID to free</param>
+        public static void RemoveSessionID(int id)
+        {
+            GameClient client;
+            lock (m_clients.SyncRoot)
+            {
+                client = m_clients[id - 1];
+                m_clients[id - 1] = null;
+            }
 
-		/// <summary>
-		/// Returns an array of GameClients currently playing from a specific realm
-		/// </summary>
-		/// <param name="realmID">ID of Realm (1=Alb, 2=Mid, 3=Hib)</param>
-		/// <returns>An ArrayList of clients</returns>
-		public static IList<GameClient> GetClientsOfRealm(eRealm realm)
-		{
-			var targetClients = new List<GameClient>();
+            client?.Player?.Delete();
+        }
 
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client != null)
-					{
-						if (client.IsPlaying &&
+        /// <summary>
+        /// Returns an array of GameClients currently playing from a specific realm
+        /// </summary>
+        /// <param name="realmID">ID of Realm (1=Alb, 2=Mid, 3=Hib)</param>
+        /// <returns>An ArrayList of clients</returns>
+        public static IList<GameClient> GetClientsOfRealm(eRealm realm)
+        {
+            var targetClients = new List<GameClient>();
+
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client != null)
+                    {
+                        if (client.IsPlaying &&
                             client.Player != null &&
                             client.Player.ObjectState == GameObject.eObjectState.Active &&
                             client.Player.Realm == realm)
-						{
-						    targetClients.Add(client);
-						}
-					}
-				}
-			}
+                        {
+                            targetClients.Add(client);
+                        }
+                    }
+                }
+            }
 
-			return targetClients;
-		}
+            return targetClients;
+        }
 
-		/// <summary>
-		/// Returns the number of playing Clients in a certain Region
-		/// </summary>
-		/// <param name="regionID">The ID of the Region</param>
-		/// <returns>Number of playing Clients in that Region</returns>
-		public static int GetClientsOfRegionCount(ushort regionID)
-		{
-			int count = 0;
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client != null)
-					{
-						if (client.IsPlaying &&
+        /// <summary>
+        /// Returns the number of playing Clients in a certain Region
+        /// </summary>
+        /// <param name="regionID">The ID of the Region</param>
+        /// <returns>Number of playing Clients in that Region</returns>
+        public static int GetClientsOfRegionCount(ushort regionID)
+        {
+            int count = 0;
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client != null)
+                    {
+                        if (client.IsPlaying &&
                             client.Player != null &&
                             client.Player.ObjectState == GameObject.eObjectState.Active &&
                             client.Player.CurrentRegionID == regionID)
-						{
-						    count++;
-						}
-					}
-				}
-			}
-			return count;
-		}
+                        {
+                            count++;
+                        }
+                    }
+                }
+            }
 
-		/// <summary>
-		/// Returns the number of playing Clients in a certain Region
-		/// </summary>
-		/// <param name="regionID">The ID of the Region</param>
-		/// <param name="realm">The realm of clients to check</param>
-		/// <returns>Number of playing Clients in that Region</returns>
-		public static int GetClientsOfRegionCount(ushort regionID, eRealm realm)
-		{
-			int count = 0;
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client != null)
-					{
-						if (client.IsPlaying &&
+            return count;
+        }
+
+        /// <summary>
+        /// Returns the number of playing Clients in a certain Region
+        /// </summary>
+        /// <param name="regionID">The ID of the Region</param>
+        /// <param name="realm">The realm of clients to check</param>
+        /// <returns>Number of playing Clients in that Region</returns>
+        public static int GetClientsOfRegionCount(ushort regionID, eRealm realm)
+        {
+            int count = 0;
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client != null)
+                    {
+                        if (client.IsPlaying &&
                             client.Player != null &&
                             client.Player.ObjectState == GameObject.eObjectState.Active &&
                             client.Player.CurrentRegionID == regionID &&
                             client.Player.Realm == realm)
-						{
-						    count++;
-						}
-					}
-				}
-			}
-			return count;
-		}
+                        {
+                            count++;
+                        }
+                    }
+                }
+            }
 
-		/// <summary>
-		/// Returns a list of playing clients inside a region
-		/// </summary>
-		/// <param name="regionID">The ID of the Region</param>
-		/// <returns>Array of GameClients from that Region</returns>
-		public static IList<GameClient> GetClientsOfRegion(ushort regionID)
-		{
-			var targetClients = new  List<GameClient>();
+            return count;
+        }
 
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client != null)
-					{
-						if (client.IsPlaying &&
+        /// <summary>
+        /// Returns a list of playing clients inside a region
+        /// </summary>
+        /// <param name="regionID">The ID of the Region</param>
+        /// <returns>Array of GameClients from that Region</returns>
+        public static IList<GameClient> GetClientsOfRegion(ushort regionID)
+        {
+            var targetClients = new List<GameClient>();
+
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client != null)
+                    {
+                        if (client.IsPlaying &&
                             client.Player != null &&
                             client.Player.ObjectState == GameObject.eObjectState.Active &&
                             client.Player.CurrentRegionID == regionID)
-						{
-						    targetClients.Add(client);
-						}
-					}
-				}
-			}
+                        {
+                            targetClients.Add(client);
+                        }
+                    }
+                }
+            }
 
-			return targetClients;
-		}
+            return targetClients;
+        }
 
-		/// <summary>
-		/// Find a GameClient by the Player's ID
-		/// Case-insensitive, make sure you use returned Player.Name instead of what player typed.
-		/// </summary>
-		/// <param name="playerID">ID to search</param>
-		/// <param name="exactMatch">true if AccountName match exactly</param>
-		/// <param name="activeRequired"></param>
-		/// <returns>The found GameClient or null</returns>
-		public static GameClient GetClientByPlayerID(string playerID, bool exactMatch, bool activeRequired)
-		{
-			foreach (GameClient client in GetAllPlayingClients())
-			{
-				if (client.Player.InternalID == playerID)
-				{
-				    return client;
-				}
-			}
-			return null;
-		}
-		
-		/// <summary>
-		/// Finds a GameClient by the AccountName
-		/// </summary>
-		/// <param name="accountName">AccountName to search</param>
-		/// <param name="exactMatch">true if AccountName match exactly</param>
-		/// <returns>The found GameClient or null</returns>
-		public static GameClient GetClientByAccountName(string accountName, bool exactMatch)
-		{
-			accountName = accountName.ToLower();
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client != null)
-					{
-						if (exactMatch && client.Account.Name.ToLower() == accountName ||
+        /// <summary>
+        /// Find a GameClient by the Player's ID
+        /// Case-insensitive, make sure you use returned Player.Name instead of what player typed.
+        /// </summary>
+        /// <param name="playerID">ID to search</param>
+        /// <param name="exactMatch">true if AccountName match exactly</param>
+        /// <param name="activeRequired"></param>
+        /// <returns>The found GameClient or null</returns>
+        public static GameClient GetClientByPlayerID(string playerID, bool exactMatch, bool activeRequired)
+        {
+            foreach (GameClient client in GetAllPlayingClients())
+            {
+                if (client.Player.InternalID == playerID)
+                {
+                    return client;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Finds a GameClient by the AccountName
+        /// </summary>
+        /// <param name="accountName">AccountName to search</param>
+        /// <param name="exactMatch">true if AccountName match exactly</param>
+        /// <returns>The found GameClient or null</returns>
+        public static GameClient GetClientByAccountName(string accountName, bool exactMatch)
+        {
+            accountName = accountName.ToLower();
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client != null)
+                    {
+                        if (exactMatch && client.Account.Name.ToLower() == accountName ||
                             !exactMatch && client.Account.Name.ToLower().StartsWith(accountName))
-						{
-							return client;
-						}
-					}
-				}
-			}
-			return null;
-		}
+                        {
+                            return client;
+                        }
+                    }
+                }
+            }
 
-		/// <summary>
-		/// Find a GameClient by the Player's name
-		/// Case-insensitive, make sure you use returned Player.Name instead of what player typed.
-		/// </summary>
-		/// <param name="playerName">Name to search</param>
-		/// <param name="exactMatch">true if AccountName match exactly</param>
-		/// <param name="activeRequired"></param>
-		/// <returns>The found GameClient or null</returns>
-		public static GameClient GetClientByPlayerName(string playerName, bool exactMatch, bool activeRequired)
-		{
-			if (exactMatch)
-			{
-				return GetClientByPlayerNameAndRealm(playerName, 0, activeRequired);
-			}
+            return null;
+        }
 
-			int x = 0;
-			return GuessClientByPlayerNameAndRealm(playerName, 0, activeRequired, out x);
-		}
+        /// <summary>
+        /// Find a GameClient by the Player's name
+        /// Case-insensitive, make sure you use returned Player.Name instead of what player typed.
+        /// </summary>
+        /// <param name="playerName">Name to search</param>
+        /// <param name="exactMatch">true if AccountName match exactly</param>
+        /// <param name="activeRequired"></param>
+        /// <returns>The found GameClient or null</returns>
+        public static GameClient GetClientByPlayerName(string playerName, bool exactMatch, bool activeRequired)
+        {
+            if (exactMatch)
+            {
+                return GetClientByPlayerNameAndRealm(playerName, 0, activeRequired);
+            }
 
-		/// <summary>
-		/// Find a GameClient by the Player's name.
-		/// Case-insensitive now, make sure you use returned Player.Name instead of what player typed.
-		/// </summary>
-		/// <param name="playerName">Name to search</param>
-		/// <param name="realmID">search in: 0=all realms or player.Realm</param>
-		/// <param name="activeRequired"></param>
-		/// <returns>The found GameClient or null</returns>
-		public static GameClient GetClientByPlayerNameAndRealm(string playerName, eRealm realm, bool activeRequired)
-		{
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client?.Player != null && (realm == eRealm.None || client.Player.Realm == realm))
-					{
-						if (activeRequired && (!client.IsPlaying || client.Player.ObjectState != GameObject.eObjectState.Active))
-						{
-						    continue;
-						}
+            int x = 0;
+            return GuessClientByPlayerNameAndRealm(playerName, 0, activeRequired, out x);
+        }
 
-						if (0 == string.Compare(client.Player.Name, playerName, true)) // case insensitive comapre
-						{
-							return client;
-						}
-					}
-				}
-			}
-			return null;
-		}
+        /// <summary>
+        /// Find a GameClient by the Player's name.
+        /// Case-insensitive now, make sure you use returned Player.Name instead of what player typed.
+        /// </summary>
+        /// <param name="playerName">Name to search</param>
+        /// <param name="realmID">search in: 0=all realms or player.Realm</param>
+        /// <param name="activeRequired"></param>
+        /// <returns>The found GameClient or null</returns>
+        public static GameClient GetClientByPlayerNameAndRealm(string playerName, eRealm realm, bool activeRequired)
+        {
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client?.Player != null && (realm == eRealm.None || client.Player.Realm == realm))
+                    {
+                        if (activeRequired && (!client.IsPlaying || client.Player.ObjectState != GameObject.eObjectState.Active))
+                        {
+                            continue;
+                        }
 
-		/// <summary>
-		/// Guess a GameClient by first letters of Player's name
-		/// Case-insensitive, make sure you use returned Player.Name instead of what player typed.
-		/// </summary>
-		/// <param name="playerName">Name to search</param>
-		/// <param name="realm">search in: 0=all realms or player.Realm</param>
-		/// <param name="result">returns: 1=no name found, 2=name is not unique, 3=exact match, 4=guessed name</param>
-		/// <param name="activeRequired"></param>
-		/// <returns>The found GameClient or null</returns>
-		public static GameClient GuessClientByPlayerNameAndRealm(string playerName, eRealm realm, bool activeRequired, out int result)
-		{
-			// first try exact match in case player with "abcde" name is
-			// before "abc" in list and user typed "abc"
-			GameClient guessedClient = GetClientByPlayerNameAndRealm(playerName, realm, activeRequired);
-			if (guessedClient != null)
-			{
-				result = 3; // exact match
-				return guessedClient;
-			}
+                        if (0 == string.Compare(client.Player.Name, playerName, true)) // case insensitive comapre
+                        {
+                            return client;
+                        }
+                    }
+                }
+            }
 
-			// now trying to guess
-			string compareName = playerName.ToLower();
-			result = 1; // no name found
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client?.Player != null)
-					{
-						if (activeRequired && (!client.IsPlaying || client.Player.ObjectState != GameObject.eObjectState.Active))
-						{
-						    continue;
-						}
+            return null;
+        }
 
-						if (realm == eRealm.None || client.Player.Realm == realm)
-						{
-							if (client.Player.Name.ToLower().StartsWith(compareName))
-							{
-								if (result == 4) // keep looking to be sure that name is unique
-								{
-									result = 2; // name not unique
-									break;
-								}
+        /// <summary>
+        /// Guess a GameClient by first letters of Player's name
+        /// Case-insensitive, make sure you use returned Player.Name instead of what player typed.
+        /// </summary>
+        /// <param name="playerName">Name to search</param>
+        /// <param name="realm">search in: 0=all realms or player.Realm</param>
+        /// <param name="result">returns: 1=no name found, 2=name is not unique, 3=exact match, 4=guessed name</param>
+        /// <param name="activeRequired"></param>
+        /// <returns>The found GameClient or null</returns>
+        public static GameClient GuessClientByPlayerNameAndRealm(string playerName, eRealm realm, bool activeRequired, out int result)
+        {
+            // first try exact match in case player with "abcde" name is
+            // before "abc" in list and user typed "abc"
+            GameClient guessedClient = GetClientByPlayerNameAndRealm(playerName, realm, activeRequired);
+            if (guessedClient != null)
+            {
+                result = 3; // exact match
+                return guessedClient;
+            }
 
-								result = 4; // guessed name
-								guessedClient = client;
+            // now trying to guess
+            string compareName = playerName.ToLower();
+            result = 1; // no name found
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client?.Player != null)
+                    {
+                        if (activeRequired && (!client.IsPlaying || client.Player.ObjectState != GameObject.eObjectState.Active))
+                        {
+                            continue;
+                        }
 
-							}
-						}
-					}
-				}
-			}
-			return guessedClient;
-		}
+                        if (realm == eRealm.None || client.Player.Realm == realm)
+                        {
+                            if (client.Player.Name.ToLower().StartsWith(compareName))
+                            {
+                                if (result == 4) // keep looking to be sure that name is unique
+                                {
+                                    result = 2; // name not unique
+                                    break;
+                                }
 
-		/// <summary>
-		/// Gets a copy of all playing clients
-		/// </summary>
-		/// <returns>ArrayList of playing GameClients</returns>
-		public static IList<GameClient> GetAllPlayingClients()
-		{
-			var targetClients = new List<GameClient>();
+                                result = 4; // guessed name
+                                guessedClient = client;
+                            }
+                        }
+                    }
+                }
+            }
 
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client != null &&
+            return guessedClient;
+        }
+
+        /// <summary>
+        /// Gets a copy of all playing clients
+        /// </summary>
+        /// <returns>ArrayList of playing GameClients</returns>
+        public static IList<GameClient> GetAllPlayingClients()
+        {
+            var targetClients = new List<GameClient>();
+
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client != null &&
                         client.IsPlaying &&
                         client.Player != null &&
                         client.Player.ObjectState == GameObject.eObjectState.Active)
-					{
-					    targetClients.Add(client);
-					}
-				}
-			}
-			return targetClients;
-		}
+                    {
+                        targetClients.Add(client);
+                    }
+                }
+            }
 
-		/// <summary>
-		/// Returns the number of all playing clients
-		/// </summary>
-		/// <returns>Count of all playing clients</returns>
-		public static int GetAllPlayingClientsCount()
-		{
-			int count = 0;
-			lock (m_clients.SyncRoot)
-			{
-				foreach (GameClient client in m_clients)
-				{
-					if (client != null &&
+            return targetClients;
+        }
+
+        /// <summary>
+        /// Returns the number of all playing clients
+        /// </summary>
+        /// <returns>Count of all playing clients</returns>
+        public static int GetAllPlayingClientsCount()
+        {
+            int count = 0;
+            lock (m_clients.SyncRoot)
+            {
+                foreach (GameClient client in m_clients)
+                {
+                    if (client != null &&
                         client.IsPlaying &&
                         client.Player != null &&
                         client.Player.ObjectState == GameObject.eObjectState.Active)
-					{
-					    count++;
-					}
-				}
-			}
-			return count;
-		}
+                    {
+                        count++;
+                    }
+                }
+            }
 
-		/// <summary>
-		/// Gets a copy of ALL clients no matter at what state they are
-		/// </summary>
-		/// <returns>ArrayList of GameClients</returns>
-		public static IList<GameClient> GetAllClients()
-		{
-			lock (m_clients.SyncRoot)
-			{
-				return m_clients.Where(c => c != null).ToList();
-			}
-		}
+            return count;
+        }
 
-		/// <summary>
-		/// Fetch an Object from a specific Region by it's ID
-		/// </summary>
-		/// <param name="regionID">Region ID of Region to search through</param>
-		/// <param name="oID">Object ID to search</param>
-		/// <returns>GameObject found in the Region or null</returns>
-		public static GameObject GetObjectByIDFromRegion(ushort regionID, ushort oID)
-		{
-			Region reg = GetRegion(regionID);
-		    return reg?.GetObject(oID);
-		}
+        /// <summary>
+        /// Gets a copy of ALL clients no matter at what state they are
+        /// </summary>
+        /// <returns>ArrayList of GameClients</returns>
+        public static IList<GameClient> GetAllClients()
+        {
+            lock (m_clients.SyncRoot)
+            {
+                return m_clients.Where(c => c != null).ToList();
+            }
+        }
 
-		/// <summary>
-		/// Returns an IEnumerator of GamePlayers that are close to a certain
-		/// spot in the region
-		/// </summary>
-		/// <param name="regionid">Region to search</param>
-		/// <param name="x">X inside region</param>
-		/// <param name="y">Y inside region</param>
-		/// <param name="z">Z inside region</param>
-		/// <param name="withDistance">Wether or not to return the objects with distance</param>
-		/// <param name="radiusToCheck">Radius to sarch for GameClients</param>
-		/// <returns>IEnumerator that can be used to go through all players</returns>
-		public static IEnumerable GetPlayersCloseToSpot(ushort regionid, int x, int y, int z, ushort radiusToCheck, bool withDistance)
-		{
-			Region reg = GetRegion(regionid);
-			if (reg == null)
-			{
-			    return new Region.EmptyEnumerator();
-			}
+        /// <summary>
+        /// Fetch an Object from a specific Region by it's ID
+        /// </summary>
+        /// <param name="regionID">Region ID of Region to search through</param>
+        /// <param name="oID">Object ID to search</param>
+        /// <returns>GameObject found in the Region or null</returns>
+        public static GameObject GetObjectByIDFromRegion(ushort regionID, ushort oID)
+        {
+            Region reg = GetRegion(regionID);
+            return reg?.GetObject(oID);
+        }
 
-			return reg.GetPlayersInRadius(x, y, z, radiusToCheck, withDistance, false);
-		}
+        /// <summary>
+        /// Returns an IEnumerator of GamePlayers that are close to a certain
+        /// spot in the region
+        /// </summary>
+        /// <param name="regionid">Region to search</param>
+        /// <param name="x">X inside region</param>
+        /// <param name="y">Y inside region</param>
+        /// <param name="z">Z inside region</param>
+        /// <param name="withDistance">Wether or not to return the objects with distance</param>
+        /// <param name="radiusToCheck">Radius to sarch for GameClients</param>
+        /// <returns>IEnumerator that can be used to go through all players</returns>
+        public static IEnumerable GetPlayersCloseToSpot(ushort regionid, int x, int y, int z, ushort radiusToCheck, bool withDistance)
+        {
+            Region reg = GetRegion(regionid);
+            if (reg == null)
+            {
+                return new Region.EmptyEnumerator();
+            }
 
-		/// <summary>
-		/// Returns an IEnumerator of GamePlayers that are close to a certain
-		/// spot in the region
-		/// </summary>
-		/// <param name="location">the game location to search from</param>
-		/// <param name="radiusToCheck">Radius to sarch for GameClients</param>
-		/// <returns>IEnumerator that can be used to go through all players</returns>
-		public static IEnumerable GetPlayersCloseToSpot(IGameLocation location, ushort radiusToCheck)
-		{
-			return GetPlayersCloseToSpot(location.RegionID, location.X, location.Y, location.Z, radiusToCheck, false);
-		}
+            return reg.GetPlayersInRadius(x, y, z, radiusToCheck, withDistance, false);
+        }
 
-		/// <summary>
-		/// Returns an IEnumerator of GamePlayers that are close to a certain
-		/// spot in the region
-		/// </summary>
-		/// <param name="regionid">Region to search</param>
-		/// <param name="point">the 3D point to search from</param>
-		/// <param name="radiusToCheck">Radius to sarch for GameClients</param>
-		/// <returns>IEnumerator that can be used to go through all players</returns>
-		public static IEnumerable GetPlayersCloseToSpot(ushort regionid, IPoint3D point, ushort radiusToCheck)
-		{
-			return GetPlayersCloseToSpot(regionid, point.X, point.Y, point.Z, radiusToCheck, false);
-		}
+        /// <summary>
+        /// Returns an IEnumerator of GamePlayers that are close to a certain
+        /// spot in the region
+        /// </summary>
+        /// <param name="location">the game location to search from</param>
+        /// <param name="radiusToCheck">Radius to sarch for GameClients</param>
+        /// <returns>IEnumerator that can be used to go through all players</returns>
+        public static IEnumerable GetPlayersCloseToSpot(IGameLocation location, ushort radiusToCheck)
+        {
+            return GetPlayersCloseToSpot(location.RegionID, location.X, location.Y, location.Z, radiusToCheck, false);
+        }
 
-		/// <summary>
-		/// Returns an IEnumerator of GamePlayers that are close to a certain
-		/// spot in the region
-		/// </summary>
-		/// <param name="regionid">Region to search</param>
-		/// <param name="x">X inside region</param>
-		/// <param name="y">Y inside region</param>
-		/// <param name="z">Z inside region</param>
-		/// <param name="radiusToCheck">Radius to sarch for GameClients</param>
-		/// <returns>IEnumerator that can be used to go through all players</returns>
-		public static IEnumerable GetPlayersCloseToSpot(ushort regionid, int x, int y, int z, ushort radiusToCheck)
-		{
-			return GetPlayersCloseToSpot(regionid, x, y, z, radiusToCheck, false);
-		}
+        /// <summary>
+        /// Returns an IEnumerator of GamePlayers that are close to a certain
+        /// spot in the region
+        /// </summary>
+        /// <param name="regionid">Region to search</param>
+        /// <param name="point">the 3D point to search from</param>
+        /// <param name="radiusToCheck">Radius to sarch for GameClients</param>
+        /// <returns>IEnumerator that can be used to go through all players</returns>
+        public static IEnumerable GetPlayersCloseToSpot(ushort regionid, IPoint3D point, ushort radiusToCheck)
+        {
+            return GetPlayersCloseToSpot(regionid, point.X, point.Y, point.Z, radiusToCheck, false);
+        }
 
-		/// <summary>
-		/// Returns an IEnumerator of GameNPCs that are close to a certain
-		/// spot in the region
-		/// </summary>
-		/// <param name="regionid">Region to search</param>
-		/// <param name="x">X inside region</param>
-		/// <param name="y">Y inside region</param>
-		/// <param name="z">Z inside region</param>
-		/// <param name="radiusToCheck">Radius to sarch for GameNPCs</param>
-		/// <param name="withDistance">Wether or not to return the objects with distance</param>
-		/// <returns>IEnumerator that can be used to go through all NPCs</returns>
-		public static IEnumerable GetNPCsCloseToSpot(ushort regionid, int x, int y, int z, ushort radiusToCheck, bool withDistance)
-		{
-			Region reg = GetRegion(regionid);
-			if (reg == null)
-			{
-			    return new Region.EmptyEnumerator();
-			}
+        /// <summary>
+        /// Returns an IEnumerator of GamePlayers that are close to a certain
+        /// spot in the region
+        /// </summary>
+        /// <param name="regionid">Region to search</param>
+        /// <param name="x">X inside region</param>
+        /// <param name="y">Y inside region</param>
+        /// <param name="z">Z inside region</param>
+        /// <param name="radiusToCheck">Radius to sarch for GameClients</param>
+        /// <returns>IEnumerator that can be used to go through all players</returns>
+        public static IEnumerable GetPlayersCloseToSpot(ushort regionid, int x, int y, int z, ushort radiusToCheck)
+        {
+            return GetPlayersCloseToSpot(regionid, x, y, z, radiusToCheck, false);
+        }
 
-			return reg.GetNPCsInRadius(x, y, z, radiusToCheck, withDistance, false);
-		}
+        /// <summary>
+        /// Returns an IEnumerator of GameNPCs that are close to a certain
+        /// spot in the region
+        /// </summary>
+        /// <param name="regionid">Region to search</param>
+        /// <param name="x">X inside region</param>
+        /// <param name="y">Y inside region</param>
+        /// <param name="z">Z inside region</param>
+        /// <param name="radiusToCheck">Radius to sarch for GameNPCs</param>
+        /// <param name="withDistance">Wether or not to return the objects with distance</param>
+        /// <returns>IEnumerator that can be used to go through all NPCs</returns>
+        public static IEnumerable GetNPCsCloseToSpot(ushort regionid, int x, int y, int z, ushort radiusToCheck, bool withDistance)
+        {
+            Region reg = GetRegion(regionid);
+            if (reg == null)
+            {
+                return new Region.EmptyEnumerator();
+            }
 
-		/// <summary>
-		/// Returns an IEnumerator of GameNPCs that are close to a certain
-		/// spot in the region
-		/// </summary>
-		/// <param name="regionid">Region to search</param>
-		/// <param name="x">X inside region</param>
-		/// <param name="y">Y inside region</param>
-		/// <param name="z">Z inside region</param>
-		/// <param name="radiusToCheck">Radius to sarch for GameNPCs</param>
-		/// <returns>IEnumerator that can be used to go through all NPCs</returns>
-		public static IEnumerable GetNPCsCloseToSpot(ushort regionid, int x, int y, int z, ushort radiusToCheck)
-		{
-			return GetNPCsCloseToSpot(regionid, x, y, z, radiusToCheck, false);
-		}
+            return reg.GetNPCsInRadius(x, y, z, radiusToCheck, withDistance, false);
+        }
 
-		/// <summary>
-		/// Saves all players into the database.
-		/// </summary>
-		/// <returns>The count of players saved</returns>
-		public static int SavePlayers()
-		{
-			GameClient[] clientsCopy;
-			lock (m_clients.SyncRoot)
-			{
-				clientsCopy = (GameClient[])m_clients.Clone();
-			}
+        /// <summary>
+        /// Returns an IEnumerator of GameNPCs that are close to a certain
+        /// spot in the region
+        /// </summary>
+        /// <param name="regionid">Region to search</param>
+        /// <param name="x">X inside region</param>
+        /// <param name="y">Y inside region</param>
+        /// <param name="z">Z inside region</param>
+        /// <param name="radiusToCheck">Radius to sarch for GameNPCs</param>
+        /// <returns>IEnumerator that can be used to go through all NPCs</returns>
+        public static IEnumerable GetNPCsCloseToSpot(ushort regionid, int x, int y, int z, ushort radiusToCheck)
+        {
+            return GetNPCsCloseToSpot(regionid, x, y, z, radiusToCheck, false);
+        }
 
-			int savedCount = 0;
-			foreach (GameClient client in clientsCopy)
-			{
-				if (client != null)
-				{
-					client.SavePlayer();
-					savedCount++;
-					//Relinquis our remaining thread time here after each save
-					Thread.Sleep(0);
-				}
-			}
-			return savedCount;
-		}
+        /// <summary>
+        /// Saves all players into the database.
+        /// </summary>
+        /// <returns>The count of players saved</returns>
+        public static int SavePlayers()
+        {
+            GameClient[] clientsCopy;
+            lock (m_clients.SyncRoot)
+            {
+                clientsCopy = (GameClient[])m_clients.Clone();
+            }
 
-		#region Instances
+            int savedCount = 0;
+            foreach (GameClient client in clientsCopy)
+            {
+                if (client != null)
+                {
+                    client.SavePlayer();
+                    savedCount++;
 
-		//Dinberg: We must now store the region data here. This is incase admins wish to create instances
-		//that require information from regions Data, like instance of underwater ToA areas as a prime
-		//example!
-		/// <summary>
-		/// Stores the region Data parsed from the regions xml file.
-		/// </summary>
-		private static Dictionary<ushort, RegionData> m_regionData;
+                    // Relinquis our remaining thread time here after each save
+                    Thread.Sleep(0);
+                }
+            }
 
-		/// <summary>
-		/// Stores the zone data parsed from the zones file by RegionID.
-		/// </summary>
-		private static Dictionary<ushort, List<ZoneData>> m_zonesData;
+            return savedCount;
+        }
 
+        #region Instances
 
-		/// <summary>
-		/// Creates a new instance, with the given 'skin' (the regionID to display client side).
-		/// </summary>
-		/// <param name="skinID"></param>
-		/// <returns></returns>
-		public static BaseInstance CreateInstance(ushort skinID, Type instanceType)
-		{
-			return CreateInstance(0, skinID, instanceType);
-		}
+        // Dinberg: We must now store the region data here. This is incase admins wish to create instances
+        // that require information from regions Data, like instance of underwater ToA areas as a prime
+        // example!
+        /// <summary>
+        /// Stores the region Data parsed from the regions xml file.
+        /// </summary>
+        private static Dictionary<ushort, RegionData> m_regionData;
 
-		/// <summary>
-		/// Where do we start looking for an instance id from if none is requested?
-		/// </summary>
-		public const int DEFAULT_VALUE_FOR_INSTANCE_ID_SEARCH_START = 1000;
+        /// <summary>
+        /// Stores the zone data parsed from the zones file by RegionID.
+        /// </summary>
+        private static Dictionary<ushort, List<ZoneData>> m_zonesData;
 
+        /// <summary>
+        /// Creates a new instance, with the given 'skin' (the regionID to display client side).
+        /// </summary>
+        /// <param name="skinID"></param>
+        /// <returns></returns>
+        public static BaseInstance CreateInstance(ushort skinID, Type instanceType)
+        {
+            return CreateInstance(0, skinID, instanceType);
+        }
 
-		/// <summary>
-		/// Tries to create an instance with the suggested ID and a given 'skin' (the regionID to display client side).
-		/// </summary>
-		/// <param name="requestedID">0 for random</param>
-		/// <param name="skinID"></param>
-		/// <param name="instanceType"></param>
-		/// <returns></returns>
-		public static BaseInstance CreateInstance(ushort requestedID, ushort skinID, Type instanceType)
-		{
-			//TODO: Typeof field so TaskDungeonInstance, QuestInstance etc can be created.
-			if ((instanceType.IsSubclassOf(typeof(BaseInstance)) || instanceType == typeof(BaseInstance)) == false)
-			{
-				log.Error($"Invalid type given for instance creation: {instanceType}. Returning null instance now.");
-				return null;
-			}
+        /// <summary>
+        /// Where do we start looking for an instance id from if none is requested?
+        /// </summary>
+        public const int DEFAULT_VALUE_FOR_INSTANCE_ID_SEARCH_START = 1000;
 
-			BaseInstance instance = null;
+        /// <summary>
+        /// Tries to create an instance with the suggested ID and a given 'skin' (the regionID to display client side).
+        /// </summary>
+        /// <param name="requestedID">0 for random</param>
+        /// <param name="skinID"></param>
+        /// <param name="instanceType"></param>
+        /// <returns></returns>
+        public static BaseInstance CreateInstance(ushort requestedID, ushort skinID, Type instanceType)
+        {
+            // TODO: Typeof field so TaskDungeonInstance, QuestInstance etc can be created.
+            if ((instanceType.IsSubclassOf(typeof(BaseInstance)) || instanceType == typeof(BaseInstance)) == false)
+            {
+                log.Error($"Invalid type given for instance creation: {instanceType}. Returning null instance now.");
+                return null;
+            }
 
-			//To create the instance, we need to select the region relevant to the SkinID.
-			var data = m_regionData[skinID];
+            BaseInstance instance = null;
 
-			if (data == null)
-			{
-				log.Error($"Data for region {skinID} not found on instance create!");
-				return null;
-			}
+            // To create the instance, we need to select the region relevant to the SkinID.
+            var data = m_regionData[skinID];
 
-			//Having selected the ID, we must select a time manager.
-			//For now, for simplicity so we can get the system running we will just take the first TimeManager
-			//in our list. This is because I don't want to risk causing an error by sharing an important resource
-			//like the TimeManager until I get some good testing and ensure work thus far is clean.
+            if (data == null)
+            {
+                log.Error($"Data for region {skinID} not found on instance create!");
+                return null;
+            }
 
-			//Later, we will share the resources over the different threads.
+            // Having selected the ID, we must select a time manager.
+            // For now, for simplicity so we can get the system running we will just take the first TimeManager
+            // in our list. This is because I don't want to risk causing an error by sharing an important resource
+            // like the TimeManager until I get some good testing and ensure work thus far is clean.
 
-			GameTimer.TimeManager time = m_regionTimeManagers[0];
+            // Later, we will share the resources over the different threads.
+            GameTimer.TimeManager time = m_regionTimeManagers[0];
 
-			if (time == null)
-			{
-				log.Warn("TimeManager not found on instance create!");
-				return null;
-			}
+            if (time == null)
+            {
+                log.Warn("TimeManager not found on instance create!");
+                return null;
+            }
 
-			//I've placed constructor info outside of the lock, to prevent a time delay on parallel threads.
-			ConstructorInfo info = instanceType.GetConstructor(new Type[] { typeof(ushort), typeof(GameTimer.TimeManager), typeof(RegionData)});
+            // I've placed constructor info outside of the lock, to prevent a time delay on parallel threads.
+            ConstructorInfo info = instanceType.GetConstructor(new Type[] { typeof(ushort), typeof(GameTimer.TimeManager), typeof(RegionData) });
 
-			if (info == null)
-			{
-				log.Error($"Classtype {instanceType} did not have a cosntructor that matched the requirement!");
-				return null;
-			}
+            if (info == null)
+            {
+                log.Error($"Classtype {instanceType} did not have a cosntructor that matched the requirement!");
+                return null;
+            }
 
-			bool RequestedAnID = requestedID != 0;
+            bool RequestedAnID = requestedID != 0;
 
-			ushort ID = requestedID;
+            ushort ID = requestedID;
 
-			//Get the unique ID for this instance or try to create an instance at the requested ID
+            // Get the unique ID for this instance or try to create an instance at the requested ID
 
-			//We need to keep the lock over this whole area until we have successfully inserted the instance,
-			//incase a parallel thread also receives a request to create an instance. We cant have the two colliding!
-			//If they did, one instance generation would fail.
+            // We need to keep the lock over this whole area until we have successfully inserted the instance,
+            // incase a parallel thread also receives a request to create an instance. We cant have the two colliding!
+            // If they did, one instance generation would fail.
 
-			//I'm welcome to suggestions on how to improve this
-			//              -Dinberg.
-			if (!m_regions.FreezeWhile<bool>(regions =>
-			{
-			    if (!RequestedAnID)
-			    {
-			        ID = DEFAULT_VALUE_FOR_INSTANCE_ID_SEARCH_START;
-			        while (ID < ushort.MaxValue)
-			        {
-			            //Look for a space in the regions table...
-			            if (!regions.ContainsKey(ID))
-			            {
-			                break;
-			            }
+            // I'm welcome to suggestions on how to improve this
+            //              -Dinberg.
+            if (!m_regions.FreezeWhile<bool>(regions =>
+            {
+                if (!RequestedAnID)
+                {
+                    ID = DEFAULT_VALUE_FOR_INSTANCE_ID_SEARCH_START;
+                    while (ID < ushort.MaxValue)
+                    {
+                        // Look for a space in the regions table...
+                        if (!regions.ContainsKey(ID))
+                        {
+                            break;
+                        }
 
-			            //If no space here, no worries - move quickly to the next ID and continue.
-			            ID++;
-			        }
-			    }
-			    else if (regions.ContainsKey(ID))
-			    {
-			        // requested ID is in use
-			        return false;
-			    }
-			    //In the unlikely event of 65535 regions, I'd still like to be warned!
-			    if (ID == ushort.MaxValue)
-			    {
-			        log.Warn("ID was ushort.MaxValue - Region Table is full upon instance creation! Aborting now.");
-			        return false;
-			    }
-			    //Having selected the data we need, create the Instance.
-			    try
-			    {
-			        instance = (BaseInstance) info.Invoke(new object[] {ID, time, data}); //new Instance(ID, time, data);
-			        regions.Add(ID, instance);
-			    }
-			    catch (Exception e)
-			    {
-			        log.ErrorFormat("Error on instance creation - {0}{1}", e.Message, e.StackTrace);
-			        return false;
-			    }
+                        // If no space here, no worries - move quickly to the next ID and continue.
+                        ID++;
+                    }
+                }
+                else if (regions.ContainsKey(ID))
+                {
+                    // requested ID is in use
+                    return false;
+                }
 
-			    return true;
-			}))
-			{
-			    return null;
-			}
-			
-			// But its not over there. We need to put a zone into the instance.
+                // In the unlikely event of 65535 regions, I'd still like to be warned!
+                if (ID == ushort.MaxValue)
+                {
+                    log.Warn("ID was ushort.MaxValue - Region Table is full upon instance creation! Aborting now.");
+                    return false;
+                }
 
-			List<ZoneData> list = null;
+                // Having selected the data we need, create the Instance.
+                try
+                {
+                    instance = (BaseInstance)info.Invoke(new object[] { ID, time, data }); // new Instance(ID, time, data);
+                    regions.Add(ID, instance);
+                }
+                catch (Exception e)
+                {
+                    log.ErrorFormat("Error on instance creation - {0}{1}", e.Message, e.StackTrace);
+                    return false;
+                }
 
-			if (m_zonesData.ContainsKey(data.Id))
-			{
-				list = m_zonesData[data.Id];
-			}
+                return true;
+            }))
+            {
+                return null;
+            }
 
-			if (list == null)
-			{
-				log.Warn("No zones found for given skinID on instance creation, " + skinID);
-				return null;
-			}
+            // But its not over there. We need to put a zone into the instance.
+            List<ZoneData> list = null;
 
-			int zoneID = 0;
+            if (m_zonesData.ContainsKey(data.Id))
+            {
+                list = m_zonesData[data.Id];
+            }
 
-			foreach (ZoneData dat in list)
-			{
-				//we need to get an id for each one.
-				if (m_zones.FreezeWhile<bool>(zones =>
-				{
-				    while (zoneID <= ushort.MaxValue && zones.ContainsKey((ushort) zoneID))
-				    {
-				        zoneID++;
-				    }
+            if (list == null)
+            {
+                log.Warn("No zones found for given skinID on instance creation, " + skinID);
+                return null;
+            }
 
-				    if (zoneID >= ushort.MaxValue)
-				    {
-				        log.Error("Zone limit reached in instance creation!");
-				    }
+            int zoneID = 0;
 
-				    if (zoneID > ushort.MaxValue)
-				    {
-				        return false;
-				    }
+            foreach (ZoneData dat in list)
+            {
+                // we need to get an id for each one.
+                if (m_zones.FreezeWhile<bool>(zones =>
+                {
+                    while (zoneID <= ushort.MaxValue && zones.ContainsKey((ushort)zoneID))
+                    {
+                        zoneID++;
+                    }
 
-				    // register id
-				    zones.Add((ushort) zoneID, null);
-				    return true;
-				}))
-				{
-	            	RegisterZone(dat, (ushort)zoneID, ID, $"{dat.Description} (Instance)", 0, 0, 0, 0, 0);
-				}
-			}
+                    if (zoneID >= ushort.MaxValue)
+                    {
+                        log.Error("Zone limit reached in instance creation!");
+                    }
 
-			// Start the instance and execute any final startup tasks
-			instance.Start();
+                    if (zoneID > ushort.MaxValue)
+                    {
+                        return false;
+                    }
 
-			return instance;
-		}
+                    // register id
+                    zones.Add((ushort)zoneID, null);
+                    return true;
+                }))
+                {
+                    RegisterZone(dat, (ushort)zoneID, ID, $"{dat.Description} (Instance)", 0, 0, 0, 0, 0);
+                }
+            }
 
-		/// <summary>
-		/// Removes the given instance from the server.
-		/// </summary>
-		/// <param name="instance"></param>
-		public static void RemoveInstance(BaseInstance instance)
-		{
-			//Remove the region
-			Region reg;
-			m_regions.TryRemove(instance.ID, out reg);
+            // Start the instance and execute any final startup tasks
+            instance.Start();
 
-			//Remove zones
-		    m_zones.FreezeWhile(zones =>
-		    {
-		        foreach (Zone zn in instance.Zones)
-		        {
-		            if (zones.ContainsKey(zn.ID))
-		            {
-		                zones.Remove(zn.ID);
-		            }
-		        }
-		    });
+            return instance;
+        }
 
-			instance.OnCollapse();
+        /// <summary>
+        /// Removes the given instance from the server.
+        /// </summary>
+        /// <param name="instance"></param>
+        public static void RemoveInstance(BaseInstance instance)
+        {
+            // Remove the region
+            Region reg;
+            m_regions.TryRemove(instance.ID, out reg);
 
-			//Destroy the region once and for all.
-			instance = null;
-		}
-		#endregion
-	}
+            // Remove zones
+            m_zones.FreezeWhile(zones =>
+            {
+                foreach (Zone zn in instance.Zones)
+                {
+                    if (zones.ContainsKey(zn.ID))
+                    {
+                        zones.Remove(zn.ID);
+                    }
+                }
+            });
+
+            instance.OnCollapse();
+
+            // Destroy the region once and for all.
+            instance = null;
+        }
+        #endregion
+    }
 }

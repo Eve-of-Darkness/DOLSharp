@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-// General Information about an assembly is controlled through the following 
+// General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dawn of Light - DOLDatabaseTests")]
@@ -43,6 +43,6 @@ using System.Runtime.InteropServices;
 //
 // Major.Minor.Build.Revision
 //
-// You can specify all the values or you can use the default the Revision and 
+// You can specify all the values or you can use the default the Revision and
 // Build Numbers by using the '*' as shown below:
 [assembly: AssemblyVersion("1.9.7.*")]

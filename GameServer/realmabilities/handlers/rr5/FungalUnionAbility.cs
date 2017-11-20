@@ -28,12 +28,12 @@ namespace DOL.GS.RealmAbilities
     {
         public FungalUnionAbility(DBAbility dba, int level) : base(dba, level) { }
 
-
         public override void Execute(GameLiving living)
         {
-            if (CheckPreconditions(living, DEAD | SITTING | MEZZED | STUNNED)) return;
-
-
+            if (CheckPreconditions(living, DEAD | SITTING | MEZZED | STUNNED))
+            {
+                return;
+            }
 
             GamePlayer player = living as GamePlayer;
             if (player != null)
@@ -42,6 +42,7 @@ namespace DOL.GS.RealmAbilities
                 FungalUnionEffect effect = new FungalUnionEffect();
                 effect.Start(player);
             }
+
             DisableSkill(living);
         }
 
@@ -53,11 +54,10 @@ namespace DOL.GS.RealmAbilities
         public override void AddEffectsInfo(IList<string> list)
         {
             list.Add("Fungal Union.");
-            list.Add("");
+            list.Add(string.Empty);
             list.Add("Target: Self");
             list.Add("Duration: 60 seconds");
             list.Add("Casting time: instant");
         }
-
     }
 }

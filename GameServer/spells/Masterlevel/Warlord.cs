@@ -23,12 +23,12 @@ using DOL.AI.Brain;
 
 namespace DOL.GS.Spells
 {
-    //http://www.camelotherald.com/masterlevels/ma.php?ml=Warlord
+    // http://www.camelotherald.com/masterlevels/ma.php?ml=Warlord
     #region Warlord-1
-    //Gamesiegeweapon - getactiondelay
+    // Gamesiegeweapon - getactiondelay
     #endregion
 
-    //shared timer 1 for 2 - shared timer 4 for 8
+    // shared timer 1 for 2 - shared timer 4 for 8
     #region Warlord-2/8
     [SpellHandler("PBAEHeal")]
     public class PBAEHealHandler : MasterlevelHandling
@@ -44,16 +44,25 @@ namespace DOL.GS.Spells
                         life = (m_caster.Health * value) / 100;
                         m_caster.Health -= life;
                     }
+
                     break;
             }
+
             m_caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
-            if (target == null) return;
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
+            if (target == null)
+            {
+                return;
+            }
+
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            {
+                return;
+            }
 
             GamePlayer player = target as GamePlayer;
 
@@ -61,7 +70,7 @@ namespace DOL.GS.Spells
             {
                 switch (Spell.DamageType)
                 {
-                    //Warlord ML 2
+                    // Warlord ML 2
                     case (eDamageType)((byte)0):
                         {
                             int mana;
@@ -73,24 +82,38 @@ namespace DOL.GS.Spells
                             health = (target.MaxHealth * value) / 100;
 
                             if (target.Health + health > target.MaxHealth)
+                            {
                                 target.Health = target.MaxHealth;
+                            }
                             else
+                            {
                                 target.Health += health;
+                            }
 
                             if (target.Mana + mana > target.MaxMana)
+                            {
                                 target.Mana = target.MaxMana;
+                            }
                             else
+                            {
                                 target.Mana += mana;
+                            }
 
                             if (target.Endurance + end > target.MaxEndurance)
+                            {
                                 target.Endurance = target.MaxEndurance;
+                            }
                             else
+                            {
                                 target.Endurance += end;
+                            }
 
                             SendEffectAnimation(target, 0, false, 1);
                         }
+
                         break;
-                    //warlord ML8
+
+                    // warlord ML8
                     case (eDamageType)((byte)1):
                         {
                             int healvalue = (int)m_spell.Value;
@@ -98,13 +121,21 @@ namespace DOL.GS.Spells
                                 if (target.IsAlive && !GameServer.ServerRules.IsAllowedToAttack(Caster, player, true))
                                 {
                                     heal = target.ChangeHealth(target, GameLiving.eHealthChangeType.Spell, healvalue);
-                                    if (heal != 0) player.Out.SendMessage(m_caster.Name + " heal you for " + heal + " hit point!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                                    if (heal != 0)
+                                {
+                                    player.Out.SendMessage(m_caster.Name + " heal you for " + heal + " hit point!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
                                 }
+                            }
+
                             heal = m_caster.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, (int)(-m_caster.Health * 90 / 100));
-                            if (heal != 0) MessageToCaster("You lose " + heal + " hit point" + (heal == 1 ? "." : "s."), eChatType.CT_Spell);
+                            if (heal != 0)
+                            {
+                                MessageToCaster("You lose " + heal + " hit point" + (heal == 1 ? "." : "s."), eChatType.CT_Spell);
+                            }
 
                             SendEffectAnimation(target, 0, false, 1);
                         }
+
                         break;
                 }
             }
@@ -115,7 +146,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //shared timer 2
+    // shared timer 2
     #region Warlord-3
     [SpellHandler("CoweringBellow")]
     public class CoweringBellowSpellHandler : FearSpellHandler
@@ -124,15 +155,19 @@ namespace DOL.GS.Spells
         {
             return 0;
         }
+
         public override IList<GameLiving> SelectTargets(GameObject castTarget)
         {
             var list = new List<GameLiving>();
             GameLiving target = Caster;
             foreach (GameNPC npc in target.GetNPCsInRadius((ushort)Spell.Radius))
             {
-                if (npc is GameNPC && npc.Brain is ControlledNpcBrain)//!(npc is NecromancerPet))
+                if (npc is GameNPC && npc.Brain is ControlledNpcBrain) // !(npc is NecromancerPet))
+                {
                     list.Add(npc);
+                }
             }
+
             return list;
         }
 
@@ -140,23 +175,24 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //ML4~     //shared timer 3
+    // ML4~     //shared timer 3
 
-    //shared timer 3
+    // shared timer 3
     #region Warlord-5
     [SpellHandler("Critical")]
     public class CriticalDamageBuff : MasterlevelDualBuffHandling
     {
         public override eProperty Property1 { get { return eProperty.CriticalSpellHitChance; } }
+
         public override eProperty Property2 { get { return eProperty.CriticalMeleeHitChance; } }
 
         public CriticalDamageBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion  
-       
-    //ML6~     //shared timer 4
+    #endregion
 
-    //shared timer 3
+    // ML6~     //shared timer 4
+
+    // shared timer 3
     #region Warlord-7
     [SpellHandler("CleansingAura")]
     public class CleansingAurauraSpellHandler : SpellHandler
@@ -170,7 +206,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //shared timer 5
+    // shared timer 5
     #region Warlord-9
     [SpellHandler("EffectivenessBuff")]
     public class EffectivenessBuff : MasterlevelHandling
@@ -221,6 +257,7 @@ namespace DOL.GS.Spells
                 player.Out.SendUpdateWeaponAndArmorStats();
                 player.Out.SendStatusUpdate();
             }
+
             return 0;
         }
 
@@ -228,7 +265,7 @@ namespace DOL.GS.Spells
     }
     #endregion
 
-    //shared timer 5
+    // shared timer 5
     #region Warlord-10
     [SpellHandler("MLABSBuff")]
     public class MLABSBuff : MasterlevelBuffHandling

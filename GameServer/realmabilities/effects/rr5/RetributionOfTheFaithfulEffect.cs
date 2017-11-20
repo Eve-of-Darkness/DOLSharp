@@ -9,20 +9,21 @@ namespace DOL.GS.Effects
     /// </summary>
     public class RetributionOfTheFaithfulStunEffect : TimedEffect
     {
-		public RetributionOfTheFaithfulStunEffect()
-			: base(3000)
-		{ }
+        public RetributionOfTheFaithfulStunEffect()
+            : base(3000)
+        { }
 
         private GameLiving owner;
 
         public override void Start(GameLiving target)
-		{
+        {
             base.Start(target);
             owner = target;
             foreach (GamePlayer p in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 p.Out.SendSpellEffectAnimation(target, target, 7042, 0, false, 1);
             }
+
             owner.IsStunned = true;
             owner.StopAttack();
             owner.StopCurrentSpellcast();
@@ -32,13 +33,11 @@ namespace DOL.GS.Effects
             {
                 player.Out.SendUpdateMaxSpeed();
             }
-            else if(owner.CurrentSpeed > owner.MaxSpeed) 
+            else if (owner.CurrentSpeed > owner.MaxSpeed)
             {
                 owner.CurrentSpeed = owner.MaxSpeed;
             }
         }
-
-
 
         public override string Name { get { return "Retribution Of The Faithful"; } }
 
@@ -57,8 +56,8 @@ namespace DOL.GS.Effects
             {
                 owner.CurrentSpeed = owner.MaxSpeed;
             }
-            base.Stop();
 
+            base.Stop();
         }
 
         public int SpellEffectiveness
@@ -77,10 +76,8 @@ namespace DOL.GS.Effects
         }
     }
 
-
     public class RetributionOfTheFaithfulEffect : TimedEffect
     {
-
 
         public RetributionOfTheFaithfulEffect()
             : base(30000)
@@ -108,15 +105,38 @@ namespace DOL.GS.Effects
 
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            if (arguments == null) return;
+            if (arguments == null)
+            {
+                return;
+            }
+
             AttackedByEnemyEventArgs args = arguments as AttackedByEnemyEventArgs;
-            if (args == null) return;
-            if (args.AttackData == null) return;
-            if (!args.AttackData.IsMeleeAttack) return;
-			//FIXME: [WARN] this has been commented out, it should be handled somewhere
-			if (args.AttackData.Attacker.EffectList.GetOfType<ChargeEffect>() != null || args.AttackData.Attacker.TempProperties.getProperty("Charging", false))
-				return;
-            if ( !owner.IsWithinRadius( args.AttackData.Attacker, 300 ) ) return;
+            if (args == null)
+            {
+                return;
+            }
+
+            if (args.AttackData == null)
+            {
+                return;
+            }
+
+            if (!args.AttackData.IsMeleeAttack)
+            {
+                return;
+            }
+
+            // FIXME: [WARN] this has been commented out, it should be handled somewhere
+            if (args.AttackData.Attacker.EffectList.GetOfType<ChargeEffect>() != null || args.AttackData.Attacker.TempProperties.getProperty("Charging", false))
+            {
+                return;
+            }
+
+            if (!owner.IsWithinRadius(args.AttackData.Attacker, 300))
+            {
+                return;
+            }
+
             if (Util.Chance(50))
             {
                 RetributionOfTheFaithfulStunEffect effect = new RetributionOfTheFaithfulStunEffect();
