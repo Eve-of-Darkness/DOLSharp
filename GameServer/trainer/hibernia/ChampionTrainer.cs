@@ -26,16 +26,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Champion Trainer", eRealm.Hibernia)] // this attribute instructs DOL to use this script for all "Champion Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class ChampionTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Champion; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Champion;
 
-        public const string ARMOR_ID1 = "champion_item";
-
-        public ChampionTrainer() : base()
-        {
-        }
+        private const string ArmorId1 = "champion_item";
 
         /// <summary>
         /// Interact with trainer
@@ -87,14 +80,17 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text) {
                 case "Champion":
                     // promote player to other class
                     if (CanPromotePlayer(player)) {
                         PromotePlayer(player, (int)eCharacterClass.Champion, "Welcome " + source.GetName(0, false) + ". Let us see if you will become a worthy Champion. Take this gift, " + source.GetName(0, false) + ". It is to aid you while you grow into a true Champion.", null);
-                        player.ReceiveItem(this,ARMOR_ID1);
+                        player.ReceiveItem(this,ArmorId1);
                     }
 
                     break;

@@ -28,16 +28,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Enchanter Trainer", eRealm.Hibernia)] // this attribute instructs DOL to use this script for all "Enchanter Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class EnchanterTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Enchanter; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Enchanter;
 
-        public const string WEAPON_ID1 = "enchanter_item";
-
-        public EnchanterTrainer() : base()
-        {
-        }
+        public const string WeaponId1 = "enchanter_item";
 
         /// <summary>
         /// Interact with trainer
@@ -89,16 +82,19 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
-            string lowerCase = text.ToLower();
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
+            string lowerCase = text.ToLower();
             if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "EnchanterTrainer.WhisperReceiveCase.Text1"))
             {
                 // promote player to other class
                 if (CanPromotePlayer(player))
                 {
                     PromotePlayer(player, (int)eCharacterClass.Enchanter, LanguageMgr.GetTranslation(player.Client.Account.Language, "EnchanterTrainer.WhisperReceive.Text1", player.GetName(0, false)), null);
-                    player.ReceiveItem(this, WEAPON_ID1);
+                    player.ReceiveItem(this, WeaponId1);
                 }
             }
 

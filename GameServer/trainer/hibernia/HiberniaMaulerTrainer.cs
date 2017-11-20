@@ -28,13 +28,10 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Mauler Trainer", eRealm.Hibernia)]
     public class HiberniaMaulerTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.MaulerHib; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.MaulerHib;
 
-        public const string WEAPON_ID1 = "maulerhib_item_staff";
-        public const string WEAPON_ID2 = "maulerhib_item_fist";
+        private const string WeaponId1 = "maulerhib_item_staff";
+        private const string WeaponId2 = "maulerhib_item_fist";
 
         /// <summary>
         /// Interact with trainer
@@ -87,10 +84,12 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             string lowerCase = text.ToLower();
-
             if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "MaulerHibTrainer.WhisperReceiveCase.Text1"))
             {
                 // promote player to other class
@@ -100,18 +99,18 @@ namespace DOL.GS.Trainer
                     PromotePlayer(player, (int)eCharacterClass.MaulerHib, LanguageMgr.GetTranslation(player.Client.Account.Language, "MaulerHibTrainer.WhisperReceive.Text1"), null);
                 }
             }
-            else if ((player.Inventory.GetFirstItemByID(WEAPON_ID1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null) &&
-                     (player.Inventory.GetFirstItemByID(WEAPON_ID2, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null))
+            else if ((player.Inventory.GetFirstItemByID(WeaponId1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null) &&
+                     (player.Inventory.GetFirstItemByID(WeaponId2, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null))
             {
                 if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "MaulerHibTrainer.WhisperReceiveCase.Text2"))
                 {
-                    player.ReceiveItem(this, WEAPON_ID1);
+                    player.ReceiveItem(this, WeaponId1);
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "MaulerHibTrainer.WhisperReceive.Text2"), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
                 }
                 else if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "MaulerHibTrainer.WhisperReceiveCase.Text3"))
                 {
-                    player.ReceiveItem(this, WEAPON_ID2);
-                    player.ReceiveItem(this, WEAPON_ID2);
+                    player.ReceiveItem(this, WeaponId2);
+                    player.ReceiveItem(this, WeaponId2);
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "MaulerHibTrainer.WhisperReceive.Text2"), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
                 }
             }

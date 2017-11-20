@@ -26,10 +26,7 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Mauler Trainer", eRealm.Midgard)]
     public class MidgardMaulerTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.MaulerMid; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.MaulerMid;
 
         /// <summary>
         /// Interact with trainer
@@ -81,7 +78,10 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text)
             {

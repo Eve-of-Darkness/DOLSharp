@@ -26,16 +26,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Ranger Trainer", eRealm.Hibernia)] // this attribute instructs DOL to use this script for all "Ranger Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class RangerTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Ranger; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Ranger;
 
-        public const string WEAPON_ID1 = "ranger_item";
-
-        public RangerTrainer() : base()
-        {
-        }
+        private const string WeaponId1 = "ranger_item";
 
         /// <summary>
         /// Interact with trainer
@@ -87,14 +80,17 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text) {
                 case "Ranger":
                     // promote player to other class
                     if (CanPromotePlayer(player)) {
                         PromotePlayer(player, (int)eCharacterClass.Ranger, "Good then. Your path as a Ranger is before you. Walk it with care, friend. Take these, " + source.GetName(0, false) + ", to help make walking the path a bit easier.", null);
-                        player.ReceiveItem(this,WEAPON_ID1);
+                        player.ReceiveItem(this,WeaponId1);
                     }
 
                     break;

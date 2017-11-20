@@ -26,15 +26,12 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Stalker Trainer", eRealm.Hibernia)] // this attribute instructs DOL to use this script for all "Stalker Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class StalkerTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Stalker; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Stalker;
 
         /// <summary>
         /// The practice weaopon template ID
         /// </summary>
-        public const string PRACTICE_WEAPON_ID = "training_dirk";
+        private const string PracticeWeaponId = "training_dirk";
 
         public StalkerTrainer() : base(eChampionTrainerType.Stalker)
         {
@@ -66,7 +63,7 @@ namespace DOL.GS.Trainer
                 }
 
                 // ask for basic equipment if player doesnt own it
-                if (player.Inventory.GetFirstItemByID(PRACTICE_WEAPON_ID, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
+                if (player.Inventory.GetFirstItemByID(PracticeWeaponId, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
                 {
                     player.Out.SendMessage(Name + " says, \"Do you require a [practice weapon]?\"", eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 }
@@ -92,7 +89,10 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text) {
                 case "Ranger":
@@ -114,9 +114,9 @@ namespace DOL.GS.Trainer
 
                     return true;
                 case "practice weapon":
-                    if (player.Inventory.GetFirstItemByID(PRACTICE_WEAPON_ID, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
+                    if (player.Inventory.GetFirstItemByID(PracticeWeaponId, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
                     {
-                        player.ReceiveItem(this,PRACTICE_WEAPON_ID);
+                        player.ReceiveItem(this,PracticeWeaponId);
                     }
 
                     return true;

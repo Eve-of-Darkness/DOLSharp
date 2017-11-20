@@ -26,15 +26,12 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Warden Trainer", eRealm.Hibernia)] // this attribute instructs DOL to use this script for all "Warden Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class WardenTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Warden; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Warden;
 
         /// <summary>
         /// The free starter armor from trainer
         /// </summary>
-        public const string ARMOR_ID1 = "warden_item";
+        private const string ArmorId1 = "warden_item";
 
         /// <summary>
         /// Interact with trainer
@@ -86,14 +83,17 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text) {
                 case "Warden":
                     // promote player to other class
                     if (CanPromotePlayer(player)) {
                         PromotePlayer(player, (int)eCharacterClass.Warden, "Good then! Welcome to the ways of the Warden! Here, take this as a gift, to start you on the path of a Warden.", null); // TODO: gifts
-                        player.ReceiveItem(this,ARMOR_ID1);
+                        player.ReceiveItem(this,ArmorId1);
                     }
 
                     break;
