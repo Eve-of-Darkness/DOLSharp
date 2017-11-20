@@ -26,14 +26,7 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Nightshade Trainer", eRealm.Hibernia)] // this attribute instructs DOL to use this script for all "Nightshade Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class NightshadeTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Nightshade; }
-        }
-
-        public NightshadeTrainer() : base()
-        {
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Nightshade;
 
         /// <summary>
         /// Interact with trainer
@@ -85,7 +78,10 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text) {
             case "Nightshade":

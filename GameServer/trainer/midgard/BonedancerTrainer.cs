@@ -28,16 +28,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Bonedancer Trainer", eRealm.Midgard)] // this attribute instructs DOL to use this script for all "Bonedancer Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class BonedancerTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Bonedancer; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Bonedancer;
 
-        public const string WEAPON_ID1 = "bonedancer_item";
-
-        public BonedancerTrainer() : base()
-        {
-        }
+        private const string WeaponId1 = "bonedancer_item";
 
         /// <summary>
         /// Interact with trainer
@@ -89,16 +82,19 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
-            string lowerCase = text.ToLower();
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
+            string lowerCase = text.ToLower();
             if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "BonedancerTrainer.WhisperReceiveCase.Text1"))
             {
                 // promote player to other class
                 if (CanPromotePlayer(player))
                 {
                     PromotePlayer(player, (int)eCharacterClass.Bonedancer, LanguageMgr.GetTranslation(player.Client.Account.Language, "BonedancerTrainer.WhisperReceive.Text1", player.GetName(0, false)), null);
-                    player.ReceiveItem(this, WEAPON_ID1);
+                    player.ReceiveItem(this, WeaponId1);
                 }
             }
 

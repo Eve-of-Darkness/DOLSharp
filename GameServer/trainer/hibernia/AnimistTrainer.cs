@@ -28,16 +28,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Animist Trainer", eRealm.Hibernia)] // this attribute instructs DOL to use this script for all "Animist Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class AnimistTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Animist; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Animist;
 
-        public const string WEAPON_ID1 = "animist_item";
-
-        public AnimistTrainer() : base()
-        {
-        }
+        private const string WeaponId1 = "animist_item";
 
         /// <summary>
         /// Interact with trainer
@@ -89,16 +82,19 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
-            string lowerCase = text.ToLower();
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
+            string lowerCase = text.ToLower();
             if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "AnimistTrainer.WhisperReceiveCase.Text1"))
             {
                 // promote player to other class
                 if (CanPromotePlayer(player))
                 {
                     PromotePlayer(player, (int)eCharacterClass.Animist, LanguageMgr.GetTranslation(player.Client.Account.Language, "AnimistTrainer.WhisperReceive.Text1", player.GetName(0, false)), null);
-                    player.ReceiveItem(this, WEAPON_ID1);
+                    player.ReceiveItem(this, WeaponId1);
                 }
             }
 

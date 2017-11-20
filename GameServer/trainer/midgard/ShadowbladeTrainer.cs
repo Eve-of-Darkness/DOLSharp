@@ -26,10 +26,7 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Shadowblade Trainer", eRealm.Midgard)] // this attribute instructs DOL to use this script for all "Shadowblade Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class ShadowbladeTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Shadowblade; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Shadowblade;
 
         /// <summary>
         /// Interact with trainer
@@ -81,7 +78,10 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text) {
                 case "join the House of Loki":

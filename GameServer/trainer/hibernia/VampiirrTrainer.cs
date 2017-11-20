@@ -26,17 +26,7 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Vampiir Trainer", eRealm.Hibernia)] // this attribute instructs DOL to use this script for all "Vampiir Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class VampiirTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Vampiir; }
-        }
-
-        public const string ARMOR_ID1 = "Vampiir_item";
-
-        public VampiirTrainer()
-            : base()
-        {
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Vampiir;
 
         /// <summary>
         /// Interact with trainer
@@ -88,8 +78,7 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
-            if (player == null)
+            if (!(source is GamePlayer player))
             {
                 return false;
             }
@@ -103,10 +92,7 @@ namespace DOL.GS.Trainer
                         PromotePlayer(player, (int)eCharacterClass.Vampiir, "Very well, " + source.GetName(0, false) + ". I gladly take your training into my hands. Congratulations, from this day forth, you are a Vampiir. Here, take this gift to aid you.", null);
                         foreach (GamePlayer plr in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE)) // inform nearest clients about this player now is vampire (can fly)
                         {
-                            if (plr != null)
-                            {
-                                plr.Out.SendVampireEffect(player, true);
-                            }
+                            plr?.Out.SendVampireEffect(player, true);
                         }
                     }
 

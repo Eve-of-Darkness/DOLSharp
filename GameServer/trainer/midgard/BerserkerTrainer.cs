@@ -26,14 +26,7 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Berserker Trainer", eRealm.Midgard)] // this attribute instructs DOL to use this script for all "Berserker Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class BerserkerTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Berserker; }
-        }
-
-        public BerserkerTrainer() : base()
-        {
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Berserker;
 
         /// <summary>
         /// Interact with trainer
@@ -85,7 +78,10 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text) {
             case "join the House of Modi":

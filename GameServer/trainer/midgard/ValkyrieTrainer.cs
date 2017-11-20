@@ -28,13 +28,10 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Valkyrie Trainer", eRealm.Midgard)] // this attribute instructs DOL to use this script for all "Valkyrie Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class ValkyrieTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Valkyrie; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Valkyrie;
 
-        public const string WEAPON_ID1 = "valkyrie_item_sword";
-        public const string WEAPON_ID2 = "valkyrie_item_spear";
+        private const string WeaponId1 = "valkyrie_item_sword";
+        private const string WeaponId2 = "valkyrie_item_spear";
 
         /// <summary>
         /// Interact with trainer
@@ -86,10 +83,12 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             string lowerCase = text.ToLower();
-
             if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "ValkyrieTrainer.WhisperReceiveCase.Text1"))
             {
                 // promote player to other class
@@ -98,17 +97,17 @@ namespace DOL.GS.Trainer
                     PromotePlayer(player, (int)eCharacterClass.Valkyrie, LanguageMgr.GetTranslation(player.Client.Account.Language, "ValkyrieTrainer.WhisperReceive.Text1"), null);
                 }
             }
-            else if ((player.Inventory.GetFirstItemByID(WEAPON_ID1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null) &&
-                     (player.Inventory.GetFirstItemByID(WEAPON_ID2, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null))
+            else if ((player.Inventory.GetFirstItemByID(WeaponId1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null) &&
+                     (player.Inventory.GetFirstItemByID(WeaponId2, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null))
             {
                 if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "ValkyrieTrainer.WhisperReceiveCase.Text2"))
                 {
-                    player.ReceiveItem(this, WEAPON_ID1);
+                    player.ReceiveItem(this, WeaponId1);
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ValkyrieTrainer.WhisperReceive.Text2"), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
                 }
                 else if (lowerCase == LanguageMgr.GetTranslation(player.Client.Account.Language, "ValkyrieTrainer.WhisperReceiveCase.Text3"))
                 {
-                    player.ReceiveItem(this, WEAPON_ID2);
+                    player.ReceiveItem(this, WeaponId2);
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ValkyrieTrainer.WhisperReceive.Text2"), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
                 }
             }

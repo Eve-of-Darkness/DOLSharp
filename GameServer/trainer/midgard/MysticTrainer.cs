@@ -26,12 +26,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Mystic Trainer", eRealm.Midgard)] // this attribute instructs DOL to use this script for all "Mystic Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class MysticTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Mystic; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Mystic;
 
-        public const string PRACTICE_WEAPON_ID = "trimmed_branch";
+        private const string PracticeWeaponId = "trimmed_branch";
 
         public MysticTrainer() : base(eChampionTrainerType.Mystic)
         {
@@ -63,7 +60,7 @@ namespace DOL.GS.Trainer
                 }
 
                 // ask for basic equipment if player doesnt own it
-                if (player.Inventory.GetFirstItemByID(PRACTICE_WEAPON_ID, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
+                if (player.Inventory.GetFirstItemByID(PracticeWeaponId, eInventorySlot.MinEquipable, eInventorySlot.LastBackpack) == null)
                 {
                     player.Out.SendMessage(Name + " says, \"Do you require a [practice branch]?\"",eChatType.CT_Say,eChatLoc.CL_PopupWindow);
                 }
@@ -89,7 +86,10 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text) {
                 case "Runemaster":
@@ -111,9 +111,9 @@ namespace DOL.GS.Trainer
 
                     return true;
                 case "practice branch":
-                    if (player.Inventory.GetFirstItemByID(PRACTICE_WEAPON_ID, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
+                    if (player.Inventory.GetFirstItemByID(PracticeWeaponId, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
                     {
-                        player.ReceiveItem(this,PRACTICE_WEAPON_ID);
+                        player.ReceiveItem(this,PracticeWeaponId);
                     }
 
                     return true;

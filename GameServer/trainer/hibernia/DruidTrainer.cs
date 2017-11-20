@@ -26,16 +26,9 @@ namespace DOL.GS.Trainer
     [NPCGuildScript("Druid Trainer", eRealm.Hibernia)] // this attribute instructs DOL to use this script for all "Druid Trainer" NPC's in Albion (multiple guilds are possible for one script)
     public class DruidTrainer : GameTrainer
     {
-        public override eCharacterClass TrainedClass
-        {
-            get { return eCharacterClass.Druid; }
-        }
+        public override eCharacterClass TrainedClass => eCharacterClass.Druid;
 
-        public const string ARMOR_ID1 = "druid_item";
-
-        public DruidTrainer() : base()
-        {
-        }
+        private const string ArmorId1 = "druid_item";
 
         /// <summary>
         /// Interact with trainer
@@ -87,14 +80,17 @@ namespace DOL.GS.Trainer
                 return false;
             }
 
-            GamePlayer player = source as GamePlayer;
+            if (!(source is GamePlayer player))
+            {
+                return false;
+            }
 
             switch (text) {
                 case "Druid":
                     // promote player to other class
                     if (CanPromotePlayer(player)) {
                         PromotePlayer(player, (int)eCharacterClass.Druid, "The path of the Druid suits you, " + source.GetName(0, false) + ". Welcome. Take this, " + source.GetName(0, false) + ". You are a Druid now. Stick to our ways, and you shall go far.", null);
-                        player.ReceiveItem(this,ARMOR_ID1);
+                        player.ReceiveItem(this,ArmorId1);
                     }
 
                     break;
