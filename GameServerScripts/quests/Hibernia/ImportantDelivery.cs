@@ -184,7 +184,7 @@ namespace DOL.GS.Quests.Hibernia
             }
             else
             {
-                aethic = npcs[0] as GameStableMaster;
+                aethic = npcs[0];
             }
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Freagus", eRealm.Hibernia);
