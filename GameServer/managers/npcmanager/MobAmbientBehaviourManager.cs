@@ -19,7 +19,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-
 using DOL.Database;
 
 namespace DOL.GS
@@ -30,19 +29,9 @@ namespace DOL.GS
     public sealed class MobAmbientBehaviourManager
     {
         /// <summary>
-        /// Sync Lock Object
-        /// </summary>
-        private readonly object LockObject = new object();
-
-        /// <summary>
-        /// Local Database Reference
-        /// </summary>
-        private IObjectDatabase Database { get; set; }
-
-        /// <summary>
         /// Mob X Ambient Behaviour Cache indexed by Mob Name
         /// </summary>
-        private Dictionary<string, MobXAmbientBehaviour[]> AmbientBehaviour { get; set; }
+        private List<MobXAmbientBehaviour> AmbientBehaviour { get; }
 
         /// <summary>
         /// Retrieve MobXambiemtBehaviour Objects from Mob Name
@@ -56,42 +45,23 @@ namespace DOL.GS
                     return new MobXAmbientBehaviour[0];
                 }
 
-                var search = index.ToLower();
-
-                MobXAmbientBehaviour[] matches;
-
-                if (AmbientBehaviour.TryGetValue(search, out matches))
-                {
-                    return matches.Select(obj => obj.Clone()).Cast<MobXAmbientBehaviour>().ToArray();
-                }
-
-                var records = Database.SelectObjects<MobXAmbientBehaviour>("`Source` = @Source", new QueryParameter("@Source", search));
-
-                lock (LockObject)
-                {
-                    if (!AmbientBehaviour.ContainsKey(search))
-                    {
-                        AmbientBehaviour.Add(search, records.ToArray());
-                    }
-                }
-
-                return records.Select(obj => obj.Clone()).Cast<MobXAmbientBehaviour>().ToArray();
+                return AmbientBehaviour
+                    .Where(x => x.Source.Equals(index, StringComparison.InvariantCultureIgnoreCase))
+                    .ToArray();
             }
         }
 
         /// <summary>
         /// Create a new Instance of <see cref="MobAmbientBehaviourManager"/>
         /// </summary>
-        public MobAmbientBehaviourManager(IObjectDatabase Database)
+        public MobAmbientBehaviourManager(IObjectDatabase database)
         {
-            if (Database == null)
+            if (database == null)
             {
-                throw new ArgumentNullException("Database");
+                throw new ArgumentNullException(nameof(database));
             }
 
-            this.Database = Database;
-
-            AmbientBehaviour = new Dictionary<string, MobXAmbientBehaviour[]>();
+            AmbientBehaviour = database.SelectAllObjects<MobXAmbientBehaviour>().ToList();
         }
     }
 }
