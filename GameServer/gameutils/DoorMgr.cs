@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -36,6 +38,8 @@ namespace DOL.GS
         private static Dictionary<int, List<IDoor>> m_doors = new Dictionary<int, List<IDoor>>();
 
         public const string WANT_TO_ADD_DOORS = "WantToAddDoors";
+
+        private static object _lock = new object();
 
         /// <summary>
         /// this function load all door from DB
@@ -96,14 +100,17 @@ namespace DOL.GS
 
         public static void RegisterDoor(IDoor door)
         {
-            if (!m_doors.ContainsKey(door.DoorID))
+            lock (_lock)
             {
-                List<IDoor> createDoorList = new List<IDoor>();
-                m_doors.Add(door.DoorID, createDoorList);
-            }
+                if (!m_doors.ContainsKey(door.DoorID))
+                {
+                    List<IDoor> createDoorList = new List<IDoor>();
+                    m_doors.Add(door.DoorID, createDoorList);
+                }
 
-            List<IDoor> addDoorList = m_doors[door.DoorID] as List<IDoor>;
-            addDoorList.Add(door);
+                List<IDoor> addDoorList = m_doors[door.DoorID];
+                addDoorList.Add(door);
+            }
         }
 
         public static void UnRegisterDoor(int doorID)
