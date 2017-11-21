@@ -1626,11 +1626,12 @@ namespace DOL.GS
                     foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
                     {
                         // Walk through each type in the assembly
-                        foreach (Type type in assembly.GetTypes())
+                        //foreach (Type type in assembly.GetTypes())
+                        assembly.GetTypes().AsParallel().ForAll(type =>
                         {
                             if (!type.IsClass || type.IsAbstract)
                             {
-                                continue;
+                                return;
                             }
 
                             var attrib = type.GetCustomAttributes<DataTable>(false);
@@ -1643,7 +1644,7 @@ namespace DOL.GS
 
                                 m_database.RegisterDataObject(type);
                             }
-                        }
+                        });
                     }
                 }
                 catch (DatabaseException e)

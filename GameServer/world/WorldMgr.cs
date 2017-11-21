@@ -459,13 +459,15 @@ namespace DOL.GS
                 long merchants = 0;
                 long items = 0;
                 long bindpoints = 0;
-                regionsData.AsParallel().WithDegreeOfParallelism(GameServer.Instance.Configuration.CPUUse << 2).ForAll(data => {
-                                                    Region reg;
-                                                    if (m_regions.TryGetValue(data.Id, out reg))
+                regionsData
+                    .AsParallel()
+                    .ForAll(data =>
                     {
-                        reg.LoadFromDatabase(data.Mobs, ref mobs, ref merchants, ref items, ref bindpoints);
-                    }
-                });
+                        if (m_regions.TryGetValue(data.Id, out var reg))
+                        {
+                            reg.LoadFromDatabase(data.Mobs, ref mobs, ref merchants, ref items, ref bindpoints);
+                        }
+                    });
 
                 if (log.IsInfoEnabled)
                 {

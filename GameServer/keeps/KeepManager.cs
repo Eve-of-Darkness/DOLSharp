@@ -104,8 +104,6 @@ namespace DOL.GS.Keeps
                         continue;
                     }
 
-                    var currentKeepComponents = GameServer.Database.SelectObjects<DBKeepComponent>("`KeepID` = @KeepID", new QueryParameter("@KeepID", datakeep.KeepID));
-
                     AbstractGameKeep keep;
                     if ((datakeep.KeepID >> 8) != 0 || ((datakeep.KeepID & 0xFF) > 150))
                     {
@@ -159,19 +157,25 @@ namespace DOL.GS.Keeps
                     keepcomponents = GameServer.Database.SelectObjects<DBKeepComponent>("`Skin` > @Skin", new QueryParameter("@Skin", 20));
                 }
 
-                foreach (DBKeepComponent component in keepcomponents)
-                {
-                    AbstractGameKeep keep = GetKeepByID(component.KeepID);
-                    if (keep == null)
+                keepcomponents
+                    ?.GroupBy(x => x.KeepID)
+                    .AsParallel()
+                    .ForAll(x =>
                     {
-                        // missingKeeps = true;
-                        continue;
-                    }
+                        foreach (var dbKeepComponent in x)
+                        {
+                            AbstractGameKeep keep = GetKeepByID(dbKeepComponent.KeepID);
+                            if (keep == null)
+                            {
+                                // missingKeeps = true;
+                                continue;
+                            }
 
-                    GameKeepComponent gamecomponent = keep.CurrentRegion.CreateGameKeepComponent();
-                    gamecomponent.LoadFromDatabase(component, keep);
-                    keep.KeepComponents.Add(gamecomponent);
-                }
+                            GameKeepComponent gamecomponent = keep.CurrentRegion.CreateGameKeepComponent();
+                            gamecomponent.LoadFromDatabase(dbKeepComponent, keep);
+                            keep.KeepComponents.Add(gamecomponent);
+                        }
+                    });
 
                 /*if (missingKeeps && log.IsWarnEnabled)
                 {

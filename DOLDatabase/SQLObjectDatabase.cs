@@ -34,6 +34,8 @@ namespace DOL.Database
     /// </summary>
     public abstract class SQLObjectDatabase : ObjectDatabase
     {
+        private static readonly object Lock = new object();
+
         /// <summary>
         /// Create a new instance of <see cref="SQLObjectDatabase"/>
         /// </summary>
@@ -82,17 +84,21 @@ namespace DOL.Database
                     CheckOrCreateTableImpl(dataTableHandler);
                 }
 
-                TableDatasets.Add(tableName, dataTableHandler);
-
-                // Init PreCache
-                if (dataTableHandler.UsesPreCaching)
+                lock (Lock)
                 {
-                    var primary = dataTableHandler.PrimaryKeys.Single();
-                    var objects = SelectObjectsImpl(dataTableHandler, string.Empty, new [] { new QueryParameter[] { } }, Transaction.IsolationLevel.DEFAULT).First();
+                    TableDatasets.Add(tableName, dataTableHandler);
 
-                    foreach (var obj in objects)
+                    // Init PreCache
+                    if (dataTableHandler.UsesPreCaching)
                     {
-                        dataTableHandler.SetPreCachedObject(primary.GetValue(obj), obj);
+                        var primary = dataTableHandler.PrimaryKeys.Single();
+                        var objects = SelectObjectsImpl(dataTableHandler, string.Empty,
+                            new[] {new QueryParameter[] { }}, Transaction.IsolationLevel.DEFAULT).First();
+
+                        foreach (var obj in objects)
+                        {
+                            dataTableHandler.SetPreCachedObject(primary.GetValue(obj), obj);
+                        }
                     }
                 }
             }
