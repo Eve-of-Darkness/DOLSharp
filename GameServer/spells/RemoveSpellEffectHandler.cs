@@ -27,19 +27,10 @@ namespace DOL.GS.Spells
     public abstract class RemoveSpellEffectHandler : SpellHandler
     {
         /// <summary>
-        /// Stores spell effect type that will be removed
-        /// RR4: now its a list of effects to remove
-        /// </summary>
-        protected List<string> m_spellTypesToRemove = null;
-
-        /// <summary>
         /// Spell effect type that will be removed
         /// RR4: now its a list of effects to remove
         /// </summary>
-        public virtual List<string> SpellTypesToRemove
-        {
-            get { return m_spellTypesToRemove; }
-        }
+        public virtual List<string> SpellTypesToRemove { get; protected set; } = null;
 
         /// <summary>
         /// called when spell effect has to be started and applied to targets
@@ -47,7 +38,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -74,10 +65,7 @@ namespace DOL.GS.Spells
             foreach (string toRemove in SpellTypesToRemove)
             {
                 GameSpellEffect effect = target.FindEffectOnTarget(toRemove);
-                if (effect != null)
-                {
-                    effect.Cancel(false);
-                }
+                effect?.Cancel(false);
             }
 
             SendEffectAnimation(target, 0, false, 1);

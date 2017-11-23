@@ -31,7 +31,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -58,7 +58,7 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness">factor from 0..1 (0%-100%)</param>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            if (target == null || target.CurrentRegion == null)
+            if (target?.CurrentRegion == null)
             {
                 return;
             }
@@ -76,16 +76,14 @@ namespace DOL.GS.Spells
 
             base.ApplyEffectOnTarget(target, effectiveness);
 
-            if (Spell.CastTime > 0) {
+            if (Spell.CastTime > 0)
+            {
                 target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
             }
 
-            if (target is GameNPC) {
-                IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
-                {
-                    aggroBrain.AddToAggroList(Caster, 1);
-                }
+            if (target is GameNPC npc && npc.Brain is IOldAggressiveBrain aggroBrain)
+            {
+                aggroBrain.AddToAggroList(Caster, 1);
             }
         }
 
@@ -115,7 +113,7 @@ namespace DOL.GS.Spells
             {
                 duration = 1;
             }
-            else if (duration > (Spell.Duration * 4))
+            else if (duration > Spell.Duration * 4)
             {
                 duration = Spell.Duration * 4;
             }

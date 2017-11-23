@@ -39,7 +39,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -64,10 +64,7 @@ namespace DOL.GS.Spells
             }
 
             GameSpellEffect mezz = FindEffectOnTarget(effect.Owner, "Mesmerize");
-            if (mezz != null)
-            {
-                mezz.Cancel(false);
-            }
+            mezz?.Cancel(false);
 
             effect.Owner.Disease(true);
             effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 1.0 - 0.15);
@@ -79,13 +76,9 @@ namespace DOL.GS.Spells
             Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, true)), eChatType.CT_System, effect.Owner);
 
             effect.Owner.StartInterruptTimer(effect.Owner.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
-            if (effect.Owner is GameNPC)
+            if (effect.Owner is GameNPC npc && npc.Brain is IOldAggressiveBrain aggroBrain)
             {
-                IOldAggressiveBrain aggroBrain = ((GameNPC)effect.Owner).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
-                {
-                    aggroBrain.AddToAggroList(Caster, 1);
-                }
+                aggroBrain.AddToAggroList(Caster, 1);
             }
         }
 
@@ -143,8 +136,7 @@ namespace DOL.GS.Spells
         /// <param name="effect"></param>
         protected virtual void SendUpdates(GameSpellEffect effect)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 if (!player.IsMezzed && !player.IsStunned)
                 {
@@ -155,8 +147,7 @@ namespace DOL.GS.Spells
                 player.Out.SendUpdateWeaponAndArmorStats();
             }
 
-            GameNPC npc = effect.Owner as GameNPC;
-            if (npc != null)
+            if (effect.Owner is GameNPC npc)
             {
                 short maxSpeed = npc.MaxSpeed;
                 if (npc.CurrentSpeed > maxSpeed)
@@ -176,11 +167,14 @@ namespace DOL.GS.Spells
                 return null;
             }
 
-            PlayerXEffect eff = new PlayerXEffect();
-            eff.Var1 = Spell.ID;
-            eff.Duration = e.RemainingTime;
-            eff.IsHandler = true;
-            eff.SpellLine = SpellLine.KeyName;
+            PlayerXEffect eff = new PlayerXEffect
+            {
+                Var1 = Spell.ID,
+                Duration = e.RemainingTime,
+                IsHandler = true,
+                SpellLine = SpellLine.KeyName
+            };
+
             return eff;
         }
 

@@ -29,14 +29,14 @@ namespace DOL.GS.Spells
     {
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            GameLiving living = effect.Owner as GameLiving;
+            GameLiving living = effect.Owner;
             GamePlayer player = effect.Owner as GamePlayer;
             int value = (int)Spell.Value;
             living.BaseBuffBonusCategory[(int)eProperty.Resist_Slash] += value;
@@ -55,7 +55,7 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GameLiving living = effect.Owner as GameLiving;
+            GameLiving living = effect.Owner;
             GamePlayer player = effect.Owner as GamePlayer;
             int value = (int)Spell.Value;
             living.BaseBuffBonusCategory[(int)eProperty.Resist_Slash] -= value;
@@ -76,9 +76,9 @@ namespace DOL.GS.Spells
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             int specLevel = 0;
-            if (Caster is GamePlayer)
+            if (Caster is GamePlayer player)
             {
-                specLevel = ((GamePlayer)Caster).GetModifiedSpecLevel(m_spellLine.Spec);
+                specLevel = player.GetModifiedSpecLevel(SpellLine.Spec);
             }
 
             effectiveness = 0.75 + (specLevel - 1) * 0.5 / Spell.Level;
@@ -91,52 +91,55 @@ namespace DOL.GS.Spells
         {
             get
             {
-                var list = new List<string>(16);
-                list.Add("Name: " + Spell.Name);
-                list.Add("Description: " + Spell.Description);
-                list.Add("Target: " + Spell.Target);
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                var list = new List<string>(16)
+                {
+                    $"Name: {Spell.Name}",
+                    $"Description: {Spell.Description}",
+                    $"Target: {Spell.Target}",
+                    $"Casting time: {Spell.CastTime * 0.001:0.0## sec;-0.0## sec;'instant'}"
+                };
+
                 if (Spell.Duration >= ushort.MaxValue * 1000)
                 {
                     list.Add("Duration: Permanent.");
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format("Duration: {0}:{1} min", Spell.Duration / 60000, (Spell.Duration % 60000 / 1000).ToString("00")));
+                    list.Add($"Duration: {Spell.Duration / 60000}:{(Spell.Duration % 60000 / 1000):00} min");
                 }
                 else if (Spell.Duration != 0)
                 {
-                    list.Add("Duration: " + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
+                    list.Add($"Duration: {Spell.Duration / 1000:0' sec';'Permanent.';'Permanent.'}");
                 }
 
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"Recast time: {Spell.RecastDelay / 60000}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"Recast time: {Spell.RecastDelay / 1000} sec");
                 }
 
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
                 if (Spell.Power != 0)
                 {
-                    list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                    list.Add($"Power cost: {Spell.Power:0;0'%'}");
                 }
 
                 list.Add("All Melee Resist Increased: 0" /*+ Spell.Value*/);
                 if (Spell.Frequency != 0)
                 {
-                    list.Add("Frequency: " + (Spell.Frequency * 0.001).ToString("0.0"));
+                    list.Add($"Frequency: {Spell.Frequency * 0.001:0.0}");
                 }
 
                 return list;
@@ -151,22 +154,18 @@ namespace DOL.GS.Spells
     {
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
-
             base.OnEffectStart(effect);
             GamePlayer player = effect.Owner as GamePlayer;
-            GameLiving living = effect.Owner as GameLiving;
+            GameLiving living = effect.Owner;
 
             BedazzlingAuraEffect boad = player.EffectList.GetOfType<BedazzlingAuraEffect>();
-            if (boad != null)
-            {
-                boad.Cancel(false);
-            }
+            boad?.Cancel(false);
 
             int value = (int)Spell.Value;
             living.AbilityBonus[(int)eProperty.Resist_Body] += value;
@@ -175,12 +174,9 @@ namespace DOL.GS.Spells
             living.AbilityBonus[(int)eProperty.Resist_Heat] += value;
             living.AbilityBonus[(int)eProperty.Resist_Matter] += value;
             living.AbilityBonus[(int)eProperty.Resist_Spirit] += value;
-            if (player != null)
-            {
-                player.Out.SendCharStatsUpdate();
-                player.UpdatePlayerStatus();
-                player.Out.SendCharResistsUpdate();
-            }
+            player.Out.SendCharStatsUpdate();
+            player.UpdatePlayerStatus();
+            player.Out.SendCharResistsUpdate();
 
             MessageToLiving(effect.Owner, Spell.Message1, eChatType.CT_Spell);
             Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, true)), eChatType.CT_Spell, effect.Owner);
@@ -188,7 +184,7 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GameLiving living = effect.Owner as GameLiving;
+            GameLiving living = effect.Owner;
             int value = (int)Spell.Value;
             living.AbilityBonus[(int)eProperty.Resist_Body] -= value;
             living.AbilityBonus[(int)eProperty.Resist_Cold] -= value;
@@ -196,8 +192,7 @@ namespace DOL.GS.Spells
             living.AbilityBonus[(int)eProperty.Resist_Heat] -= value;
             living.AbilityBonus[(int)eProperty.Resist_Matter] -= value;
             living.AbilityBonus[(int)eProperty.Resist_Spirit] -= value;
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
                 player.UpdatePlayerStatus();
@@ -212,9 +207,9 @@ namespace DOL.GS.Spells
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             int specLevel = 0;
-            if (Caster is GamePlayer)
+            if (Caster is GamePlayer player)
             {
-                specLevel = ((GamePlayer)Caster).GetModifiedSpecLevel(m_spellLine.Spec);
+                specLevel = player.GetModifiedSpecLevel(SpellLine.Spec);
             }
 
             effectiveness = 0.75 + (specLevel - 1) * 0.5 / Spell.Level;
@@ -227,52 +222,55 @@ namespace DOL.GS.Spells
         {
             get
             {
-                var list = new List<string>(16);
-                list.Add("Name: " + Spell.Name);
-                list.Add("Description: " + Spell.Description);
-                list.Add("Target: " + Spell.Target);
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                var list = new List<string>(16)
+                {
+                    $"Name: {Spell.Name}",
+                    $"Description: {Spell.Description}",
+                    $"Target: {Spell.Target}",
+                    $"Casting time: {Spell.CastTime * 0.001:0.0## sec;-0.0## sec;'instant'}"
+                };
+
                 if (Spell.Duration >= ushort.MaxValue * 1000)
                 {
                     list.Add("Duration: Permanent.");
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format("Duration: {0}:{1} min", Spell.Duration / 60000, (Spell.Duration % 60000 / 1000).ToString("00")));
+                    list.Add($"Duration: {Spell.Duration / 60000}:{Spell.Duration % 60000 / 1000:00} min");
                 }
                 else if (Spell.Duration != 0)
                 {
-                    list.Add("Duration: " + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
+                    list.Add($"Duration: {Spell.Duration / 1000:0' sec';'Permanent.';'Permanent.'}");
                 }
 
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"Recast time: {Spell.RecastDelay / 60000}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"Recast time: {Spell.RecastDelay / 1000} sec");
                 }
 
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
                 if (Spell.Power != 0)
                 {
-                    list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                    list.Add($"Power cost: {Spell.Power:0;0'%'}");
                 }
 
-                list.Add("All Magic Resist Increased: " + Spell.Value);
+                list.Add($"All Magic Resist Increased: {Spell.Value}");
                 if (Spell.Frequency != 0)
                 {
-                    list.Add("Frequency: " + (Spell.Frequency * 0.001).ToString("0.0"));
+                    list.Add($"Frequency: {Spell.Frequency * 0.001:0.0}");
                 }
 
                 return list;

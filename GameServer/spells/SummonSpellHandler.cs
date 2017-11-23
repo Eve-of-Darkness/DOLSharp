@@ -24,6 +24,7 @@ using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using log4net;
 
 namespace DOL.GS.Spells
 {
@@ -40,9 +41,9 @@ namespace DOL.GS.Spells
     /// </summary>
     public abstract class SummonSpellHandler : SpellHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        protected GamePet m_pet = null;
+        protected GamePet m_pet;
 
         /// <summary>
         /// Is a summon of this pet silent (no message to caster, or ambient texts)?
@@ -56,15 +57,15 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
+            foreach (GamePlayer player in Caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
             {
-                if (player != m_caster)
+                if (player != Caster)
                 {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObject.Casting.CastsASpell", m_caster.GetName(0, true)), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObject.Casting.CastsASpell", Caster.GetName(0, true)), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
             }
 
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
 
             base.FinishSpellCast(target);
 
@@ -77,7 +78,7 @@ namespace DOL.GS.Spells
             {
                 if (m_isSilent == false)
                 {
-                    MessageToCaster(string.Format("The {0} is now under your control.", m_pet.Name), eChatType.CT_Spell);
+                    MessageToCaster($"The {m_pet.Name} is now under your control.", eChatType.CT_Spell);
                 }
             }
             else
@@ -153,10 +154,10 @@ namespace DOL.GS.Spells
             {
                 if (log.IsWarnEnabled)
                 {
-                    log.WarnFormat("NPC template {0} not found! Spell: {1}", Spell.LifeDrainReturn, Spell.ToString());
+                    log.Warn($"NPC template {Spell.LifeDrainReturn} not found! Spell: {Spell}");
                 }
 
-                MessageToCaster("NPC template " + Spell.LifeDrainReturn + " not found!", eChatType.CT_System);
+                MessageToCaster($"NPC template {Spell.LifeDrainReturn} not found!", eChatType.CT_System);
                 return;
             }
 
@@ -192,17 +193,11 @@ namespace DOL.GS.Spells
             m_pet.AddToWorld();
 
             // Check for buffs
-            if (brain is ControlledNpcBrain)
-            {
-                (brain as ControlledNpcBrain).CheckSpells(StandardMobBrain.eCheckSpellType.Defensive);
-            }
+            (brain as ControlledNpcBrain)?.CheckSpells(StandardMobBrain.eCheckSpellType.Defensive);
 
             AddHandlers();
-
             SetBrainToOwner(brain);
-
             effect.Start(m_pet);
-
             Caster.OnPetSummoned(m_pet);
         }
 
@@ -242,7 +237,7 @@ namespace DOL.GS.Spells
         /// <param name="arguments"></param>
         protected virtual void OnNpcReleaseCommand(DOLEvent e, object sender, EventArgs arguments)
         {
-            if (!(sender is GameNPC) || !((sender as GameNPC).Brain is IControlledBrain))
+            if (!((sender as GameNPC)?.Brain is IControlledBrain))
             {
                 return;
             }
@@ -255,10 +250,7 @@ namespace DOL.GS.Spells
             GameEventMgr.RemoveHandler(pet, GameLivingEvent.PetReleased, new DOLEventHandler(OnNpcReleaseCommand));
 
             GameSpellEffect effect = FindEffectOnTarget(pet, this);
-            if (effect != null)
-            {
-                effect.Cancel(false);
-            }
+            effect?.Cancel(false);
         }
 
         /// <summary>
@@ -270,19 +262,19 @@ namespace DOL.GS.Spells
             {
                 var list = new List<string>();
 
-                list.Add("Function: " + (Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType));
+                list.Add($"Function: {(Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType)}");
                 list.Add(" "); // empty line
                 list.Add(Spell.Description);
                 list.Add(" "); // empty line
                 if (Spell.InstrumentRequirement != 0)
                 {
-                    list.Add("Instrument require: " + GlobalConstants.InstrumentTypeToName(Spell.InstrumentRequirement));
+                    list.Add($"Instrument require: {GlobalConstants.InstrumentTypeToName(Spell.InstrumentRequirement)}");
                 }
 
-                list.Add("Target: " + Spell.Target);
+                list.Add($"Target: {Spell.Target}");
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
                 if (Spell.Duration >= ushort.MaxValue * 1000)
@@ -291,46 +283,46 @@ namespace DOL.GS.Spells
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format("Duration: {0}:{1} min", Spell.Duration / 60000, (Spell.Duration % 60000 / 1000).ToString("00")));
+                    list.Add($"Duration: {Spell.Duration / 60000}:{(Spell.Duration % 60000 / 1000):00} min");
                 }
                 else if (Spell.Duration != 0)
                 {
-                    list.Add("Duration: " + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
+                    list.Add($"Duration: {Spell.Duration / 1000:0' sec';'Permanent.';'Permanent.'}");
                 }
 
                 if (Spell.Frequency != 0)
                 {
-                    list.Add("Frequency: " + (Spell.Frequency * 0.001).ToString("0.0"));
+                    list.Add($"Frequency: {(Spell.Frequency * 0.001):0.0}");
                 }
 
                 if (Spell.Power != 0)
                 {
-                    list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                    list.Add($"Power cost: {Spell.Power:0;0'%'}");
                 }
 
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                list.Add($"Casting time: {(Spell.CastTime * 0.001):0.0## sec;-0.0## sec;'instant'}");
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"Recast time: {Spell.RecastDelay / 60000}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"Recast time: {Spell.RecastDelay / 1000} sec");
                 }
 
                 if (Spell.Concentration != 0)
                 {
-                    list.Add("Concentration cost: " + Spell.Concentration);
+                    list.Add($"Concentration cost: {Spell.Concentration}");
                 }
 
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
                 if (Spell.DamageType != eDamageType.Natural)
                 {
-                    list.Add("Damage: " + GlobalConstants.DamageTypeToName(Spell.DamageType));
+                    list.Add($"Damage: {GlobalConstants.DamageTypeToName(Spell.DamageType)}");
                 }
 
                 return list;

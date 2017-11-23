@@ -35,7 +35,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -45,7 +45,7 @@ namespace DOL.GS.Spells
             double eff = 1.25;
             if (Caster is GamePlayer)
             {
-                double lineSpec = Caster.GetModifiedSpecLevel(m_spellLine.Spec);
+                double lineSpec = Caster.GetModifiedSpecLevel(SpellLine.Spec);
                 if (lineSpec < 1)
                 {
                     lineSpec = 1;
@@ -103,15 +103,9 @@ namespace DOL.GS.Spells
 
             #region PVP DAMAGE
 
-            if (target.DamageRvRMemory > 0 &&
-                (target is NecromancerPet &&
-                ((target as NecromancerPet).Brain as IControlledBrain).GetPlayerOwner() != null
-                || target is GamePlayer))
+            if (target.DamageRvRMemory > 0 && (((target as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || target is GamePlayer))
             {
-                if (target.DamageRvRMemory > 0)
-                {
-                    target.DamageRvRMemory -= (long)Math.Max(heal, 0);
-                }
+                target.DamageRvRMemory -= (long)Math.Max(heal, 0);
             }
 
             #endregion PVP DAMAGE

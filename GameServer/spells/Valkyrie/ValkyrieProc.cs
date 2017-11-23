@@ -44,8 +44,7 @@ namespace DOL.GS.Spells
 
         public void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-            if (args == null || args.AttackData == null)
+            if (!(arguments is AttackFinishedEventArgs args) || args.AttackData == null)
             {
                 return;
             }
@@ -63,10 +62,9 @@ namespace DOL.GS.Spells
             }
             else if (ad.IsMeleeAttack)
             {
-                baseChance = (int)Spell.Frequency;
-                if (sender is GamePlayer)
+                baseChance = Spell.Frequency;
+                if (sender is GamePlayer player)
                 {
-                    GamePlayer player = (GamePlayer)sender;
                     InventoryItem leftWeapon = player.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
 
                     // if we can use left weapon, we have currently a weapon in left hand and we still have endurance,

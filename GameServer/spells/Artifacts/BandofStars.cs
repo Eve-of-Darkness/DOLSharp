@@ -26,11 +26,6 @@ namespace DOL.GS.Spells
     [SpellHandler("StarsProc")]
     public class StarsProc : SpellHandler
     {
-        public override bool CheckBeginCast(GameLiving selectedTarget)
-        {
-            return base.CheckBeginCast(selectedTarget);
-        }
-
         public override bool StartSpell(GameLiving target)
         {
             foreach (GameLiving targ in SelectTargets(target))
@@ -43,11 +38,11 @@ namespace DOL.GS.Spells
 
         private void DealDamage(GameLiving target)
         {
-            int ticksToTarget = m_caster.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
+            int ticksToTarget = Caster.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
             int delay = 1 + ticksToTarget / 100;
             foreach (GamePlayer player in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                player.Out.SendSpellEffectAnimation(m_caster, target, m_spell.ClientEffect, (ushort)delay, false, 1);
+                player.Out.SendSpellEffectAnimation(Caster, target, Spell.ClientEffect, (ushort)delay, false, 1);
             }
 
             BoltOnTargetAction bolt = new BoltOnTargetAction(Caster, target, this);
@@ -72,30 +67,16 @@ namespace DOL.GS.Spells
 
             public BoltOnTargetAction(GameLiving actionSource, GameLiving boltTarget, StarsProc spellHandler) : base(actionSource)
             {
-                if (boltTarget == null)
-                {
-                    throw new ArgumentNullException("boltTarget");
-                }
-
-                if (spellHandler == null)
-                {
-                    throw new ArgumentNullException("spellHandler");
-                }
-
-                m_boltTarget = boltTarget;
-                m_handler = spellHandler;
+                m_boltTarget = boltTarget ?? throw new ArgumentNullException(nameof(boltTarget));
+                m_handler = spellHandler ?? throw new ArgumentNullException(nameof(spellHandler));
             }
 
             protected override void OnTick()
             {
                 GameLiving target = m_boltTarget;
                 GameLiving caster = (GameLiving)m_actionSource;
-                if (target == null)
-                {
-                    return;
-                }
 
-                if (target.CurrentRegion.ID != caster.CurrentRegion.ID)
+                if (target?.CurrentRegion.ID != caster.CurrentRegion.ID)
                 {
                     return;
                 }
@@ -110,12 +91,7 @@ namespace DOL.GS.Spells
                     return;
                 }
 
-                if (target == null)
-                {
-                    return;
-                }
-
-                if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+                if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
                 {
                     return;
                 }
@@ -126,9 +102,9 @@ namespace DOL.GS.Spells
                 m_handler.DamageTarget(ad, false);
 
                 // if (m_handler.Spell.SubSpellID != 0) Spell subspell = m_handler.SkillBase.GetSpellByID(m_handler.Spell.SubSpellID);
-                if (m_handler.Spell.SubSpellID != 0 && SkillBase.GetSpellByID(m_handler.Spell.SubSpellID) != null)
+                if (m_handler.Spell.SubSpellId != 0 && SkillBase.GetSpellByID(m_handler.Spell.SubSpellId) != null)
                 {
-                    ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(caster, SkillBase.GetSpellByID(m_handler.Spell.SubSpellID), SkillBase.GetSpellLine("Mob Spells"));
+                    ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(caster, SkillBase.GetSpellByID(m_handler.Spell.SubSpellId), SkillBase.GetSpellLine("Mob Spells"));
                     spellhandler.StartSpell(target);
                 }
 
@@ -150,26 +126,26 @@ namespace DOL.GS.Spells
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            effect.Owner.DebuffCategory[(int)eProperty.Dexterity] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Strength] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Constitution] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Acuity] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Piety] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Empathy] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Quickness] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Intelligence] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Charisma] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.ArmorAbsorption] += (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.MagicAbsorption] += (int)m_spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Dexterity] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Strength] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Constitution] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Acuity] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Piety] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Empathy] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Quickness] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Intelligence] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Charisma] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.ArmorAbsorption] += (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.MagicAbsorption] += (int)Spell.Value;
 
             if (effect.Owner is GamePlayer)
             {
                 GamePlayer player = effect.Owner as GamePlayer;
-                if (m_spell.LifeDrainReturn > 0)
+                if (Spell.LifeDrainReturn > 0)
                 {
                     if (player.CharacterClass.ID != (byte)eCharacterClass.Necromancer)
                     {
-                        player.Model = (ushort)m_spell.LifeDrainReturn;
+                        player.Model = (ushort)Spell.LifeDrainReturn;
                     }
                 }
 
@@ -182,21 +158,20 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            effect.Owner.DebuffCategory[(int)eProperty.Dexterity] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Strength] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Constitution] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Acuity] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Piety] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Empathy] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Quickness] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Intelligence] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.Charisma] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.ArmorAbsorption] -= (int)m_spell.Value;
-            effect.Owner.DebuffCategory[(int)eProperty.MagicAbsorption] -= (int)m_spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Dexterity] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Strength] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Constitution] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Acuity] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Piety] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Empathy] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Quickness] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Intelligence] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.Charisma] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.ArmorAbsorption] -= (int)Spell.Value;
+            effect.Owner.DebuffCategory[(int)eProperty.MagicAbsorption] -= (int)Spell.Value;
 
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                GamePlayer player = effect.Owner as GamePlayer;
                 if (player.CharacterClass.ID != (byte)eCharacterClass.Necromancer)
                 {
                     player.Model = player.CreationModel;
@@ -225,10 +200,9 @@ namespace DOL.GS.Spells
                 Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
             }
 
-            if (target is GameNPC)
+            if (target is GameNPC npc)
             {
-                IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
+                if (npc.Brain is IOldAggressiveBrain aggroBrain)
                 {
                     aggroBrain.AddToAggroList(Caster, (int)Spell.Value);
                 }

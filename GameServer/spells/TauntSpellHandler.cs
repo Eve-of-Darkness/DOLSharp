@@ -48,7 +48,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -100,15 +100,12 @@ namespace DOL.GS.Spells
         {
             base.DamageTarget(ad, showEffectAnimation, attackResult);
 
-            if (ad.Target is GameNPC && Spell.Value > 0)
+            if (ad.Target is GameNPC npc && Spell.Value > 0)
             {
-                IOldAggressiveBrain aggroBrain = ((GameNPC)ad.Target).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
+                if (npc.Brain is IOldAggressiveBrain aggroBrain)
                 {
                     // this amount is a wild guess - Tolakram
                     aggroBrain.AddToAggroList(Caster, Math.Max(1, (int)(Spell.Value * Caster.Level * 0.1)));
-
-                    // log.DebugFormat("Damage: {0}, Taunt Value: {1}, Taunt Amount {2}", ad.Damage, Spell.Value, Math.Max(1, (int)(Spell.Value * Caster.Level * 0.1)));
                 }
             }
 

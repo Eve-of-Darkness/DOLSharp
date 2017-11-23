@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
@@ -41,7 +40,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -60,7 +59,7 @@ namespace DOL.GS.Spells
         /// <param name="ad">Attack data.</param>
         public virtual void DrainPower(AttackData ad)
         {
-            if (ad == null || !m_caster.IsAlive)
+            if (ad == null || !Caster.IsAlive)
             {
                 return;
             }
@@ -71,12 +70,12 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            int powerGain = (ad.Damage + ad.CriticalDamage) * m_spell.LifeDrainReturn / 100;
-            powerGain = owner.ChangeMana(m_caster, GameLiving.eManaChangeType.Spell, powerGain);
+            int powerGain = (ad.Damage + ad.CriticalDamage) * Spell.LifeDrainReturn / 100;
+            powerGain = owner.ChangeMana(Caster, GameLiving.eManaChangeType.Spell, powerGain);
 
             if (powerGain > 0)
             {
-                MessageToOwner(string.Format("Your summon channels {0} power to you!", powerGain), eChatType.CT_Spell);
+                MessageToOwner($"Your summon channels {powerGain} power to you!", eChatType.CT_Spell);
             }
             else
             {

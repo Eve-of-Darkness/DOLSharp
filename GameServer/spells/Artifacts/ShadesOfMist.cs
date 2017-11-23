@@ -32,7 +32,7 @@ namespace DOL.GS.Spells
     [SpellHandler("ShadesOfMist")]
     public class ShadeOfMistDefensiveProcSpellHandler : SpellHandler
     {
-        private int ablativehp = 0;
+        private int ablativehp;
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
@@ -50,7 +50,7 @@ namespace DOL.GS.Spells
                         Effect.SpellHandler.Spell.SpellType.Equals("AtlantisTabletMorph") ||
                         Effect.SpellHandler.Spell.SpellType.Equals("AlvarusMorph"))
                     {
-                        player.Out.SendMessage("You already have an active morph!", DOL.GS.PacketHandler.eChatType.CT_SpellResisted, DOL.GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        player.Out.SendMessage("You already have an active morph!", eChatType.CT_SpellResisted, eChatLoc.CL_ChatWindow);
                         return;
                     }
                 }
@@ -76,8 +76,7 @@ namespace DOL.GS.Spells
 
         public void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackedByEnemyEventArgs args = arguments as AttackedByEnemyEventArgs;
-            if (args == null)
+            if (!(arguments is AttackedByEnemyEventArgs args))
             {
                 return;
             }
@@ -117,8 +116,7 @@ namespace DOL.GS.Spells
             if (ablativehp != 0)
             {
                 AttackData ad = args.AttackData;
-                GameLiving living = sender as GameLiving;
-                if (living == null)
+                if (!(sender is GameLiving))
                 {
                     return;
                 }
@@ -141,8 +139,8 @@ namespace DOL.GS.Spells
                 OnDamageAbsorbed(ad, damageAbsorbed);
 
                 // TODO correct messages
-                MessageToLiving(ad.Target, string.Format("Your ablative absorbs {0} damage!", damageAbsorbed), eChatType.CT_Spell);// since its not always Melee absorbing
-                MessageToLiving(ad.Attacker, string.Format("A barrier absorbs {0} damage of your attack!", damageAbsorbed), eChatType.CT_Spell);
+                MessageToLiving(ad.Target, $"Your ablative absorbs {damageAbsorbed} damage!", eChatType.CT_Spell);// since its not always Melee absorbing
+                MessageToLiving(ad.Attacker, $"A barrier absorbs {damageAbsorbed} damage of your attack!", eChatType.CT_Spell);
             }
         }
 

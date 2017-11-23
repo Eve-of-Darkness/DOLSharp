@@ -33,10 +33,7 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Does this spell break stealth on start?
         /// </summary>
-        public override bool UnstealthCasterOnStart
-        {
-            get { return false; }
-        }
+        public override bool UnstealthCasterOnStart => false;
 
         /// <summary>
         /// Fire arrow
@@ -44,7 +41,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Endurance -= CalculateEnduranceCost();
+            Caster.Endurance -= CalculateEnduranceCost();
 
             // if ((target is Keeps.GameKeepDoor || target is Keeps.GameKeepComponent) && Spell.SpellType != "SiegeArrow")
             // {
@@ -104,11 +101,11 @@ namespace DOL.GS.Spells
 
         private void DealDamage(GameLiving target)
         {
-            int ticksToTarget = m_caster.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
+            int ticksToTarget = Caster.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
             int delay = 1 + ticksToTarget / 100;
             foreach (GamePlayer player in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                player.Out.SendSpellEffectAnimation(m_caster, target, m_spell.ClientEffect, (ushort)delay, false, 1);
+                player.Out.SendSpellEffectAnimation(Caster, target, Spell.ClientEffect, (ushort)delay, false, 1);
             }
 
             ArrowOnTargetAction arrow = new ArrowOnTargetAction(Caster, target, this);
@@ -140,18 +137,8 @@ namespace DOL.GS.Spells
             public ArrowOnTargetAction(GameLiving actionSource, GameLiving arrowTarget, ArrowSpellHandler spellHandler)
                 : base(actionSource)
             {
-                if (arrowTarget == null)
-                {
-                    throw new ArgumentNullException("arrowTarget");
-                }
-
-                if (spellHandler == null)
-                {
-                    throw new ArgumentNullException("spellHandler");
-                }
-
-                m_arrowTarget = arrowTarget;
-                m_handler = spellHandler;
+                m_arrowTarget = arrowTarget ?? throw new ArgumentNullException(nameof(arrowTarget));
+                m_handler = spellHandler ?? throw new ArgumentNullException(nameof(spellHandler));
             }
 
             /// <summary>
@@ -184,7 +171,7 @@ namespace DOL.GS.Spells
 
                 // half of the damage is magical
                 // subtract any spelldamage bonus and re-calculate after half damage is calculated
-                AttackData ad = m_handler.CalculateDamageToTarget(target, 0.5 - (caster.GetModified(eProperty.SpellDamage) * 0.01));
+                AttackData ad = m_handler.CalculateDamageToTarget(target, 0.5 - caster.GetModified(eProperty.SpellDamage) * 0.01);
 
                 // check for bladeturn miss
                 if (ad.AttackResult == GameLiving.eAttackResult.Missed)
@@ -199,10 +186,9 @@ namespace DOL.GS.Spells
                     m_handler.MessageToLiving(target, caster.GetName(0, false) + " missed!", eChatType.CT_Missed);
                     target.OnAttackedByEnemy(ad);
                     target.StartInterruptTimer(target.SpellInterruptDuration, ad.AttackType, caster);
-                    if (target is GameNPC)
+                    if (target is GameNPC npc)
                     {
-                        IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
-                        if (aggroBrain != null)
+                        if (npc.Brain is IOldAggressiveBrain aggroBrain)
                         {
                             aggroBrain.AddToAggroList(caster, 1);
                         }
@@ -211,13 +197,12 @@ namespace DOL.GS.Spells
                     return;
                 }
 
-                ad.Damage = (int)((double)ad.Damage * (1.0 + caster.GetModified(eProperty.SpellDamage) * 0.01));
+                ad.Damage = (int)(ad.Damage * (1.0 + caster.GetModified(eProperty.SpellDamage) * 0.01));
 
                 bool arrowBlock = false;
 
-                if (target is GamePlayer && !target.IsStunned && !target.IsMezzed && !target.IsSitting && m_handler.Spell.LifeDrainReturn != (int)Archery.eShotType.Critical)
+                if (target is GamePlayer player && !target.IsStunned && !target.IsMezzed && !target.IsSitting && m_handler.Spell.LifeDrainReturn != (int)Archery.eShotType.Critical)
                 {
-                    GamePlayer player = (GamePlayer)target;
                     InventoryItem lefthand = player.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
                     if (lefthand != null && (player.AttackWeapon == null || player.AttackWeapon.Item_Type == Slot.RIGHTHAND || player.AttackWeapon.Item_Type == Slot.LEFTHAND))
                     {
@@ -225,7 +210,7 @@ namespace DOL.GS.Spells
                         {
                             // TODO: shield size vs number of attackers not calculated
                             double shield = 0.5 * player.GetModifiedSpecLevel(Specs.Shields);
-                            double blockchance = ((player.Dexterity * 2) - 100) / 40.0 + shield + (0 * 3) + 5;
+                            double blockchance = (player.Dexterity * 2 - 100) / 40.0 + shield + 0 * 3 + 5;
                             blockchance += 30;
                             blockchance -= target.GetConLevel(caster) * 5;
                             if (blockchance >= 100)
@@ -247,10 +232,7 @@ namespace DOL.GS.Spells
                                     // You cannot engage a mob that was attacked within the last X seconds...
                                     if (engage.EngageTarget.LastAttackedByEnemyTick > engage.EngageTarget.CurrentRegion.Time - EngageAbilityHandler.ENGAGE_ATTACK_DELAY_TICK)
                                     {
-                                        if (engage.Owner is GamePlayer)
-                                        {
-                                            (engage.Owner as GamePlayer).Out.SendMessage(engage.EngageTarget.GetName(0, true) + " has been attacked recently and you are unable to engage.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                        }
+                                        (engage.Owner as GamePlayer)?.Out.SendMessage($"{engage.EngageTarget.GetName(0, true)} has been attacked recently and you are unable to engage.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                     } // Check if player has enough endurance left to engage
                                     else if (engage.Owner.Endurance < EngageAbilityHandler.ENGAGE_DURATION_LOST)
                                     {
@@ -259,10 +241,7 @@ namespace DOL.GS.Spells
                                     else
                                     {
                                         engage.Owner.Endurance -= EngageAbilityHandler.ENGAGE_DURATION_LOST;
-                                        if (engage.Owner is GamePlayer)
-                                        {
-                                            (engage.Owner as GamePlayer).Out.SendMessage("You concentrate on blocking the blow!", eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
-                                        }
+                                        (engage.Owner as GamePlayer)?.Out.SendMessage("You concentrate on blocking the blow!", eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
 
                                         if (blockchance < 85)
                                         {
@@ -275,10 +254,10 @@ namespace DOL.GS.Spells
                             if (blockchance >= Util.Random(1, 100))
                             {
                                 arrowBlock = true;
-                                m_handler.MessageToLiving(player, "You block " + caster.GetName(0, false) + "'s arrow!", eChatType.CT_System);
+                                m_handler.MessageToLiving(player, $"You block {caster.GetName(0, false)}\'s arrow!", eChatType.CT_System);
                                 if (m_handler.Spell.Target.ToLower() != "area")
                                 {
-                                    m_handler.MessageToCaster(player.GetName(0, true) + " blocks your arrow!", eChatType.CT_System);
+                                    m_handler.MessageToCaster($"{player.GetName(0, true)} blocks your arrow!", eChatType.CT_System);
                                     m_handler.DamageTarget(ad, false, 0x02);
                                 }
                             }
@@ -290,9 +269,9 @@ namespace DOL.GS.Spells
                 {
                     // now calculate the magical part of arrow damage (similar to bolt calculation).  Part 1 Physical, Part 2 Magical
                     double damage = m_handler.Spell.Damage / 2; // another half is physical damage
-                    if (target is GamePlayer)
+                    if (target is GamePlayer gamePlayer)
                     {
-                        ad.ArmorHitLocation = ((GamePlayer)target).CalculateArmorHitLocation(ad);
+                        ad.ArmorHitLocation = gamePlayer.CalculateArmorHitLocation(ad);
                     }
 
                     InventoryItem armor = null;
@@ -327,7 +306,7 @@ namespace DOL.GS.Spells
                         ad.Damage -= (int)(ad.Damage * (100 - caster.AttackWeapon.Quality) * .01);
 
                         // Condition
-                        ad.Damage = (int)((double)ad.Damage * Math.Min(1.0, (double)caster.AttackWeapon.Condition / (double)caster.AttackWeapon.MaxCondition));
+                        ad.Damage = (int)(ad.Damage * Math.Min(1.0, caster.AttackWeapon.Condition / (double)caster.AttackWeapon.MaxCondition));
 
                         // Patch Note:  http://support.darkageofcamelot.com/kb/article.php?id=931
                         // - The Damage Per Second (DPS) of your bow will have an effect on your damage for archery shots. If the effective DPS
@@ -337,7 +316,7 @@ namespace DOL.GS.Spells
 
                         if (caster.AttackWeapon.DPS_AF < spellRequiredDPS)
                         {
-                            double percentReduction = (double)caster.AttackWeapon.DPS_AF / (double)spellRequiredDPS;
+                            double percentReduction = caster.AttackWeapon.DPS_AF / (double)spellRequiredDPS;
                             ad.Damage = (int)(ad.Damage * percentReduction);
                         }
                     }
@@ -358,7 +337,7 @@ namespace DOL.GS.Spells
                         }
                         else
                         {
-                            int critMax = (target is GamePlayer) ? ad.Damage / 2 : ad.Damage;
+                            int critMax = target is GamePlayer ? ad.Damage / 2 : ad.Damage;
                             ad.CriticalDamage = Util.Random(critMax / 10, critMax);
                         }
                     }
@@ -370,17 +349,14 @@ namespace DOL.GS.Spells
                     target.StartInterruptTimer(target.SpellInterruptDuration, ad.AttackType, caster);
                 }
 
-                if (m_handler.Spell.SubSpellID != 0)
+                if (m_handler.Spell.SubSpellId != 0)
                 {
-                    Spell subspell = SkillBase.GetSpellByID(m_handler.Spell.SubSpellID);
+                    Spell subspell = SkillBase.GetSpellByID(m_handler.Spell.SubSpellId);
                     if (subspell != null)
                     {
                         subspell.Level = m_handler.Spell.Level;
                         ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(m_handler.Caster, subspell, SkillBase.GetSpellLine(GlobalSpellsLines.Combat_Styles_Effect));
-                        if (spellhandler != null)
-                        {
-                            spellhandler.StartSpell(target);
-                        }
+                        spellhandler?.StartSpell(target);
                     }
                 }
 

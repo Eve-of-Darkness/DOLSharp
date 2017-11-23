@@ -64,7 +64,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -90,26 +90,14 @@ namespace DOL.GS.Spells
             if (powerHealed <= 0)
             {
                 SendEffectAnimation(target, 0, false, 0);
-                owner.Out.SendMessage(
-                    string.Format(
-                    "{0} is at full power already!",
-                    target.Name), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                owner.Out.SendMessage($"{target.Name} is at full power already!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
             }
             else
             {
                 SendEffectAnimation(target, 0, false, 1);
-                owner.Out.SendMessage(
-                    string.Format(
-                    "You transfer {0} power to {1}!",
-                    powerHealed, target.Name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                owner.Out.SendMessage($"You transfer {powerHealed} power to {target.Name}!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
 
-                if (target is GamePlayer)
-                {
-                    (target as GamePlayer).Out.SendMessage(
-                        string.Format(
-                        "{0} transfers {1} power to you!",
-                        owner.Name, powerHealed), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                }
+                (target as GamePlayer)?.Out.SendMessage($"{owner.Name} transfers {powerHealed} power to you!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -119,12 +107,7 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         protected virtual GamePlayer Owner()
         {
-            if (Caster is GamePlayer)
-            {
-                return Caster as GamePlayer;
-            }
-
-            return null;
+            return Caster as GamePlayer;
         }
 
         /// <summary>

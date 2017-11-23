@@ -34,20 +34,15 @@ namespace DOL.GS.Spells
     [SpellHandler("StrengthShear")]
     public class StrengthShear : AbstractBuffShear
     {
-        public override string ShearSpellType { get { return "StrengthBuff"; } }
+        public override string ShearSpellType => "StrengthBuff";
 
-        public override string DelveSpellType { get { return "Strength"; } }
+        public override string DelveSpellType => "Strength";
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
             base.OnDirectEffect(target, effectiveness);
-            GameSpellEffect effect;
-            effect = FindEffectOnTarget(target, "Mesmerize");
-            if (effect != null)
-            {
-                effect.Cancel(false);
-                return;
-            }
+            var effect = FindEffectOnTarget(target, "Mesmerize");
+            effect?.Cancel(false);
         }
 
         // constructor
@@ -60,9 +55,9 @@ namespace DOL.GS.Spells
     [SpellHandler("DexterityShear")]
     public class DexterityShear : AbstractBuffShear
     {
-        public override string ShearSpellType { get { return "DexterityBuff"; } }
+        public override string ShearSpellType => "DexterityBuff";
 
-        public override string DelveSpellType { get { return "Dexterity"; } }
+        public override string DelveSpellType => "Dexterity";
 
         // constructor
         public DexterityShear(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -74,9 +69,9 @@ namespace DOL.GS.Spells
     [SpellHandler("ConstitutionShear")]
     public class ConstitutionShear : AbstractBuffShear
     {
-        public override string ShearSpellType { get { return "ConstitutionBuff"; } }
+        public override string ShearSpellType => "ConstitutionBuff";
 
-        public override string DelveSpellType { get { return "Constitution"; } }
+        public override string DelveSpellType => "Constitution";
 
         // constructor
         public ConstitutionShear(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -88,9 +83,9 @@ namespace DOL.GS.Spells
     [SpellHandler("AcuityShear")]
     public class AcuityShear : AbstractBuffShear
     {
-        public override string ShearSpellType { get { return "AcuityBuff"; } }
+        public override string ShearSpellType => "AcuityBuff";
 
-        public override string DelveSpellType { get { return "Acuity"; } }
+        public override string DelveSpellType => "Acuity";
 
         // constructor
         public AcuityShear(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -102,9 +97,9 @@ namespace DOL.GS.Spells
     [SpellHandler("StrengthConstitutionShear")]
     public class StrengthConstitutionShear : AbstractBuffShear
     {
-        public override string ShearSpellType { get { return "StrengthConstitutionBuff"; } }
+        public override string ShearSpellType => "StrengthConstitutionBuff";
 
-        public override string DelveSpellType { get { return "Str/Con"; } }
+        public override string DelveSpellType => "Str/Con";
 
         // constructor
         public StrengthConstitutionShear(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -116,9 +111,9 @@ namespace DOL.GS.Spells
     [SpellHandler("DexterityQuicknessShear")]
     public class DexterityQuicknessShear : AbstractBuffShear
     {
-        public override string ShearSpellType { get { return "DexterityQuicknessBuff"; } }
+        public override string ShearSpellType => "DexterityQuicknessBuff";
 
-        public override string DelveSpellType { get { return "Dex/Qui"; } }
+        public override string DelveSpellType => "Dex/Qui";
 
         // constructor
         public DexterityQuicknessShear(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -144,7 +139,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -161,7 +156,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -177,8 +172,7 @@ namespace DOL.GS.Spells
             if (target is GameNPC)
             {
                 GameNPC npc = (GameNPC)target;
-                IOldAggressiveBrain aggroBrain = npc.Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
+                if (npc.Brain is IOldAggressiveBrain aggroBrain)
                 {
                     aggroBrain.AddToAggroList(Caster, 1);
                 }
@@ -208,14 +202,6 @@ namespace DOL.GS.Spells
 
             SendEffectAnimation(target, 0, false, 0);
             MessageToCaster("No enhancement of that type found on the target.", eChatType.CT_SpellResisted);
-
-            /*
-            if (!noMessages)
-            {
-                MessageToLiving(effect.Owner, effect.Spell.Message3, eChatType.CT_SpellExpires);
-                Message.SystemToArea(effect.Owner, Util.MakeSentence(effect.Spell.Message4, effect.Owner.GetName(0, false)), eChatType.CT_SpellExpires, effect.Owner);
-            }
-            */
         }
 
         /// <summary>
@@ -257,31 +243,31 @@ namespace DOL.GS.Spells
 
                 var list = new List<string>();
 
-                list.Add("Function: " + (Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType));
+                list.Add($"Function: {(Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType)}");
                 list.Add(" "); // empty line
                 list.Add(Spell.Description);
                 list.Add(" "); // empty line
-                list.Add("Type: " + DelveSpellType);
-                list.Add("Maximum strength of buffs removed: " + Spell.Value);
+                list.Add($"Type: {DelveSpellType}");
+                list.Add($"Maximum strength of buffs removed: {Spell.Value}");
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
                 if (Spell.Power != 0)
                 {
-                    list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                    list.Add($"Power cost: {Spell.Power:0;0'%'}");
                 }
 
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                list.Add($"Casting time: {Spell.CastTime * 0.001:0.0## sec;-0.0## sec;'instant'}");
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
                 if (Spell.DamageType != eDamageType.Natural)
                 {
-                    list.Add("Damage: " + GlobalConstants.DamageTypeToName(Spell.DamageType));
+                    list.Add($"Damage: {GlobalConstants.DamageTypeToName(Spell.DamageType)}");
                 }
 
                 return list;
@@ -301,7 +287,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -318,7 +304,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -327,8 +313,7 @@ namespace DOL.GS.Spells
             if (target is GameNPC)
             {
                 GameNPC npc = (GameNPC)target;
-                IOldAggressiveBrain aggroBrain = npc.Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
+                if (npc.Brain is IOldAggressiveBrain aggroBrain)
                 {
                     aggroBrain.AddToAggroList(Caster, 1);
                 }
@@ -339,7 +324,7 @@ namespace DOL.GS.Spells
             {
                 foreach (Type buffType in buffs)
                 {
-                    if (effect.SpellHandler.GetType().Equals(buffType))
+                    if (effect.SpellHandler.GetType() == buffType)
                     {
                         SendEffectAnimation(target, 0, false, 1);
                         effect.Cancel(false);
@@ -352,20 +337,20 @@ namespace DOL.GS.Spells
 
             SendEffectAnimation(target, 0, false, 0);
             MessageToCaster("No enhancement of that type found on the target.", eChatType.CT_SpellResisted);
-
-            /*
-            if (!noMessages)
-            {
-                MessageToLiving(effect.Owner, effect.Spell.Message3, eChatType.CT_SpellExpires);
-                Message.SystemToArea(effect.Owner, Util.MakeSentence(effect.Spell.Message4, effect.Owner.GetName(0, false)), eChatType.CT_SpellExpires, effect.Owner);
-            }
-            */
         }
 
-        private static Type[] buffs = new Type[] { typeof(AcuityBuff), typeof(StrengthBuff), typeof(DexterityBuff), typeof(ConstitutionBuff), typeof(StrengthConBuff), typeof(DexterityQuiBuff),
-            typeof(ArmorFactorBuff),typeof(ArmorAbsorptionBuff),typeof(HealthRegenSpellHandler),typeof(CombatSpeedBuff),typeof(PowerRegenSpellHandler),typeof(UninterruptableSpellHandler),typeof(WeaponSkillBuff),typeof(DPSBuff),typeof(EvadeChanceBuff),typeof(ParryChanceBuff),
-            typeof(ColdResistBuff),typeof(EnergyResistBuff),typeof(CrushResistBuff),typeof(ThrustResistBuff),typeof(SlashResistBuff),typeof(MatterResistBuff),typeof(BodyResistBuff),typeof(HeatResistBuff),typeof(SpiritResistBuff),typeof(BodySpiritEnergyBuff),typeof(HeatColdMatterBuff),typeof(CrushSlashThrustBuff),
-            typeof(EnduranceRegenSpellHandler),typeof(DamageAddSpellHandler),typeof(DamageShieldSpellHandler) };
+        private static readonly Type[] buffs = {
+            typeof(AcuityBuff), typeof(StrengthBuff), typeof(DexterityBuff), typeof(ConstitutionBuff),
+            typeof(StrengthConBuff), typeof(DexterityQuiBuff),
+            typeof(ArmorFactorBuff), typeof(ArmorAbsorptionBuff), typeof(HealthRegenSpellHandler),
+            typeof(CombatSpeedBuff), typeof(PowerRegenSpellHandler), typeof(UninterruptableSpellHandler),
+            typeof(WeaponSkillBuff), typeof(DPSBuff), typeof(EvadeChanceBuff), typeof(ParryChanceBuff),
+            typeof(ColdResistBuff), typeof(EnergyResistBuff), typeof(CrushResistBuff), typeof(ThrustResistBuff),
+            typeof(SlashResistBuff), typeof(MatterResistBuff), typeof(BodyResistBuff), typeof(HeatResistBuff),
+            typeof(SpiritResistBuff), typeof(BodySpiritEnergyBuff), typeof(HeatColdMatterBuff),
+            typeof(CrushSlashThrustBuff),
+            typeof(EnduranceRegenSpellHandler), typeof(DamageAddSpellHandler), typeof(DamageShieldSpellHandler)
+        };
 
         // constructor
         public RandomBuffShear(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }

@@ -30,8 +30,8 @@ namespace DOL.GS.Spells
     [SpellHandler("FocusShell")]
     public class FocusShellHandler : SpellHandler
     {
-        private GamePlayer FSTarget = null;
-        private FSTimer timer = null;
+        private GamePlayer FSTarget;
+        private FSTimer timer;
 
         public FocusShellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
@@ -51,10 +51,7 @@ namespace DOL.GS.Spells
                 {
                     GameSpellEffect currentEffect = (GameSpellEffect)Caster.TempProperties.getProperty<object>(FOCUS_SPELL, null);
 
-                    if (currentEffect != null && currentEffect.SpellHandler is FocusShellHandler)
-                    {
-                        (currentEffect.SpellHandler as FocusShellHandler).FocusSpellAction(null, Caster, null);
-                    }
+                    (currentEffect?.SpellHandler as FocusShellHandler)?.FocusSpellAction(null, Caster, null);
 
                     FSTarget = selectedTarget as GamePlayer;
                 }
@@ -135,8 +132,7 @@ namespace DOL.GS.Spells
 
         private void OnAttacked(DOLEvent e, object sender, EventArgs args)
         {
-            AttackedByEnemyEventArgs attackArgs = args as AttackedByEnemyEventArgs;
-            if (attackArgs == null || attackArgs.AttackData == null)
+            if (!(args is AttackedByEnemyEventArgs attackArgs) || attackArgs.AttackData == null)
             {
                 return;
             }
@@ -156,7 +152,7 @@ namespace DOL.GS.Spells
 
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -171,7 +167,7 @@ namespace DOL.GS.Spells
         private class FSTimer : RegionAction
         {
             // The handler for this timer
-            FocusShellHandler m_handler;
+            private readonly FocusShellHandler m_handler;
 
             public FSTimer(GameObject actionSource, FocusShellHandler handler) : base(actionSource)
             {

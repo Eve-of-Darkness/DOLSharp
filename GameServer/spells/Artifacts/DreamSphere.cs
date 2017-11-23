@@ -34,9 +34,8 @@ namespace DOL.GS.Spells
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                GamePlayer player = effect.Owner as GamePlayer;
                 foreach (GameSpellEffect Effect in player.EffectList.GetAllOfType<GameSpellEffect>())
                 {
                     if (Effect.SpellHandler.Spell.SpellType.Equals("ShadesOfMist") ||
@@ -46,7 +45,7 @@ namespace DOL.GS.Spells
                         Effect.SpellHandler.Spell.SpellType.Equals("AtlantisTabletMorph") ||
                         Effect.SpellHandler.Spell.SpellType.Equals("AlvarusMorph"))
                     {
-                        player.Out.SendMessage("You already have an active morph!", DOL.GS.PacketHandler.eChatType.CT_SpellResisted, DOL.GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        player.Out.SendMessage("You already have an active morph!", PacketHandler.eChatType.CT_SpellResisted, PacketHandler.eChatLoc.CL_ChatWindow);
                         return;
                     }
                 }
@@ -62,9 +61,8 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect,bool noMessages)
         {
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                GamePlayer player = effect.Owner as GamePlayer;
                 if (player.CharacterClass.ID != (byte)eCharacterClass.Necromancer)
                 {
                     player.Model = player.CreationModel;
@@ -94,7 +92,7 @@ namespace DOL.GS.Spells
     [SpellHandler("DreamGroupMorph")]
     public class DreamGroupMorph : DreamMorph
     {
-        private GameSpellEffect m_effect = null;
+        private GameSpellEffect m_effect;
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
@@ -110,30 +108,24 @@ namespace DOL.GS.Spells
                     Effect.SpellHandler.Spell.SpellType.Equals("AtlantisTabletMorph") ||
                     Effect.SpellHandler.Spell.SpellType.Equals("AlvarusMorph"))
                 {
-                    player.Out.SendMessage("You already have an active morph!", DOL.GS.PacketHandler.eChatType.CT_SpellResisted, DOL.GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                    player.Out.SendMessage("You already have an active morph!", PacketHandler.eChatType.CT_SpellResisted, PacketHandler.eChatLoc.CL_ChatWindow);
                     return;
                 }
             }
 
-            if (player == null)
-            {
-                return;
-            }
-
             // GameEventMgr.AddHandler(player, GamePlayerEvent.TakeDamage, new DOLEventHandler(LivingTakeDamage));
-            GameEventMgr.AddHandler(player, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(LivingTakeDamage));
+            GameEventMgr.AddHandler(player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(LivingTakeDamage));
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player == null)
+            if (!(effect.Owner is GamePlayer player))
             {
                 return base.OnEffectExpires(effect, noMessages);
             }
 
             // GameEventMgr.RemoveHandler(player, GamePlayerEvent.TakeDamage, new DOLEventHandler(LivingTakeDamage));
-            GameEventMgr.RemoveHandler(player, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(LivingTakeDamage));
+            GameEventMgr.RemoveHandler(player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(LivingTakeDamage));
             return base.OnEffectExpires(effect, noMessages);
         }
 

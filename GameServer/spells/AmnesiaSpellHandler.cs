@@ -35,7 +35,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -69,10 +69,10 @@ namespace DOL.GS.Spells
 
             SendEffectAnimation(target, 0, false, 1);
 
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                ((GamePlayer)target).NextCombatStyle = null;
-                ((GamePlayer)target).NextCombatBackupStyle = null;
+                player.NextCombatStyle = null;
+                player.NextCombatBackupStyle = null;
             }
 
             target.StopCurrentSpellcast(); // stop even if MoC or QC
@@ -82,24 +82,18 @@ namespace DOL.GS.Spells
                 MessageToLiving(target, LanguageMgr.GetTranslation((target as GamePlayer).Client, "Amnesia.MessageToTarget"), eChatType.CT_Spell);
             }
 
-            GameSpellEffect effect;
-            effect = FindEffectOnTarget(target, "Mesmerize");
+            var effect = FindEffectOnTarget(target, "Mesmerize");
             if (effect != null)
             {
                 effect.Cancel(false);
                 return;
             }
 
-            if (target is GameNPC)
+            if (target is GameNPC npc && npc.Brain is IOldAggressiveBrain aggroBrain)
             {
-                GameNPC npc = (GameNPC)target;
-                IOldAggressiveBrain aggroBrain = npc.Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
+                if (Util.Chance(Spell.AmnesiaChance))
                 {
-                    if (Util.Chance(Spell.AmnesiaChance))
-                    {
-                        aggroBrain.ClearAggroList();
-                    }
+                    aggroBrain.ClearAggroList();
                 }
             }
         }

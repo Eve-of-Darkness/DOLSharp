@@ -27,11 +27,7 @@ namespace DOL.AI.Brain
         /// <summary>
         /// Fixed thinking Interval for Fleeing
         /// </summary>
-        public override int ThinkInterval {
-            get {
-                return 3000;
-            }
-        }
+        public override int ThinkInterval => 3000;
 
         /// <summary>
         /// Flee from Players on Brain Think

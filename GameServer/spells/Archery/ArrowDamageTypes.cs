@@ -8,18 +8,12 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Does this spell break stealth on finish?
         /// </summary>
-        public override bool UnstealthCasterOnFinish
-        {
-            get { return false; }
-        }
+        public override bool UnstealthCasterOnFinish => false;
 
         /// <summary>
         /// Does this spell break stealth on start?
         /// </summary>
-        public override bool UnstealthCasterOnStart
-        {
-            get { return false; }
-        }
+        public override bool UnstealthCasterOnStart => false;
 
         public ArrowDamageTypes(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }

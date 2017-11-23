@@ -10,8 +10,8 @@ namespace DOL.GS.Spells
     [SpellHandler("HereticPiercingMagic")]
     public class HereticPiercingMagic : SpellHandler
     {
-        protected GameLiving focustarget = null;
-        protected ArrayList m_focusTargets = null;
+        protected GameLiving focustarget;
+        protected ArrayList m_focusTargets;
 
         public override void FinishSpellCast(GameLiving target)
         {
@@ -26,8 +26,7 @@ namespace DOL.GS.Spells
             {
                 m_focusTargets = new ArrayList();
             }
-
-            GameLiving living = effect.Owner as GameLiving;
+            
             lock (m_focusTargets.SyncRoot)
             {
                 if (!m_focusTargets.Contains(effect.Owner))
@@ -41,18 +40,16 @@ namespace DOL.GS.Spells
 
         protected virtual void BeginEffect()
         {
-            GameEventMgr.AddHandler(m_caster, GamePlayerEvent.AttackFinished, new DOLEventHandler(EventAction));
-            GameEventMgr.AddHandler(m_caster, GamePlayerEvent.CastStarting, new DOLEventHandler(EventAction));
-            GameEventMgr.AddHandler(m_caster, GamePlayerEvent.Moving, new DOLEventHandler(EventAction));
-            GameEventMgr.AddHandler(m_caster, GamePlayerEvent.Dying, new DOLEventHandler(EventAction));
-            GameEventMgr.AddHandler(m_caster, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(EventAction));
+            GameEventMgr.AddHandler(Caster, GameLivingEvent.AttackFinished, new DOLEventHandler(EventAction));
+            GameEventMgr.AddHandler(Caster, GameLivingEvent.CastStarting, new DOLEventHandler(EventAction));
+            GameEventMgr.AddHandler(Caster, GameLivingEvent.Moving, new DOLEventHandler(EventAction));
+            GameEventMgr.AddHandler(Caster, GameLivingEvent.Dying, new DOLEventHandler(EventAction));
+            GameEventMgr.AddHandler(Caster, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(EventAction));
         }
 
         public void EventAction(DOLEvent e, object sender, EventArgs args)
         {
-            GameLiving player = sender as GameLiving;
-
-            if (player == null)
+            if (!(sender is GameLiving))
             {
                 return;
             }
@@ -70,10 +67,7 @@ namespace DOL.GS.Spells
                     foreach (GameLiving living in m_focusTargets)
                     {
                         GameSpellEffect effect = FindEffectOnTarget(living, this);
-                        if (effect != null)
-                        {
-                            effect.Cancel(false);
-                        }
+                        effect?.Cancel(false);
                     }
                 }
             }
@@ -84,14 +78,14 @@ namespace DOL.GS.Spells
                 CancelPulsingSpell(Caster, Spell.SpellType);
             }
 
-            GameEventMgr.RemoveHandler(m_caster, GamePlayerEvent.AttackFinished, new DOLEventHandler(EventAction));
-            GameEventMgr.RemoveHandler(m_caster, GamePlayerEvent.CastStarting, new DOLEventHandler(EventAction));
-            GameEventMgr.RemoveHandler(m_caster, GamePlayerEvent.Moving, new DOLEventHandler(EventAction));
-            GameEventMgr.RemoveHandler(m_caster, GamePlayerEvent.Dying, new DOLEventHandler(EventAction));
-            GameEventMgr.RemoveHandler(m_caster, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(EventAction));
-            foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            GameEventMgr.RemoveHandler(Caster, GameLivingEvent.AttackFinished, new DOLEventHandler(EventAction));
+            GameEventMgr.RemoveHandler(Caster, GameLivingEvent.CastStarting, new DOLEventHandler(EventAction));
+            GameEventMgr.RemoveHandler(Caster, GameLivingEvent.Moving, new DOLEventHandler(EventAction));
+            GameEventMgr.RemoveHandler(Caster, GameLivingEvent.Dying, new DOLEventHandler(EventAction));
+            GameEventMgr.RemoveHandler(Caster, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(EventAction));
+            foreach (GamePlayer player in Caster.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                player.Out.SendInterruptAnimation(m_caster);
+                player.Out.SendInterruptAnimation(Caster);
             }
         }
 

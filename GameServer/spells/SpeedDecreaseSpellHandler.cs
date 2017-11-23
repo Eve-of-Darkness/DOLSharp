@@ -66,10 +66,7 @@ namespace DOL.GS.Spells
 
             // Cancels mezz on the effect owner, if applied
             GameSpellEffect mezz = FindEffectOnTarget(effect.Owner, "Mesmerize");
-            if (mezz != null)
-            {
-                mezz.Cancel(false);
-            }
+            mezz?.Cancel(false);
         }
 
         /// <summary>
@@ -110,10 +107,7 @@ namespace DOL.GS.Spells
                 case GameLiving.eAttackResult.HitStyle:
                 case GameLiving.eAttackResult.HitUnstyled:
                     GameSpellEffect effect = FindEffectOnTarget(living, this);
-                    if (effect != null)
-                    {
-                        effect.Cancel(false);
-                    }
+                    effect?.Cancel(false);
 
                     break;
             }

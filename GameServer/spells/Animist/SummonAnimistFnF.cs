@@ -40,11 +40,11 @@ namespace DOL.GS.Spells
 
             Region rgn = WorldMgr.GetRegion(Caster.CurrentRegion.ID);
 
-            if (rgn == null || rgn.GetZone(Caster.GroundTarget.X, Caster.GroundTarget.Y) == null)
+            if (rgn?.GetZone(Caster.GroundTarget.X, Caster.GroundTarget.Y) == null)
             {
-                if (Caster is GamePlayer)
+                if (Caster is GamePlayer player)
                 {
-                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonAnimistFnF.CheckBeginCast.NoGroundTarget"), eChatType.CT_SpellResisted);
+                    MessageToCaster(LanguageMgr.GetTranslation(player.Client, "SummonAnimistFnF.CheckBeginCast.NoGroundTarget"), eChatType.CT_SpellResisted);
                 }
 
                 return false;
@@ -60,9 +60,9 @@ namespace DOL.GS.Spells
 
             if (nCount >= Properties.TURRET_AREA_CAP_COUNT)
             {
-                if (Caster is GamePlayer)
+                if (Caster is GamePlayer player)
                 {
-                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonAnimistFnF.CheckBeginCast.TurretAreaCap"), eChatType.CT_SpellResisted);
+                    MessageToCaster(LanguageMgr.GetTranslation(player.Client, "SummonAnimistFnF.CheckBeginCast.TurretAreaCap"), eChatType.CT_SpellResisted);
                 }
 
                 return false;
@@ -70,9 +70,9 @@ namespace DOL.GS.Spells
 
             if (Caster.PetCount >= Properties.TURRET_PLAYER_CAP_COUNT)
             {
-                if (Caster is GamePlayer)
+                if (Caster is GamePlayer player)
                 {
-                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonAnimistFnF.CheckBeginCast.TurretPlayerCap"), eChatType.CT_SpellResisted);
+                    MessageToCaster(LanguageMgr.GetTranslation(player.Client, "SummonAnimistFnF.CheckBeginCast.TurretPlayerCap"), eChatType.CT_SpellResisted);
                 }
 
                 return false;
@@ -85,18 +85,18 @@ namespace DOL.GS.Spells
         {
             base.ApplyEffectOnTarget(target, effectiveness);
 
-            if (Spell.SubSpellID > 0 && SkillBase.GetSpellByID(Spell.SubSpellID) != null)
+            if (Spell.SubSpellId > 0 && SkillBase.GetSpellByID(Spell.SubSpellId) != null)
             {
-                m_pet.Spells.Add(SkillBase.GetSpellByID(Spell.SubSpellID));
+                m_pet.Spells.Add(SkillBase.GetSpellByID(Spell.SubSpellId));
             }
 
-            (m_pet.Brain as TurretBrain).IsMainPet = false;
+            ((TurretBrain) m_pet.Brain).IsMainPet = false;
 
-            (m_pet.Brain as IOldAggressiveBrain).AddToAggroList(target, 1);
+            ((IOldAggressiveBrain) m_pet.Brain)?.AddToAggroList(target, 1);
             (m_pet.Brain as TurretBrain).Think();
 
             // [Ganrod] Nidel: Set only one spell.
-            (m_pet as TurretPet).TurretSpell = m_pet.Spells[0] as Spell;
+            ((TurretPet) m_pet).TurretSpell = m_pet.Spells[0] as Spell;
             Caster.PetCount++;
         }
 
@@ -113,12 +113,8 @@ namespace DOL.GS.Spells
         protected override void OnNpcReleaseCommand(DOLEvent e, object sender, EventArgs arguments)
         {
             m_pet = sender as GamePet;
-            if (m_pet == null)
-            {
-                return;
-            }
 
-            if ((m_pet.Brain as TurretFNFBrain) == null)
+            if (!(m_pet?.Brain is TurretFNFBrain))
             {
                 return;
             }
@@ -131,10 +127,7 @@ namespace DOL.GS.Spells
             GameEventMgr.RemoveHandler(m_pet, GameLivingEvent.PetReleased, OnNpcReleaseCommand);
 
             GameSpellEffect effect = FindEffectOnTarget(m_pet, this);
-            if (effect != null)
-            {
-                effect.Cancel(false);
-            }
+            effect?.Cancel(false);
         }
 
         protected override byte GetPetLevel()

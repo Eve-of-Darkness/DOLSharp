@@ -41,18 +41,16 @@ namespace DOL.GS.Spells
             }
 
             bool healed = false;
-            int minHeal;
-            int maxHeal;
-            CalculateHealVariance(out minHeal, out maxHeal);
+            CalculateHealVariance(out var minHeal, out var maxHeal);
 
             foreach (GameLiving healTarget in targets)
             {
-                if (healTarget is GamePlayer
+                if (healTarget is GamePlayer player
                     && (
-                    ((GamePlayer)healTarget).CharacterClass is PlayerClass.ClassVampiir
-                    || ((GamePlayer)healTarget).CharacterClass is PlayerClass.ClassMaulerAlb
-                    || ((GamePlayer)healTarget).CharacterClass is PlayerClass.ClassMaulerHib
-                    || ((GamePlayer)healTarget).CharacterClass is PlayerClass.ClassMaulerMid))
+                        player.CharacterClass is PlayerClass.ClassVampiir
+                        || player.CharacterClass is PlayerClass.ClassMaulerAlb
+                        || player.CharacterClass is PlayerClass.ClassMaulerHib
+                        || player.CharacterClass is PlayerClass.ClassMaulerMid))
                 {
                     continue;
                 }
@@ -64,11 +62,11 @@ namespace DOL.GS.Spells
             // group heals seem to use full power even if no heals
             if (!healed && Spell.Target == "Realm")
             {
-                m_caster.Mana -= PowerCost(target) >> 1; // only 1/2 power if no heal
+                Caster.Mana -= PowerCost(target) >> 1; // only 1/2 power if no heal
             }
             else
             {
-                m_caster.Mana -= PowerCost(target);
+                Caster.Mana -= PowerCost(target);
             }
 
             // send animation for non pulsing spells only
@@ -105,7 +103,7 @@ namespace DOL.GS.Spells
         /// <returns>true if heal was done</returns>
         public virtual bool HealTarget(GameLiving target, int amount)
         {
-            if (target == null || target.ObjectState != GameLiving.eObjectState.Active)
+            if (target == null || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return false;
             }
@@ -119,7 +117,7 @@ namespace DOL.GS.Spells
             if (!target.IsAlive)
             {
                 // "You cannot heal the dead!" sshot550.tga
-                MessageToCaster(target.GetName(0, true) + " is dead!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.GetName(0, true)} is dead!", eChatType.CT_SpellResisted);
                 return false;
             }
 
@@ -129,22 +127,22 @@ namespace DOL.GS.Spells
             {
                 if (Spell.Pulse == 0)
                 {
-                    if (target == m_caster)
+                    if (target == Caster)
                     {
                         MessageToCaster("Your power is full.", eChatType.CT_SpellResisted);
                     }
                     else
                     {
-                        MessageToCaster(target.GetName(0, true) + " power is full.", eChatType.CT_SpellResisted);
+                        MessageToCaster($"{target.GetName(0, true)} power is full.", eChatType.CT_SpellResisted);
                     }
                 }
 
                 return false;
             }
 
-            if (m_caster == target)
+            if (Caster == target)
             {
-                MessageToCaster("You restore " + heal + " power points.", eChatType.CT_Spell);
+                MessageToCaster($"You restore {heal} power points.", eChatType.CT_Spell);
                 if (heal < amount)
                 {
                     MessageToCaster("Your power is full.", eChatType.CT_Spell);
@@ -152,11 +150,11 @@ namespace DOL.GS.Spells
             }
             else
             {
-                MessageToCaster("You restore " + target.GetName(0, false) + " for " + heal + " power points!", eChatType.CT_Spell);
-                MessageToLiving(target, "Your power was restored by " + m_caster.GetName(0, false) + " for " + heal + " points.", eChatType.CT_Spell);
+                MessageToCaster($"You restore {target.GetName(0, false)} for {heal} power points!", eChatType.CT_Spell);
+                MessageToLiving(target, $"Your power was restored by {Caster.GetName(0, false)} for {heal} points.", eChatType.CT_Spell);
                 if (heal < amount)
                 {
-                    MessageToCaster(target.GetName(0, true) + " mana is full.", eChatType.CT_Spell);
+                    MessageToCaster($"{target.GetName(0, true)} mana is full.", eChatType.CT_Spell);
                 }
             }
 
@@ -170,17 +168,15 @@ namespace DOL.GS.Spells
         /// <param name="max">store max variance here</param>
         public virtual void CalculateHealVariance(out int min, out int max)
         {
-            double spellValue = m_spell.Value;
-            GamePlayer casterPlayer = m_caster as GamePlayer;
+            double spellValue = Spell.Value;
 
             // percents if less than zero
             if (spellValue < 0)
             {
-                spellValue = (spellValue * -0.01) * m_caster.MaxMana;
+                spellValue = spellValue * -0.01 * Caster.MaxMana;
             }
 
             min = max = (int)spellValue;
-            return;
         }
     }
 }

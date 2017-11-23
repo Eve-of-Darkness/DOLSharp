@@ -31,9 +31,9 @@ namespace DOL.GS.Spells
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
-            if (Caster is GamePlayer && ((GamePlayer)Caster).ControlledBrain != null)
+            if (Caster is GamePlayer player && player.ControlledBrain != null)
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "Summon.CheckBeginCast.AlreadyHaveaPet"), eChatType.CT_SpellResisted);
+                MessageToCaster(LanguageMgr.GetTranslation(player.Client, "Summon.CheckBeginCast.AlreadyHaveaPet"), eChatType.CT_SpellResisted);
                 return false;
             }
 

@@ -8,9 +8,8 @@ namespace DOL.GS.Spells
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                GamePlayer player = effect.Owner as GamePlayer;
                 foreach (GameSpellEffect Effect in player.EffectList.GetAllOfType<GameSpellEffect>())
                 {
                     if (Effect.SpellHandler.Spell.SpellType.Equals("ShadesOfMist") ||
@@ -20,7 +19,7 @@ namespace DOL.GS.Spells
                         Effect.SpellHandler.Spell.SpellType.Equals("MaddeningScalars") ||
                         Effect.SpellHandler.Spell.SpellType.Equals("AlvarusMorph"))
                     {
-                        player.Out.SendMessage("You already have an active morph!", DOL.GS.PacketHandler.eChatType.CT_SpellResisted, DOL.GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        player.Out.SendMessage("You already have an active morph!", PacketHandler.eChatType.CT_SpellResisted, PacketHandler.eChatLoc.CL_ChatWindow);
                         return;
                     }
                 }
@@ -36,9 +35,8 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect,bool noMessages)
         {
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                GamePlayer player = effect.Owner as GamePlayer;
                 if (player.CharacterClass.ID != (byte)eCharacterClass.Necromancer)
                 {
                     player.Model = player.CreationModel;

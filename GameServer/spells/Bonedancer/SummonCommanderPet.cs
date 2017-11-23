@@ -39,7 +39,7 @@ namespace DOL.GS.Spells
         {
             if (Caster is GamePlayer && ((GamePlayer)Caster).ControlledBrain != null)
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonCommanderPet.CheckBeginCast.Text"), eChatType.CT_SpellResisted);
+                MessageToCaster(LanguageMgr.GetTranslation(((GamePlayer) Caster).Client, "SummonCommanderPet.CheckBeginCast.Text"), eChatType.CT_SpellResisted);
                 return false;
             }
 
@@ -53,7 +53,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            CommanderPet pet = sender as CommanderPet;
+            CommanderPet pet = (CommanderPet) sender;
 
             if (pet.ControlledNpcList != null)
             {
@@ -87,13 +87,13 @@ namespace DOL.GS.Spells
             get
             {
                 var delve = new List<string>();
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonCommanderPet.DelveInfo.Text1"));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonCommanderPet.DelveInfo.Text1"));
                 delve.Add(string.Empty);
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonCommanderPet.DelveInfo.Text2"));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonCommanderPet.DelveInfo.Text2"));
                 delve.Add(string.Empty);
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonCommanderPet.DelveInfo.Text3", Spell.Target));
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonCommanderPet.DelveInfo.Text4", Math.Abs(Spell.Power)));
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonCommanderPet.DelveInfo.Text5", (Spell.CastTime / 1000).ToString("0.0## " + LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "Effects.DelveInfo.Seconds"))));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonCommanderPet.DelveInfo.Text3", Spell.Target));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonCommanderPet.DelveInfo.Text4", Math.Abs(Spell.Power)));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonCommanderPet.DelveInfo.Text5", (Spell.CastTime / 1000).ToString("0.0## " + LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "Effects.DelveInfo.Seconds"))));
                 return delve;
             }
         }

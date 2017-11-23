@@ -31,12 +31,12 @@ namespace DOL.GS.Spells
         public override void CalculateDamageVariance(GameLiving target, out double min, out double max)
         {
             int speclevel = 1;
-            if (Caster is GamePlayer)
+            if (Caster is GamePlayer player)
             {
-                speclevel = ((GamePlayer)Caster).GetModifiedSpecLevel(Specs.Stealth);
-                if (speclevel > ((GamePlayer)Caster).Level)
+                speclevel = player.GetModifiedSpecLevel(Specs.Stealth);
+                if (speclevel > player.Level)
                 {
-                    speclevel = ((GamePlayer)Caster).Level;
+                    speclevel = player.Level;
                 }
             }
 
@@ -73,9 +73,8 @@ namespace DOL.GS.Spells
         public override double CalculateDamageBase(GameLiving target)
         {
             double spellDamage = Spell.Damage;
-            GamePlayer player = Caster as GamePlayer;
 
-            if (player != null)
+            if (Caster is GamePlayer player)
             {
                 int dexValue = player.GetModified((eProperty)player.Dexterity);
                 spellDamage *= (dexValue + 300) / 275.0;

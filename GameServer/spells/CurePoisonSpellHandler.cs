@@ -31,9 +31,7 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // RR4: now it's a list
-            m_spellTypesToRemove = new List<string>();
-            m_spellTypesToRemove.Add("DamageOverTime");
-            m_spellTypesToRemove.Add("StyleBleeding");
+            SpellTypesToRemove = new List<string> {"DamageOverTime", "StyleBleeding"};
         }
     }
 }

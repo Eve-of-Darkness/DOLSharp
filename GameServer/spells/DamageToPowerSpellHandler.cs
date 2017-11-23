@@ -36,26 +36,26 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!m_caster.IsAlive)
+            if (!Caster.IsAlive)
             {
                 return;
             }
 
-            int heal = (ad.Damage + ad.CriticalDamage) * m_spell.LifeDrainReturn / 100;
+            int heal = (ad.Damage + ad.CriticalDamage) * Spell.LifeDrainReturn / 100;
 
             // Return the spell power? + % calculated on HP value and caster maxmana
-            double manareturned = m_spell.Power + (heal * m_caster.MaxMana / 100);
+            double manareturned = Spell.Power + (heal * Caster.MaxMana / 100);
 
             if (heal <= 0)
             {
                 return;
             }
 
-            heal = m_caster.ChangeMana(m_caster, GameLiving.eManaChangeType.Spell, (int)manareturned);
+            heal = Caster.ChangeMana(Caster, GameLiving.eManaChangeType.Spell, (int)manareturned);
 
             if (heal > 0)
             {
-                MessageToCaster("You steal " + heal + " power point" + (heal == 1 ? "." : "s."), eChatType.CT_Spell);
+                MessageToCaster($"You steal {heal} power point{(heal == 1 ? "." : "s.")}", eChatType.CT_Spell);
             }
             else
             {

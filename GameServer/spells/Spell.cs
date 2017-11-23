@@ -30,130 +30,53 @@ namespace DOL.GS
     /// </summary>
     public class Spell : Skill, ICustomParamsValuable
     {
-        protected readonly string m_description = string.Empty;
-        protected readonly string m_target = string.Empty;
-        protected readonly string m_spelltype = "-";
-        protected readonly int m_range = 0;
-        protected readonly int m_radius = 0;
-        protected double m_value = 0;
-        protected double m_damage = 0;
-        protected readonly eDamageType m_damageType = eDamageType.Natural;
-        protected readonly byte m_concentration = 0;
-        protected int m_duration = 0;
-        protected readonly int m_frequency = 0;
-        protected readonly int m_pulse = 0;
-        protected readonly int m_pulse_power = 0;
-        protected readonly int m_power = 0;
-        protected readonly int m_casttime = 0;
-        protected readonly int m_recastdelay = 0;
-        protected readonly int m_reshealth = 0;
-        protected readonly int m_resmana = 0;
-        protected readonly int m_lifedrain_return = 0;
-        protected readonly int m_amnesia_chance = 0;
-        protected readonly string m_message1 = string.Empty;
-        protected readonly string m_message2 = string.Empty;
-        protected readonly string m_message3 = string.Empty;
-        protected readonly string m_message4 = string.Empty;
-        protected readonly ushort m_effectID = 0;
-        protected readonly int m_instrumentRequirement = 0;
-        protected readonly int m_spellGroup = 0;
-        protected readonly int m_effectGroup = 0;
-        protected readonly int m_subSpellID = 0;
-        protected readonly int m_sharedtimergroup = 0;
-        protected readonly bool m_moveCast = false;
-        protected readonly bool m_uninterruptible = false;
-        protected readonly bool m_isfocus = false;
-        protected readonly bool m_minotaurspell = false;
+        protected readonly int m_range;
+        protected readonly int m_power;
+        protected readonly int m_casttime;
+        protected readonly bool m_minotaurspell;
 
         // warlocks
-        protected readonly bool m_isprimary = false;
-        protected readonly bool m_issecondary = false;
-        protected bool m_inchamber = false;
-        protected bool m_costpower = true;
-        protected readonly bool m_allowbolt = false;
-        protected int m_overriderange = 0;
-        protected bool m_isShearable = false;
 
         // tooltip
         protected ushort m_tooltipId = 0;
 
         // params
-        protected Dictionary<string, List<string>> m_paramCache = null;
 
-        public Dictionary<string, List<string>> CustomParamsDictionary
-        {
-            get { return m_paramCache; }
-            set { m_paramCache = value; }
-        }
+        public Dictionary<string, List<string>> CustomParamsDictionary { get; set; }
 
         #region member access properties
         #region warlocks
-        public bool IsPrimary
-        {
-            get { return m_isprimary; }
-        }
+        public bool IsPrimary { get; }
 
-        public bool IsSecondary
-        {
-            get { return m_issecondary; }
-        }
+        public bool IsSecondary { get; }
 
-        public bool InChamber
-        {
-            get { return m_inchamber; }
-            set { m_inchamber = value; }
-        }
+        public bool InChamber { get; set; }
 
-        public bool CostPower
-        {
-            get { return m_costpower; }
-            set { m_costpower = value; }
-        }
+        public bool CostPower { get; set; } = true;
 
-        public bool AllowBolt
-        {
-            get { return m_allowbolt; }
-        }
+        public bool AllowBolt { get; }
 
-        public int OverrideRange
-        {
-            get { return m_overriderange; }
-            set { m_overriderange = value; }
-        }
+        public int OverrideRange { get; set; }
 
         #endregion
-        public ushort ClientEffect
-        {
-            get { return m_effectID; }
-        }
+        public ushort ClientEffect { get; }
 
-        public string Description
-        {
-            get { return m_description; }
-        }
+        public string Description { get; } = string.Empty;
 
-        public int SharedTimerGroup
-        {
-            get { return m_sharedtimergroup; }
-        }
+        public int SharedTimerGroup { get; }
 
-        public string Target
-        {
-            get { return m_target; }
-        }
+        public string Target { get; } = string.Empty;
 
         public int Range
         {
             get
             {
-                if (m_overriderange != 0 && m_range != 0)
+                if (OverrideRange != 0 && m_range != 0)
                 {
-                    return m_overriderange;
+                    return OverrideRange;
                 }
-                else
-                {
-                    return m_range;
-                }
+
+                return m_range;
             }
         }
 
@@ -161,14 +84,12 @@ namespace DOL.GS
         {
             get
             {
-                if (!m_costpower)
+                if (!CostPower)
                 {
                     return 0;
                 }
-                else
-                {
-                    return m_power;
-                }
+
+                return m_power;
             }
         }
 
@@ -176,151 +97,73 @@ namespace DOL.GS
         {
             get
             {
-                if (m_inchamber)
+                if (InChamber)
                 {
                     return 0;
                 }
-                else
-                {
-                    return m_casttime;
-                }
+
+                return m_casttime;
             }
         }
 
-        public double Damage
-        {
-            get { return m_damage; }
-            set { m_damage = value; }
-        }
+        public double Damage { get; set; }
 
-        public eDamageType DamageType
-        {
-            get { return m_damageType; }
-        }
+        public eDamageType DamageType { get; } = eDamageType.Natural;
 
-        public string SpellType
-        {
-            get { return m_spelltype; }
-        }
+        public string SpellType { get; } = "-";
 
-        public int Duration
-        {
-            get { return m_duration; }
-            set { m_duration = value; }
-        }
+        public int Duration { get; set; }
 
-        public int Frequency
-        {
-            get { return m_frequency; }
-        }
+        public int Frequency { get; }
 
-        public int Pulse
-        {
-            get { return m_pulse; }
-        }
+        public int Pulse { get; }
 
-        public int PulsePower
-        {
-            get { return m_pulse_power; }
-        }
+        public int PulsePower { get; }
 
-        public int Radius
-        {
-            get { return m_radius; }
-        }
+        public int Radius { get; }
 
-        public int RecastDelay
-        {
-            get { return m_recastdelay; }
-        }
+        public int RecastDelay { get; }
 
-        public int ResurrectHealth
-        {
-            get { return m_reshealth; }
-        }
+        public int ResurrectHealth { get; }
 
-        public int ResurrectMana
-        {
-            get { return m_resmana; }
-        }
+        public int ResurrectMana { get; }
 
-        public double Value
-        {
-            get { return m_value; }
-            set { m_value = value; }
-        }
+        public double Value { get; set; }
 
-        public byte Concentration
-        {
-            get { return m_concentration; }
-        }
+        public byte Concentration { get; }
 
-        public int LifeDrainReturn
-        {
-            get { return m_lifedrain_return; }
-        }
+        public int LifeDrainReturn { get; }
 
-        public int AmnesiaChance
-        {
-            get { return m_amnesia_chance; }
-        }
+        public int AmnesiaChance { get; }
 
-        public string Message1 { get { return m_message1; } }
+        public string Message1 { get; } = string.Empty;
 
-        public string Message2 { get { return m_message2; } }
+        public string Message2 { get; } = string.Empty;
 
-        public string Message3 { get { return m_message3; } }
+        public string Message3 { get; } = string.Empty;
 
-        public string Message4 { get { return m_message4; } }
+        public string Message4 { get; } = string.Empty;
 
-        public override eSkillPage SkillType
-        {
-            get { return NeedInstrument ? eSkillPage.Songs : eSkillPage.Spells; }
-        }
+        public override eSkillPage SkillType => NeedInstrument ? eSkillPage.Songs : eSkillPage.Spells;
 
-        public int InstrumentRequirement
-        {
-            get { return m_instrumentRequirement; }
-        }
+        public int InstrumentRequirement { get; }
 
-        public int Group
-        {
-            get { return m_spellGroup; }
-        }
+        public int Group { get; }
 
-        public int EffectGroup
-        {
-            get { return m_effectGroup; }
-        }
+        public int EffectGroup { get; }
 
-        public int SubSpellID
-        {
-            get { return m_subSpellID; }
-        }
+        public int SubSpellId { get; }
 
-        public bool MoveCast
-        {
-            get { return m_moveCast; }
-        }
+        public bool MoveCast { get; }
 
-        public bool Uninterruptible
-        {
-            get { return m_uninterruptible; }
-        }
+        public bool Uninterruptible { get; }
 
-        public bool IsFocus
-        {
-            get { return m_isfocus; }
-        }
+        public bool IsFocus { get; }
 
         /// <summary>
         /// This spell can be sheared even if cast by self
         /// </summary>
-        public bool IsShearable
-        {
-            get { return m_isShearable; }
-            set { m_isShearable = value; }
-        }
+        public bool IsShearable { get; set; } = false;
 
         /// <summary>
         /// Whether or not this spell is harmful.
@@ -329,8 +172,8 @@ namespace DOL.GS
         {
             get
             {
-                return Target.ToLower() == "enemy" || Target.ToLower() == "area" ||
-                    Target.ToLower() == "cone";
+                var target = Target.ToLower();
+                return target == "enemy" || target == "area" || target == "cone";
             }
         }
 
@@ -357,44 +200,44 @@ namespace DOL.GS
         public Spell(DBSpell dbspell, int requiredLevel, bool minotaur)
             : base(dbspell.Name, dbspell.SpellID, (ushort)dbspell.Icon, requiredLevel, dbspell.TooltipId)
         {
-            m_description = dbspell.Description;
-            m_target = dbspell.Target;
-            m_spelltype = dbspell.Type;
+            Description = dbspell.Description;
+            Target = dbspell.Target;
+            SpellType = dbspell.Type;
             m_range = dbspell.Range;
-            m_radius = dbspell.Radius;
-            m_value = dbspell.Value;
-            m_damage = dbspell.Damage;
-            m_damageType = (eDamageType)dbspell.DamageType;
-            m_concentration = (byte)dbspell.Concentration;
-            m_duration = dbspell.Duration * 1000;
-            m_frequency = dbspell.Frequency * 100;
-            m_pulse = dbspell.Pulse;
-            m_pulse_power = dbspell.PulsePower;
+            Radius = dbspell.Radius;
+            Value = dbspell.Value;
+            Damage = dbspell.Damage;
+            DamageType = (eDamageType)dbspell.DamageType;
+            Concentration = (byte)dbspell.Concentration;
+            Duration = dbspell.Duration * 1000;
+            Frequency = dbspell.Frequency * 100;
+            Pulse = dbspell.Pulse;
+            PulsePower = dbspell.PulsePower;
             m_power = dbspell.Power;
             m_casttime = (int)(dbspell.CastTime * 1000);
-            m_recastdelay = dbspell.RecastDelay * 1000;
-            m_reshealth = dbspell.ResurrectHealth;
-            m_resmana = dbspell.ResurrectMana;
-            m_lifedrain_return = dbspell.LifeDrainReturn;
-            m_amnesia_chance = dbspell.AmnesiaChance;
-            m_message1 = dbspell.Message1;
-            m_message2 = dbspell.Message2;
-            m_message3 = dbspell.Message3;
-            m_message4 = dbspell.Message4;
-            m_effectID = (ushort)dbspell.ClientEffect;
-            m_instrumentRequirement = dbspell.InstrumentRequirement;
-            m_spellGroup = dbspell.SpellGroup;
-            m_effectGroup = dbspell.EffectGroup;
-            m_subSpellID = dbspell.SubSpellID;
-            m_moveCast = dbspell.MoveCast;
-            m_uninterruptible = dbspell.Uninterruptible;
-            m_isfocus = dbspell.IsFocus;
+            RecastDelay = dbspell.RecastDelay * 1000;
+            ResurrectHealth = dbspell.ResurrectHealth;
+            ResurrectMana = dbspell.ResurrectMana;
+            LifeDrainReturn = dbspell.LifeDrainReturn;
+            AmnesiaChance = dbspell.AmnesiaChance;
+            Message1 = dbspell.Message1;
+            Message2 = dbspell.Message2;
+            Message3 = dbspell.Message3;
+            Message4 = dbspell.Message4;
+            ClientEffect = (ushort)dbspell.ClientEffect;
+            InstrumentRequirement = dbspell.InstrumentRequirement;
+            Group = dbspell.SpellGroup;
+            EffectGroup = dbspell.EffectGroup;
+            SubSpellId = dbspell.SubSpellID;
+            MoveCast = dbspell.MoveCast;
+            Uninterruptible = dbspell.Uninterruptible;
+            IsFocus = dbspell.IsFocus;
 
             // warlocks
-            m_isprimary = dbspell.IsPrimary;
-            m_issecondary = dbspell.IsSecondary;
-            m_allowbolt = dbspell.AllowBolt;
-            m_sharedtimergroup = dbspell.SharedTimerGroup;
+            IsPrimary = dbspell.IsPrimary;
+            IsSecondary = dbspell.IsSecondary;
+            AllowBolt = dbspell.AllowBolt;
+            SharedTimerGroup = dbspell.SharedTimerGroup;
             m_minotaurspell = minotaur;
 
             // Params
@@ -409,47 +252,47 @@ namespace DOL.GS
         /// <param name="spellType"></param>
         public Spell(Spell spell, string spellType) : base(spell.Name, spell.ID, (ushort)spell.Icon, spell.Level, spell.InternalID)
         {
-            m_description = spell.Description;
-            m_target = spell.Target;
-            m_spelltype = spellType; // replace SpellType
+            Description = spell.Description;
+            Target = spell.Target;
+            SpellType = spellType; // replace SpellType
             m_range = spell.Range;
-            m_radius = spell.Radius;
-            m_value = spell.Value;
-            m_damage = spell.Damage;
-            m_damageType = spell.DamageType;
-            m_concentration = spell.Concentration;
-            m_duration = spell.Duration;
-            m_frequency = spell.Frequency;
-            m_pulse = spell.Pulse;
-            m_pulse_power = spell.PulsePower;
+            Radius = spell.Radius;
+            Value = spell.Value;
+            Damage = spell.Damage;
+            DamageType = spell.DamageType;
+            Concentration = spell.Concentration;
+            Duration = spell.Duration;
+            Frequency = spell.Frequency;
+            Pulse = spell.Pulse;
+            PulsePower = spell.PulsePower;
             m_power = spell.Power;
             m_casttime = spell.CastTime;
-            m_recastdelay = spell.RecastDelay;
-            m_reshealth = spell.ResurrectHealth;
-            m_resmana = spell.ResurrectMana;
-            m_lifedrain_return = spell.LifeDrainReturn;
-            m_amnesia_chance = spell.AmnesiaChance;
-            m_message1 = spell.Message1;
-            m_message2 = spell.Message2;
-            m_message3 = spell.Message3;
-            m_message4 = spell.Message4;
-            m_effectID = spell.ClientEffect;
+            RecastDelay = spell.RecastDelay;
+            ResurrectHealth = spell.ResurrectHealth;
+            ResurrectMana = spell.ResurrectMana;
+            LifeDrainReturn = spell.LifeDrainReturn;
+            AmnesiaChance = spell.AmnesiaChance;
+            Message1 = spell.Message1;
+            Message2 = spell.Message2;
+            Message3 = spell.Message3;
+            Message4 = spell.Message4;
+            ClientEffect = spell.ClientEffect;
             m_icon = spell.Icon;
-            m_instrumentRequirement = spell.InstrumentRequirement;
-            m_spellGroup = spell.Group;
-            m_effectGroup = spell.EffectGroup;
-            m_subSpellID = spell.SubSpellID;
-            m_moveCast = spell.MoveCast;
-            m_uninterruptible = spell.Uninterruptible;
-            m_isfocus = spell.IsFocus;
-            m_isprimary = spell.IsPrimary;
-            m_issecondary = spell.IsSecondary;
-            m_allowbolt = spell.AllowBolt;
-            m_sharedtimergroup = spell.SharedTimerGroup;
+            InstrumentRequirement = spell.InstrumentRequirement;
+            Group = spell.Group;
+            EffectGroup = spell.EffectGroup;
+            SubSpellId = spell.SubSpellId;
+            MoveCast = spell.MoveCast;
+            Uninterruptible = spell.Uninterruptible;
+            IsFocus = spell.IsFocus;
+            IsPrimary = spell.IsPrimary;
+            IsSecondary = spell.IsSecondary;
+            AllowBolt = spell.AllowBolt;
+            SharedTimerGroup = spell.SharedTimerGroup;
             m_minotaurspell = spell.m_minotaurspell;
 
             // Params
-            m_paramCache = new Dictionary<string, List<string>>(spell.m_paramCache);
+            CustomParamsDictionary = new Dictionary<string, List<string>>(spell.CustomParamsDictionary);
         }
 
         /// <summary>
@@ -473,7 +316,7 @@ namespace DOL.GS
         /// <param name="delve"></param>
         public virtual void Delve(List<string> delve)
         {
-            delve.Add(string.Format("Function: {0}", Name));
+            delve.Add($"Function: {Name}");
             delve.Add(string.Empty);
             delve.Add(Description);
             delve.Add(string.Empty);
@@ -482,27 +325,19 @@ namespace DOL.GS
 
             if (Range > 0)
             {
-                delve.Add(string.Format("Range: {0}", Range));
+                delve.Add($"Range: {Range}");
             }
 
             if (Duration > 0 && Duration < 65535)
             {
-                delve.Add(string.Format(
-                    "Duration: {0}",
-                    (Duration >= 60000)
-                    ? string.Format("{0}:{1} min", (int)(Duration / 60000), Duration % 60000)
-                    : string.Format("{0} sec", Duration / 1000)));
+                delve.Add($"Duration: {(Duration >= 60000 ? $"{Duration / 60000}:{Duration % 60000} min" : $"{Duration / 1000} sec")}");
             }
 
-            delve.Add(string.Format(
-                "Casting time: {0}",
-                (CastTime == 0) ? "instant" : string.Format("{0} sec", CastTime)));
+            delve.Add($"Casting time: {(CastTime == 0 ? "instant" : $"{CastTime} sec")}");
 
             if (Target.ToLower() == "enemy" || Target.ToLower() == "area" || Target.ToLower() == "cone")
             {
-                delve.Add(string.Format(
-                    "Damage: {0}",
-                    GlobalConstants.DamageTypeToName((eDamageType)DamageType)));
+                delve.Add($"Damage: {GlobalConstants.DamageTypeToName(DamageType)}");
             }
 
             delve.Add(string.Empty);
@@ -525,7 +360,7 @@ namespace DOL.GS
                     break;
             }
 
-            delve.Add(string.Format("Target: {0}", target));
+            delve.Add($"Target: {target}");
         }
 
         #region Spell Helpers
@@ -533,144 +368,67 @@ namespace DOL.GS
         /// <summary>
         /// Whether or not the spell is instant cast.
         /// </summary>
-        public bool IsInstantCast
-        {
-            get
-            {
-                return CastTime <= 0;
-            }
-        }
+        public bool IsInstantCast => CastTime <= 0;
 
         /// <summary>
         /// Wether or not the spell is Point Blank Area of Effect
         /// </summary>
-        public bool IsPBAoE
-        {
-            get
-            {
-                return Range == 0 && IsAoE;
-            }
-        }
+        public bool IsPBAoE => Range == 0 && IsAoE;
 
         /// <summary>
         /// Wether or not this spell need Instrument (and is a Song)
         /// </summary>
-        public bool NeedInstrument
-        {
-            get
-            {
-                return InstrumentRequirement != 0;
-            }
-        }
+        public bool NeedInstrument => InstrumentRequirement != 0;
 
         /// <summary>
         /// Wether or not this spell is an Area of Effect Spell
         /// </summary>
-        public bool IsAoE
-        {
-            get
-            {
-                return Radius > 0;
-            }
-        }
+        public bool IsAoE => Radius > 0;
 
         /// <summary>
         /// Wether this spell Has valid SubSpell
         /// </summary>
-        public bool HasSubSpell
-        {
-            get
-            {
-                return SubSpellID > 0 || MultipleSubSpells.Count > 0;
-            }
-        }
+        public bool HasSubSpell => SubSpellId > 0 || MultipleSubSpells.Count > 0;
 
         /// <summary>
         /// Wether this spell has a recast delay (cooldown)
         /// </summary>
-        public bool HasRecastDelay
-        {
-            get
-            {
-                return RecastDelay > 0;
-            }
-        }
+        public bool HasRecastDelay => RecastDelay > 0;
 
         /// <summary>
         /// Wether this spell is concentration based
         /// </summary>
-        public bool IsConcentration
-        {
-            get
-            {
-                return Concentration > 0;
-            }
-        }
+        public bool IsConcentration => Concentration > 0;
 
         /// <summary>
         /// Wether this spell has power usage.
         /// </summary>
-        public bool UsePower
-        {
-            get
-            {
-                return Power != 0;
-            }
-        }
+        public bool UsePower => Power != 0;
 
         /// <summary>
         /// Wether this spell has pulse power usage.
         /// </summary>
-        public bool UsePulsePower
-        {
-            get
-            {
-                return PulsePower != 0;
-            }
-        }
+        public bool UsePulsePower => PulsePower != 0;
 
         /// <summary>
         /// Wether this Spell is a pulsing spell (Song/Chant)
         /// </summary>
-        public bool IsPulsing
-        {
-            get
-            {
-                return Pulse != 0;
-            }
-        }
+        public bool IsPulsing => Pulse != 0;
 
         /// <summary>
         /// Wether this Spell is a Song/Chant
         /// </summary>
-        public bool IsChant
-        {
-            get
-            {
-                return Pulse != 0 && !IsFocus;
-            }
-        }
+        public bool IsChant => Pulse != 0 && !IsFocus;
 
         /// <summary>
         /// Wether this Spell is a Pulsing Effect (Dot/Hot...)
         /// </summary>
-        public bool IsPulsingEffect
-        {
-            get
-            {
-                return Frequency > 0 && !IsPulsing;
-            }
-        }
+        public bool IsPulsingEffect => Frequency > 0 && !IsPulsing;
+
         #endregion
         #region utils
 
-        public ushort InternalIconID
-        {
-            get
-            {
-                return this.GetParamValue<ushort>("InternalIconID");
-            }
-        }
+        public ushort InternalIconID => this.GetParamValue<ushort>("InternalIconID");
 
         public IList<int> MultipleSubSpells
         {
@@ -680,13 +438,7 @@ namespace DOL.GS
             }
         }
 
-        public bool AllowCoexisting
-        {
-            get
-            {
-                return this.GetParamValue<bool>("AllowCoexisting");
-            }
-        }
+        public bool AllowCoexisting => this.GetParamValue<bool>("AllowCoexisting");
 
         #endregion
     }

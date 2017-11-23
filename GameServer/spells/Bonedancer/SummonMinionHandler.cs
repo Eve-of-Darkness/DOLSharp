@@ -61,15 +61,15 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
-            if (Caster is GamePlayer && ((GamePlayer)Caster).ControlledBrain == null)
+            if (Caster is GamePlayer player && player.ControlledBrain == null)
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonMinionHandler.CheckBeginCast.Text1"), eChatType.CT_SpellResisted);
+                MessageToCaster(LanguageMgr.GetTranslation(player.Client, "SummonMinionHandler.CheckBeginCast.Text1"), eChatType.CT_SpellResisted);
                 return false;
             }
 
-            if (Caster is GamePlayer && (((GamePlayer)Caster).ControlledBrain.Body.ControlledNpcList == null || ((GamePlayer)Caster).ControlledBrain.Body.PetCount >= ((GamePlayer)Caster).ControlledBrain.Body.ControlledNpcList.Length))
+            if (Caster is GamePlayer gamePlayer && (gamePlayer.ControlledBrain.Body.ControlledNpcList == null || gamePlayer.ControlledBrain.Body.PetCount >= gamePlayer.ControlledBrain.Body.ControlledNpcList.Length))
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonMinionHandler.CheckBeginCast.Text2"), eChatType.CT_SpellResisted);
+                MessageToCaster(LanguageMgr.GetTranslation(gamePlayer.Client, "SummonMinionHandler.CheckBeginCast.Text2"), eChatType.CT_SpellResisted);
 
                 return false;
             }
@@ -84,7 +84,7 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness">factor from 0..1 (0%-100%)</param>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            if (Caster == null || Caster.ControlledBrain == null)
+            if (Caster?.ControlledBrain == null)
             {
                 return;
             }
@@ -95,9 +95,9 @@ namespace DOL.GS.Spells
             // and that m_controlledNpc is initialized (since we aren't thread safe).
             if (temppet == null)
             {
-                if (Caster is GameNPC)
+                if (Caster is GameNPC npc)
                 {
-                    temppet = (GameNPC)Caster;
+                    temppet = npc;
 
                     // We'll give default NPCs 2 minions!
                     if (temppet.ControlledNpcList == null)
@@ -115,8 +115,7 @@ namespace DOL.GS.Spells
 
             if (m_pet.Brain is BDArcherBrain)
             {
-                ItemTemplate temp = GameServer.Database.FindObjectByKey<ItemTemplate>("BD_Archer_Distance_bow") as ItemTemplate;
-                if (temp == null)
+                if (!(GameServer.Database.FindObjectByKey<ItemTemplate>("BD_Archer_Distance_bow") is ItemTemplate temp))
                 {
                     log.Error("Unable to find Bonedancer Archer's Bow");
                 }
@@ -146,8 +145,7 @@ namespace DOL.GS.Spells
         /// <param name="arguments"></param>
         protected override void OnNpcReleaseCommand(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameNPC pet = sender as GameNPC;
-            if (pet == null)
+            if (!(sender is GameNPC pet))
             {
                 return;
             }
@@ -155,18 +153,15 @@ namespace DOL.GS.Spells
             GameEventMgr.RemoveHandler(pet, GameLivingEvent.PetReleased, new DOLEventHandler(OnNpcReleaseCommand));
 
             GameSpellEffect effect = FindEffectOnTarget(pet, this);
-            if (effect != null)
-            {
-                effect.Cancel(false);
-            }
+            effect?.Cancel(false);
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            if ((effect.Owner is BDPet) && ((effect.Owner as BDPet).Brain is IControlledBrain) && (((effect.Owner as BDPet).Brain as IControlledBrain).Owner is CommanderPet))
+            if (((effect.Owner as BDPet)?.Brain as IControlledBrain)?.Owner is CommanderPet)
             {
-                BDPet pet = effect.Owner as BDPet;
-                CommanderPet commander = (pet.Brain as IControlledBrain).Owner as CommanderPet;
+                BDPet pet = (BDPet) effect.Owner;
+                CommanderPet commander = (pet.Brain as IControlledBrain)?.Owner as CommanderPet;
                 commander.RemoveControlledNpc(pet.Brain as IControlledBrain);
             }
 
@@ -175,7 +170,7 @@ namespace DOL.GS.Spells
 
         protected override IControlledBrain GetPetBrain(GameLiving owner)
         {
-            IControlledBrain controlledBrain = null;
+            IControlledBrain controlledBrain;
             BDSubPet.SubPetType type = (BDSubPet.SubPetType)(byte)Spell.DamageType;
             owner = owner.ControlledBrain.Body;
 
@@ -237,7 +232,7 @@ namespace DOL.GS.Spells
             // edit for BD
             // Patch 1.87: subpets have been increased by one level to make them blue
             // to a level 50
-            if (level == 37 && (m_pet.Brain as IControlledBrain).Owner.Level >= 41)
+            if (level == 37 && ((IControlledBrain) m_pet.Brain).Owner.Level >= 41)
             {
                 level = 41;
             }
@@ -253,9 +248,9 @@ namespace DOL.GS.Spells
             get
             {
                 var delve = new List<string>();
-                delve.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonMinionHandler.DelveInfo.Text1", Spell.Target)));
-                delve.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonMinionHandler.DelveInfo.Text2", Math.Abs(Spell.Power))));
-                delve.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonMinionHandler.DelveInfo.Text3", (Spell.CastTime / 1000).ToString("0.0## " + LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "Effects.DelveInfo.Seconds")))));
+                delve.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonMinionHandler.DelveInfo.Text1", Spell.Target)));
+                delve.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonMinionHandler.DelveInfo.Text2", Math.Abs(Spell.Power))));
+                delve.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonMinionHandler.DelveInfo.Text3", (Spell.CastTime / 1000).ToString("0.0## " + LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "Effects.DelveInfo.Seconds")))));
                 return delve;
             }
         }

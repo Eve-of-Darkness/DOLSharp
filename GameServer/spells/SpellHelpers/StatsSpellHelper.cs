@@ -32,8 +32,7 @@ namespace DOL.GS.Spells
         /// <param name="target">Living needing Updates</param>
         public static void SendLivingStatsAndRegenUpdate(this GameLiving target)
         {
-            var player = target as GamePlayer;  // need new prop system to not worry about updates
-            if (player != null)
+            if (target is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
                 player.Out.SendUpdateWeaponAndArmorStats();

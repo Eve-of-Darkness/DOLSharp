@@ -33,8 +33,6 @@ namespace DOL.GS.Spells
             // Same level or lower resists 0%
             // Every level above vamp level increases percent by .5%
             return target.Level <= Caster.Level ? 0 : (target.Level - Caster.Level) / 2;
-
-            // return base.CalculateSpellResistChance(target);
         }
     }
 }

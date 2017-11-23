@@ -15,7 +15,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -55,13 +55,13 @@ namespace DOL.GS.Spells
 
             if (target.HasAbility(Abilities.CCImmunity))
             {
-                MessageToCaster(target.Name + " is immune to this effect!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.Name} is immune to this effect!", eChatType.CT_SpellResisted);
                 return;
             }
 
             if (target.TempProperties.getProperty("Charging", false))
             {
-                MessageToCaster(target.Name + " is moving to fast for this spell to have any effect!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.Name} is moving to fast for this spell to have any effect!", eChatType.CT_SpellResisted);
                 return;
             }
 
@@ -72,40 +72,15 @@ namespace DOL.GS.Spells
                 target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
             }
 
-            if (target is GameNPC)
+            if (target is GameNPC npc)
             {
-                GameNPC npc = (GameNPC)target;
-                IOldAggressiveBrain aggroBrain = npc.Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
+                if (npc.Brain is IOldAggressiveBrain aggroBrain)
                 {
                     aggroBrain.AddToAggroList(Caster, 1);
                 }
             }
         }
-
-// /// <summary>
-//      /// Calculates effect duration in ticks
-//      /// </summary>
-//      /// <param name="target"></param>
-//      /// <param name="effectiveness"></param>
-//      /// <returns></returns>
-//      protected override int CalculateEffectDuration(GameLiving target, double effectiveness)
-//      {
-//          // http://support.darkageofcamelot.com/kb/article.php?id=423
-//          // Patch Notes: Version 1.52
-//          // The duration is 100% at the middle of the area, and it tails off to 50%
-//          // duration at the edges. This does NOT change the way area effect spells
-//          // work against monsters, only realm enemies (i.e. enemy players and enemy realm guards).
-//          int duration = base.CalculateEffectDuration(target, effectiveness);
-//          if (target is GamePlayer == false)
-//              return duration;
-//          duration *= (int)(0.5 + 0.5*effectiveness);
-//          duration -= (int)(duration * target.GetResist(Spell.DamageType) * 0.01);
-//
-//          if (duration < 1) duration = 1;
-//          else if (duration > (Spell.Duration << 5)) duration = (Spell.Duration << 5); // duration is in seconds, mult by 32
-//          return duration;
-//      }
+        
         protected override int CalculateEffectDuration(GameLiving target, double effectiveness)
         {
             double duration = base.CalculateEffectDuration(target, effectiveness);
@@ -131,7 +106,7 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
-            return new GameSpellAndImmunityEffect(this, (int)CalculateEffectDuration(target, effectiveness), 0, effectiveness);
+            return new GameSpellAndImmunityEffect(this, CalculateEffectDuration(target, effectiveness), 0, effectiveness);
         }
 
         // constructor
@@ -141,8 +116,6 @@ namespace DOL.GS.Spells
     [SpellHandler("HereticSpeedDecrease")]
     public class HereticSpeedDecreaseSpellHandler : HereticImmunityEffectSpellHandler
     {
-        private readonly object TIMER_PROPERTY;
-        private const string EFFECT_PROPERTY = "Effect";
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
@@ -199,19 +172,13 @@ namespace DOL.GS.Spells
             GameSpellEffect effect = FindEffectOnTarget(living, this);
             if (attackArgs.AttackData.Damage > 0)
             {
-                            if (effect != null)
-                {
-                    effect.Cancel(false);
-                }
+                effect?.Cancel(false);
             }
 
             if (attackArgs.AttackData.SpellHandler is StyleBleeding || attackArgs.AttackData.SpellHandler is DoTSpellHandler || attackArgs.AttackData.SpellHandler is HereticDoTSpellHandler)
             {
                 GameSpellEffect affect = FindEffectOnTarget(living, this);
-                if (affect != null)
-                {
-                    affect.Cancel(false);
-                }
+                affect?.Cancel(false);
             }
         }
 
@@ -226,14 +193,12 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            GamePlayer player = owner as GamePlayer;
-            if (player != null)
+            if (owner is GamePlayer player)
             {
                 player.Out.SendUpdateMaxSpeed();
             }
 
-            GameNPC npc = owner as GameNPC;
-            if (npc != null)
+            if (owner is GameNPC npc)
             {
                 short maxSpeed = npc.MaxSpeed;
                 if (npc.CurrentSpeed > maxSpeed)
@@ -245,7 +210,6 @@ namespace DOL.GS.Spells
 
         public HereticSpeedDecreaseSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
         {
-            TIMER_PROPERTY = this;
         }
 
         /// <summary>
@@ -301,7 +265,7 @@ namespace DOL.GS.Spells
             public override string ToString()
             {
                 return new StringBuilder(base.ToString())
-                    .Append(" SpeedDecreaseEffect: (").Append(m_effect.ToString()).Append(')')
+                    .Append(" SpeedDecreaseEffect: (").Append(m_effect).Append(')')
                     .ToString();
             }
         }

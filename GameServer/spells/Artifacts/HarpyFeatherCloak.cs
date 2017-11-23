@@ -34,9 +34,6 @@ namespace DOL.GS.Spells
         /// <summary>
         /// This is melee to hit penalty
         /// </summary>
-        public override eProperty Property1
-        {
-            get { return eProperty.ToHitBonus; }
-        }
+        public override eProperty Property1 => eProperty.ToHitBonus;
     }
 }

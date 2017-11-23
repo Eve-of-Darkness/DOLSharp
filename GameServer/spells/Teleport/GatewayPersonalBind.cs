@@ -36,10 +36,7 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Can this spell be queued with other spells?
         /// </summary>
-        public override bool CanQueue
-        {
-            get { return false; }
-        }
+        public override bool CanQueue => false;
 
         /// <summary>
         /// Whether this spell can be cast on the selected target at all.
@@ -48,8 +45,7 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
-            GamePlayer player = Caster as GamePlayer;
-            if (player == null)
+            if (!(Caster is GamePlayer player))
             {
                 return false;
             }
@@ -57,19 +53,19 @@ namespace DOL.GS.Spells
             if (player.CurrentRegion.IsRvR || player.CurrentRegion.IsInstance)
             {
                 // Actual live message is: You can't use that item!
-                player.Out.SendMessage("You can't use that here!", DOL.GS.PacketHandler.eChatType.CT_System, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage("You can't use that here!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
             if (player.IsMoving)
             {
-                player.Out.SendMessage("You must be standing still to use this item!", DOL.GS.PacketHandler.eChatType.CT_System, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage("You must be standing still to use this item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
             if (player.InCombat || GameRelic.IsPlayerCarryingRelic(player))
             {
-                player.Out.SendMessage("You have been in combat recently and cannot use this item!", DOL.GS.PacketHandler.eChatType.CT_System, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage("You have been in combat recently and cannot use this item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
@@ -82,7 +78,7 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         public override int CalculateCastingTime()
         {
-            return m_spell.CastTime;
+            return Spell.CastTime;
         }
 
         /// <summary>
@@ -92,8 +88,7 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness"></param>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            GamePlayer player = Caster as GamePlayer;
-            if (player == null)
+            if (!(Caster is GamePlayer player))
             {
                 return;
             }
@@ -114,10 +109,7 @@ namespace DOL.GS.Spells
         public override void CasterMoves()
         {
             InterruptCasting();
-            if (Caster is GamePlayer)
-            {
-                (Caster as GamePlayer).Out.SendMessage(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SpellHandler.CasterMove"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-            }
+            (Caster as GamePlayer)?.Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer) Caster).Client, "SpellHandler.CasterMove"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
         }
 
         public override void InterruptCasting()
@@ -131,7 +123,7 @@ namespace DOL.GS.Spells
             get
             {
                 var list = new List<string>();
-                list.Add(string.Format("  {0}", Spell.Description));
+                list.Add($"  {Spell.Description}");
 
                 return list;
             }

@@ -143,7 +143,7 @@ namespace DOL.GS.Spells
             }
 
             // You should be able to chain pulsing charm on the same mob
-            if (Spell.Pulse != 0 && Caster is GamePlayer && (((GamePlayer)Caster).ControlledBrain != null && ((GamePlayer)Caster).ControlledBrain.Body == (GameNPC)selectedTarget))
+            if (Spell.Pulse != 0 && (Caster as GamePlayer)?.ControlledBrain != null && ((GamePlayer)Caster).ControlledBrain.Body == (GameNPC)selectedTarget)
             {
                 ((GamePlayer)Caster).CommandNpcRelease();
             }
@@ -153,7 +153,7 @@ namespace DOL.GS.Spells
                 return false;
             }
 
-            if (Caster is GamePlayer && ((GamePlayer)Caster).ControlledBrain != null)
+            if (Caster is GamePlayer player && player.ControlledBrain != null)
             {
                 MessageToCaster("You already have a charmed creature, release it first!", eChatType.CT_SpellResisted);
                 return false;
@@ -180,7 +180,7 @@ namespace DOL.GS.Spells
             if (m_controlledBrain == null)
             {
                  // Target is already controlled
-                if (((GameNPC)target).Brain != null && ((GameNPC)target).Brain is IControlledBrain && (((IControlledBrain)((GameNPC)target).Brain).Owner as GamePlayer) != Caster)
+                if (((GameNPC) target).Brain is IControlledBrain && (((IControlledBrain)((GameNPC)target).Brain).Owner as GamePlayer) != Caster)
                 {
                     // TODO: proper message
                     MessageToCaster("Your target is not valid.", eChatType.CT_SpellResisted);
@@ -209,13 +209,13 @@ namespace DOL.GS.Spells
                 }
 
                 // Check if Body type applies
-                if (m_spell.AmnesiaChance != (ushort)eCharmType.All)
+                if (Spell.AmnesiaChance != (ushort)eCharmType.All)
                 {
 
                     bool charmable = false;
 
                     // gets true only for charm-able mobs for this spell type
-                    switch ((eCharmType)m_spell.AmnesiaChance) {
+                    switch ((eCharmType)Spell.AmnesiaChance) {
 
                         case eCharmType.HumanoidAnimalInsectMagicalUndead :
                             if (((GameNPC)target).BodyType == (ushort)NpcTemplateMgr.eBodyType.Undead)
@@ -310,7 +310,7 @@ namespace DOL.GS.Spells
             // Spell.Value == Max Level this spell can charm, Spell.Damage == Max percent of the caster level this spell can charm
             if (target.Level > Spell.Value || target.Level > Caster.Level * Spell.Damage / 100)
             {
-                MessageToCaster(target.GetName(0, true) + " is too strong for you to charm!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.GetName(0, true)} is too strong for you to charm!", eChatType.CT_SpellResisted);
                 return;
             }
 
@@ -332,7 +332,7 @@ namespace DOL.GS.Spells
                      * The higher your spec level, the greater your chance of controlling.
                      */
 
-                    int diffLevel = (int)(Caster.Level / 1.5 + Caster.GetModifiedSpecLevel(m_spellLine.Spec) / 3) - target.Level;
+                    int diffLevel = (int)(Caster.Level / 1.5 + Caster.GetModifiedSpecLevel(SpellLine.Spec) / 3) - target.Level;
 
                     if (diffLevel >= 0)
                     {
@@ -351,7 +351,7 @@ namespace DOL.GS.Spells
                 if (Util.Chance(resistChance))
                 {
 
-                    MessageToCaster(target.GetName(0, true) + " resists the charm!", eChatType.CT_SpellResisted);
+                    MessageToCaster($"{target.GetName(0, true)} resists the charm!", eChatType.CT_SpellResisted);
                     return;
                 }
             }
@@ -368,10 +368,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectStart(effect);
 
-            GamePlayer player = Caster as GamePlayer;
-            GameNPC npc = effect.Owner as GameNPC;
-
-            if (player != null && npc != null)
+            if (Caster is GamePlayer player && effect.Owner is GameNPC npc)
             {
 
                 if (m_controlledBrain == null)
@@ -393,7 +390,7 @@ namespace DOL.GS.Spells
 
                     // sorc: "The slough serpent is enthralled!" ct_spell
                     Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message1, npc.GetName(0, false)), eChatType.CT_Spell);
-                    MessageToCaster(npc.GetName(0, true) + " is now under your control.", eChatType.CT_Spell);
+                    MessageToCaster($"{npc.GetName(0, true)} is now under your control.", eChatType.CT_Spell);
 
                     player.SetControlledBrain(m_controlledBrain);
 
@@ -413,10 +410,7 @@ namespace DOL.GS.Spells
                 // something went wrong.
                 if (log.IsWarnEnabled)
                 {
-                    log.Warn(string.Format(
-                        "charm effect start: Caster={0} effect.Owner={1}",
-                                           Caster == null ? "(null)" : Caster.GetType().ToString(),
-                                           effect.Owner == null ? "(null)" : effect.Owner.GetType().ToString()));
+                    log.Warn($"charm effect start: Caster={Caster?.GetType().ToString() ?? "(null)"} effect.Owner={effect.Owner?.GetType().ToString() ?? "(null)"}");
                 }
             }
         }
@@ -446,10 +440,7 @@ namespace DOL.GS.Spells
             }
 
             PulsingSpellEffect concEffect = FindPulsingSpellOnTarget(npc.Owner, this);
-            if (concEffect != null)
-            {
-                concEffect.Cancel(false);
-            }
+            concEffect?.Cancel(false);
 
             GameSpellEffect charm = FindEffectOnTarget(npc.Body, this);
 
@@ -473,10 +464,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectExpires(effect, noMessages);
 
-            GamePlayer player = Caster as GamePlayer;
-            GameNPC npc = effect.Owner as GameNPC;
-
-            if (player != null && npc != null)
+            if (Caster is GamePlayer player && effect.Owner is GameNPC npc)
             {
                 if (!noMessages) // no overwrite
                 {
@@ -521,10 +509,7 @@ namespace DOL.GS.Spells
                                 continue;
                             }
 
-                            if (((GameNPC)obj).Brain != null && ((GameNPC)obj).Brain is IOldAggressiveBrain)
-                            {
-                                ((IOldAggressiveBrain)((GameNPC)obj).Brain).RemoveFromAggroList(npc);
-                            }
+                            (((GameNPC) obj).Brain as IOldAggressiveBrain)?.RemoveFromAggroList(npc);
                         }
                     }
 
@@ -553,10 +538,7 @@ namespace DOL.GS.Spells
             {
                 if (log.IsWarnEnabled)
                 {
-                    log.Warn(string.Format(
-                        "charm effect expired: Caster={0} effect.Owner={1}",
-                                           Caster == null ? "(null)" : Caster.GetType().ToString(),
-                                           effect.Owner == null ? "(null)" : effect.Owner.GetType().ToString()));
+                    log.Warn($"charm effect expired: Caster={Caster?.GetType().ToString() ?? "(null)"} effect.Owner={effect.Owner?.GetType().ToString() ?? "(null)"}");
                 }
             }
 
@@ -576,7 +558,7 @@ namespace DOL.GS.Spells
             {
                 if (log.IsWarnEnabled)
                 {
-                    log.Warn("Spell effect compare with different types " + oldeffect.Spell.SpellType + " <=> " + neweffect.Spell.SpellType + "\n" + Environment.StackTrace);
+                    log.Warn($"Spell effect compare with different types {oldeffect.Spell.SpellType} <=> {neweffect.Spell.SpellType}\n{Environment.StackTrace}");
                 }
 
                 return false;
@@ -606,67 +588,67 @@ namespace DOL.GS.Spells
             {
                 var list = new List<string>();
 
-                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "CharmSpellHandler.DelveInfo.Function", Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType));
+                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "CharmSpellHandler.DelveInfo.Function", Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType));
                 list.Add(" "); // empty line
                 list.Add(Spell.Description);
                 list.Add(" "); // empty line
                 if (Spell.InstrumentRequirement != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.InstrumentRequire", GlobalConstants.InstrumentTypeToName(Spell.InstrumentRequirement)));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.InstrumentRequire", GlobalConstants.InstrumentTypeToName(Spell.InstrumentRequirement)));
                 }
 
                 list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Target", Spell.Target));
                 if (Spell.Range != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Range", Spell.Range));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Range", Spell.Range));
                 }
 
                 if (Spell.Duration >= ushort.MaxValue * 1000)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Duration") + " Permanent.");
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Duration") + " Permanent.");
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Duration") + Spell.Duration / 60000 + ":" + (Spell.Duration % 60000 / 1000).ToString("00") + " min"));
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Duration")}{Spell.Duration / 60000}:{Spell.Duration % 60000 / 1000:00} min");
                 }
                 else if (Spell.Duration != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Duration") + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Duration") + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
                 }
 
                 if (Spell.Frequency != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Frequency", (Spell.Frequency * 0.001).ToString("0.0")));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Frequency", (Spell.Frequency * 0.001).ToString("0.0")));
                 }
 
                 if (Spell.Power != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.PowerCost", Spell.Power.ToString("0;0'%'")));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.PowerCost", Spell.Power.ToString("0;0'%'")));
                 }
 
-                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.CastingTime", (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'")));
+                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.CastingTime", (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'")));
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.RecastTime") + Spell.RecastDelay / 60000 + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.RecastTime")}{Spell.RecastDelay / 60000}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.RecastTime") + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.RecastTime")}{Spell.RecastDelay / 1000} sec");
                 }
 
                 if (Spell.Concentration != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.ConcentrationCost", Spell.Concentration));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.ConcentrationCost", Spell.Concentration));
                 }
 
                 if (Spell.Radius != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Radius", Spell.Radius));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Radius", Spell.Radius));
                 }
 
                 if (Spell.DamageType != eDamageType.Natural)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Damage", GlobalConstants.DamageTypeToName(Spell.DamageType)));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Damage", GlobalConstants.DamageTypeToName(Spell.DamageType)));
                 }
 
                 return list;

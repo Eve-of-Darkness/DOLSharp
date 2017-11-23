@@ -36,7 +36,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            double value = 0;
+            double value;
             switch (attackArgs.AttackData.AttackType)
             {
                 case AttackData.eAttackType.Ranged:

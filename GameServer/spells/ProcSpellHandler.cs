@@ -18,7 +18,6 @@
  */
 using System;
 using System.Collections.Generic;
-
 using DOL.AI.Brain;
 using DOL.Events;
 using DOL.GS.Effects;
@@ -82,7 +81,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -95,7 +94,7 @@ namespace DOL.GS.Spells
         protected override int CalculateEffectDuration(GameLiving target, double effectiveness)
         {
             double duration = Spell.Duration;
-            duration *= 1.0 + m_caster.GetModified(eProperty.SpellDuration) * 0.01;
+            duration *= 1.0 + Caster.GetModified(eProperty.SpellDuration) * 0.01;
             return (int)duration;
         }
 
@@ -225,16 +224,16 @@ namespace DOL.GS.Spells
             {
                 var list = new List<string>();
 
-// list.Add("Function: " + (string)(Spell.SpellType == "" ? "(not implemented)" : Spell.SpellType));
-                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "ProcSpellHandler.DelveInfo.Function", (string)(Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType)));
+                // list.Add("Function: " + (string)(Spell.SpellType == "" ? "(not implemented)" : Spell.SpellType));
+                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "ProcSpellHandler.DelveInfo.Function", Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType));
 
-// list.Add("Target: " + Spell.Target);
-                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Target", Spell.Target));
+                // list.Add("Target: " + Spell.Target);
+                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Target", Spell.Target));
 
-// if (Spell.Range != 0) list.Add("Range: " + Spell.Range);
+                // if (Spell.Range != 0) list.Add("Range: " + Spell.Range);
                 if (Spell.Range != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Range", Spell.Range));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Range", Spell.Range));
                 }
 
                 // if (Spell.Duration >= ushort.MaxValue * 1000) list.Add("Duration: Permanent.");
@@ -246,36 +245,36 @@ namespace DOL.GS.Spells
                 // else if (Spell.Duration > 60000) list.Add(string.Format("Duration: {0}:{1} min", Spell.Duration / 60000, (Spell.Duration % 60000 / 1000).ToString("00")));
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Duration") + Spell.Duration / 60000 + ":" + (Spell.Duration % 60000 / 1000).ToString("00") + "min"));
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Duration")}{Spell.Duration / 60000}:{(Spell.Duration % 60000 / 1000):00}min");
                 }
                 else if (Spell.Duration != 0)
                 {
-                    list.Add("Duration: " + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
+                    list.Add($"Duration: {(Spell.Duration / 1000):0' sec';'Permanent.';'Permanent.'}");
                 }
 
                 if (Spell.Power != 0)
                 {
-                    list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                    list.Add($"Power cost: {Spell.Power:0;0'%'}");
                 }
 
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                list.Add($"Casting time: {(Spell.CastTime * 0.001):0.0## sec;-0.0## sec;'instant'}");
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"Recast time: {(Spell.RecastDelay / 60000)}:{(Spell.RecastDelay % 60000 / 1000):00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"Recast time: {(Spell.RecastDelay / 1000)} sec");
                 }
 
                 if (Spell.Concentration != 0)
                 {
-                    list.Add("Concentration cost: " + Spell.Concentration);
+                    list.Add($"Concentration cost: {Spell.Concentration}");
                 }
 
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
                 // Recursion check
@@ -283,7 +282,7 @@ namespace DOL.GS.Spells
                 if (nextDelveDepth > MAX_DELVE_RECURSION)
                 {
                     list.Add("(recursion - see server logs)");
-                    log.ErrorFormat("Spell delve info recursion limit reached. Source spell ID: {0}, Sub-spell ID: {1}", m_spell.ID, m_procSpell.ID);
+                    log.Error($"Spell delve info recursion limit reached. Source spell ID: {Spell.ID}, Sub-spell ID: {m_procSpell.ID}");
                 }
                 else
                 {
@@ -294,7 +293,7 @@ namespace DOL.GS.Spells
                     ISpellHandler subSpellHandler = ScriptMgr.CreateSpellHandler(Caster, m_procSpell, m_procSpellLine);
                     if (subSpellHandler == null)
                     {
-                        list.Add("unable to create subspell handler: '" + SubSpellLineName + "', " + m_spell.Value);
+                        list.Add($"unable to create subspell handler: \'{SubSpellLineName}\', {Spell.Value}");
                         return list;
                     }
 
@@ -325,18 +324,12 @@ namespace DOL.GS.Spells
         /// <summary>
         /// The event type to hook on
         /// </summary>
-        protected override DOLEvent EventType
-        {
-            get { return GameLivingEvent.AttackFinished; }
-        }
+        protected override DOLEvent EventType => GameLivingEvent.AttackFinished;
 
         /// <summary>
         /// The spell line name of the proc spell
         /// </summary>
-        protected override string SubSpellLineName
-        {
-            get { return "OffensiveProc"; }
-        }
+        protected override string SubSpellLineName => "OffensiveProc";
 
         /// <summary>
         /// Handler fired whenever effect target attacks
@@ -346,9 +339,7 @@ namespace DOL.GS.Spells
         /// <param name="arguments"></param>
         protected override void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-
-            if (args == null || args.AttackData == null || args.AttackData.AttackType == AttackData.eAttackType.Spell)
+            if (!(arguments is AttackFinishedEventArgs args) || args.AttackData == null || args.AttackData.AttackType == AttackData.eAttackType.Spell)
             {
                 return;
             }
@@ -427,18 +418,12 @@ namespace DOL.GS.Spells
         /// <summary>
         /// The event type to hook on
         /// </summary>
-        protected override DOLEvent EventType
-        {
-            get { return GameLivingEvent.AttackedByEnemy; }
-        }
+        protected override DOLEvent EventType => GameLivingEvent.AttackedByEnemy;
 
         /// <summary>
         /// The spell line name of the proc spell
         /// </summary>
-        protected override string SubSpellLineName
-        {
-            get { return "DefensiveProc"; }
-        }
+        protected override string SubSpellLineName => "DefensiveProc";
 
         /// <summary>
         /// Handler fired whenever effect target is attacked
@@ -448,8 +433,7 @@ namespace DOL.GS.Spells
         /// <param name="arguments"></param>
         protected override void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackedByEnemyEventArgs args = arguments as AttackedByEnemyEventArgs;
-            if (args == null || args.AttackData == null || args.AttackData.AttackType == AttackData.eAttackType.Spell)
+            if (!(arguments is AttackedByEnemyEventArgs args) || args.AttackData == null || args.AttackData.AttackType == AttackData.eAttackType.Spell)
             {
                 return;
             }
@@ -505,15 +489,12 @@ namespace DOL.GS.Spells
         /// <param name="arguments"></param>
         protected override void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-            if (args == null || args.AttackData == null)
+            if (!(arguments is AttackFinishedEventArgs args) || args.AttackData == null)
             {
                 return;
             }
 
-            GameNPC target = args.AttackData.Target as GameNPC;
-
-            if (target != null && !(target.Brain is IControlledBrain && ((IControlledBrain)target.Brain).GetPlayerOwner() != null))
+            if (args.AttackData.Target is GameNPC target && !(target.Brain is IControlledBrain && ((IControlledBrain)target.Brain).GetPlayerOwner() != null))
             {
                 base.EventHandler(e, sender, arguments);
             }

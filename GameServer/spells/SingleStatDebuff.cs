@@ -28,7 +28,7 @@ namespace DOL.GS.Spells
     public abstract class SingleStatDebuff : SingleStatBuff
     {
         // bonus category
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.Debuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.Debuff;
 
         /// <summary>
         /// Apply effect on target or do spell action if non duration spell
@@ -50,13 +50,9 @@ namespace DOL.GS.Spells
                 Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
             }
 
-            if (target is GameNPC)
+            if (target is GameNPC npc && npc.Brain is IOldAggressiveBrain aggroBrain)
             {
-                IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
-                {
-                    aggroBrain.AddToAggroList(Caster, (int)Spell.Value);
-                }
+                aggroBrain.AddToAggroList(Caster, (int)Spell.Value);
             }
         }
 
@@ -69,7 +65,7 @@ namespace DOL.GS.Spells
         protected override int CalculateEffectDuration(GameLiving target, double effectiveness)
         {
             double duration = Spell.Duration;
-            duration *= 1.0 + m_caster.GetModified(eProperty.SpellDuration) * 0.01;
+            duration *= 1.0 + Caster.GetModified(eProperty.SpellDuration) * 0.01;
             duration -= duration * target.GetResist(Spell.DamageType) * 0.01;
 
             if (duration < 1)
@@ -111,7 +107,7 @@ namespace DOL.GS.Spells
     [SpellHandler("StrengthDebuff")]
     public class StrengthDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.Strength; } }
+        public override eProperty Property1 => eProperty.Strength;
 
         // constructor
         public StrengthDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -123,7 +119,7 @@ namespace DOL.GS.Spells
     [SpellHandler("DexterityDebuff")]
     public class DexterityDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.Dexterity; } }
+        public override eProperty Property1 => eProperty.Dexterity;
 
         // constructor
         public DexterityDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -135,7 +131,7 @@ namespace DOL.GS.Spells
     [SpellHandler("ConstitutionDebuff")]
     public class ConstitutionDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.Constitution; } }
+        public override eProperty Property1 => eProperty.Constitution;
 
         // constructor
         public ConstitutionDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -147,7 +143,7 @@ namespace DOL.GS.Spells
     [SpellHandler("ArmorFactorDebuff")]
     public class ArmorFactorDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.ArmorFactor; } }
+        public override eProperty Property1 => eProperty.ArmorFactor;
 
         // constructor
         public ArmorFactorDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -159,7 +155,7 @@ namespace DOL.GS.Spells
     [SpellHandler("ArmorAbsorptionDebuff")]
     public class ArmorAbsorptionDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.ArmorAbsorption; } }
+        public override eProperty Property1 => eProperty.ArmorAbsorption;
 
         /// <summary>
         /// send updates about the changes
@@ -179,7 +175,7 @@ namespace DOL.GS.Spells
     [SpellHandler("CombatSpeedDebuff")]
     public class CombatSpeedDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.MeleeSpeed; } }
+        public override eProperty Property1 => eProperty.MeleeSpeed;
 
         /// <summary>
         /// send updates about the changes
@@ -199,7 +195,7 @@ namespace DOL.GS.Spells
     [SpellHandler("MeleeDamageDebuff")]
     public class MeleeDamageDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.MeleeDamage; } }
+        public override eProperty Property1 => eProperty.MeleeDamage;
 
         /// <summary>
         /// send updates about the changes
@@ -219,7 +215,7 @@ namespace DOL.GS.Spells
     [SpellHandler("FatigueConsumptionDebuff")]
     public class FatigueConsumptionDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.FatigueConsumption; } }
+        public override eProperty Property1 => eProperty.FatigueConsumption;
 
         /// <summary>
         /// send updates about the changes
@@ -239,7 +235,7 @@ namespace DOL.GS.Spells
     [SpellHandler("FumbleChanceDebuff")]
     public class FumbleChanceDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.FumbleChance; } }
+        public override eProperty Property1 => eProperty.FumbleChance;
 
         /// <summary>
         /// send updates about the changes
@@ -259,7 +255,7 @@ namespace DOL.GS.Spells
     [SpellHandler("DPSDebuff")]
     public class DPSDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.DPS; } }
+        public override eProperty Property1 => eProperty.DPS;
 
         // constructor
         public DPSDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -271,7 +267,7 @@ namespace DOL.GS.Spells
     [SpellHandler("SkillsDebuff")]
     public class SkillsDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.AllSkills; } }
+        public override eProperty Property1 => eProperty.AllSkills;
 
         // constructor
         public SkillsDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -283,7 +279,7 @@ namespace DOL.GS.Spells
     [SpellHandler("AcuityDebuff")]
     public class AcuityDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.Acuity; } }
+        public override eProperty Property1 => eProperty.Acuity;
 
         // constructor
         public AcuityDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -295,7 +291,7 @@ namespace DOL.GS.Spells
     [SpellHandler("QuicknessDebuff")]
     public class QuicknessDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.Quickness; } }
+        public override eProperty Property1 => eProperty.Quickness;
 
         // constructor
         public QuicknessDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -307,7 +303,7 @@ namespace DOL.GS.Spells
     [SpellHandler("ToHitDebuff")]
     public class ToHitSkillDebuff : SingleStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.ToHitBonus; } }
+        public override eProperty Property1 => eProperty.ToHitBonus;
 
         // constructor
         public ToHitSkillDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }

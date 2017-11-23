@@ -259,7 +259,7 @@ namespace DOL.GS.Spells
         /// <returns>Modified Spell Range</returns>
         int CalculateSpellRange();
 
-        void TooltipDelve(ref DOL.GS.PacketHandler.MiniDelveWriter dw, int id);
+        void TooltipDelve(ref PacketHandler.MiniDelveWriter dw, int id);
     }
 
     /// <summary>

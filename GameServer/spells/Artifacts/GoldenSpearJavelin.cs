@@ -43,7 +43,7 @@ namespace DOL.GS.Spells
         {
             get
             {
-                _artefJavelin = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Artef_Javelin");
+                _artefJavelin = GameServer.Database.FindObjectByKey<ItemTemplate>("Artef_Javelin");
                 if (_artefJavelin == null)
                 {
                     if (log.IsWarnEnabled)
@@ -51,25 +51,27 @@ namespace DOL.GS.Spells
                         log.Warn("Could not find Artef_Javelin, loading it ...");
                     }
 
-                    _artefJavelin = new ItemTemplate();
-                    _artefJavelin.Id_nb = "Artef_Javelin";
-                    _artefJavelin.Name = "Golden Javelin";
-                    _artefJavelin.Level = 50;
-                    _artefJavelin.MaxDurability = 50000;
-                    _artefJavelin.MaxCondition = 50000;
-                    _artefJavelin.Quality = 100;
-                    _artefJavelin.Object_Type = (int)eObjectType.Magical;
-                    _artefJavelin.Item_Type = 41;
-                    _artefJavelin.Model = 23;
-                    _artefJavelin.IsPickable = false;
-                    _artefJavelin.IsDropable = false;
-                    _artefJavelin.CanDropAsLoot = false;
-                    _artefJavelin.IsTradable = false;
-                    _artefJavelin.MaxCount = 1;
-                    _artefJavelin.PackSize = 1;
-                    _artefJavelin.Charges = 5;
-                    _artefJavelin.MaxCharges = 5;
-                    _artefJavelin.SpellID = 38076;
+                    _artefJavelin = new ItemTemplate
+                    {
+                        Id_nb = "Artef_Javelin",
+                        Name = "Golden Javelin",
+                        Level = 50,
+                        MaxDurability = 50000,
+                        MaxCondition = 50000,
+                        Quality = 100,
+                        Object_Type = (int) eObjectType.Magical,
+                        Item_Type = 41,
+                        Model = 23,
+                        IsPickable = false,
+                        IsDropable = false,
+                        CanDropAsLoot = false,
+                        IsTradable = false,
+                        MaxCount = 1,
+                        PackSize = 1,
+                        Charges = 5,
+                        MaxCharges = 5,
+                        SpellID = 38076
+                    };
                 }
 
                 return _artefJavelin;

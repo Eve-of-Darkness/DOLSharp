@@ -35,11 +35,26 @@ namespace DOL.GS.Spells
             }
 
             GameSpellEffect RangeSpell = FindEffectOnTarget(Caster, "Range");
-            if (RangeSpell != null) { MessageToCaster("You already preparing a Range spell", eChatType.CT_System); return false; }
+            if (RangeSpell != null)
+            {
+                MessageToCaster("You already preparing a Range spell", eChatType.CT_System);
+                return false;
+            }
+
             GameSpellEffect UninterruptableSpell = FindEffectOnTarget(Caster, "Uninterruptable");
-            if (UninterruptableSpell != null) { MessageToCaster("You already preparing a Uninterruptable spell", eChatType.CT_System); return false; }
+            if (UninterruptableSpell != null)
+            {
+                MessageToCaster("You already preparing a Uninterruptable spell", eChatType.CT_System);
+                return false;
+            }
+
             GameSpellEffect PowerlessSpell = FindEffectOnTarget(Caster, "Powerless");
-            if (PowerlessSpell != null) { MessageToCaster("You must finish casting Powerless before you can cast it again", eChatType.CT_System); return false; }
+            if (PowerlessSpell != null)
+            {
+                MessageToCaster("You must finish casting Powerless before you can cast it again", eChatType.CT_System);
+                return false;
+            }
+
             return true;
         }
 

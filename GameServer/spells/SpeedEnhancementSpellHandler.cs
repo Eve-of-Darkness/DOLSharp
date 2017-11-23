@@ -49,7 +49,7 @@ namespace DOL.GS.Spells
         protected override int CalculateEffectDuration(GameLiving target, double effectiveness)
         {
             double duration = Spell.Duration;
-            duration *= 1.0 + m_caster.GetModified(eProperty.SpellDuration) * 0.01;
+            duration *= 1.0 + Caster.GetModified(eProperty.SpellDuration) * 0.01;
             if (Spell.InstrumentRequirement != 0)
             {
                 InventoryItem instrument = Caster.AttackWeapon;
@@ -165,9 +165,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectStart(effect);
 
-            GamePlayer player = effect.Owner as GamePlayer;
-
-            if (player == null || !player.IsStealthed)
+            if (!(effect.Owner is GamePlayer player) || !player.IsStealthed)
             {
                 effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, Spell.Value / 100.0);
                 SendUpdates(effect.Owner);
@@ -204,9 +202,9 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (owner is GamePlayer)
+            if (owner is GamePlayer player)
             {
-                ((GamePlayer)owner).Out.SendUpdateMaxSpeed();
+                player.Out.SendUpdateMaxSpeed();
             }
             else if (owner is GameNPC)
             {
@@ -227,8 +225,7 @@ namespace DOL.GS.Spells
         /// <param name="arguments"></param>
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            if (!(sender is GameLiving living))
             {
                 return;
             }
@@ -258,20 +255,19 @@ namespace DOL.GS.Spells
             {
                 return;
             }
-            else if (sp == null && (ad.AttackResult != GameLiving.eAttackResult.HitStyle && ad.AttackResult != GameLiving.eAttackResult.HitUnstyled))
+
+            if (sp == null && (ad.AttackResult != GameLiving.eAttackResult.HitStyle && ad.AttackResult != GameLiving.eAttackResult.HitUnstyled))
             {
                 return;
             }
-            else if (sp != null && (sp.HasPositiveEffect || ad == null))
+
+            if (sp != null && (sp.HasPositiveEffect || ad == null))
             {
                 return;
             }
 
             GameSpellEffect speed = FindEffectOnTarget(living, this);
-            if (speed != null)
-            {
-                speed.Cancel(false);
-            }
+            speed?.Cancel(false);
         }
 
         /// <summary>

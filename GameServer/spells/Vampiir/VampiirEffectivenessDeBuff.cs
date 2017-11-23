@@ -27,7 +27,7 @@ namespace DOL.GS.Spells
     {
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -41,7 +41,7 @@ namespace DOL.GS.Spells
                 player.TempProperties.setProperty("PreEffectivenessDebuff", player.Effectiveness);
 
                 double effectiveness = player.Effectiveness;
-                double valueToAdd = (Spell.Value * effectiveness) / 100;
+                double valueToAdd = Spell.Value * effectiveness / 100;
                 valueToAdd = effectiveness - valueToAdd;
 
                 if (valueToAdd > 0)
@@ -84,68 +84,61 @@ namespace DOL.GS.Spells
         {
             get
             {
-                var list = new List<string>(16);
+                var list = new List<string>(16)
+                {
+                    $"Name: {Spell.Name}",
+                    $"Description: {Spell.Description}",
+                    $"Target: {Spell.Target}",
+                    $"Casting time: {(Spell.CastTime * 0.001):0.0## sec;-0.0## sec;'instant'}"
+                };
 
-                // Name
-                list.Add("Name: " + Spell.Name);
-
-                // Description
-                list.Add("Description: " + Spell.Description);
-
-                // Target
-                list.Add("Target: " + Spell.Target);
-
-                // Cast
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
-
-                // Duration
                 if (Spell.Duration >= ushort.MaxValue * 1000)
                 {
                     list.Add("Duration: Permanent.");
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format("Duration: {0}:{1} min", Spell.Duration / 60000, (Spell.Duration % 60000 / 1000).ToString("00")));
+                    list.Add($"Duration: {Spell.Duration / 60000}:{Spell.Duration % 60000 / 1000:00} min");
                 }
                 else if (Spell.Duration != 0)
                 {
-                    list.Add("Duration: " + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
+                    list.Add($"Duration: {Spell.Duration / 1000:0' sec';'Permanent.';'Permanent.'}");
                 }
 
                 // Recast
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"Recast time: {Spell.RecastDelay / 60000}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"Recast time: {Spell.RecastDelay / 1000} sec");
                 }
 
                 // Range
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
                 // Radius
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
                 // Cost
                 if (Spell.Power != 0)
                 {
-                    list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                    list.Add($"Power cost: {Spell.Power:0;0'%'}");
                 }
 
                 // Effect
-                list.Add("Debuff Effectiveness Of target By: " + Spell.Value + "%");
+                list.Add($"Debuff Effectiveness Of target By: {Spell.Value}%");
 
                 if (Spell.Frequency != 0)
                 {
-                    list.Add("Frequency: " + (Spell.Frequency * 0.001).ToString("0.0"));
+                    list.Add($"Frequency: {Spell.Frequency * 0.001:0.0}");
                 }
 
                 return list;

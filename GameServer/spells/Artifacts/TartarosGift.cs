@@ -61,7 +61,7 @@ namespace DOL.GS.Spells
             heal = Caster.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, heal);
             if (heal > 0)
             {
-                MessageToCaster("You drain " + heal + " hit point" + (heal == 1 ? "." : "s."), eChatType.CT_Spell);
+                MessageToCaster($"You drain {heal} hit point{(heal == 1 ? "." : "s.")}", eChatType.CT_Spell);
             }
             else
             {
@@ -76,7 +76,7 @@ namespace DOL.GS.Spells
             mana = Caster.ChangeMana(Caster,GameLiving.eManaChangeType.Spell,mana);
             if (mana > 0)
             {
-                MessageToCaster("You drain " + mana + " power point" + (mana == 1 ? "." : "s."), eChatType.CT_Spell);
+                MessageToCaster($"You drain {mana} power point{(mana == 1 ? "." : "s.")}", eChatType.CT_Spell);
             }
             else
             {
@@ -91,7 +91,7 @@ namespace DOL.GS.Spells
             endu = Caster.ChangeEndurance(Caster,GameLiving.eEnduranceChangeType.Spell,endu);
             if (heal > 0)
             {
-                MessageToCaster("You drain " + endu + " endurance point" + (endu == 1 ? "." : "s."), eChatType.CT_Spell);
+                MessageToCaster($"You drain {endu} endurance point{(endu == 1 ? "." : "s.")}", eChatType.CT_Spell);
             }
             else
             {

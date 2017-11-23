@@ -51,13 +51,13 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!m_caster.IsAlive)
+            if (!Caster.IsAlive)
             {
                 return;
             }
 
-            int heal = (ad.Damage + ad.CriticalDamage) * m_spell.LifeDrainReturn / 100;
-            if (m_caster.IsDiseased)
+            int heal = (ad.Damage + ad.CriticalDamage) * Spell.LifeDrainReturn / 100;
+            if (Caster.IsDiseased)
             {
                 MessageToCaster("You are diseased!", eChatType.CT_SpellResisted);
                 heal >>= 1;
@@ -68,11 +68,11 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            heal = m_caster.ChangeHealth(m_caster, GameLiving.eHealthChangeType.Spell, heal);
+            heal = Caster.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, heal);
 
             if (heal > 0)
             {
-                MessageToCaster("You steal " + heal + " hit point" + (heal == 1 ? "." : "s."), eChatType.CT_Spell);
+                MessageToCaster($"You steal {heal} hit point{(heal == 1 ? "." : "s.")}", eChatType.CT_Spell);
             }
             else
             {

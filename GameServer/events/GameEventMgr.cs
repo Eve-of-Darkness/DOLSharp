@@ -263,22 +263,22 @@ namespace DOL.Events
         {
             if (obj == null)
             {
-                throw new ArgumentNullException("obj", "No object given!");
+                throw new ArgumentNullException(nameof(obj), "No object given!");
             }
 
             if (e == null)
             {
-                throw new ArgumentNullException("e", "No event type given!");
+                throw new ArgumentNullException(nameof(e), "No event type given!");
             }
 
             if (del == null)
             {
-                throw new ArgumentNullException("del", "No event handler given!");
+                throw new ArgumentNullException(nameof(del), "No event handler given!");
             }
 
             if (!e.IsValidFor(obj))
             {
-                throw new ArgumentException("Object is not valid for this event type", "obj");
+                throw new ArgumentException("Object is not valid for this event type", nameof(obj));
             }
 
             if (Lock.TryEnterUpgradeableReadLock(LOCK_TIMEOUT))

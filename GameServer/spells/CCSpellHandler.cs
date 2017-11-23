@@ -39,13 +39,13 @@ namespace DOL.GS.Spells
         {
             if (target.HasAbility(Abilities.CCImmunity))
             {
-                MessageToCaster(target.Name + " is immune to this effect!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.Name} is immune to this effect!", eChatType.CT_SpellResisted);
                 return;
             }
 
             if (target.EffectList.GetOfType<ChargeEffect>() != null || target.TempProperties.getProperty("Charging", false))
             {
-                MessageToCaster(target.Name + " is moving too fast for this spell to have any effect!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.Name} is moving too fast for this spell to have any effect!", eChatType.CT_SpellResisted);
                 return;
             }
 
@@ -63,16 +63,12 @@ namespace DOL.GS.Spells
 
             MessageToLiving(effect.Owner, Spell.Message1, eChatType.CT_Spell);
             MessageToCaster(Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, true)), eChatType.CT_Spell);
-            Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, true)), eChatType.CT_Spell, effect.Owner, m_caster);
+            Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, true)), eChatType.CT_Spell, effect.Owner, Caster);
 
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 player.Client.Out.SendUpdateMaxSpeed();
-                if (player.Group != null)
-                {
-                    player.Group.UpdateMember(player, false, false);
-                }
+                player.Group?.UpdateMember(player, false, false);
             }
             else
             {
@@ -98,23 +94,16 @@ namespace DOL.GS.Spells
 
             base.OnEffectExpires(effect, noMessages);
 
-            GamePlayer player = effect.Owner as GamePlayer;
-
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 player.Client.Out.SendUpdateMaxSpeed();
-                if (player.Group != null)
-                {
-                    player.Group.UpdateMember(player, false, false);
-                }
+                player.Group?.UpdateMember(player, false, false);
             }
             else
             {
-                GameNPC npc = effect.Owner as GameNPC;
-                if (npc != null)
+                if (effect.Owner is GameNPC npc)
                 {
-                    IOldAggressiveBrain aggroBrain = npc.Brain as IOldAggressiveBrain;
-                    if (aggroBrain != null)
+                    if (npc.Brain is IOldAggressiveBrain aggroBrain)
                     {
                         aggroBrain.AddToAggroList(Caster, 1);
                     }
@@ -180,7 +169,7 @@ namespace DOL.GS.Spells
                 return AllureofDeathEffect.ccchance;
             }
 
-            if (m_spellLine.KeyName == GlobalSpellsLines.Combat_Styles_Effect)
+            if (SpellLine.KeyName == GlobalSpellsLines.Combat_Styles_Effect)
             {
                 return 0;
             }
@@ -254,9 +243,9 @@ namespace DOL.GS.Spells
         /// <returns>amount to subtract from effectiveness</returns>
         protected override double CalculateAreaVariance(GameLiving target, int distance, int radius)
         {
-            if (target is GamePlayer || (target is GameNPC && (target as GameNPC).Brain is IControlledBrain))
+            if (target is GamePlayer || (target as GameNPC)?.Brain is IControlledBrain)
             {
-                return ((double)distance / (double)radius) / 2.0;
+                return ((double)distance / radius) / 2.0;
             }
 
             return 0;
@@ -269,7 +258,7 @@ namespace DOL.GS.Spells
 // Flute Mez (pulse>0)
             if (Spell.Pulse > 0)
             {
-                if (target != null && (!target.IsAlive))
+                if (target != null && !target.IsAlive)
                 {
                     GameSpellEffect effect = FindEffectOnTarget(target, this);
                     if (effect != null)
@@ -307,16 +296,14 @@ namespace DOL.GS.Spells
             {
                 foreach (IGameEffect effect in target.EffectList)
                 {
-                    if (effect is GameSpellEffect)
+                    if (effect is GameSpellEffect gsp)
                     {
-                        GameSpellEffect gsp = (GameSpellEffect)effect;
-                        if (gsp is GameSpellAndImmunityEffect)
+                        if (gsp is GameSpellAndImmunityEffect immunity)
                         {
-                            GameSpellAndImmunityEffect immunity = (GameSpellAndImmunityEffect)gsp;
                             if (immunity.ImmunityState
                                 && target == immunity.Owner)
                             {
-                                MessageToCaster(immunity.Owner.GetName(0, true) + " can't have that effect again yet!!!", eChatType.CT_SpellPulse);
+                                MessageToCaster($"{immunity.Owner.GetName(0, true)} can\'t have that effect again yet!!!", eChatType.CT_SpellPulse);
                                 return;
                             }
                         }
@@ -326,7 +313,7 @@ namespace DOL.GS.Spells
 
 // END
             SendEffectAnimation(target, 0, false, 0);
-            MessageToCaster(target.GetName(0, true) + " resists the effect!", eChatType.CT_SpellResisted);
+            MessageToCaster($"{target.GetName(0, true)} resists the effect!", eChatType.CT_SpellResisted);
             target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
         }
 
@@ -358,7 +345,7 @@ namespace DOL.GS.Spells
                     return;
                 }
 
-                if (target != null && (!target.IsAlive))
+                if (target != null && !target.IsAlive)
                 {
                     GameSpellEffect effect = FindEffectOnTarget(target, this);
                     if (effect != null)
@@ -388,7 +375,7 @@ namespace DOL.GS.Spells
 //
             if (target.HasAbility(Abilities.MezzImmunity))
             {
-                MessageToCaster(target.Name + " is immune to this effect!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.Name} is immune to this effect!", eChatType.CT_SpellResisted);
                 SendEffectAnimation(target, 0, false, 0);
                 target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
                 return;
@@ -416,10 +403,7 @@ namespace DOL.GS.Spells
             if (mezblock != null)
             {
                 mezblock.Cancel(false);
-                if (target is GamePlayer)
-                {
-                    (target as GamePlayer).Out.SendMessage("Your item effect intercepts the mesmerization spell and fades!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-                }
+                (target as GamePlayer)?.Out.SendMessage("Your item effect intercepts the mesmerization spell and fades!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
 
                 // inform caster
                 MessageToCaster("Ceremonial Bracer intercept your mez!", eChatType.CT_SpellResisted);
@@ -510,10 +494,7 @@ namespace DOL.GS.Spells
             if (remove)
             {
                 GameSpellEffect effect = FindEffectOnTarget(living, this);
-                if (effect != null)
-                {
-                    effect.Cancel(false);// call OnEffectExpires
-                }
+                effect?.Cancel(false);// call OnEffectExpires
             }
         }
 
@@ -532,13 +513,11 @@ namespace DOL.GS.Spells
             // use ResurrectMana=1 if the Stun should not have immunity
             if (Spell.ResurrectMana == 1)
             {
-                int freq = Spell != null ? Spell.Frequency : 0;
+                int freq = Spell.Frequency;
                 return new GameSpellEffect(this, CalculateEffectDuration(target, effectiveness), freq, effectiveness);
             }
-            else
-            {
-                return new GameSpellAndImmunityEffect(this, CalculateEffectDuration(target, effectiveness), 0, effectiveness);
-            }
+
+            return new GameSpellAndImmunityEffect(this, CalculateEffectDuration(target, effectiveness), 0, effectiveness);
         }
 
         /// <summary>
@@ -550,9 +529,9 @@ namespace DOL.GS.Spells
         /// <returns>amount to subtract from effectiveness</returns>
         protected override double CalculateAreaVariance(GameLiving target, int distance, int radius)
         {
-            if (target is GamePlayer || (target is GameNPC && (target as GameNPC).Brain is IControlledBrain))
+            if (target is GamePlayer || (target as GameNPC)?.Brain is IControlledBrain)
             {
-                return ((double)distance / (double)radius) / 2.0;
+                return (distance / (double)radius) / 2.0;
             }
 
             return 0;
@@ -593,7 +572,7 @@ namespace DOL.GS.Spells
         {
             if (target.HasAbility(Abilities.StunImmunity))
             {
-                MessageToCaster(target.Name + " is immune to this effect!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.Name} is immune to this effect!", eChatType.CT_SpellResisted);
                 base.OnSpellResisted(target);
                 return;
             }
@@ -605,10 +584,7 @@ namespace DOL.GS.Spells
                 if (stunblock != null)
                 {
                     stunblock.Cancel(false);
-                    if (target is GamePlayer)
-                    {
-                        (target as GamePlayer).Out.SendMessage("Your item effect intercepts the stun spell and fades!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-                    }
+                    (target as GamePlayer)?.Out.SendMessage("Your item effect intercepts the stun spell and fades!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
 
                     base.OnSpellResisted(target);
                     return;

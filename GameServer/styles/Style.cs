@@ -32,7 +32,7 @@ namespace DOL.GS.Styles
         /// <summary>
         /// The opening type of a style
         /// </summary>
-        public enum eOpening : int
+        public enum eOpening
         {
             /// <summary>
             /// Offensive opening, depending on the attacker's actions
@@ -51,7 +51,7 @@ namespace DOL.GS.Styles
         /// <summary>
         /// The opening positions if the style is a position based style
         /// </summary>
-        public enum eOpeningPosition : int
+        public enum eOpeningPosition
         {
             /// <summary>
             /// Towards back of the target
@@ -70,7 +70,7 @@ namespace DOL.GS.Styles
         /// <summary>
         /// The required attack result of the style
         /// </summary>
-        public enum eAttackResultRequirement : int
+        public enum eAttackResultRequirement
         {
             /// <summary>
             /// Any attack result is fine
@@ -126,7 +126,7 @@ namespace DOL.GS.Styles
         /// <summary>
         /// The database style object, used to retrieve information for this object
         /// </summary>
-        protected DBStyle baseStyle = null;
+        protected DBStyle baseStyle ;
 
         /// <summary>
         /// Constructs a new Style object based on a database Style object
@@ -138,59 +138,38 @@ namespace DOL.GS.Styles
             baseStyle = style;
         }
 
-        public int ClassID
-        {
-            get { return baseStyle.ClassId; }
-        }
+        public int ClassID => baseStyle.ClassId;
 
         /// <summary>
         /// (readonly)(procs) The list of procs available for this style
         /// </summary>
-        public IList<Tuple<Spell, int, int>> Procs
-        {
-            get { return SkillBase.GetStyleProcsByID(this); }
-        }
+        public IList<Tuple<Spell, int, int>> Procs => SkillBase.GetStyleProcsByID(this);
 
         /// <summary>
         /// (readonly) The Specialization's name required to execute this style
         /// </summary>
-        public string Spec
-        {
-            get { return baseStyle.SpecKeyName; }
-        }
+        public string Spec => baseStyle.SpecKeyName;
 
         /// <summary>
         /// (readonly) The Specialization's level required to execute this style
         /// </summary>
-        public int SpecLevelRequirement
-        {
-            get { return baseStyle.SpecLevelRequirement; }
-        }
+        public int SpecLevelRequirement => baseStyle.SpecLevelRequirement;
 
         /// <summary>
         /// (readonly) The fatique cost of this style in % of player's total fatique
         /// This cost will be modified by weapon speed, realm abilities and magic effects
         /// </summary>
-        public int EnduranceCost
-        {
-            get { return baseStyle.EnduranceCost; }
-        }
+        public int EnduranceCost => baseStyle.EnduranceCost;
 
         /// <summary>
         /// (readonly) Stealth requirement of this style
         /// </summary>
-        public bool StealthRequirement
-        {
-            get { return baseStyle.StealthRequirement; }
-        }
+        public bool StealthRequirement => baseStyle.StealthRequirement;
 
         /// <summary>
         /// (readonly) The opening type of this style
         /// </summary>
-        public eOpening OpeningRequirementType
-        {
-            get { return (eOpening)baseStyle.OpeningRequirementType; }
-        }
+        public eOpening OpeningRequirementType => (eOpening)baseStyle.OpeningRequirementType;
 
         /// <summary>
         /// (readonly) Depending on the OpeningRequirementType.
@@ -204,89 +183,56 @@ namespace DOL.GS.Styles
         /// If the style is a position opened style, this
         /// holds the position requirement.
         /// </summary>
-        public int OpeningRequirementValue
-        {
-            get { return baseStyle.OpeningRequirementValue; }
-        }
+        public int OpeningRequirementValue => baseStyle.OpeningRequirementValue;
 
         /// <summary>
         /// (readonly) The attack result required from
         /// attacker(offensive style) or defender(defensive style)
         /// </summary>
-        public eAttackResultRequirement AttackResultRequirement
-        {
-            get { return (eAttackResultRequirement)baseStyle.AttackResultRequirement; }
-        }
+        public eAttackResultRequirement AttackResultRequirement => (eAttackResultRequirement)baseStyle.AttackResultRequirement;
 
         /// <summary>
         /// (readonly) The type of weapon required to execute this style.
         /// If not one of SpecialWeaponType then eObjectType is used.
         /// </summary>
-        public int WeaponTypeRequirement
-        {
-            get { return baseStyle.WeaponTypeRequirement; }
-        }
+        public int WeaponTypeRequirement => baseStyle.WeaponTypeRequirement;
 
         /// <summary>
         /// (readonly) The growth offset of the style growth function
         /// </summary>
-        public double GrowthOffset
-        {
-            get { return baseStyle.GrowthOffset; }
-        }
+        public double GrowthOffset => baseStyle.GrowthOffset;
 
         /// <summary>
         /// (readonly) The growth rate of the style
         /// </summary>
-        public double GrowthRate
-        {
-            get { return baseStyle.GrowthRate; }
-        }
+        public double GrowthRate => baseStyle.GrowthRate;
 
         /// <summary>
         /// (readonly) The bonus to hit if this style get's executed successfully
         /// </summary>
-        public int BonusToHit
-        {
-            get { return baseStyle.BonusToHit; }
-        }
+        public int BonusToHit => baseStyle.BonusToHit;
 
         /// <summary>
         /// (readonly) The bonus to defense if this style get's executed successfully
         /// </summary>
-        public int BonusToDefense
-        {
-            get { return baseStyle.BonusToDefense; }
-        }
+        public int BonusToDefense => baseStyle.BonusToDefense;
 
         /// <summary>
         /// (readonly) The type of this skill, always returns eSkillPage.Styles
         /// </summary>
-        public override eSkillPage SkillType
-        {
-            get { return eSkillPage.Styles; }
-        }
+        public override eSkillPage SkillType => eSkillPage.Styles;
 
         /// <summary>
         /// (readonly) The animation ID for 2h weapon styles
         /// </summary>
-        public int TwoHandAnimation
-        {
-            get { return baseStyle.TwoHandAnimation; }
-        }
+        public int TwoHandAnimation => baseStyle.TwoHandAnimation;
 
         /// <summary>
         /// (readonly) (procs) Tell if the proc should be select randomly
         /// </summary>
-        public bool RandomProc
-        {
-            get { return baseStyle.RandomProc; }
-        }
+        public bool RandomProc => baseStyle.RandomProc;
 
-        public eArmorSlot ArmorHitLocation
-        {
-            get { return (eArmorSlot)baseStyle.ArmorHitLocation; }
-        }
+        public eArmorSlot ArmorHitLocation => (eArmorSlot)baseStyle.ArmorHitLocation;
 
         /// <summary>
         /// Gets name of required weapon type

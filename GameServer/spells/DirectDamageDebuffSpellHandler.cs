@@ -18,6 +18,7 @@
  */
 using System;
 using System.Collections.Generic;
+using DOL.AI.Brain;
 using DOL.GS.PacketHandler;
 using DOL.Language;
 using DOL.Events;
@@ -32,9 +33,9 @@ namespace DOL.GS.Spells
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public override eProperty Property1 { get { return Caster.GetResistTypeForDamage(Spell.DamageType); } }
+        public override eProperty Property1 => Caster.GetResistTypeForDamage(Spell.DamageType);
 
-        public override string DebuffTypeName { get { return GlobalConstants.DamageTypeToName(Spell.DamageType); } }
+        public override string DebuffTypeName => GlobalConstants.DamageTypeToName(Spell.DamageType);
 
         #region LOS on Keeps
 
@@ -52,13 +53,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            bool spellOK = true;
-
-            // cone spells
-            if (Spell.Target == "Frontal" || (Spell.Target == "Enemy" && Spell.Radius > 0 && Spell.Range == 0))
-            {
-                spellOK = false;
-            }
+            bool spellOK = !(Spell.Target == "Frontal" || Spell.Target == "Enemy" && Spell.Radius > 0 && Spell.Range == 0);
 
             if (!spellOK || CheckLOS(Caster))
             {
@@ -69,22 +64,22 @@ namespace DOL.GS.Spells
                 }
                 else
                 {
-                    if (Caster is GamePlayer)
+                    if (Caster is GamePlayer gamePlayer)
                     {
-                        player = Caster as GamePlayer;
+                        player = gamePlayer;
                     }
-                    else if (Caster is GameNPC && (Caster as GameNPC).Brain is AI.Brain.IControlledBrain)
+                    else if ((Caster as GameNPC)?.Brain is IControlledBrain)
                     {
-                        AI.Brain.IControlledBrain brain = (Caster as GameNPC).Brain as AI.Brain.IControlledBrain;
+                        IControlledBrain brain = ((GameNPC) Caster).Brain as IControlledBrain;
 
                         // Ryan: edit for BD
-                        if (brain.Owner is GamePlayer)
+                        if (brain.Owner is GamePlayer player1)
                         {
-                            player = (GamePlayer)brain.Owner;
+                            player = player1;
                         }
                         else
                         {
-                            player = (GamePlayer)((AI.Brain.IControlledBrain)((GameNPC)brain.Owner).Brain).Owner;
+                            player = (GamePlayer)((IControlledBrain)((GameNPC)brain.Owner).Brain).Owner;
                         }
                     }
                 }
@@ -129,21 +124,20 @@ namespace DOL.GS.Spells
             {
                 try
                 {
-                    GameLiving target = Caster.CurrentRegion.GetObject(targetOID) as GameLiving;
-                    if (target != null)
+                    if (Caster.CurrentRegion.GetObject(targetOID) is GameLiving target)
                     {
                         double effectiveness = (double)player.TempProperties.getProperty<object>(LOSEFFECTIVENESS, null);
                         DealDamage(target, effectiveness);
 
                         // Due to LOS check delay the actual cast happens after FinishSpellCast does a notify, so we notify again
-                        GameEventMgr.Notify(GameLivingEvent.CastFinished, m_caster, new CastingEventArgs(this, target, m_lastAttackData));
+                        GameEventMgr.Notify(GameLivingEvent.CastFinished, Caster, new CastingEventArgs(this, target, m_lastAttackData));
                     }
                 }
                 catch (Exception e)
                 {
                     if (log.IsErrorEnabled)
                     {
-                        log.Error(string.Format("targetOID:{0} caster:{1} exception:{2}", targetOID, Caster, e));
+                        log.Error($"targetOID:{targetOID} caster:{Caster} exception:{e}");
                     }
                 }
             }
@@ -157,7 +151,7 @@ namespace DOL.GS.Spells
                 base.ApplyEffectOnTarget(target, effectiveness);
             }
 
-            if ((Spell.Duration > 0 && Spell.Target != "Area") || Spell.Concentration > 0)
+            if (Spell.Duration > 0 && Spell.Target != "Area" || Spell.Concentration > 0)
             {
                 OnDirectEffect(target, effectiveness);
             }
@@ -165,7 +159,7 @@ namespace DOL.GS.Spells
 
         private void DealDamage(GameLiving target, double effectiveness)
         {
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -209,8 +203,7 @@ namespace DOL.GS.Spells
             {
                 try
                 {
-                    GameLiving target = Caster.CurrentRegion.GetObject(targetOID) as GameLiving;
-                    if (target != null)
+                    if (Caster.CurrentRegion.GetObject(targetOID) is GameLiving target)
                     {
                         SpellResisted(target);
                     }
@@ -219,7 +212,7 @@ namespace DOL.GS.Spells
                 {
                     if (log.IsErrorEnabled)
                     {
-                        log.Error(string.Format("targetOID:{0} caster:{1} exception:{2}", targetOID, Caster, e));
+                        log.Error($"targetOID:{targetOID} caster:{Caster} exception:{e}");
                     }
                 }
             }
@@ -258,72 +251,72 @@ namespace DOL.GS.Spells
 
                 var list = new List<string>();
 
-                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DirectDamageDebuffSpellHandler.DelveInfo.Function"));
+                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DirectDamageDebuffSpellHandler.DelveInfo.Function"));
                 list.Add(" "); // empty line
                 list.Add(Spell.Description);
                 list.Add(" "); // empty line
                 if (Spell.Damage != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Damage", Spell.Damage.ToString("0.###;0.###'%'")));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Damage", Spell.Damage.ToString("0.###;0.###'%'")));
                 }
 
                 if (Spell.Value != 0)
                 {
-                    list.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DirectDamageDebuffSpellHandler.DelveInfo.Decrease", DebuffTypeName, Spell.Value)));
+                    list.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DirectDamageDebuffSpellHandler.DelveInfo.Decrease", DebuffTypeName, Spell.Value)));
                 }
 
-                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Target", Spell.Target));
+                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Target", Spell.Target));
                 if (Spell.Range != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Range", Spell.Range));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Range", Spell.Range));
                 }
 
                 if (Spell.Duration >= ushort.MaxValue * 1000)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Duration") + " Permanent.");
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Duration")} Permanent.");
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Duration") + Spell.Duration / 60000 + ":" + (Spell.Duration % 60000 / 1000).ToString("00") + " min"));
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Duration")}{Spell.Duration / 60000}:{Spell.Duration % 60000 / 1000:00} min");
                 }
                 else if (Spell.Duration != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Duration") + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Duration")}{Spell.Duration / 1000:0\' sec\';\'Permanent.\';\'Permanent.\'}");
                 }
 
                 if (Spell.Frequency != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Frequency", (Spell.Frequency * 0.001).ToString("0.0")));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Frequency", (Spell.Frequency * 0.001).ToString("0.0")));
                 }
 
                 if (Spell.Power != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.PowerCost", Spell.Power.ToString("0;0'%'")));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.PowerCost", Spell.Power.ToString("0;0'%'")));
                 }
 
-                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.CastingTime", (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'")));
+                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.CastingTime", (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'")));
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.RecastTime") + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.RecastTime")}{Spell.RecastDelay / 60000}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.RecastTime") + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.RecastTime")}{Spell.RecastDelay / 1000} sec");
                 }
 
                 if (Spell.Concentration != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.ConcentrationCost", Spell.Concentration));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.ConcentrationCost", Spell.Concentration));
                 }
 
                 if (Spell.Radius != 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Radius", Spell.Radius));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Radius", Spell.Radius));
                 }
 
                 if (Spell.DamageType != eDamageType.Natural)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.Damage", GlobalConstants.DamageTypeToName(Spell.DamageType)));
+                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.Damage", GlobalConstants.DamageTypeToName(Spell.DamageType)));
                 }
 
                 return list;

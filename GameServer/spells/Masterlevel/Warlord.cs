@@ -37,18 +37,17 @@ namespace DOL.GS.Spells
         {
             switch (Spell.DamageType)
             {
-                case (eDamageType)((byte)1):
+                case (eDamageType)1:
                     {
                         int value = (int)Spell.Value;
-                        int life;
-                        life = (m_caster.Health * value) / 100;
-                        m_caster.Health -= life;
+                        var life = Caster.Health * value / 100;
+                        Caster.Health -= life;
                     }
 
                     break;
             }
 
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -59,7 +58,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -71,15 +70,12 @@ namespace DOL.GS.Spells
                 switch (Spell.DamageType)
                 {
                     // Warlord ML 2
-                    case (eDamageType)((byte)0):
+                    case 0:
                         {
-                            int mana;
-                            int health;
-                            int end;
                             int value = (int)Spell.Value;
-                            mana = (target.MaxMana * value) / 100;
-                            end = (target.MaxEndurance * value) / 100;
-                            health = (target.MaxHealth * value) / 100;
+                            var mana = target.MaxMana * value / 100;
+                            var end = target.MaxEndurance * value / 100;
+                            var health = target.MaxHealth * value / 100;
 
                             if (target.Health + health > target.MaxHealth)
                             {
@@ -114,23 +110,23 @@ namespace DOL.GS.Spells
                         break;
 
                     // warlord ML8
-                    case (eDamageType)((byte)1):
+                    case (eDamageType)1:
                         {
-                            int healvalue = (int)m_spell.Value;
+                            int healvalue = (int)Spell.Value;
                             int heal;
                                 if (target.IsAlive && !GameServer.ServerRules.IsAllowedToAttack(Caster, player, true))
                                 {
                                     heal = target.ChangeHealth(target, GameLiving.eHealthChangeType.Spell, healvalue);
                                     if (heal != 0)
                                 {
-                                    player.Out.SendMessage(m_caster.Name + " heal you for " + heal + " hit point!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                                    player.Out.SendMessage($"{Caster.Name} heal you for {heal} hit point!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
                                 }
                             }
 
-                            heal = m_caster.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, (int)(-m_caster.Health * 90 / 100));
+                            heal = Caster.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, (int)(-Caster.Health * 90 / 100));
                             if (heal != 0)
                             {
-                                MessageToCaster("You lose " + heal + " hit point" + (heal == 1 ? "." : "s."), eChatType.CT_Spell);
+                                MessageToCaster($"You lose {heal} hit point{(heal == 1 ? "." : "s.")}", eChatType.CT_Spell);
                             }
 
                             SendEffectAnimation(target, 0, false, 1);
@@ -162,7 +158,7 @@ namespace DOL.GS.Spells
             GameLiving target = Caster;
             foreach (GameNPC npc in target.GetNPCsInRadius((ushort)Spell.Radius))
             {
-                if (npc is GameNPC && npc.Brain is ControlledNpcBrain) // !(npc is NecromancerPet))
+                if (npc?.Brain is ControlledNpcBrain) // !(npc is NecromancerPet))
                 {
                     list.Add(npc);
                 }
@@ -182,9 +178,9 @@ namespace DOL.GS.Spells
     [SpellHandler("Critical")]
     public class CriticalDamageBuff : MasterlevelDualBuffHandling
     {
-        public override eProperty Property1 { get { return eProperty.CriticalSpellHitChance; } }
+        public override eProperty Property1 => eProperty.CriticalSpellHitChance;
 
-        public override eProperty Property2 { get { return eProperty.CriticalMeleeHitChance; } }
+        public override eProperty Property2 => eProperty.CriticalMeleeHitChance;
 
         public CriticalDamageBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
@@ -216,14 +212,11 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
-        public override bool HasPositiveEffect
-        {
-            get { return true; }
-        }
+        public override bool HasPositiveEffect => true;
 
         /// <summary>
         /// When an applied effect starts
@@ -232,8 +225,7 @@ namespace DOL.GS.Spells
         /// <param name="effect"></param>
         public override void OnEffectStart(GameSpellEffect effect)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 player.Effectiveness += Spell.Value * 0.01;
                 player.Out.SendUpdateWeaponAndArmorStats();
@@ -250,8 +242,7 @@ namespace DOL.GS.Spells
         /// <returns>immunity duration in milliseconds</returns>
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 player.Effectiveness -= Spell.Value * 0.01;
                 player.Out.SendUpdateWeaponAndArmorStats();
@@ -270,7 +261,7 @@ namespace DOL.GS.Spells
     [SpellHandler("MLABSBuff")]
     public class MLABSBuff : MasterlevelBuffHandling
     {
-        public override eProperty Property1 { get { return eProperty.ArmorAbsorption; } }
+        public override eProperty Property1 => eProperty.ArmorAbsorption;
 
         public MLABSBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }

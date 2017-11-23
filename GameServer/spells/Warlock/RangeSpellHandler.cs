@@ -35,11 +35,26 @@ namespace DOL.GS.Spells
             }
 
             GameSpellEffect UninterruptableSpell = FindEffectOnTarget(Caster, "Uninterruptable");
-            if (UninterruptableSpell != null) { MessageToCaster("You already preparing a Uninterruptable spell", eChatType.CT_System); return false; }
+            if (UninterruptableSpell != null)
+            {
+                MessageToCaster("You already preparing a Uninterruptable spell", eChatType.CT_System);
+                return false;
+            }
+
             GameSpellEffect PowerlessSpell = FindEffectOnTarget(Caster, "Powerless");
-            if (PowerlessSpell != null) { MessageToCaster("You already preparing	a Powerless spell", eChatType.CT_System); return false; }
+            if (PowerlessSpell != null)
+            {
+                MessageToCaster("You already preparing	a Powerless spell", eChatType.CT_System);
+                return false;
+            }
+
             GameSpellEffect RangeSpell = FindEffectOnTarget(Caster, "Range");
-            if (RangeSpell != null) { MessageToCaster("You must finish casting Range before you can cast it again", eChatType.CT_System); return false; }
+            if (RangeSpell != null)
+            {
+                MessageToCaster("You must finish casting Range before you can cast it again", eChatType.CT_System);
+                return false;
+            }
+
             return true;
         }
 
@@ -50,14 +65,13 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         public override int PowerCost(GameLiving target)
         {
-            double basepower = m_spell.Power; // <== defined a basevar first then modified this base-var to tell %-costs from absolut-costs
+            double basepower = Spell.Power; // <== defined a basevar first then modified this base-var to tell %-costs from absolut-costs
 
             // percent of maxPower if less than zero
             if (basepower < 0)
             {
-                if (Caster is GamePlayer && ((GamePlayer)Caster).CharacterClass.ManaStat != eStat.UNDEFINED)
+                if (Caster is GamePlayer player && player.CharacterClass.ManaStat != eStat.UNDEFINED)
                 {
-                    GamePlayer player = Caster as GamePlayer;
                     basepower = player.CalculateMaxMana(player.Level, player.GetBaseStat(player.CharacterClass.ManaStat)) * basepower * -0.01;
                 }
                 else
@@ -68,11 +82,6 @@ namespace DOL.GS.Spells
 
             return (int)basepower;
         }
-
-// public override bool CasterIsAttacked(GameLiving attacker)
-//      {
-//          return false;
-//      }
 
         // constructor
         public RangeSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }

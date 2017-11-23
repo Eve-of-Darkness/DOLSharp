@@ -52,7 +52,7 @@ namespace DOL.GS.Spells
             SpellLine line = SkillBase.GetSpellLine("Summon Monster");
             Spell castSpell = SkillBase.GetSpellByID(14078);
 
-            ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(m_caster, castSpell, line);
+            ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(Caster, castSpell, line);
             spellhandler.StartSpell(living);
         }
     }
@@ -63,9 +63,8 @@ namespace DOL.GS.Spells
     [SpellHandler("SummonMonster")]
     public class SummonMonster : SpellHandler
     {
-        private ushort m_model = 0;
-        private SpellLine m_monsterspellline = null;
-        private GamePlayer m_owner = null;
+        private ushort m_model;
+        private SpellLine m_monsterspellline;
 
         public SpellLine MonsterSpellLine
         {
@@ -80,21 +79,9 @@ namespace DOL.GS.Spells
             }
         }
 
-        public Spell MonsterSpellDoT
-        {
-            get
-            {
-                return SkillBase.GetSpellByID(14077);
-            }
-        }
+        public Spell MonsterSpellDoT => SkillBase.GetSpellByID(14077);
 
-        public Spell MonsterSpellDisease
-        {
-            get
-            {
-                return SkillBase.GetSpellByID(14079);
-            }
-        }
+        public Spell MonsterSpellDisease => SkillBase.GetSpellByID(14079);
 
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
@@ -108,13 +95,12 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            GamePlayer player = effect.Owner as GamePlayer;
-            m_owner = player;
+            GamePlayer player = (GamePlayer) effect.Owner;
             m_model = player.Model;
             player.Model = (ushort)Spell.Value;
 
-            player.BuffBonusCategory4[(int)eProperty.MagicAbsorption] += (int)Spell.LifeDrainReturn;
-            player.BuffBonusCategory4[(int)eProperty.ArmorAbsorption] += (int)Spell.LifeDrainReturn;
+            player.BuffBonusCategory4[(int)eProperty.MagicAbsorption] += Spell.LifeDrainReturn;
+            player.BuffBonusCategory4[(int)eProperty.ArmorAbsorption] += Spell.LifeDrainReturn;
             player.Out.SendCharStatsUpdate();
             player.Health = player.MaxHealth;
             GameEventMgr.AddHandler(player, GameLivingEvent.Dying, new DOLEventHandler(EventRaised));
@@ -128,9 +114,8 @@ namespace DOL.GS.Spells
         public override void OnEffectPulse(GameSpellEffect effect)
         {
 
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                GamePlayer player = effect.Owner as GamePlayer;
                 player.CastSpell(MonsterSpellDoT, MonsterSpellLine);
                 player.CastSpell(MonsterSpellDisease, MonsterSpellLine);
             }
@@ -145,12 +130,11 @@ namespace DOL.GS.Spells
                 return 0;
             }
 
-            GamePlayer player = effect.Owner as GamePlayer;
-
+            GamePlayer player = (GamePlayer) effect.Owner;
             player.Model = m_model;
 
-            player.BuffBonusCategory4[(int)eProperty.MagicAbsorption] -= (int)Spell.LifeDrainReturn ;
-            player.BuffBonusCategory4[(int)eProperty.ArmorAbsorption] -= (int)Spell.LifeDrainReturn ;
+            player.BuffBonusCategory4[(int)eProperty.MagicAbsorption] -= Spell.LifeDrainReturn ;
+            player.BuffBonusCategory4[(int)eProperty.ArmorAbsorption] -= Spell.LifeDrainReturn ;
             player.Out.SendCharStatsUpdate();
 
             int leftHealth = Convert.ToInt32(player.MaxHealth * 0.10);
@@ -166,18 +150,14 @@ namespace DOL.GS.Spells
 
         public void EventRaised(DOLEvent e, object sender, EventArgs arguments)
         {
-            GamePlayer player = sender as GamePlayer; // attacker
-            if (player == null)
+            if (!(sender is GamePlayer player))
             {
                 return;
             }
 
             player.Model = m_model;
             GameSpellEffect effect = FindEffectOnTarget(player, "SummonMonster");
-            if (effect != null)
-            {
-                effect.Cancel(false);
-            }
+            effect?.Cancel(false);
         }
 
         // Constructor
@@ -229,9 +209,8 @@ namespace DOL.GS.Spells
         public override IList<GameLiving> SelectTargets(GameObject castTarget)
         {
             var list = new List<GameLiving>(8);
-            GameLiving target = castTarget as GameLiving;
 
-            if (target == null || Spell.Range == 0)
+            if (!(castTarget is GameLiving target) || Spell.Range == 0)
             {
                 target = Caster;
             }

@@ -30,7 +30,7 @@ namespace DOL.GS.Spells
     [SpellHandler("UniPortal")]
     public class UniPortal : SpellHandler
     {
-        private Teleport m_destination;
+        private readonly Teleport m_destination;
 
         public UniPortal(GameLiving caster, Spell spell, SpellLine spellLine, Teleport destination)
             : base(caster, spell, spellLine)
@@ -60,8 +60,7 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness"></param>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            GamePlayer player = target as GamePlayer;
-            if (player == null)
+            if (!(target is GamePlayer player))
             {
                 return;
             }

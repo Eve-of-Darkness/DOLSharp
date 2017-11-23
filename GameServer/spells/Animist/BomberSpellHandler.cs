@@ -32,13 +32,13 @@ namespace DOL.GS.Spells
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        const string BOMBERTARGET = "bombertarget";
+        private const string BOMBERTARGET = "bombertarget";
 
         public BomberSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { m_isSilent = true; }
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
-            if (Spell.SubSpellID == 0)
+            if (Spell.SubSpellId == 0)
             {
                 MessageToCaster("SPELL NOT IMPLEMENTED: CONTACT GM", eChatType.CT_Important);
                 return false;
@@ -95,23 +95,21 @@ namespace DOL.GS.Spells
         /// </summary>
         private void BomberArriveAtTarget(DOLEvent e, object sender, EventArgs args)
         {
-            GameNPC bomber = sender as GameNPC;
-
             // [Ganrod] Nidel: Prevent NPE
-            if (bomber == null || m_pet == null || bomber != m_pet)
+            if (!(sender is GameNPC bomber) || m_pet == null || bomber != m_pet)
             {
                 return;
             }
 
             // [Ganrod] Nidel: Abort and delete bomber if Spell or Target is NULL
-            Spell subspell = SkillBase.GetSpellByID(m_spell.SubSpellID);
+            Spell subspell = SkillBase.GetSpellByID(Spell.SubSpellId);
             GameLiving living = m_pet.TempProperties.getProperty<object>(BOMBERTARGET, null) as GameLiving;
 
             if (subspell == null || living == null)
             {
                 if (log.IsErrorEnabled && subspell == null)
                 {
-                    log.Error("Bomber SubspellID for Bomber SpellID: " + m_spell.ID + " is not implemented yet");
+                    log.Error($"Bomber SubspellID for Bomber SpellID: {Spell.ID} is not implemented yet");
                 }
 
                 bomber.Health = 0;
@@ -120,7 +118,7 @@ namespace DOL.GS.Spells
             }
 
             // Andraste
-            subspell.Level = m_spell.Level;
+            subspell.Level = Spell.Level;
             if (living.IsWithinRadius(bomber, 350))
             {
                 ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(Caster, subspell, SkillBase.GetSpellLine(SpellLine.KeyName));

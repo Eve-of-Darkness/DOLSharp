@@ -40,19 +40,16 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Does this spell break stealth on start?
         /// </summary>
-        public override bool UnstealthCasterOnStart
-        {
-            get { return false; }
-        }
+        public override bool UnstealthCasterOnStart => false;
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
-            if (m_caster.ObjectState != GameLiving.eObjectState.Active)
+            if (Caster.ObjectState != GameObject.eObjectState.Active)
             {
                 return false;
             }
 
-            if (!m_caster.IsAlive)
+            if (!Caster.IsAlive)
             {
                 MessageToCaster("You are dead and can't cast!", eChatType.CT_System);
                 return false;
@@ -81,9 +78,9 @@ namespace DOL.GS.Spells
                 GameLiving EffectOwner = SelectiveBlindness.EffectSource;
                 if (EffectOwner == selectedTarget)
                 {
-                    if (m_caster is GamePlayer)
+                    if (Caster is GamePlayer)
                     {
-                        ((GamePlayer)m_caster).Out.SendMessage(string.Format("{0} is invisible to you!", selectedTarget.GetName(0, true)), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
+                        ((GamePlayer)Caster).Out.SendMessage($"{selectedTarget.GetName(0, true)} is invisible to you!", eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
                     }
 
                     return false;
@@ -93,30 +90,30 @@ namespace DOL.GS.Spells
             // Is immune ?
             if (selectedTarget != null && selectedTarget.HasAbility("DamageImmunity"))
             {
-                MessageToCaster(selectedTarget.Name + " is immune to this effect!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{selectedTarget.Name} is immune to this effect!", eChatType.CT_SpellResisted);
                 return false;
             }
 
-            if (m_caster.IsSitting)
+            if (Caster.IsSitting)
             {
                 MessageToCaster("You can't cast while sitting!", eChatType.CT_SpellResisted);
                 return false;
             }
 
-            if (m_spell.RecastDelay > 0)
+            if (Spell.RecastDelay > 0)
             {
-                int left = m_caster.GetSkillDisabledDuration(m_spell);
+                int left = Caster.GetSkillDisabledDuration(Spell);
                 if (left > 0)
                 {
-                    MessageToCaster("You must wait " + (left / 1000 + 1).ToString() + " seconds to use this spell!", eChatType.CT_System);
+                    MessageToCaster($"You must wait {left / 1000 + 1} seconds to use this spell!", eChatType.CT_System);
                     return false;
                 }
             }
 
-            string targetType = m_spell.Target.ToLower();
+            string targetType = Spell.Target.ToLower();
             if (targetType == "area")
             {
-                if (!m_caster.IsWithinRadius(m_caster.GroundTarget, CalculateSpellRange()))
+                if (!Caster.IsWithinRadius(Caster.GroundTarget, CalculateSpellRange()))
                 {
                     MessageToCaster("Your area target is out of range.  Select a closer target.", eChatType.CT_SpellResisted);
                     return false;
@@ -125,14 +122,14 @@ namespace DOL.GS.Spells
 
             if (targetType == "enemy")
             {
-                if (m_caster.IsObjectInFront(selectedTarget, 180) == false)
+                if (Caster.IsObjectInFront(selectedTarget, 180) == false)
                 {
                     MessageToCaster("Your target is not in view!", eChatType.CT_SpellResisted);
                     Caster.Notify(GameLivingEvent.CastFailed, new CastFailedEventArgs(this, CastFailedEventArgs.Reasons.TargetNotInView));
                     return false;
                 }
 
-                if (m_caster.TargetInView == false)
+                if (Caster.TargetInView == false)
                 {
                     MessageToCaster("Your target is not visible!", eChatType.CT_SpellResisted);
                     Caster.Notify(GameLivingEvent.CastFailed, new CastFailedEventArgs(this, CastFailedEventArgs.Reasons.TargetNotInView));
@@ -140,7 +137,7 @@ namespace DOL.GS.Spells
                 }
             }
 
-            if (Caster != null && Caster is GamePlayer && Caster.AttackWeapon != null && GlobalConstants.IsBowWeapon((eObjectType)Caster.AttackWeapon.Object_Type))
+            if (Caster is GamePlayer && Caster.AttackWeapon != null && GlobalConstants.IsBowWeapon((eObjectType)Caster.AttackWeapon.Object_Type))
             {
                 if (Spell.LifeDrainReturn == (int)eShotType.Critical && (!Caster.IsStealthed))
                 {
@@ -165,7 +162,7 @@ namespace DOL.GS.Spells
 
         public override void SendSpellMessages()
         {
-            MessageToCaster("You prepare a " + Spell.Name, eChatType.CT_YouHit);
+            MessageToCaster($"You prepare a {Spell.Name}", eChatType.CT_YouHit);
         }
 
         public override int CalculateToHitChance(GameLiving target)
@@ -214,10 +211,10 @@ namespace DOL.GS.Spells
         public override AttackData CalculateDamageToTarget(GameLiving target, double effectiveness)
         {
             AttackData ad = base.CalculateDamageToTarget(target, effectiveness);
-            GamePlayer player;
             GameSpellEffect bladeturn = FindEffectOnTarget(target, "Bladeturn");
             if (bladeturn != null)
             {
+                GamePlayer player;
                 switch (Spell.LifeDrainReturn)
                 {
                     case (int)eShotType.Critical:
@@ -232,7 +229,6 @@ namespace DOL.GS.Spells
                         }
 
                         break;
-
                     case (int)eShotType.Power:
                         {
                             player = target as GamePlayer;
@@ -242,8 +238,6 @@ namespace DOL.GS.Spells
                         }
 
                         break;
-
-                    case (int)eShotType.Other:
                     default:
                         {
                             if (Caster is GamePlayer)
@@ -267,8 +261,7 @@ namespace DOL.GS.Spells
 
             if (ad.AttackResult != GameLiving.eAttackResult.Missed)
             {
-                GameNPC npc = target as GameNPC;
-                if (npc != null)
+                if (target is GameNPC npc)
                 {
                     if (npc.Brain != null && (npc.Brain is IControlledBrain) == false)
                     {
@@ -298,10 +291,8 @@ namespace DOL.GS.Spells
             {
                 return ef.SpellHandler.Spell.DamageType;
             }
-            else
-            {
-                return eDamageType.Slash;
-            }
+
+            return eDamageType.Slash;
         }
 
         /// <summary>
@@ -311,9 +302,8 @@ namespace DOL.GS.Spells
         public override double CalculateDamageBase(GameLiving target)
         {
             double spellDamage = Spell.Damage;
-            GamePlayer player = Caster as GamePlayer;
 
-            if (player != null)
+            if (Caster is GamePlayer player)
             {
                 int manaStatValue = player.GetModified((eProperty)player.CharacterClass.ManaStat);
                 spellDamage *= (manaStatValue + 300) / 275.0;
@@ -386,7 +376,7 @@ namespace DOL.GS.Spells
                 return 6000;
             }
 
-            int ticks = m_spell.CastTime;
+            int ticks = Spell.CastTime;
 
             double percent = 1.0;
             int dex = Caster.GetModified(eProperty.Dexterity);
@@ -404,18 +394,16 @@ namespace DOL.GS.Spells
                 percent = 1.0 - ((dex - 60) * 0.15 + (dex - 250) * 0.05) * 0.01;
             }
 
-            GamePlayer player = m_caster as GamePlayer;
-
-            if (player != null)
+            if (Caster is GamePlayer player)
             {
-                percent *= 1.0 - m_caster.GetModified(eProperty.CastingSpeed) * 0.01;
+                percent *= 1.0 - Caster.GetModified(eProperty.CastingSpeed) * 0.01;
             }
 
-            ticks = (int)(ticks * Math.Max(m_caster.CastingSpeedReductionCap, percent));
+            ticks = (int)(ticks * Math.Max(Caster.CastingSpeedReductionCap, percent));
 
-            if (ticks < m_caster.MinimumCastingSpeed)
+            if (ticks < Caster.MinimumCastingSpeed)
             {
-                ticks = m_caster.MinimumCastingSpeed;
+                ticks = Caster.MinimumCastingSpeed;
             }
 
             return ticks;
@@ -460,7 +448,7 @@ namespace DOL.GS.Spells
                 if (Util.Chance((int)chance))
                 {
                     Caster.TempProperties.setProperty(INTERRUPT_TIMEOUT_PROPERTY, Caster.CurrentRegion.Time + Caster.SpellInterruptDuration);
-                    MessageToLiving(Caster, attacker.GetName(0, true) + " attacks you and your shot is interrupted!", eChatType.CT_SpellResisted);
+                    MessageToLiving(Caster, $"{attacker.GetName(0, true)} attacks you and your shot is interrupted!", eChatType.CT_SpellResisted);
                     InterruptCasting();
                     return true;
                 }
@@ -481,22 +469,22 @@ namespace DOL.GS.Spells
                 list.Add(" "); // empty line
                 if (Spell.InstrumentRequirement != 0)
                 {
-                    list.Add("Instrument require: " + GlobalConstants.InstrumentTypeToName(Spell.InstrumentRequirement));
+                    list.Add($"Instrument require: {GlobalConstants.InstrumentTypeToName(Spell.InstrumentRequirement)}");
                 }
 
                 if (Spell.Damage != 0)
                 {
-                    list.Add("Damage: " + Spell.Damage.ToString("0.###;0.###'%'"));
+                    list.Add($"Damage: {Spell.Damage:0.###;0.###'%'}");
                 }
                 else if (Spell.Value != 0)
                 {
-                    list.Add("Value: " + Spell.Value.ToString("0.###;0.###'%'"));
+                    list.Add($"Value: {Spell.Value:0.###;0.###'%'}");
                 }
 
-                list.Add("Target: " + Spell.Target);
+                list.Add($"Target: {Spell.Target}");
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
                 if (Spell.Duration >= ushort.MaxValue * 1000)
@@ -505,41 +493,41 @@ namespace DOL.GS.Spells
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format("Duration: {0}:{1} min", Spell.Duration / 60000, (Spell.Duration % 60000 / 1000).ToString("00")));
+                    list.Add($"Duration: {Spell.Duration / 60000}:{(Spell.Duration % 60000 / 1000).ToString("00")} min");
                 }
                 else if (Spell.Duration != 0)
                 {
-                    list.Add("Duration: " + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
+                    list.Add($"Duration: {Spell.Duration / 1000:0' sec';'Permanent.';'Permanent.'}");
                 }
 
                 if (Spell.Frequency != 0)
                 {
-                    list.Add("Frequency: " + (Spell.Frequency * 0.001).ToString("0.0"));
+                    list.Add($"Frequency: {Spell.Frequency * 0.001:0.0}");
                 }
 
                 if (Spell.Power != 0)
                 {
-                    list.Add("Endurance cost: " + Spell.Power.ToString("0;0'%'"));
+                    list.Add($"Endurance cost: {Spell.Power:0;0'%'}");
                 }
 
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                list.Add($"Casting time: {Spell.CastTime * 0.001:0.0## sec;-0.0## sec;'instant'}");
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"Recast time: {Spell.RecastDelay / 60000}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"Recast time: {Spell.RecastDelay / 1000} sec");
                 }
 
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
                 if (Spell.DamageType != eDamageType.Natural)
                 {
-                    list.Add("Damage: " + GlobalConstants.DamageTypeToName(Spell.DamageType));
+                    list.Add($"Damage: {GlobalConstants.DamageTypeToName(Spell.DamageType)}");
                 }
 
                 return list;

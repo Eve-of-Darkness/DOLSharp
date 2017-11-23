@@ -31,15 +31,9 @@ namespace DOL.GS.Spells
     /// </summary>
     public class MasterlevelHandling : SpellHandler
     {
-        public override bool HasPositiveEffect
-        {
-            get { return false; }
-        }
+        public override bool HasPositiveEffect => false;
 
-        public override bool IsUnPurgeAble
-        {
-            get { return true; }
-        }
+        public override bool IsUnPurgeAble => true;
 
         public override int CalculateSpellResistChance(GameLiving target)
         {
@@ -172,20 +166,20 @@ namespace DOL.GS.Spells
 
                 case "group":
                     {
-                        Group group = m_caster.Group;
+                        Group group = Caster.Group;
                         int spellRange = CalculateSpellRange();
                         if (spellRange == 0)
                         {
-                            spellRange = m_spell.Radius;
+                            spellRange = Spell.Radius;
                         }
 
                         if (group == null)
                         {
-                            list.Add(m_caster);
-                            IControlledBrain npc = m_caster.ControlledBrain;
+                            list.Add(Caster);
+                            IControlledBrain npc = Caster.ControlledBrain;
                             if (npc != null)
                             {
-                                if (m_caster.IsWithinRadius(npc.Body, spellRange))
+                                if (Caster.IsWithinRadius(npc.Body, spellRange))
                                 {
                                     list.Add(npc.Body);
                                 }
@@ -196,7 +190,7 @@ namespace DOL.GS.Spells
                             foreach (GameLiving living in group.GetMembersInTheGroup())
                             {
                                 // only players in range
-                                if (m_caster.IsWithinRadius(living, spellRange))
+                                if (Caster.IsWithinRadius(living, spellRange))
                                 {
                                     list.Add(living);
                                 }
@@ -252,17 +246,11 @@ namespace DOL.GS.Spells
     public abstract class MasterlevelDebuffHandling : SingleStatDebuff
     {
         // bonus category
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.Debuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.Debuff;
 
-        public override bool HasPositiveEffect
-        {
-            get { return false; }
-        }
+        public override bool HasPositiveEffect => false;
 
-        public override bool IsUnPurgeAble
-        {
-            get { return true; }
-        }
+        public override bool IsUnPurgeAble => true;
 
         public override int CalculateSpellResistChance(GameLiving target)
         {
@@ -411,20 +399,20 @@ namespace DOL.GS.Spells
 
                 case "group":
                     {
-                        Group group = m_caster.Group;
+                        Group group = Caster.Group;
                         int spellRange = CalculateSpellRange();
                         if (spellRange == 0)
                         {
-                            spellRange = m_spell.Radius;
+                            spellRange = Spell.Radius;
                         }
 
                         if (group == null)
                         {
-                            list.Add(m_caster);
-                            IControlledBrain npc = m_caster.ControlledBrain;
+                            list.Add(Caster);
+                            IControlledBrain npc = Caster.ControlledBrain;
                             if (npc != null)
                             {
-                                if (m_caster.IsWithinRadius(npc.Body, spellRange))
+                                if (Caster.IsWithinRadius(npc.Body, spellRange))
                                 {
                                     list.Add(npc.Body);
                                 }
@@ -435,7 +423,7 @@ namespace DOL.GS.Spells
                             foreach (GameLiving living in group.GetMembersInTheGroup())
                             {
                                 // only players in range
-                                if (m_caster.IsWithinRadius(living, spellRange))
+                                if (Caster.IsWithinRadius(living, spellRange))
                                 {
                                     list.Add(living);
                                 }
@@ -443,7 +431,7 @@ namespace DOL.GS.Spells
                                 IControlledBrain npc = living.ControlledBrain;
                                 if (npc != null)
                                 {
-                                    if (m_caster.IsWithinRadius(npc.Body, spellRange))
+                                    if (Caster.IsWithinRadius(npc.Body, spellRange))
                                     {
                                         list.Add(npc.Body);
                                     }
@@ -483,7 +471,7 @@ namespace DOL.GS.Spells
     public abstract class MasterlevelBuffHandling : SingleStatBuff
     {
         // bonus category
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.BaseBuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.BaseBuff;
 
         public override int CalculateSpellResistChance(GameLiving target)
         {
@@ -633,20 +621,20 @@ namespace DOL.GS.Spells
 
                 case "group":
                     {
-                        Group group = m_caster.Group;
+                        Group group = Caster.Group;
                         int spellRange = CalculateSpellRange();
                         if (spellRange == 0)
                         {
-                            spellRange = m_spell.Radius;
+                            spellRange = Spell.Radius;
                         }
 
                         if (group == null)
                         {
-                            list.Add(m_caster);
-                            IControlledBrain npc = m_caster.ControlledBrain;
+                            list.Add(Caster);
+                            IControlledBrain npc = Caster.ControlledBrain;
                             if (npc != null)
                             {
-                                if (m_caster.IsWithinRadius(npc.Body, spellRange))
+                                if (Caster.IsWithinRadius(npc.Body, spellRange))
                                 {
                                     list.Add(npc.Body);
                                 }
@@ -657,7 +645,7 @@ namespace DOL.GS.Spells
                             foreach (GameLiving living in group.GetMembersInTheGroup())
                             {
                                 // only players in range
-                                if (m_caster.IsWithinRadius(living, spellRange))
+                                if (Caster.IsWithinRadius(living, spellRange))
                                 {
                                     list.Add(living);
                                 }
@@ -705,9 +693,9 @@ namespace DOL.GS.Spells
     public abstract class MasterlevelDualBuffHandling : DualStatBuff
     {
         // bonus category
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.BaseBuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.BaseBuff;
 
-        public override eBuffBonusCategory BonusCategory2 { get { return eBuffBonusCategory.SpecBuff; } }
+        public override eBuffBonusCategory BonusCategory2 => eBuffBonusCategory.SpecBuff;
 
         public override int CalculateSpellResistChance(GameLiving target)
         {
@@ -856,20 +844,20 @@ namespace DOL.GS.Spells
 
                 case "group":
                     {
-                        Group group = m_caster.Group;
+                        Group group = Caster.Group;
                         int spellRange = CalculateSpellRange();
                         if (spellRange == 0)
                         {
-                            spellRange = m_spell.Radius;
+                            spellRange = Spell.Radius;
                         }
 
                         if (group == null)
                         {
-                            list.Add(m_caster);
-                            IControlledBrain npc = m_caster.ControlledBrain;
+                            list.Add(Caster);
+                            IControlledBrain npc = Caster.ControlledBrain;
                             if (npc != null)
                             {
-                                if (m_caster.IsWithinRadius(npc.Body, spellRange))
+                                if (Caster.IsWithinRadius(npc.Body, spellRange))
                                 {
                                     list.Add(npc.Body);
                                 }
@@ -880,7 +868,7 @@ namespace DOL.GS.Spells
                             foreach (GameLiving living in group.GetMembersInTheGroup())
                             {
                                 // only players in range
-                                if (m_caster.IsWithinRadius(living, spellRange))
+                                if (Caster.IsWithinRadius(living, spellRange))
                                 {
                                     list.Add(living);
                                 }
@@ -927,15 +915,9 @@ namespace DOL.GS.Spells
     /// </summary>
     public class BanelordSnare : UnbreakableSpeedDecreaseSpellHandler
     {
-        public override bool HasPositiveEffect
-        {
-            get { return false; }
-        }
+        public override bool HasPositiveEffect => false;
 
-        public override bool IsUnPurgeAble
-        {
-            get { return true; }
-        }
+        public override bool IsUnPurgeAble => true;
 
         public override int CalculateSpellResistChance(GameLiving target)
         {
@@ -1099,20 +1081,20 @@ namespace DOL.GS.Spells
 
                 case "group":
                     {
-                        Group group = m_caster.Group;
+                        Group group = Caster.Group;
                         int spellRange = CalculateSpellRange();
                         if (spellRange == 0)
                         {
-                            spellRange = m_spell.Radius;
+                            spellRange = Spell.Radius;
                         }
 
                         if (group == null)
                         {
-                            list.Add(m_caster);
-                            IControlledBrain npc = m_caster.ControlledBrain;
+                            list.Add(Caster);
+                            IControlledBrain npc = Caster.ControlledBrain;
                             if (npc != null)
                             {
-                                if (m_caster.IsWithinRadius(npc.Body, spellRange))
+                                if (Caster.IsWithinRadius(npc.Body, spellRange))
                                 {
                                     list.Add(npc.Body);
                                 }
@@ -1123,7 +1105,7 @@ namespace DOL.GS.Spells
                             foreach (GameLiving living in group.GetMembersInTheGroup())
                             {
                                 // only players in range
-                                if (m_caster.IsWithinRadius(living, spellRange))
+                                if (Caster.IsWithinRadius(living, spellRange))
                                 {
                                     list.Add(living);
                                 }
@@ -1213,11 +1195,11 @@ namespace DOL.GS.Spells
                     && (!player.InCombat
                     || ApplyOnCombat))
                 {
-                    heal.StartSpell((GameLiving)player);
+                    heal.StartSpell(player);
                 }
                 else if (Friendly && player.IsAlive && (!player.InCombat || ApplyOnCombat))
                 {
-                    heal.StartSpell((GameLiving)player);
+                    heal.StartSpell(player);
                 }
             }
 
@@ -1230,7 +1212,7 @@ namespace DOL.GS.Spells
             {
                 if (!Friendly && npc.IsAlive && GameServer.ServerRules.IsAllowedToAttack(Caster, npc, true) && (!npc.InCombat || ApplyOnCombat))
                 {
-                    heal.StartSpell((GameLiving)npc);
+                    heal.StartSpell(npc);
                 }
 
                 if (Friendly && npc.IsAlive && (!npc.InCombat || ApplyOnCombat))
@@ -1292,7 +1274,7 @@ namespace DOL.GS.Spells
             {
                 if (player.IsAlive && GameServer.ServerRules.IsAllowedToAttack(Caster, player, true))
                 {
-                    trap.StartSpell((GameLiving)player);
+                    trap.StartSpell(player);
                     if (!Unstealth)
                     {
                         ((GamePlayer)Caster).Stealth(wasstealthed);
@@ -1327,10 +1309,7 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            if (mine != null)
-            {
-                mine.Delete();
-            }
+            mine?.Delete();
 
             effect.Owner.EffectList.Remove(effect);
             return base.OnEffectExpires(effect, noMessages);
@@ -1364,7 +1343,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            int ranged = storm.GetDistanceTo(new Point3D((int)effect.Owner.X, (int)effect.Owner.Y, (int)effect.Owner.Z));
+            int ranged = storm.GetDistanceTo(new Point3D(effect.Owner.X, effect.Owner.Y, effect.Owner.Z));
             if (ranged > 3000)
             {
                 return;
@@ -1374,10 +1353,10 @@ namespace DOL.GS.Spells
             {
                 foreach (GamePlayer player in storm.GetPlayersInRadius(sRadius))
                 {
-                    tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+                    tempest = ScriptMgr.CreateSpellHandler(Caster, s, sl);
                     if (player.IsAlive && GameServer.ServerRules.IsSameRealm(storm, player, true))
                     {
-                        tempest.StartSpell((GameLiving)player);
+                        tempest.StartSpell(player);
                     }
                 }
             }
@@ -1385,10 +1364,10 @@ namespace DOL.GS.Spells
             {
                 foreach (GamePlayer player in storm.GetPlayersInRadius(sRadius))
                 {
-                    tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+                    tempest = ScriptMgr.CreateSpellHandler(Caster, s, sl);
                     if (player.IsAlive && GameServer.ServerRules.IsAllowedToAttack(storm, player, true))
                     {
-                        tempest.StartSpell((GameLiving)player);
+                        tempest.StartSpell(player);
                     }
                 }
             }
@@ -1403,10 +1382,7 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            if (storm != null)
-            {
-                storm.Delete();
-            }
+            storm?.Delete();
 
             effect.Owner.EffectList.Remove(effect);
             return base.OnEffectExpires(effect, noMessages);
@@ -1429,14 +1405,11 @@ namespace DOL.GS.Spells
         ///
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
-        public override bool HasPositiveEffect
-        {
-            get { return true; }
-        }
+        public override bool HasPositiveEffect => true;
 
         /// <summary>
         /// execute non duration spell effect on target
@@ -1461,7 +1434,7 @@ namespace DOL.GS.Spells
                     {
 
                         InventoryLogging.LogInventoryAction(Caster, targetPlayer, eInventoryActionType.Other, item.Template, item.Count);
-                        targetPlayer.Out.SendMessage("Item created: " + item.GetName(0, false), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        targetPlayer.Out.SendMessage($"Item created: {item.GetName(0, false)}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                 }
             }
@@ -1479,10 +1452,7 @@ namespace DOL.GS.Spells
     [SpellHandler("TargetModifier")]
     public class TargetModifierSpellHandler : MasterlevelHandling
     {
-        public override bool HasPositiveEffect
-        {
-            get { return true; }
-        }
+        public override bool HasPositiveEffect => true;
 
         public TargetModifierSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
@@ -1519,18 +1489,9 @@ namespace DOL.GS
             Delete();
         }
 
-        private GamePlayer m_owner;
+        public GamePlayer Owner { get; set; }
 
-        public GamePlayer Owner
-        {
-            get { return m_owner; }
-            set { m_owner = value; }
-        }
-
-        public override int MaxHealth
-        {
-            get { return 1; }
-        }
+        public override int MaxHealth => 1;
     }
     #endregion
 
@@ -1547,13 +1508,7 @@ namespace DOL.GS
             Health = MaxHealth;
         }
 
-        private GamePlayer m_owner;
-
-        public GamePlayer Owner
-        {
-            get { return m_owner; }
-            set { m_owner = value; }
-        }
+        public GamePlayer Owner { get; set; }
 
         public override int MaxHealth
         {
@@ -1562,16 +1517,15 @@ namespace DOL.GS
 
         public virtual int CalculateToHitChance(GameLiving target)
         {
-            int spellLevel = m_owner.Level;
-            GameLiving caster = m_owner as GameLiving;
-            int spellbonus = m_owner.GetModified(eProperty.SpellLevel);
+            int spellLevel = Owner.Level;
+            int spellbonus = Owner.GetModified(eProperty.SpellLevel);
             spellLevel += spellbonus;
             if (spellLevel > 50)
             {
                 spellLevel = 50;
             }
 
-            int hitchance = 85 + ((spellLevel - target.Level) / 2);
+            int hitchance = 85 + (spellLevel - target.Level) / 2;
             return hitchance;
         }
 
@@ -1610,26 +1564,19 @@ namespace DOL.GS
             MaxSpeedBase = 0;
         }
 
-        private GamePlayer m_owner;
-
-        public GamePlayer Owner
-        {
-            get { return m_owner; }
-            set { m_owner = value; }
-        }
+        public GamePlayer Owner { get; set; }
 
         public virtual int CalculateToHitChance(GameLiving target)
         {
-            int spellLevel = m_owner.Level;
-            GameLiving caster = m_owner as GameLiving;
-            int spellbonus = m_owner.GetModified(eProperty.SpellLevel);
+            int spellLevel = Owner.Level;
+            int spellbonus = Owner.GetModified(eProperty.SpellLevel);
             spellLevel += spellbonus;
             if (spellLevel > 50)
             {
                 spellLevel = 50;
             }
 
-            int hitchance = 85 + ((spellLevel - target.Level) / 2);
+            int hitchance = 85 + (spellLevel - target.Level) / 2;
             return hitchance;
         }
 
@@ -1669,26 +1616,11 @@ namespace DOL.GS
             Movable = true;
         }
 
-        private GamePlayer m_owner;
+        public GamePlayer Owner { get; set; }
 
-        public GamePlayer Owner
-        {
-            get { return m_owner; }
-            set { m_owner = value; }
-        }
+        public bool Movable { get; set; }
 
-        private bool m_movable;
-
-        public bool Movable
-        {
-            get { return m_movable; }
-            set { m_movable = value; }
-        }
-
-        public override int MaxHealth
-        {
-            get { return 10000; }
-        }
+        public override int MaxHealth => 10000;
 
         public override void Die(GameObject killer)
         {
@@ -1698,16 +1630,15 @@ namespace DOL.GS
 
         public virtual int CalculateToHitChance(GameLiving target)
         {
-            int spellLevel = m_owner.Level;
-            GameLiving caster = m_owner as GameLiving;
-            int spellbonus = m_owner.GetModified(eProperty.SpellLevel);
+            int spellLevel = Owner.Level;
+            int spellbonus = Owner.GetModified(eProperty.SpellLevel);
             spellLevel += spellbonus;
             if (spellLevel > 50)
             {
                 spellLevel = 50;
             }
 
-            int hitchance = 85 + ((spellLevel - target.Level) / 2);
+            int hitchance = 85 + (spellLevel - target.Level) / 2;
             return hitchance;
         }
 

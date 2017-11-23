@@ -43,20 +43,11 @@ namespace DOL.GS.Spells
             GameLiving mostInjuredLiving = target;
             double mostInjuredPercent = mostInjuredLiving.Health / (float)mostInjuredLiving.MaxHealth;
 
-            int minHealVariance;
-            int maxHealVariance;
             int targetHealCap;
 
-            CalculateHealVariance(out minHealVariance, out maxHealVariance);
+            CalculateHealVariance(out var minHealVariance, out var maxHealVariance);
 
-            if (minHealVariance >= maxHealVariance)
-            {
-                targetHealCap = maxHealVariance;
-            }
-            else
-            {
-                targetHealCap = Util.Random(minHealVariance, maxHealVariance);
-            }
+            targetHealCap = minHealVariance >= maxHealVariance ? maxHealVariance : Util.Random(minHealVariance, maxHealVariance);
 
             int groupHealCap = targetHealCap;
 
@@ -74,7 +65,7 @@ namespace DOL.GS.Spells
                     }
 
                     // heal only if target is in range
-                    if (target.IsWithinRadius(living, m_spell.Range))
+                    if (target.IsWithinRadius(living, Spell.Range))
                     {
                         double livingHealthPercent = living.Health / (double)living.MaxHealth;
                         if (livingHealthPercent < 1)

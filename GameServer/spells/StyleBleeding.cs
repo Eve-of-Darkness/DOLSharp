@@ -27,8 +27,6 @@ namespace DOL.GS.Spells
     [SpellHandler("StyleBleeding")]
     public class StyleBleeding : SpellHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// The property name for bleed value
         /// </summary>
@@ -113,16 +111,19 @@ namespace DOL.GS.Spells
         {
             int bleedValue = target.TempProperties.getProperty<int>(BLEED_VALUE_PROPERTY);
 
-            AttackData ad = new AttackData();
-            ad.Attacker = Caster;
-            ad.Target = target;
-            ad.AttackType = AttackData.eAttackType.Spell;
+            AttackData ad = new AttackData
+            {
+                Attacker = Caster,
+                Target = target,
+                AttackType = AttackData.eAttackType.Spell,
+                DamageType = Spell.DamageType,
+                AttackResult = GameLiving.eAttackResult.HitUnstyled,
+                SpellHandler = this,
+                CausesCombat = false
+            };
+
             ad.Modifier = bleedValue * ad.Target.GetResist(Spell.DamageType) / -100;
             ad.Damage = bleedValue + ad.Modifier;
-            ad.DamageType = Spell.DamageType;
-            ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
-            ad.SpellHandler = this;
-            ad.CausesCombat = false;
 
             return ad;
         }

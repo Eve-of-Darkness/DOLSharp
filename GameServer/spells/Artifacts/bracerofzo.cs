@@ -31,20 +31,19 @@ namespace DOL.GS.Spells
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public override bool IsUnPurgeAble { get { return true; } }
+        public override bool IsUnPurgeAble => true;
 
         protected ZoarkatPet[] deamons = new ZoarkatPet[3];
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            if (Caster.TargetObject as GameLiving == null)
+            if (!(Caster.TargetObject is GameLiving))
             {
                 return;
             }
 
-            GamePlayer player = Caster as GamePlayer;
-            if (player == null)
+            if (!(Caster is GamePlayer player))
             {
                 return;
             }
@@ -52,7 +51,7 @@ namespace DOL.GS.Spells
             INpcTemplate template = NpcTemplateMgr.GetTemplate(Spell.LifeDrainReturn);
             if (template == null)
             {
-                string errorMessage = string.Format("NPC template {0} is missing, spell ID = {1}", Spell.LifeDrainReturn, Spell.ID);
+                string errorMessage = $"NPC template {Spell.LifeDrainReturn} is missing, spell ID = {Spell.ID}";
                 if (log.IsWarnEnabled)
                 {
                     log.Warn(errorMessage);
@@ -67,8 +66,7 @@ namespace DOL.GS.Spells
             }
 
             Point2D spawnPoint = Caster.GetPointFromHeading(Caster.Heading, 64);
-            int i = 0;
-            for (i = 0;i < 3;i++)
+            for (int i = 0;i < 3;i++)
             {
                 deamons[i] = new ZoarkatPet(template);
                 deamons[i].SetOwnBrain(new ProcPetBrain(player));
@@ -82,15 +80,14 @@ namespace DOL.GS.Spells
                 deamons[i].Level = 36;
                 deamons[i].Flags |= GameNPC.eFlags.FLYING;
                 deamons[i].AddToWorld();
-                (deamons[i].Brain as IOldAggressiveBrain).AddToAggroList(Caster.TargetObject as GameLiving, 1);
-                (deamons[i].Brain as ProcPetBrain).Think();
+                (deamons[i].Brain as IOldAggressiveBrain)?.AddToAggroList(Caster.TargetObject as GameLiving, 1);
+                (deamons[i].Brain as ProcPetBrain)?.Think();
             }
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            int i = 0;
-            for (i = 0;i < 3;i++)
+            for (int i = 0;i < 3;i++)
             {
                 if (deamons[i] != null)
                 {
@@ -110,9 +107,9 @@ namespace DOL.GS.Spells
     [SpellHandler("Bedazzlement")]
     public class ZoDebuffSpellHandler : DualStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.FumbleChance; } }
+        public override eProperty Property1 => eProperty.FumbleChance;
 
-        public override eProperty Property2 { get { return eProperty.SpellFumbleChance; } }
+        public override eProperty Property2 => eProperty.SpellFumbleChance;
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
@@ -128,10 +125,7 @@ namespace DOL.GS
 {
     public class ZoarkatPet : GamePet
     {
-        public override int MaxHealth
-        {
-            get { return Level * 10; }
-        }
+        public override int MaxHealth => Level * 10;
 
         public override void OnAttackedByEnemy(AttackData ad) { }
 

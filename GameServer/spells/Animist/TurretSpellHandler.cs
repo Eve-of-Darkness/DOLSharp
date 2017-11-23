@@ -38,41 +38,28 @@ namespace DOL.GS.Spells
 
             if (selectedTarget == null)
             {
-                if (Caster is GamePlayer)
-                {
-                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "TurretsRelease.CheckBeginCast.NoSelectedTarget"), eChatType.CT_SpellResisted);
-                }
+                MessageToCaster(LanguageMgr.GetTranslation(((GamePlayer)Caster).Client, "TurretsRelease.CheckBeginCast.NoSelectedTarget"), eChatType.CT_SpellResisted);
 
                 return false;
             }
 
-            GameNPC target = selectedTarget as GameNPC;
-            if (target == null || !(target.Brain is TurretBrain) || !Caster.IsControlledNPC(target))
+            if (!(selectedTarget is GameNPC target) || !(target.Brain is TurretBrain) || !Caster.IsControlledNPC(target))
             {
-                if (Caster is GamePlayer)
-                {
-                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "TurretsRelease.CheckBeginCast.NoSelectedTarget"), eChatType.CT_SpellResisted);
-                }
+                MessageToCaster(LanguageMgr.GetTranslation(((GamePlayer)Caster).Client, "TurretsRelease.CheckBeginCast.NoSelectedTarget"), eChatType.CT_SpellResisted);
 
                 return false;
             }
 
-            if ((target.Brain is TurretBrain) && !Caster.IsControlledNPC(target))
+            if (!Caster.IsControlledNPC(target))
             {
-                if (Caster is GamePlayer)
-                {
-                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "TurretsRelease.CheckBeginCast.NoSelectedTarget"), eChatType.CT_SpellResisted);
-                }
+                MessageToCaster(LanguageMgr.GetTranslation(((GamePlayer) Caster).Client, "TurretsRelease.CheckBeginCast.NoSelectedTarget"), eChatType.CT_SpellResisted);
 
                 return false;
             }
 
             if (!Caster.IsWithinRadius(target, Spell.Range))
             {
-                if (Caster is GamePlayer)
-                {
-                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "TurretsRelease.CheckBeginCast.TargetTooFarAway"), eChatType.CT_SpellResisted);
-                }
+                MessageToCaster(LanguageMgr.GetTranslation(((GamePlayer) Caster).Client, "TurretsRelease.CheckBeginCast.TargetTooFarAway"), eChatType.CT_SpellResisted);
 
                 return false;
             }
@@ -82,13 +69,13 @@ namespace DOL.GS.Spells
 
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            if (target != null && target.CurrentRegion != null)
+            if (target?.CurrentRegion != null)
             {
                 foreach (GameNPC npc in target.CurrentRegion.GetNPCsInRadius(target.X, target.Y, target.Z, (ushort)Spell.Radius, false, true))
                 {

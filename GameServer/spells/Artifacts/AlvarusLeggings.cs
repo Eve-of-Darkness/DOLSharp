@@ -30,13 +30,11 @@ namespace DOL.GS.Spells
     [SpellHandler("AlvarusMorph")]
     public class AlvarusMorph : Morph
     {
-        GameSpellEffect m_effect = null;
+        GameSpellEffect m_effect;
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            GamePlayer targetPlayer = target as GamePlayer;
-
-            if (targetPlayer == null)
+            if (!(target is GamePlayer targetPlayer))
             {
                 return;
             }
@@ -69,8 +67,7 @@ namespace DOL.GS.Spells
         {
             m_effect = effect;
             base.OnEffectStart(effect);
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player == null)
+            if (!(effect.Owner is GamePlayer))
             {
                 return;
             }
@@ -80,8 +77,7 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player == null)
+            if (!(effect.Owner is GamePlayer))
             {
                 return base.OnEffectExpires(effect, noMessages);
             }

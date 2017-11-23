@@ -27,21 +27,6 @@ namespace DOL.GS.Spells
     [SpellHandler("HpPwrEndRegen")]
     public class HpPwrEndRegenSpellHandler : SpellHandler
     {
-        /// <summary>
-        /// Execute heal over time spell
-        /// </summary>
-        /// <param name="target"></param>
-        public override void FinishSpellCast(GameLiving target)
-        {
-            // m_caster.Mana -= CalculateNeededPower(target);
-            base.FinishSpellCast(target);
-        }
-
-        public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
-        {
-            base.ApplyEffectOnTarget(target, effectiveness);
-        }
-
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
             return new GameSpellEffect(this, Spell.Duration, Spell.Frequency, effectiveness);

@@ -28,10 +28,7 @@ namespace DOL.GS.Spells
         {
         }
 
-        public override bool HasPositiveEffect
-        {
-            get { return true; }
-        }
+        public override bool HasPositiveEffect => true;
     }
 
     /// <summary>
@@ -45,9 +42,6 @@ namespace DOL.GS.Spells
         {
         }
 
-        public override bool HasPositiveEffect
-        {
-            get { return true; }
-        }
+        public override bool HasPositiveEffect => true;
     }
 }
