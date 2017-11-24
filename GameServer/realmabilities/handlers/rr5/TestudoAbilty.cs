@@ -23,12 +23,8 @@ namespace DOL.GS.RealmAbilities
             }
 
             InventoryItem shield = living.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
-            if (shield == null)
-            {
-                return;
-            }
 
-            if (shield.Object_Type != (int)eObjectType.Shield)
+            if (shield?.Object_Type != (int)eObjectType.Shield)
             {
                 return;
             }
@@ -48,8 +44,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 SendCasterSpellEffectAndCastMessage(player, 7068, true);
                 TestudoEffect effect = new TestudoEffect();

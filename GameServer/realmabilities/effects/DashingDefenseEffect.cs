@@ -25,59 +25,44 @@ namespace DOL.GS.Effects
     // <summary>
     // The helper class for the guard ability
     // <//summary>
-    public class DashingDefenseEffect : StaticEffect, IGameEffect
+    public class DashingDefenseEffect : StaticEffect
     {
 
         // private Int64 m_startTick;
-        private RegionTimer m_expireTimer;
+        private RegionTimer _expireTimer;
 
         // private GamePlayer m_player;
-        private int m_effectDuration;
+        private int _effectDuration;
 
         // <summary>
         // The ability description
         // <//summary>
-        protected const string delveString = "Ability that if successful will guard an attack meant for the ability's target. You will block in the target's place.";
+        private const string DelveString = "Ability that if successful will guard an attack meant for the ability's target. You will block in the target's place.";
 
         // <summary>
         // Holds guarder
         // <//summary>
-        private GamePlayer m_guardSource;
 
         // <summary>
         // Gets guarder
         // <//summary>
-        public GamePlayer GuardSource
-        {
-            get { return m_guardSource; }
-        }
+        public GamePlayer GuardSource { get; private set; }
 
         // <summary>
         // Holds guarded player
         // <//summary>
-        private GamePlayer m_guardTarget;
 
         // <summary>
         // Gets guarded player
         // <//summary>
-        public GamePlayer GuardTarget
-        {
-            get { return m_guardTarget; }
-        }
+        public GamePlayer GuardTarget { get; private set; }
 
         // <summary>
         // Holds player group
         // <//summary>
-        private Group m_playerGroup;
+        private Group _playerGroup;
 
-        // <summary>
-        // Creates a new guard effect
-        // <//summary>
-        public DashingDefenseEffect()
-        {
-        }
-
-        public const int GUARD_DISTANCE = 1000;
+        public const int GuardDistance = 1000;
 
         // <summary>
         // Start the guarding on player
@@ -91,32 +76,32 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            m_playerGroup = guardSource.Group;
+            _playerGroup = guardSource.Group;
 
-            if (m_playerGroup != guardTarget.Group)
+            if (_playerGroup != guardTarget.Group)
             {
                 return;
             }
 
-            m_guardSource = guardSource;
-            m_guardTarget = guardTarget;
+            GuardSource = guardSource;
+            GuardTarget = guardTarget;
 
             // Set the duration & start the timers
-            m_effectDuration = duration;
+            _effectDuration = duration;
             StartTimers();
 
-            m_guardSource.EffectList.Add(this);
-            m_guardTarget.EffectList.Add(this);
+            GuardSource.EffectList.Add(this);
+            GuardTarget.EffectList.Add(this);
 
-            if (!guardSource.IsWithinRadius(guardTarget, DashingDefenseEffect.GUARD_DISTANCE))
+            if (!guardSource.IsWithinRadius(guardTarget, GuardDistance))
             {
-                guardSource.Out.SendMessage(string.Format("You are now guarding {0}, but you must stand closer.", guardTarget.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                guardTarget.Out.SendMessage(string.Format("{0} is now guarding you, but you must stand closer.", guardSource.GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                guardSource.Out.SendMessage($"You are now guarding {guardTarget.GetName(0, false)}, but you must stand closer.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                guardTarget.Out.SendMessage($"{guardSource.GetName(0, true)} is now guarding you, but you must stand closer.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
             else
             {
-                guardSource.Out.SendMessage(string.Format("You are now guarding {0}.", guardTarget.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                guardTarget.Out.SendMessage(string.Format("{0} is now guarding you.", guardSource.GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                guardSource.Out.SendMessage($"You are now guarding {guardTarget.GetName(0, false)}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                guardTarget.Out.SendMessage($"{guardSource.GetName(0, true)} is now guarding you.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
 
             guardTarget.TempProperties.setProperty(RealmAbilities.DashingDefenseAbility.Dashing, true);
@@ -129,15 +114,15 @@ namespace DOL.GS.Effects
         {
             // Stop Timers
             StopTimers();
-            m_guardSource.EffectList.Remove(this);
-            m_guardTarget.EffectList.Remove(this);
+            GuardSource.EffectList.Remove(this);
+            GuardTarget.EffectList.Remove(this);
 
-            m_guardTarget.TempProperties.removeProperty(RealmAbilities.DashingDefenseAbility.Dashing);
+            GuardTarget.TempProperties.removeProperty(RealmAbilities.DashingDefenseAbility.Dashing);
 
-            m_guardSource.Out.SendMessage(string.Format("You are no longer guarding {0}.", m_guardTarget.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            m_guardTarget.Out.SendMessage(string.Format("{0} is no longer guarding you.", m_guardSource.GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            GuardSource.Out.SendMessage($"You are no longer guarding {GuardTarget.GetName(0, false)}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            GuardTarget.Out.SendMessage($"{GuardSource.GetName(0, true)} is no longer guarding you.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-            m_playerGroup = null;
+            _playerGroup = null;
         }
 
         // <summary>
@@ -146,7 +131,7 @@ namespace DOL.GS.Effects
         private void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(GuardSource, new RegionTimerCallback(ExpireCallback), m_effectDuration * 1000);
+            _expireTimer = new RegionTimer(GuardSource, new RegionTimerCallback(ExpireCallback), _effectDuration * 1000);
         }
 
         /// <summary>
@@ -155,10 +140,10 @@ namespace DOL.GS.Effects
         private void StopTimers()
         {
 
-            if (m_expireTimer != null)
+            if (_expireTimer != null)
             {
-                m_expireTimer.Stop();
-                m_expireTimer = null;
+                _expireTimer.Stop();
+                _expireTimer = null;
             }
         }
 
@@ -175,13 +160,7 @@ namespace DOL.GS.Effects
         // <summary>
         // Effect Name
         // <//summary>
-        public override string Name
-        {
-            get
-            {
-                return "Dashing Defense";
-            }
-        }
+        public override string Name => "Dashing Defense";
 
         /// <summary>
         /// Remaining time of the effect in milliseconds
@@ -190,7 +169,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
+                RegionTimer timer = _expireTimer;
                 if (timer == null || !timer.IsAlive)
                 {
                     return 0;
@@ -203,13 +182,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override ushort Icon
-        {
-            get
-            {
-                return 3032;
-            }
-        }
+        public override ushort Icon => 3032;
 
         // <summary>
         // Delve Info
@@ -218,10 +191,13 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>(4);
-                delveInfoList.Add(delveString);
-                delveInfoList.Add(" ");
-                delveInfoList.Add(GuardSource.GetName(0, true) + " is guarding " + GuardTarget.GetName(0, false));
+                var delveInfoList = new List<string>(4)
+                {
+                    DelveString,
+                    " ",
+                    $"{GuardSource.GetName(0, true)} is guarding {GuardTarget.GetName(0, false)}"
+                };
+
                 return delveInfoList;
             }
         }

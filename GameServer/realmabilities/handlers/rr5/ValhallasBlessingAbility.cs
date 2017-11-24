@@ -35,7 +35,6 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class ValhallasBlessingAbility : RR5RealmAbility
     {
-        public const int DURATION = 30 * 1000;
         private const int SpellRadius = 1500;
 
         public ValhallasBlessingAbility(DBAbility dba, int level) : base(dba, level) { }
@@ -51,8 +50,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 ArrayList targets = new ArrayList();
                 if (player.Group == null)
@@ -78,11 +76,8 @@ namespace DOL.GS.RealmAbilities
                         continue;
                     }
 
-                    ValhallasBlessingEffect ValhallasBlessing = target.EffectList.GetOfType<ValhallasBlessingEffect>();
-                    if (ValhallasBlessing != null)
-                    {
-                        ValhallasBlessing.Cancel(false);
-                    }
+                    ValhallasBlessingEffect valhallasBlessing = target.EffectList.GetOfType<ValhallasBlessingEffect>();
+                    valhallasBlessing?.Cancel(false);
 
                     new ValhallasBlessingEffect().Start(target);
                 }

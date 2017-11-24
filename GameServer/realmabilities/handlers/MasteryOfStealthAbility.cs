@@ -24,29 +24,27 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (level)
                 {
-                        case 1: return 75;
-                        case 2: return 125;
-                        case 3: return 175;
-                        case 4: return 235;
-                        case 5: return 300;
-                        case 6: return 375;
-                        case 7: return 450;
-                        case 8: return 535;
-                        case 9: return 625;
-                        default: return 625;
+                    case 1: return 75;
+                    case 2: return 125;
+                    case 3: return 175;
+                    case 4: return 235;
+                    case 5: return 300;
+                    case 6: return 375;
+                    case 7: return 450;
+                    case 8: return 535;
+                    case 9: return 625;
+                    default: return 625;
                 }
             }
-            else
+
+            switch (level)
             {
-                switch (level)
-                {
-                        case 1: return 50;
-                        case 2: return 100;
-                        case 3: return 200;
-                        case 4: return 325;
-                        case 5: return 475;
-                        default: return 50;
-                }
+                case 1: return 50;
+                case 2: return 100;
+                case 3: return 200;
+                case 4: return 325;
+                case 5: return 475;
+                default: return 50;
             }
         }
 
@@ -56,29 +54,27 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (level)
                 {
-                        case 1: return 0.10;
-                        case 2: return 0.15;
-                        case 3: return 0.20;
-                        case 4: return 0.25;
-                        case 5: return 0.30;
-                        case 6: return 0.35;
-                        case 7: return 0.40;
-                        case 8: return 0.45;
-                        case 9: return 0.50;
-                        default: return 0.50;
+                    case 1: return 0.10;
+                    case 2: return 0.15;
+                    case 3: return 0.20;
+                    case 4: return 0.25;
+                    case 5: return 0.30;
+                    case 6: return 0.35;
+                    case 7: return 0.40;
+                    case 8: return 0.45;
+                    case 9: return 0.50;
+                    default: return 0.50;
                 }
             }
-            else
+
+            switch (level)
             {
-                switch (level)
-                {
-                        case 1: return 0.10;
-                        case 2: return 0.20;
-                        case 3: return 0.30;
-                        case 4: return 0.40;
-                        case 5: return 0.50;
-                        default: return 0;
-                }
+                case 1: return 0.10;
+                case 2: return 0.20;
+                case 3: return 0.30;
+                case 4: return 0.40;
+                case 5: return 0.50;
+                default: return 0;
             }
         }
 
@@ -91,7 +87,7 @@ namespace DOL.GS.RealmAbilities
                 list.Add(string.Empty);
                 for (int i = 1; i <= MaxLevel; i++)
                 {
-                    list.Add("Level " + i + ": Amount: " + Level * 5 + "% / " + GetAmountForLevel(i));
+                    list.Add($"Level {i}: Amount: {Level * 5}% / {GetAmountForLevel(i)}");
                 }
 
                 return list;

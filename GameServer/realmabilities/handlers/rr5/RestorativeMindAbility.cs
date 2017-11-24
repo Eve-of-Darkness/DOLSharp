@@ -24,8 +24,7 @@ namespace DOL.GS.RealmAbilities
 
             bool deactivate = false;
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 if (player.Group != null)
                 {

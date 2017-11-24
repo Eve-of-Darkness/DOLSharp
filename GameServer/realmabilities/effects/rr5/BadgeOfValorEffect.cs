@@ -26,7 +26,7 @@ namespace DOL.GS.Effects
         public override void Start(GameLiving living)
         {
             base.Start(living);
-            GameEventMgr.AddHandler(m_owner, GamePlayerEvent.AttackFinished, new DOLEventHandler(AttackFinished));
+            GameEventMgr.AddHandler(m_owner, GameLivingEvent.AttackFinished, new DOLEventHandler(AttackFinished));
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            GamePlayer target = afea.AttackData.Target as GamePlayer;
+            GamePlayer target = (GamePlayer) afea.AttackData.Target;
 
             Database.InventoryItem armor = target.Inventory.GetItem((eInventorySlot)((int)afea.AttackData.ArmorHitLocation));
 
@@ -72,30 +72,18 @@ namespace DOL.GS.Effects
         public override void Stop()
         {
             base.Stop();
-            GameEventMgr.RemoveHandler(m_owner, GamePlayerEvent.AttackFinished, new DOLEventHandler(AttackFinished));
+            GameEventMgr.RemoveHandler(m_owner, GameLivingEvent.AttackFinished, new DOLEventHandler(AttackFinished));
         }
 
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "Badge of Valor";
-            }
-        }
+        public override string Name => "Badge of Valor";
 
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override ushort Icon
-        {
-            get
-            {
-                return 3056;
-            }
-        }
+        public override ushort Icon => 3056;
 
         /// <summary>
         /// Delve information
@@ -104,15 +92,17 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>();
-                delveInfoList.Add("Melee damage for the next 20 seconds will be INCREASED by the targets armor-based ABS instead of decreased.");
-                delveInfoList.Add(" ");
+                var delveInfoList = new List<string>
+                {
+                    "Melee damage for the next 20 seconds will be INCREASED by the targets armor-based ABS instead of decreased.",
+                    " "
+                };
 
-                int seconds = (int)RemainingTime / 1000;
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" ");
-                    delveInfoList.Add("- " + seconds + " seconds remaining.");
+                    delveInfoList.Add($"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

@@ -23,27 +23,26 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }
 
             // Check for MoC on the Sorceror: he cannot cast RA5L when the other is up
-            MasteryofConcentrationEffect ra5l = null;
+            MasteryofConcentrationEffect ra5L = null;
             lock (player.EffectList)
             {
-                foreach (object effect in player.EffectList)
+                foreach (IGameEffect effect in player.EffectList)
                 {
                     if (effect is MasteryofConcentrationEffect)
                     {
-                        ra5l = effect as MasteryofConcentrationEffect;
+                        ra5L = effect as MasteryofConcentrationEffect;
                         break;
                     }
                 }
             }
 
-            if (ra5l != null)
+            if (ra5L != null)
             {
                 player.Out.SendMessage("You cannot currently use this ability", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                 return;

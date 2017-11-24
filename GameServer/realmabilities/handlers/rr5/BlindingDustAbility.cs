@@ -29,7 +29,7 @@ namespace DOL.GS.RealmAbilities
             {
                 if (GameServer.ServerRules.IsAllowedToAttack(living, player, true))
                 {
-                    DamageTarget(player, living);
+                    DamageTarget(player);
                     deactivate = true;
                 }
             }
@@ -38,7 +38,7 @@ namespace DOL.GS.RealmAbilities
             {
                 if (GameServer.ServerRules.IsAllowedToAttack(living, npc, true))
                 {
-                    DamageTarget(npc, living);
+                    DamageTarget(npc);
                     deactivate = true;
                 }
             }
@@ -49,7 +49,7 @@ namespace DOL.GS.RealmAbilities
             }
         }
 
-        private void DamageTarget(GameLiving target, GameLiving caster)
+        private void DamageTarget(GameLiving target)
         {
             if (!target.IsAlive)
             {

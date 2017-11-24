@@ -12,7 +12,6 @@ namespace DOL.GS.Effects
         public BladeBarrierEffect()
             : base(30000)
         {
-            ;
         }
 
         public override void Start(GameLiving target)
@@ -23,9 +22,7 @@ namespace DOL.GS.Effects
             {
                 p.Out.SendSpellEffectAnimation(target, target, 7055, 0, false, 1);
             }
-
-            // Commented out for removal: Parry Chance for BladeBarrier is hardcoded in GameLiving.cs in the CalculateEnemyAttackResult method
-            // m_owner.BuffBonusCategory4[(int)eProperty.ParryChance] += 90;
+            
             GameEventMgr.AddHandler(target, GameLivingEvent.AttackFinished, new DOLEventHandler(attackEventHandler));
             GameEventMgr.AddHandler(target, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(TakeDamage));
         }
@@ -58,8 +55,7 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            AttackFinishedEventArgs ag = args as AttackFinishedEventArgs;
-            if (ag == null)
+            if (!(args is AttackFinishedEventArgs ag))
             {
                 return;
             }
@@ -87,23 +83,19 @@ namespace DOL.GS.Effects
             }
         }
 
-        public override string Name { get { return "Blade Barrier"; } }
+        public override string Name => "Blade Barrier";
 
-        public override ushort Icon { get { return 3054; } }
-
-        public override void Stop()
-        {
-            // Commented out for removal
-            // m_owner.BuffBonusCategory4[(int)eProperty.ParryChance] -= 90;
-            base.Stop();
-        }
+        public override ushort Icon => 3054;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Grants 90% Parry chance which is broken by an attack");
+                var list = new List<string>
+                {
+                    "Grants 90% Parry chance which is broken by an attack"
+                };
+
                 return list;
             }
         }

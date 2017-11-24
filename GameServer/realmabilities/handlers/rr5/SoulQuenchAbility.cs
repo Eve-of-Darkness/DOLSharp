@@ -64,19 +64,17 @@ namespace DOL.GS.RealmAbilities
 
             caster.Health += modheal;
 
-            GamePlayer player = caster as GamePlayer;
-            if (player != null)
+            if (caster is GamePlayer player)
             {
-                player.Out.SendMessage("You hit " + target.Name + " for " + damage + "(" + resist + ") points of damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"You hit {target.Name} for {damage}({resist}) points of damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
             }
 
-            if (caster is GamePlayer && modheal > 0)
+            if (caster is GamePlayer gamePlayer && modheal > 0)
             {
-                ((GamePlayer)caster).Out.SendMessage("Your Soul Quench returns " + modheal + " lifepoints to you", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                gamePlayer.Out.SendMessage($"Your Soul Quench returns {modheal} lifepoints to you", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
 
-            GamePlayer targetPlayer = target as GamePlayer;
-            if (targetPlayer != null)
+            if (target is GamePlayer targetPlayer)
             {
                 if (targetPlayer.IsStealthed)
                 {
@@ -91,12 +89,15 @@ namespace DOL.GS.RealmAbilities
             }
 
             // target.TakeDamage(caster, eDamageType.Spirit, damage, 0);
-            AttackData ad = new AttackData();
-            ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
-            ad.Attacker = caster;
-            ad.Target = target;
-            ad.DamageType = eDamageType.Spirit;
-            ad.Damage = damage;
+            AttackData ad = new AttackData
+            {
+                AttackResult = GameLiving.eAttackResult.HitUnstyled,
+                Attacker = caster,
+                Target = target,
+                DamageType = eDamageType.Spirit,
+                Damage = damage
+            };
+
             target.OnAttackedByEnemy(ad);
             caster.DealDamage(ad);
         }

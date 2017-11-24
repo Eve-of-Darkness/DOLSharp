@@ -55,14 +55,12 @@ namespace DOL.GS.RealmAbilities
             int resist = 251 * target.GetResist(eDamageType.Crush) / -100;
             int damage = 251 + resist;
 
-            GamePlayer player = caster as GamePlayer;
-            if (player != null)
+            if (caster is GamePlayer player)
             {
-                player.Out.SendMessage("You hit " + target.Name + " for " + damage + "(" + resist + ") points of damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"You hit {target.Name} for {damage}({resist}) points of damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
             }
 
-            GamePlayer targetPlayer = target as GamePlayer;
-            if (targetPlayer != null)
+            if (target is GamePlayer targetPlayer)
             {
                 if (targetPlayer.IsStealthed)
                 {
@@ -77,12 +75,15 @@ namespace DOL.GS.RealmAbilities
             }
 
             // target.TakeDamage(caster, eDamageType.Spirit, damage, 0);
-            AttackData ad = new AttackData();
-            ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
-            ad.Attacker = caster;
-            ad.Target = target;
-            ad.DamageType = eDamageType.Crush;
-            ad.Damage = damage;
+            AttackData ad = new AttackData
+            {
+                AttackResult = GameLiving.eAttackResult.HitUnstyled,
+                Attacker = caster,
+                Target = target,
+                DamageType = eDamageType.Crush,
+                Damage = damage
+            };
+
             target.OnAttackedByEnemy(ad);
             caster.DealDamage(ad);
 

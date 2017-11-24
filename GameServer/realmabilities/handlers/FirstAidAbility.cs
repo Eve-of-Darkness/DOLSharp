@@ -50,8 +50,7 @@ namespace DOL.GS.RealmAbilities
 
             SendCasterSpellEffectAndCastMessage(living, 7001, healed > 0);
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 if (healed > 0)
                 {

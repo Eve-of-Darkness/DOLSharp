@@ -8,9 +8,9 @@ namespace DOL.GS.RealmAbilities
     /// <summary>
     /// Effect handler for Adrenaline Rush
     /// </summary>
-    public class AdrenalineRushEffect : TimedEffect, IGameEffect
+    public class AdrenalineRushEffect : TimedEffect
     {
-        private int m_value;
+        private readonly int _value;
 
         /// <summary>
         /// Default constructor for AdrenalineRushEffect
@@ -18,7 +18,7 @@ namespace DOL.GS.RealmAbilities
         public AdrenalineRushEffect(int duration, int value)
             : base(duration)
         {
-            m_value = value;
+            _value = value;
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace DOL.GS.RealmAbilities
                 GameEventMgr.AddHandler(living, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
             }
 
-            living.AbilityBonus[(int)eProperty.MeleeDamage] += m_value;
+            living.AbilityBonus[(int)eProperty.MeleeDamage] += _value;
         }
 
         /// <summary>
@@ -45,19 +45,17 @@ namespace DOL.GS.RealmAbilities
         /// <param name="args">EventArgs associated with the event</param>
         private static void PlayerLeftWorld(DOLEvent e, object sender, EventArgs args)
         {
-            GamePlayer player = (GamePlayer)sender;
-
-            AdrenalineRushEffect SPEffect = player.EffectList.GetOfType<AdrenalineRushEffect>();
-            if (SPEffect != null)
+            if (sender is GamePlayer player)
             {
-                SPEffect.Cancel(false);
+                AdrenalineRushEffect spEffect = player.EffectList.GetOfType<AdrenalineRushEffect>();
+                spEffect?.Cancel(false);
             }
         }
 
         public override void Stop()
         {
             base.Stop();
-            m_owner.AbilityBonus[(int)eProperty.MeleeDamage] -= m_value;
+            m_owner.AbilityBonus[(int)eProperty.MeleeDamage] -= _value;
             if (m_owner is GamePlayer)
             {
                 GameEventMgr.RemoveHandler(m_owner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
@@ -67,18 +65,12 @@ namespace DOL.GS.RealmAbilities
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name
-        {
-            get { return "Adrenaline Rush"; }
-        }
+        public override string Name => "Adrenaline Rush";
 
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override ushort Icon
-        {
-            get { return 3001; }
-        }
+        public override ushort Icon => 3001;
 
         /// <summary>
         /// Delve information
@@ -87,16 +79,18 @@ namespace DOL.GS.RealmAbilities
         {
             get
             {
-                var delveInfoList = new List<string>(8);
-                delveInfoList.Add("Doubles the base melee damage for 20 seconds.");
-                delveInfoList.Add(" ");
-                delveInfoList.Add("Value: " + m_value + "%");
+                var delveInfoList = new List<string>(8)
+                {
+                    "Doubles the base melee damage for 20 seconds.",
+                    " ",
+                    "Value: " + _value + "%"
+                };
 
-                int seconds = (int)(RemainingTime / 1000);
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" ");
-                    delveInfoList.Add("- " + seconds + " seconds remaining.");
+                    delveInfoList.Add($"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

@@ -27,9 +27,7 @@ namespace DOL.GS.RealmAbilities
     {
         public FanatacismAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        int RANGE = 2000;
-        public const int DURATION = 45 * 1000;
-        public const int VALUE = 25;
+        private readonly int _range = 2000;
 
         public override void Execute(GameLiving living)
         {
@@ -38,8 +36,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }
@@ -53,7 +50,7 @@ namespace DOL.GS.RealmAbilities
             {
                 foreach (GamePlayer grpMate in player.Group.GetPlayersInTheGroup())
                 {
-                    if (player.IsWithinRadius(grpMate, RANGE) && grpMate.IsAlive)
+                    if (player.IsWithinRadius(grpMate, _range) && grpMate.IsAlive)
                     {
                         if (grpMate.CharacterClass.ClassType == eClassType.Hybrid
                             || grpMate.CharacterClass.ClassType == eClassType.PureTank)
@@ -66,11 +63,8 @@ namespace DOL.GS.RealmAbilities
 
             foreach (GamePlayer target in targets)
             {
-                FanatacismEffect Fanatacism = target.EffectList.GetOfType<FanatacismEffect>();
-                if (Fanatacism != null)
-                {
-                    Fanatacism.Cancel(false);
-                }
+                FanatacismEffect fanatacism = target.EffectList.GetOfType<FanatacismEffect>();
+                fanatacism?.Cancel(false);
 
                 new FanatacismEffect().Start(target);
             }

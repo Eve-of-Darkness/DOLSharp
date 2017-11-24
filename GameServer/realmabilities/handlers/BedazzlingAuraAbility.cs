@@ -9,14 +9,18 @@ namespace DOL.GS.RealmAbilities
     {
         public BedazzlingAuraAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        public const string BofBaSb = "RA_DAMAGE_DECREASE";
+        private const string BofBaSb = "RA_DAMAGE_DECREASE";
 
-        int m_range = 1500;
-        int m_value = 0;
+        private int _range = 1500;
+        private int _value;
 
         public override void Execute(GameLiving living)
         {
-            GamePlayer player = living as GamePlayer;
+            if (!(living is GamePlayer player))
+            {
+                return;
+            }
+
             if (CheckPreconditions(living, DEAD | SITTING | MEZZED | STUNNED))
             {
                 return;
@@ -32,11 +36,11 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (Level)
                 {
-                    case 1: m_value = 10; break;
-                    case 2: m_value = 15; break;
-                    case 3: m_value = 20; break;
-                    case 4: m_value = 30; break;
-                    case 5: m_value = 40; break;
+                    case 1: _value = 10; break;
+                    case 2: _value = 15; break;
+                    case 3: _value = 20; break;
+                    case 4: _value = 30; break;
+                    case 5: _value = 40; break;
                     default: return;
                 }
             }
@@ -44,9 +48,9 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (Level)
                 {
-                    case 1: m_value = 10; break;
-                    case 2: m_value = 20; break;
-                    case 3: m_value = 40; break;
+                    case 1: _value = 10; break;
+                    case 2: _value = 20; break;
+                    case 3: _value = 40; break;
                     default: return;
                 }
             }
@@ -62,14 +66,13 @@ namespace DOL.GS.RealmAbilities
             {
                 foreach (GamePlayer p in player.Group.GetPlayersInTheGroup())
                 {
-                    if (player.IsWithinRadius(p, m_range) && p.IsAlive)
+                    if (player.IsWithinRadius(p, _range) && p.IsAlive)
                     {
                         targets.Add(p);
                     }
                 }
             }
 
-            bool success;
             foreach (GamePlayer target in targets)
             {
                 // send spelleffect
@@ -83,7 +86,7 @@ namespace DOL.GS.RealmAbilities
                     continue;
                 }
 
-                success = !target.TempProperties.getProperty(BofBaSb, false);
+                var success = !target.TempProperties.getProperty(BofBaSb, false);
                 foreach (GamePlayer visPlayer in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
                     visPlayer.Out.SendSpellEffectAnimation(player, target, 7030, 0, false, CastSuccess(success));
@@ -91,10 +94,7 @@ namespace DOL.GS.RealmAbilities
 
                 if (success)
                 {
-                    if (target != null)
-                    {
-                        new BedazzlingAuraEffect().Start(target, m_value);
-                    }
+                    new BedazzlingAuraEffect().Start(target, _value);
                 }
             }
         }

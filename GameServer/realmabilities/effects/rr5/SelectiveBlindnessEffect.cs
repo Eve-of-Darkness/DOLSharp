@@ -26,29 +26,25 @@ namespace DOL.GS.Effects
 
     public class SelectiveBlindnessEffect : TimedEffect
     {
-        private GameLiving EffectOwner;
-        private GameLiving m_EffectSource;
+        private const int Duration = 20 * 1000;
+
+        private GameLiving _effectOwner;
 
         public SelectiveBlindnessEffect(GameLiving source)
-            : base(RealmAbilities.SelectiveBlindnessAbility.DURATION)
+            : base(Duration)
         {
-                m_EffectSource = source as GamePlayer;
+                EffectSource = source as GamePlayer;
         }
 
-        public GameLiving EffectSource
-        {
-            get {
-                return m_EffectSource;
-            }
-        }
+        public GameLiving EffectSource { get; }
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            EffectOwner = target;
+            _effectOwner = target;
             foreach (GamePlayer p in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                p.Out.SendSpellEffectAnimation(EffectOwner, EffectOwner, 7059, 0, false, 1);
+                p.Out.SendSpellEffectAnimation(_effectOwner, _effectOwner, 7059, 0, false, 1);
             }
 
             GameEventMgr.AddHandler(EffectSource, GameLivingEvent.AttackFinished, new DOLEventHandler(EventHandler));
@@ -57,7 +53,7 @@ namespace DOL.GS.Effects
 
         public override void Stop()
         {
-            if (EffectOwner != null)
+            if (_effectOwner != null)
             {
                 GameEventMgr.RemoveHandler(EffectSource, GameLivingEvent.AttackFinished, new DOLEventHandler(EventHandler));
                 GameEventMgr.RemoveHandler(EffectSource, GameLivingEvent.CastFinished, new DOLEventHandler(EventHandler));
@@ -77,17 +73,20 @@ namespace DOL.GS.Effects
             Cancel(false);
         }
 
-        public override string Name { get { return "Selective Blindness"; } }
+        public override string Name => "Selective Blindness";
 
-        public override ushort Icon { get { return 3058; } }
+        public override ushort Icon => 3058;
 
         // Delve Info
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("You can't attack an ennemy.");
+                var list = new List<string>
+                {
+                    "You can't attack an ennemy."
+                };
+
                 return list;
             }
         }

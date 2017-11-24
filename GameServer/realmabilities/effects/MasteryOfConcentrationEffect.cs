@@ -6,7 +6,7 @@ namespace DOL.GS.Effects
     /// <summary>
     ///
     /// </summary>
-    public class MasteryofConcentrationEffect : TimedEffect, IGameEffect
+    public class MasteryofConcentrationEffect : TimedEffect
     {
         /// <summary>
         /// Default constructor for MasteryofConcentrationEffect
@@ -34,24 +34,12 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "Mastery of Concentration";
-            }
-        }
+        public override string Name => "Mastery of Concentration";
 
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override ushort Icon
-        {
-            get
-            {
-                return 3006;
-            }
-        }
+        public override ushort Icon => 3006;
 
         /// <summary>
         /// Delve information
@@ -60,14 +48,16 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>(4);
-                delveInfoList.Add("This ability allows a player to cast uninterrupted, even while sustaining attacks, through melee or spell for 30 seconds.");
+                var delveInfoList = new List<string>(4)
+                {
+                    "This ability allows a player to cast uninterrupted, even while sustaining attacks, through melee or spell for 30 seconds."
+                };
 
-                int seconds = (int)(RemainingTime / 1000);
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" ");
-                    delveInfoList.Add("- " + seconds + " seconds remaining.");
+                    delveInfoList.Add($"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

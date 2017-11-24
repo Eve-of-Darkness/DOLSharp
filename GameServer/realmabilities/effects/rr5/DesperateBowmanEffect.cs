@@ -10,7 +10,6 @@ namespace DOL.GS.Effects
         public DesperateBowmanDisarmEffect()
             : base(15000)
         {
-            ;
         }
 
         public override void Start(GameLiving target)
@@ -22,16 +21,19 @@ namespace DOL.GS.Effects
             target.StopCurrentSpellcast();
         }
 
-        public override string Name { get { return "Desperate Bowman"; } }
+        public override string Name => "Desperate Bowman";
 
-        public override ushort Icon { get { return 3060; } }
+        public override ushort Icon => 3060;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Disarms you for 15 seconds!");
+                var list = new List<string>
+                {
+                    "Disarms you for 15 seconds!"
+                };
+
                 return list;
             }
         }
@@ -51,10 +53,7 @@ namespace DOL.GS.Effects
             target.StopAttack();
             target.StopCurrentSpellcast();
             target.DisableTurning(true);
-            if (target is GamePlayer)
-            {
-                (target as GamePlayer).Out.SendUpdateMaxSpeed();
-            }
+            (target as GamePlayer)?.Out.SendUpdateMaxSpeed();
         }
 
         public override void Stop()
@@ -62,22 +61,22 @@ namespace DOL.GS.Effects
             base.Stop();
             m_owner.IsStunned = false;
             m_owner.DisableTurning(false);
-            if (m_owner is GamePlayer)
-            {
-                (m_owner as GamePlayer).Out.SendUpdateMaxSpeed();
-            }
+            (m_owner as GamePlayer)?.Out.SendUpdateMaxSpeed();
         }
 
-        public override string Name { get { return "Desperate Bowman"; } }
+        public override string Name => "Desperate Bowman";
 
-        public override ushort Icon { get { return 3060; } }
+        public override ushort Icon => 3060;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Stun Effect");
+                var list = new List<string>
+                {
+                    "Stun Effect"
+                };
+
                 return list;
             }
         }

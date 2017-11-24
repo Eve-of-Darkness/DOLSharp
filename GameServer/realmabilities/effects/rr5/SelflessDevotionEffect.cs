@@ -27,51 +27,50 @@ namespace DOL.GS.Effects
     {
         public SelflessDevotionEffect() : base(15000)
         {
-            m_healpulse = 5;
+            _healpulse = 5;
         }
 
-        private GamePlayer owner;
-        private RegionTimer m_timer = null;
-        private int m_healpulse;
-        private Dictionary<eProperty, int> m_debuffs;
+        private GamePlayer _owner;
+        private RegionTimer _timer;
+        private int _healpulse;
+        private Dictionary<eProperty, int> _debuffs;
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
 
-            owner = target as GamePlayer;
-            if (owner == null)
+            _owner = target as GamePlayer;
+            if (_owner == null)
             {
                 return;
             }
 
-            foreach (GamePlayer p in owner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            foreach (GamePlayer p in _owner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                p.Out.SendSpellEffectAnimation(owner, owner, Icon, 0, false, 1);
+                p.Out.SendSpellEffectAnimation(_owner, _owner, Icon, 0, false, 1);
             }
 
-            m_debuffs = new Dictionary<eProperty, int>(1 + eProperty.Stat_Last - eProperty.Stat_First);
+            _debuffs = new Dictionary<eProperty, int>(1 + eProperty.Stat_Last - eProperty.Stat_First);
 
             for (eProperty property = eProperty.Stat_First; property <= eProperty.Stat_Last; property++)
             {
-                m_debuffs.Add(property, (int)(owner.GetModified(property) * 0.25));
-                owner.DebuffCategory[(int)property] += m_debuffs[property];
+                _debuffs.Add(property, (int)(_owner.GetModified(property) * 0.25));
+                _owner.DebuffCategory[(int)property] += _debuffs[property];
             }
 
-            owner.Out.SendCharStatsUpdate();
+            _owner.Out.SendCharStatsUpdate();
 
-            m_timer = new RegionTimer(owner, new RegionTimerCallback(HealPulse));
-            m_timer.Start(1);
+            _timer = new RegionTimer(_owner, new RegionTimerCallback(HealPulse));
+            _timer.Start(1);
         }
 
         public int HealPulse(RegionTimer timer)
         {
-            if (m_healpulse > 0)
+            if (_healpulse > 0)
             {
-                m_healpulse--;
+                _healpulse--;
 
-                GamePlayer player = Owner as GamePlayer;
-                if (player == null)
+                if (!(Owner is GamePlayer player))
                 {
                     return 0;
                 }
@@ -114,38 +113,41 @@ namespace DOL.GS.Effects
         {
             base.Stop();
 
-            if (owner != null)
+            if (_owner != null)
             {
                 for (eProperty property = eProperty.Stat_First; property <= eProperty.Stat_Last; property++)
                 {
-                    if (m_debuffs.ContainsKey(property))
+                    if (_debuffs.ContainsKey(property))
                     {
-                        owner.DebuffCategory[(int)property] -= m_debuffs[property];
+                        _owner.DebuffCategory[(int)property] -= _debuffs[property];
                     }
                 }
 
-                owner.Out.SendCharStatsUpdate();
+                _owner.Out.SendCharStatsUpdate();
             }
 
-            if (m_timer != null)
+            if (_timer != null)
             {
-                m_timer.Stop();
-                m_timer = null;
+                _timer.Stop();
+                _timer = null;
             }
         }
 
-        public override string Name { get { return "Selfless Devotion"; } }
+        public override string Name => "Selfless Devotion";
 
-        public override ushort Icon { get { return 3038; } }
+        public override ushort Icon => 3038;
 
-        public int SpellEffectiveness { get { return 100; } }
+        public int SpellEffectiveness => 100;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Decrease Paladin stats by 25%, and pulse a 300 points group heal with a 750 units range every 3 seconds for 15 seconds total.");
+                var list = new List<string>
+                {
+                    "Decrease Paladin stats by 25%, and pulse a 300 points group heal with a 750 units range every 3 seconds for 15 seconds total."
+                };
+
                 return list;
             }
         }

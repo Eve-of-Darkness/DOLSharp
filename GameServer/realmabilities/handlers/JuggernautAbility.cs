@@ -2,85 +2,67 @@ using DOL.Database;
 using DOL.GS.PacketHandler;
 using DOL.GS.Effects;
 using DOL.GS.Spells;
+using log4net;
 
 namespace DOL.GS.RealmAbilities
 {
     public class JuggernautAbility : TimedRealmAbility
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public JuggernautAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        int m_range = 1500;
-        int m_duration = 60;
-        byte m_value = 0;
+        private int _range = 1500;
+        private int _duration = 60;
+        private byte _value;
 
         public override void Execute(GameLiving living)
         {
-            GamePlayer player = living as GamePlayer;
-            #region preCheck
-            if (living == null)
+            if (!(living is GamePlayer player))
             {
-                log.Warn("Could not retrieve player in JuggernautAbilityHandler.");
+                Log.Warn("Could not retrieve player in JuggernautAbilityHandler.");
                 return;
             }
 
+            #region preCheck
             if (!living.IsAlive)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage("You cannot use this ability while dead!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player.Out.SendMessage("You cannot use this ability while dead!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return;
             }
 
             if (living.IsMezzed)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage("You cannot use this ability while mesmerized!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player.Out.SendMessage("You cannot use this ability while mesmerized!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return;
             }
 
             if (living.IsStunned)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage("You cannot use this ability while stunned!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player.Out.SendMessage("You cannot use this ability while stunned!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return;
             }
 
             if (living.IsSitting)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage("You cannot use this ability while sitting!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player.Out.SendMessage("You cannot use this ability while sitting!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return;
             }
 
             if (living.ControlledBrain == null)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage("You must have a pet controlled to use this ability!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player.Out.SendMessage("You must have a pet controlled to use this ability!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return;
             }
 
-            if (!living.IsWithinRadius(player.ControlledBrain.Body, m_range))
+            if (!living.IsWithinRadius(player.ControlledBrain.Body, _range))
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage("Your pet is too far away!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player.Out.SendMessage("Your pet is too far away!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return;
             }
@@ -88,10 +70,7 @@ namespace DOL.GS.RealmAbilities
             GameSpellEffect ml9 = SpellHandler.FindEffectOnTarget(living.ControlledBrain.Body,"SummonMastery");
             if (ml9 != null)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage("Your Pet already has an ability of this type active", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-                }
+                player.Out.SendMessage("Your Pet already has an ability of this type active", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
 
                 return;
             }
@@ -103,19 +82,19 @@ namespace DOL.GS.RealmAbilities
                 switch (Level)
                 {
                     case 1:
-                        m_value = 10;
+                        _value = 10;
                         break;
                     case 2:
-                        m_value = 15;
+                        _value = 15;
                         break;
                     case 3:
-                        m_value = 20;
+                        _value = 20;
                         break;
                     case 4:
-                        m_value = 25;
+                        _value = 25;
                         break;
                     case 5:
-                        m_value = 30;
+                        _value = 30;
                         break;
                     default:
                         return;
@@ -126,20 +105,20 @@ namespace DOL.GS.RealmAbilities
                 switch (Level)
                 {
                     case 1:
-                        m_value = 10;
+                        _value = 10;
                         break;
                     case 2:
-                        m_value = 20;
+                        _value = 20;
                         break;
                     case 3:
-                        m_value = 30;
+                        _value = 30;
                         break;
                     default:
                         return;
                 }
             }
 
-            new JuggernautEffect().Start(living, m_duration, m_value);
+            new JuggernautEffect().Start(living, _duration, _value);
 
             DisableSkill(living);
         }

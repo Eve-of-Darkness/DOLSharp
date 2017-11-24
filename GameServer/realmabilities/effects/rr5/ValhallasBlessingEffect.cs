@@ -26,32 +26,34 @@ namespace DOL.GS.Effects
 
     public class ValhallasBlessingEffect : TimedEffect
     {
-        private GamePlayer EffectOwner;
+        private const int Duration = 30 * 1000;
+
+        private GamePlayer _effectOwner;
 
         public ValhallasBlessingEffect()
-            : base(RealmAbilities.ValhallasBlessingAbility.DURATION)
+            : base(Duration)
         { }
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                EffectOwner = target as GamePlayer;
+                _effectOwner = player;
                 foreach (GamePlayer p in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
                     p.Out.SendSpellEffectAnimation(target, target, 7087, 0, false, 1);
                 }
 
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
             }
         }
 
         public override void Stop()
         {
-            if (EffectOwner != null)
+            if (_effectOwner != null)
             {
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
             }
 
             base.Stop();
@@ -68,17 +70,20 @@ namespace DOL.GS.Effects
             Cancel(false);
         }
 
-        public override string Name { get { return "Valhalla's Blessing"; } }
+        public override string Name => "Valhalla's Blessing";
 
-        public override ushort Icon { get { return 3086; } }
+        public override ushort Icon => 3086;
 
         // Delve Info
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Spells/Styles have has a chance of not costing power or endurance.");
+                var list = new List<string>
+                {
+                    "Spells/Styles have has a chance of not costing power or endurance."
+                };
+
                 return list;
             }
         }

@@ -24,24 +24,18 @@ namespace DOL.GS.Effects
     /// <summary>
     /// The Empty Mind Effect
     /// </summary>
-    public class TheEmptyMindEffect : TimedEffect, IGameEffect
+    public class TheEmptyMindEffect : TimedEffect
     {
-        private int Value
-        {
-            get
-            {
-                return m_value;
-            }
-        }
+        private const int Duration = 45000; // 45 seconds
 
-        private int m_value = 0;
+        private readonly int _value;
         /// <summary>
         /// Constructs a new Empty Mind Effect
         /// </summary>
         public TheEmptyMindEffect(int effectiveness)
-            : base(RealmAbilities.TheEmptyMindAbility.m_duration)
+            : base(Duration)
         {
-            m_value = effectiveness;
+            _value = effectiveness;
         }
 
         /// <summary>
@@ -51,17 +45,13 @@ namespace DOL.GS.Effects
         public override void Start(GameLiving living)
         {
             base.Start(living);
-            m_value = Value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Body] += m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Cold] += m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Energy] += m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Heat] += m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Matter] += m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Spirit] += m_value;
-            if (m_owner is GamePlayer)
-            {
-                (m_owner as GamePlayer).Out.SendCharResistsUpdate();
-            }
+            m_owner.AbilityBonus[(int)eProperty.Resist_Body] += _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Cold] += _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Energy] += _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Heat] += _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Matter] += _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Spirit] += _value;
+            (m_owner as GamePlayer)?.Out.SendCharResistsUpdate();
 
             foreach (GamePlayer visiblePlayer in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
@@ -71,16 +61,16 @@ namespace DOL.GS.Effects
 
         public override void Stop()
         {
-            m_owner.AbilityBonus[(int)eProperty.Resist_Body] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Cold] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Energy] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Heat] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Matter] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Spirit] -= m_value;
-            if (m_owner is GamePlayer)
+            m_owner.AbilityBonus[(int)eProperty.Resist_Body] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Cold] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Energy] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Heat] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Matter] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Spirit] -= _value;
+            if (m_owner is GamePlayer player)
             {
-                (m_owner as GamePlayer).Out.SendCharResistsUpdate();
-                (m_owner as GamePlayer).Out.SendMessage("Your clearheaded state leaves you.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendCharResistsUpdate();
+                player.Out.SendMessage("Your clearheaded state leaves you.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
 
             base.Stop();
@@ -89,21 +79,12 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "The Empty Mind";
-            }
-        }
+        public override string Name => "The Empty Mind";
 
         /// <summary>
         /// Icon to show on players, can be id
         /// </summary>
-        public override ushort Icon
-        {
-            get { return 3007; }
-        }
+        public override ushort Icon => 3007;
 
         /// <summary>
         /// Delve Info
@@ -112,8 +93,11 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>(4);
-                delveInfoList.Add("Grants the user 45 seconds of increased resistances to all magical damage by the percentage listed.");
+                var delveInfoList = new List<string>(4)
+                {
+                    "Grants the user 45 seconds of increased resistances to all magical damage by the percentage listed."
+                };
+
                 foreach (string str in base.DelveInfo)
                 {
                     delveInfoList.Add(str);

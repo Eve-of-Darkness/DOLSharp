@@ -11,18 +11,20 @@ namespace DOL.GS.RealmAbilities
     /// <summary>
     ///
     /// </summary>
-    public class DivineInterventionEffect : TimedEffect, IGameEffect
+    public class DivineInterventionEffect : TimedEffect
     {
+        private const int PoolDuration = 1200000; // 20 minutes
+
         public DivineInterventionEffect(int value)
-            : base(DivineInterventionAbility.poolDuration)
+            : base(PoolDuration)
         {
-            PoolValue = value;
+            _poolValue = value;
         }
 
-        private Group m_group = null;
-        public int PoolValue = 0;
-        private ArrayList m_affected = new ArrayList();
-        private GamePlayer m_playerOwner = null;
+        private readonly ArrayList _affected = new ArrayList();
+        private Group _group;
+        private int _poolValue;
+        private GamePlayer _playerOwner;
 
         /// <summary>
         /// Start the effect on a living target
@@ -30,27 +32,27 @@ namespace DOL.GS.RealmAbilities
         /// <param name="living"></param>
         public override void Start(GameLiving living)
         {
-            m_playerOwner = living as GamePlayer;
+            _playerOwner = living as GamePlayer;
 
-            if (m_playerOwner == null)
+            if (_playerOwner == null)
             {
                 return;
             }
 
-            m_group = m_playerOwner.Group;
+            _group = _playerOwner.Group;
 
-            if (m_group == null)
+            if (_group == null)
             {
                 return;
             }
 
             base.Start(living);
 
-            m_playerOwner.Out.SendMessage("You group is protected by a pool of healing!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-            GameEventMgr.AddHandler(m_group, GroupEvent.MemberJoined, new DOLEventHandler(PlayerJoinedGroup));
-            GameEventMgr.AddHandler(m_group, GroupEvent.MemberDisbanded, new DOLEventHandler(PlayerDisbandedGroup));
+            _playerOwner.Out.SendMessage("You group is protected by a pool of healing!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+            GameEventMgr.AddHandler(_group, GroupEvent.MemberJoined, new DOLEventHandler(PlayerJoinedGroup));
+            GameEventMgr.AddHandler(_group, GroupEvent.MemberDisbanded, new DOLEventHandler(PlayerDisbandedGroup));
 
-            foreach (GamePlayer gp in m_group.GetPlayersInTheGroup())
+            foreach (GamePlayer gp in _group.GetPlayersInTheGroup())
             {
                 foreach (GamePlayer p in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
@@ -62,19 +64,19 @@ namespace DOL.GS.RealmAbilities
                     p.Out.SendSpellEffectAnimation(living, gp, 7036, 0, false, 1);
                 }
 
-                if (gp == m_playerOwner)
+                if (gp == _playerOwner)
                 {
                     continue;
                 }
 
                 gp.Out.SendMessage("You are protected by a pool of healing!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                m_affected.Add(gp);
-                GameEventMgr.AddHandler(gp, GamePlayerEvent.TakeDamage, new DOLEventHandler(TakeDamage));
+                _affected.Add(gp);
+                GameEventMgr.AddHandler(gp, GameObjectEvent.TakeDamage, new DOLEventHandler(TakeDamage));
                 if (gp.CharacterClass.ID == (int)eCharacterClass.Necromancer)
                 {
                     if (gp.ControlledBrain != null)
                     {
-                        m_affected.Add(gp.ControlledBrain.Body);
+                        _affected.Add(gp.ControlledBrain.Body);
                         GameEventMgr.AddHandler(gp.ControlledBrain.Body, GameLivingEvent.TakeDamage, new DOLEventHandler(TakeDamageNPC));
                     }
                 }
@@ -83,24 +85,23 @@ namespace DOL.GS.RealmAbilities
 
         protected void PlayerJoinedGroup(DOLEvent e, object sender, EventArgs args)
         {
-            MemberJoinedEventArgs pjargs = args as MemberJoinedEventArgs;
-            if (pjargs == null)
+            if (!(args is MemberJoinedEventArgs pjargs))
             {
                 return;
             }
 
-            m_affected.Add(pjargs.Member);
-            GameEventMgr.AddHandler(pjargs.Member, GamePlayerEvent.TakeDamage, new DOLEventHandler(TakeDamage));
+            _affected.Add(pjargs.Member);
+            GameEventMgr.AddHandler(pjargs.Member, GameObjectEvent.TakeDamage, new DOLEventHandler(TakeDamage));
 
-            if (pjargs.Member is GamePlayer)
+            if (pjargs.Member is GamePlayer player)
             {
-                ((GamePlayer)pjargs.Member).Out.SendMessage("You are protected by a pool of healing!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                if (((GamePlayer)pjargs.Member).CharacterClass.ID == (int)eCharacterClass.Necromancer)
+                player.Out.SendMessage("You are protected by a pool of healing!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                if (player.CharacterClass.ID == (int)eCharacterClass.Necromancer)
                 {
-                    if (((GamePlayer)pjargs.Member).ControlledBrain != null)
+                    if (player.ControlledBrain != null)
                     {
-                        m_affected.Add(((GamePlayer)pjargs.Member).ControlledBrain.Body);
-                        GameEventMgr.AddHandler(((GamePlayer)pjargs.Member).ControlledBrain.Body, GameLivingEvent.TakeDamage, new DOLEventHandler(TakeDamageNPC));
+                        _affected.Add(player.ControlledBrain.Body);
+                        GameEventMgr.AddHandler(player.ControlledBrain.Body, GameObjectEvent.TakeDamage, new DOLEventHandler(TakeDamageNPC));
                     }
                 }
             }
@@ -108,28 +109,27 @@ namespace DOL.GS.RealmAbilities
 
         protected void PlayerDisbandedGroup(DOLEvent e, object sender, EventArgs args)
         {
-            MemberDisbandedEventArgs pdargs = args as MemberDisbandedEventArgs;
-            if (pdargs == null)
+            if (!(args is MemberDisbandedEventArgs pdargs))
             {
                 return;
             }
 
-            m_affected.Remove(pdargs.Member);
-            GameEventMgr.RemoveHandler(pdargs.Member, GamePlayerEvent.TakeDamage, new DOLEventHandler(TakeDamage));
-            if (pdargs.Member is GamePlayer)
+            _affected.Remove(pdargs.Member);
+            GameEventMgr.RemoveHandler(pdargs.Member, GameObjectEvent.TakeDamage, new DOLEventHandler(TakeDamage));
+            if (pdargs.Member is GamePlayer player)
             {
-                ((GamePlayer)pdargs.Member).Out.SendMessage("You are no longer protected by a pool of healing!", eChatType.CT_SpellExpires, eChatLoc.CL_SystemWindow);
-                if (((GamePlayer)pdargs.Member).CharacterClass.ID == (int)eCharacterClass.Necromancer)
+                player.Out.SendMessage("You are no longer protected by a pool of healing!", eChatType.CT_SpellExpires, eChatLoc.CL_SystemWindow);
+                if (player.CharacterClass.ID == (int)eCharacterClass.Necromancer)
                 {
-                    if (((GamePlayer)pdargs.Member).ControlledBrain != null)
+                    if (player.ControlledBrain != null)
                     {
-                        m_affected.Remove(((GamePlayer)pdargs.Member).ControlledBrain.Body);
-                        GameEventMgr.RemoveHandler(((GamePlayer)pdargs.Member).ControlledBrain.Body, GameLivingEvent.TakeDamage, new DOLEventHandler(TakeDamageNPC));
+                        _affected.Remove(player.ControlledBrain.Body);
+                        GameEventMgr.RemoveHandler(player.ControlledBrain.Body, GameObjectEvent.TakeDamage, new DOLEventHandler(TakeDamageNPC));
                     }
                 }
             }
 
-            if (m_group == null)
+            if (_group == null)
             {
                 Cancel(false);
             }
@@ -137,7 +137,6 @@ namespace DOL.GS.RealmAbilities
 
         protected void TakeDamageNPC(DOLEvent e, object sender, EventArgs args)
         {
-            TakeDamageEventArgs targs = args as TakeDamageEventArgs;
             GameNPC npc = sender as GameNPC;
 
             if (!npc.IsWithinRadius(m_owner, 2300))
@@ -157,45 +156,40 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            int healamount = 0;
+            int healamount;
 
-            if (PoolValue <= 0)
+            if (_poolValue <= 0)
             {
                 Cancel(false);
             }
 
-            if (PoolValue - dmgamount > 0)
+            if (_poolValue - dmgamount > 0)
             {
                 healamount = dmgamount;
             }
             else
             {
-                healamount = dmgamount - PoolValue;
+                healamount = dmgamount - _poolValue;
             }
 
-            foreach (GamePlayer t_player in npc.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            foreach (GamePlayer tPlayer in npc.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                if (!t_player.IsAlive)
+                if (!tPlayer.IsAlive)
                 {
                     continue;
                 }
 
-                t_player.Out.SendSpellEffectAnimation(m_owner, npc, 8051, 0, false, 1);
+                tPlayer.Out.SendSpellEffectAnimation(m_owner, npc, 8051, 0, false, 1);
             }
 
-            GamePlayer petOwner = null;
-            petOwner = ((npc as GameNPC).Brain as IControlledBrain).Owner as GamePlayer;
-            if (petOwner != null)
-            {
-                petOwner.Out.SendMessage("Your " + npc.Name + " was healed by the pool of healing for " + healamount + "!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-            }
-
-            m_playerOwner.Out.SendMessage("Your pool of healing heals the " + npc.Name + " of " + petOwner.Name + " for " + healamount + "!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+            var petOwner = (npc.Brain as IControlledBrain)?.Owner as GamePlayer;
+            petOwner?.Out.SendMessage($"Your {npc.Name} was healed by the pool of healing for {healamount}!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+            _playerOwner.Out.SendMessage($"Your pool of healing heals the {npc.Name} of {petOwner?.Name} for {healamount}!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
 
             npc.ChangeHealth(m_owner, GameLiving.eHealthChangeType.Spell, healamount);
-            PoolValue -= dmgamount;
+            _poolValue -= dmgamount;
 
-            if (PoolValue <= 0)
+            if (_poolValue <= 0)
             {
                 Cancel(false);
             }
@@ -204,14 +198,13 @@ namespace DOL.GS.RealmAbilities
         protected void TakeDamage(DOLEvent e, object sender, EventArgs args)
         {
             TakeDamageEventArgs targs = args as TakeDamageEventArgs;
-            GamePlayer player = sender as GamePlayer;
 
-            if (!player.IsWithinRadius(m_owner, 2300))
+            if (!(sender is GamePlayer player) || !player.IsWithinRadius(m_owner, 2300))
             {
                 return;
             }
 
-            if (targs.DamageType == eDamageType.Falling)
+            if (targs == null || targs.DamageType == eDamageType.Falling)
             {
                 return;
             }
@@ -228,9 +221,9 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            int healamount = 0;
+            int healamount;
 
-            if (PoolValue <= 0)
+            if (_poolValue <= 0)
             {
                 Cancel(false);
             }
@@ -240,31 +233,31 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            if (PoolValue - dmgamount > 0)
+            if (_poolValue - dmgamount > 0)
             {
                 healamount = dmgamount;
             }
             else
             {
-                healamount = dmgamount - PoolValue;
+                healamount = dmgamount - _poolValue;
             }
 
-            foreach (GamePlayer t_player in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            foreach (GamePlayer tPlayer in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                if (!t_player.IsAlive)
+                if (!tPlayer.IsAlive)
                 {
                     continue;
                 }
 
-                t_player.Out.SendSpellEffectAnimation(m_owner, player, 8051, 0, false, 1);
+                tPlayer.Out.SendSpellEffectAnimation(m_owner, player, 8051, 0, false, 1);
             }
 
-            player.Out.SendMessage("You are healed by the pool of healing for " + healamount + "!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-            m_playerOwner.Out.SendMessage("Your pool of healing heals " + player.Name + " for " + healamount + "!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage($"You are healed by the pool of healing for {healamount}!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+            _playerOwner.Out.SendMessage($"Your pool of healing heals {player.Name} for {healamount}!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             player.ChangeHealth(m_owner, GameLiving.eHealthChangeType.Spell, healamount);
-            PoolValue -= dmgamount;
+            _poolValue -= dmgamount;
 
-            if (PoolValue <= 0)
+            if (_poolValue <= 0)
             {
                 Cancel(false);
             }
@@ -273,38 +266,38 @@ namespace DOL.GS.RealmAbilities
         public override void Stop()
         {
             base.Stop();
-            if (m_group != null)
+            if (_group != null)
             {
-                GameEventMgr.RemoveHandler(m_group, GroupEvent.MemberDisbanded, new DOLEventHandler(PlayerDisbandedGroup));
-                GameEventMgr.RemoveHandler(m_group, GroupEvent.MemberJoined, new DOLEventHandler(PlayerJoinedGroup));
+                GameEventMgr.RemoveHandler(_group, GroupEvent.MemberDisbanded, new DOLEventHandler(PlayerDisbandedGroup));
+                GameEventMgr.RemoveHandler(_group, GroupEvent.MemberJoined, new DOLEventHandler(PlayerJoinedGroup));
             }
 
-            foreach (GameLiving l in m_affected)
+            foreach (GameLiving l in _affected)
             {
                 if (l is GamePlayer)
                 {
                     (l as GamePlayer).Out.SendMessage("You are no longer protected by a pool of healing!", eChatType.CT_SpellExpires, eChatLoc.CL_SystemWindow);
-                    GameEventMgr.RemoveHandler(l, GamePlayerEvent.TakeDamage, new DOLEventHandler(TakeDamage));
+                    GameEventMgr.RemoveHandler(l, GameObjectEvent.TakeDamage, new DOLEventHandler(TakeDamage));
                 }
                 else
                 {
-                    GameEventMgr.RemoveHandler(l, GameLivingEvent.TakeDamage, new DOLEventHandler(TakeDamageNPC));
+                    GameEventMgr.RemoveHandler(l, GameObjectEvent.TakeDamage, new DOLEventHandler(TakeDamageNPC));
                 }
             }
 
-            m_affected.Clear();
-            m_group = null;
+            _affected.Clear();
+            _group = null;
         }
 
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name { get { return "Divine Intervention"; } }
+        public override string Name => "Divine Intervention";
 
         /// <summary>
         /// Icon to show on players, can be id
         /// </summary>
-        public override ushort Icon { get { return 3035; } }
+        public override ushort Icon => 3035;
 
         /// <summary>
         /// Delve Info
@@ -313,25 +306,23 @@ namespace DOL.GS.RealmAbilities
         {
             get
             {
-                var delveInfoList = new List<string>();
-                delveInfoList.Add("This ability creates a pool of healing on the user, instantly healing any member of the caster's group when they go below 75% hp until it is used up.");
-                delveInfoList.Add(" ");
-                delveInfoList.Add("Target: Group");
-                delveInfoList.Add("Duration: 15:00 min");
-                delveInfoList.Add(" ");
-                delveInfoList.Add("Value: " + PoolValue);
-                int seconds = (int)(RemainingTime / 1000);
+                var delveInfoList = new List<string>
+                {
+                    "This ability creates a pool of healing on the user, instantly healing any member of the caster's group when they go below 75% hp until it is used up.",
+                    " ",
+                    "Target: Group",
+                    "Duration: 15:00 min",
+                    " ",
+                    $"Value: {_poolValue}"
+                };
+
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" ");
-                    if (seconds > 60)
-                    {
-                        delveInfoList.Add("- " + seconds / 60 + ":" + (seconds % 60).ToString("00") + " minutes remaining.");
-                    }
-                    else
-                    {
-                        delveInfoList.Add("- " + seconds + " seconds remaining.");
-                    }
+                    delveInfoList.Add(seconds > 60
+                        ? $"- {seconds / 60}:{seconds % 60:00} minutes remaining."
+                        : $"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

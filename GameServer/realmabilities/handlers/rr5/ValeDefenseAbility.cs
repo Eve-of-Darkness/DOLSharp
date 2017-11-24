@@ -22,9 +22,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }

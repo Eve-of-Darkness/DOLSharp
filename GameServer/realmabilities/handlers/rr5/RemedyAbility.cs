@@ -34,21 +34,19 @@ namespace DOL.GS.SkillHandler
         /// <param name="living"></param>
         public void Execute(Ability ab, GamePlayer player)
         {
-            if (!player.IsAlive || player.IsSitting || player.IsMezzed || player.IsStunned)
+            if (player == null || !player.IsAlive || player.IsSitting || player.IsMezzed || player.IsStunned)
             {
                 return;
             }
 
-            if (player != null)
-            {
-                player.Out.SendSpellEffectAnimation(player, player, 7060, 0, false, 1);
 
-                // SendCasterSpellEffectAndCastMessage(player, 7060, true);
-                RemedyEffect effect = new RemedyEffect();
-                effect.Start(player);
+            player.Out.SendSpellEffectAnimation(player, player, 7060, 0, false, 1);
 
-                player.DisableSkill(ab, 300 * 1000);
-            }
+            // SendCasterSpellEffectAndCastMessage(player, 7060, true);
+            RemedyEffect effect = new RemedyEffect();
+            effect.Start(player);
+
+            player.DisableSkill(ab, 300 * 1000);
         }
 
         /*

@@ -7,7 +7,7 @@ namespace DOL.GS.Effects
     /// </summary>
     public class RuneOfUtterAgilityEffect : TimedEffect
     {
-        private GameLiving owner;
+        private GameLiving _owner;
 
         public RuneOfUtterAgilityEffect()
             : base(15000)
@@ -17,9 +17,8 @@ namespace DOL.GS.Effects
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
-            GamePlayer player = target as GamePlayer;
-            if (player != null)
+            _owner = target;
+            if (target is GamePlayer player)
             {
                 foreach (GamePlayer p in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
@@ -32,8 +31,7 @@ namespace DOL.GS.Effects
 
         public override void Stop()
         {
-            GamePlayer player = owner as GamePlayer;
-            if (player != null)
+            if (_owner is GamePlayer player)
             {
                 player.BuffBonusCategory4[(int)eProperty.EvadeChance] -= 90;
             }
@@ -41,16 +39,19 @@ namespace DOL.GS.Effects
             base.Stop();
         }
 
-        public override string Name { get { return "Rune Of Utter Agility"; } }
+        public override string Name => "Rune Of Utter Agility";
 
-        public override ushort Icon { get { return 3073; } }
+        public override ushort Icon => 3073;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Increases your evade chance up to 90% for 30 seconds.");
+                var list = new List<string>
+                {
+                    "Increases your evade chance up to 90% for 30 seconds."
+                };
+
                 return list;
             }
         }

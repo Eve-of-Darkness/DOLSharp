@@ -11,7 +11,6 @@ namespace DOL.GS.Effects
         public FuryOfNatureEffect()
             : base(30000)
         {
-            ;
         }
 
         public override void Start(GameLiving target)
@@ -20,12 +19,9 @@ namespace DOL.GS.Effects
             {
                 base.Start(target);
 
-                if (target != null)
+                foreach (GamePlayer p in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
-                    foreach (GamePlayer p in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                    {
-                        p.Out.SendSpellEffectAnimation(m_owner, target, Icon, 0, false, 1);
-                    }
+                    p.Out.SendSpellEffectAnimation(m_owner, target, Icon, 0, false, 1);
                 }
 
                 GameEventMgr.AddHandler(m_owner, GameLivingEvent.AttackFinished, new DOLEventHandler(OnAttack));
@@ -34,14 +30,12 @@ namespace DOL.GS.Effects
 
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            if (!(sender is GameLiving))
             {
                 return;
             }
 
-            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-            if (args == null)
+            if (!(arguments is AttackFinishedEventArgs args))
             {
                 return;
             }
@@ -59,8 +53,7 @@ namespace DOL.GS.Effects
                 args.AttackData.StyleDamage *= 2;
             }
 
-            GamePlayer player = sender as GamePlayer;
-            if (player == null)
+            if (!(sender is GamePlayer player))
             {
                 return;
             }
@@ -72,7 +65,7 @@ namespace DOL.GS.Effects
 
             if (extra > 0)
             {
-                player.Out.SendMessage("Your Fury enables you to strike " + args.AttackData.Target.Name + " for " + extra + " additional points of damage", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"Your Fury enables you to strike {args.AttackData.Target.Name} for {extra} additional points of damage", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
 
             Hashtable injuredTargets = new Hashtable();
@@ -156,13 +149,16 @@ namespace DOL.GS.Effects
 
                 // targets hp percent after heal is same as mostInjuredLiving
                 double targetHealPercent = bestHealPercent + mostInjuredPercent - targetHealthPercent;
-                int targetHeal = (int)(healTarget.MaxHealth * targetHealPercent);
-
-                // DOLConsole.WriteLine("SpreadHeal: targetHealPercent=" + targetHealPercent + "; uncapped targetHeal=" + targetHeal + "; bestHealPercent=" + bestHealPercent + "; mostInjuredPercent=" + mostInjuredPercent + "; targetHealthPercent=" + targetHealthPercent);
-                if (targetHeal > 0)
+                if (healTarget != null)
                 {
-                    totalHealed += targetHeal;
-                    healAmount.Add(healTarget, targetHeal);
+                    int targetHeal = (int)(healTarget.MaxHealth * targetHealPercent);
+
+                    // DOLConsole.WriteLine("SpreadHeal: targetHealPercent=" + targetHealPercent + "; uncapped targetHeal=" + targetHeal + "; bestHealPercent=" + bestHealPercent + "; mostInjuredPercent=" + mostInjuredPercent + "; targetHealthPercent=" + targetHealthPercent);
+                    if (targetHeal > 0)
+                    {
+                        totalHealed += targetHeal;
+                        healAmount.Add(healTarget, targetHeal);
+                    }
                 }
             }
 
@@ -172,7 +168,7 @@ namespace DOL.GS.Effects
             while (iter.MoveNext())
             {
                 GameLiving healTarget = iter.Key as GameLiving;
-                if (!healTarget.IsAlive)
+                if (healTarget != null && !healTarget.IsAlive)
                 {
                     continue;
                 }
@@ -181,26 +177,27 @@ namespace DOL.GS.Effects
                 int reducedHeal = (int)Math.Min(targetHealCap, uncappedHeal * (groupHealCap / totalHealed));
 
                 // heal target
-                int baseheal = healTarget.MaxHealth - healTarget.Health;
-                if (reducedHeal < baseheal)
+                if (healTarget != null)
                 {
-                    baseheal = reducedHeal;
-                }
+                    int baseheal = healTarget.MaxHealth - healTarget.Health;
+                    if (reducedHeal < baseheal)
+                    {
+                        baseheal = reducedHeal;
+                    }
 
-                healTarget.ChangeHealth(player, GameLiving.eHealthChangeType.Spell, baseheal);
-                player.Out.SendMessage("You heal " + healTarget.Name + " for " + baseheal + "!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                if (healTarget is GamePlayer)
-                {
-                    ((GamePlayer)healTarget).Out.SendMessage(player.Name + " heals you for " + baseheal + "!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    healTarget.ChangeHealth(player, GameLiving.eHealthChangeType.Spell, baseheal);
+                    player.Out.SendMessage($"You heal {healTarget.Name} for {baseheal}!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    if (healTarget is GamePlayer gamePlayer)
+                    {
+                        gamePlayer.Out.SendMessage($"{player.Name} heals you for {baseheal}!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    }
                 }
             }
-
-            return;
         }
 
-        public override string Name { get { return "Fury of Nature"; } }
+        public override string Name => "Fury of Nature";
 
-        public override ushort Icon { get { return 991; } }
+        public override ushort Icon => 991;
 
         public override void Stop()
         {
@@ -208,17 +205,17 @@ namespace DOL.GS.Effects
             base.Stop();
         }
 
-        public int SpellEffectiveness
-        {
-            get { return 100; }
-        }
+        public int SpellEffectiveness => 100;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Doubles style damage and returns all damage dealt as spreadheal to all group members except the caster");
+                var list = new List<string>
+                {
+                    "Doubles style damage and returns all damage dealt as spreadheal to all group members except the caster"
+                };
+
                 return list;
             }
         }

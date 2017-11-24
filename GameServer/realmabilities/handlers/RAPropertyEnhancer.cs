@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.Language;
+using log4net;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -9,30 +10,32 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public abstract class RAPropertyEnhancer : L5RealmAbility
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         // property to modify
-        eProperty[] m_property;
+        private readonly eProperty[] _property;
 
         public RAPropertyEnhancer(DBAbility dba, int level, eProperty[] property)
             : base(dba, level)
         {
-            m_property = property;
+            _property = property;
         }
 
         public RAPropertyEnhancer(DBAbility dba, int level, eProperty property)
             : base(dba, level)
         {
-            m_property = new eProperty[] { property };
+            _property = new[] { property };
         }
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add(m_description);
-                list.Add(string.Empty);
+                var list = new List<string>
+                {
+                    m_description, string.Empty
+                };
+
                 for (int i = 1; i <= MaxLevel; i++)
                 {
                     list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "RAPropertyEnhancer.DelveInfo.Info1", i, GetAmountForLevel(i), ValueUnit));
@@ -55,13 +58,7 @@ namespace DOL.GS.RealmAbilities
         /// <summary>
         /// The bonus amount at this RA's level
         /// </summary>
-        public int Amount
-        {
-            get
-            {
-                return GetAmountForLevel(Level);
-            }
-        }
+        public int Amount => GetAmountForLevel(Level);
 
         /// <summary>
         /// send updates about the changes
@@ -74,13 +71,13 @@ namespace DOL.GS.RealmAbilities
         /// <summary>
         /// Unit for values like %
         /// </summary>
-        protected virtual string ValueUnit { get { return string.Empty; } }
+        protected virtual string ValueUnit => string.Empty;
 
         public override void Activate(GameLiving living, bool sendUpdates)
         {
             if (m_activeLiving == null)
             {
-                foreach (eProperty property in m_property)
+                foreach (eProperty property in _property)
                 {
                     living.AbilityBonus[(int)property] += GetAmountForLevel(Level);
                 }
@@ -93,7 +90,7 @@ namespace DOL.GS.RealmAbilities
             }
             else
             {
-                log.Warn("ability " + Name + " already activated on " + living.Name);
+                Log.Warn($"ability {Name} already activated on {living.Name}");
             }
         }
 
@@ -101,7 +98,7 @@ namespace DOL.GS.RealmAbilities
         {
             if (m_activeLiving != null)
             {
-                foreach (eProperty property in m_property)
+                foreach (eProperty property in _property)
                 {
                     living.AbilityBonus[(int)property] -= GetAmountForLevel(Level);
                 }
@@ -115,7 +112,7 @@ namespace DOL.GS.RealmAbilities
             }
             else
             {
-                log.Warn("ability " + Name + " already deactivated on " + living.Name);
+                Log.Warn($"ability {Name} already deactivated on {living.Name}");
             }
         }
 
@@ -126,7 +123,7 @@ namespace DOL.GS.RealmAbilities
                 newLevel = Level;
             }
 
-            foreach (eProperty property in m_property)
+            foreach (eProperty property in _property)
             {
                 m_activeLiving.AbilityBonus[(int)property] += GetAmountForLevel(newLevel) - GetAmountForLevel(oldLevel);
             }
@@ -161,10 +158,8 @@ namespace DOL.GS.RealmAbilities
                     default: return 1000;
                 }
             }
-            else
-            {
-                return (level + 1) * 5;
-            }
+
+            return (level + 1) * 5;
         }
 
         public override int MaxLevel
@@ -175,10 +170,8 @@ namespace DOL.GS.RealmAbilities
                 {
                     return 5;
                 }
-                else
-                {
-                    return 3;
-                }
+
+                return 3;
             }
         }
     }

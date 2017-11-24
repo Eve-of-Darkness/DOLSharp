@@ -9,18 +9,11 @@ namespace DOL.GS.Effects
     /// </summary>
     public class SoldiersBarricadeEffect : StaticEffect, IGameEffect
     {
-        private const string m_delveString = "Grants the group an absorption bonus to all forms of damage (Does not stack with Barrier of Fortitude or Bedazzling Aura).";
-        private GamePlayer m_player;
-        private int m_effectDuration;
-        private RegionTimer m_expireTimer;
-        private int m_value;
-
-        /// <summary>
-        /// Default constructor for AmelioratingMelodiesEffect
-        /// </summary>
-        public SoldiersBarricadeEffect()
-        {
-        }
+        private const string DelveString = "Grants the group an absorption bonus to all forms of damage (Does not stack with Barrier of Fortitude or Bedazzling Aura).";
+        private GamePlayer _player;
+        private int _effectDuration;
+        private RegionTimer _expireTimer;
+        private int _value;
 
         /// <summary>
         /// Called when effect is to be started
@@ -30,9 +23,9 @@ namespace DOL.GS.Effects
         /// <param name="value">The percentage additional value for all magic resis</param>
         public void Start(GamePlayer player, int duration, int value)
         {
-            m_player = player;
-            m_effectDuration = duration;
-            m_value = value;
+            _player = player;
+            _effectDuration = duration;
+            _value = value;
 
             if (player.TempProperties.getProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb, false))
             {
@@ -41,19 +34,19 @@ namespace DOL.GS.Effects
 
             StartTimers();
 
-            GameEventMgr.AddHandler(m_player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.AddHandler(_player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
 
-            m_player.AbilityBonus[(int)eProperty.Resist_Body] += m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Cold] += m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Energy] += m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Heat] += m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Matter] += m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Spirit] += m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Crush] += m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Slash] += m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Thrust] += m_value;
-            m_player.Out.SendCharResistsUpdate();
-            m_player.EffectList.Add(this);
+            _player.AbilityBonus[(int)eProperty.Resist_Body] += _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Cold] += _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Energy] += _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Heat] += _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Matter] += _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Spirit] += _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Crush] += _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Slash] += _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Thrust] += _value;
+            _player.Out.SendCharResistsUpdate();
+            _player.EffectList.Add(this);
             player.TempProperties.setProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb, true);
         }
 
@@ -65,12 +58,10 @@ namespace DOL.GS.Effects
         /// <param name="args">EventArgs associated with the event</param>
         private static void PlayerLeftWorld(DOLEvent e, object sender, EventArgs args)
         {
-            GamePlayer player = (GamePlayer)sender;
-
-            SoldiersBarricadeEffect SBEffect = player.EffectList.GetOfType<SoldiersBarricadeEffect>();
-            if (SBEffect != null)
+            if (sender is GamePlayer player)
             {
-                SBEffect.Cancel(false);
+                SoldiersBarricadeEffect sbEffect = player.EffectList.GetOfType<SoldiersBarricadeEffect>();
+                sbEffect?.Cancel(false);
             }
         }
 
@@ -82,19 +73,19 @@ namespace DOL.GS.Effects
         {
 
             StopTimers();
-            m_player.AbilityBonus[(int)eProperty.Resist_Body] -= m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Cold] -= m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Energy] -= m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Heat] -= m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Matter] -= m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Spirit] -= m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Crush] -= m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Slash] -= m_value;
-            m_player.AbilityBonus[(int)eProperty.Resist_Thrust] -= m_value;
-            m_player.Out.SendCharResistsUpdate();
-            m_player.EffectList.Remove(this);
-            GameEventMgr.RemoveHandler(m_player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-            m_player.TempProperties.removeProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb);
+            _player.AbilityBonus[(int)eProperty.Resist_Body] -= _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Cold] -= _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Energy] -= _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Heat] -= _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Matter] -= _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Spirit] -= _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Crush] -= _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Slash] -= _value;
+            _player.AbilityBonus[(int)eProperty.Resist_Thrust] -= _value;
+            _player.Out.SendCharResistsUpdate();
+            _player.EffectList.Remove(this);
+            GameEventMgr.RemoveHandler(_player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            _player.TempProperties.removeProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb);
         }
 
         /// <summary>
@@ -103,7 +94,7 @@ namespace DOL.GS.Effects
         private void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(m_player, new RegionTimerCallback(ExpireCallback), m_effectDuration * 1000);
+            _expireTimer = new RegionTimer(_player, new RegionTimerCallback(ExpireCallback), _effectDuration * 1000);
         }
 
         /// <summary>
@@ -112,10 +103,10 @@ namespace DOL.GS.Effects
         private void StopTimers()
         {
 
-            if (m_expireTimer != null)
+            if (_expireTimer != null)
             {
-                m_expireTimer.Stop();
-                m_expireTimer = null;
+                _expireTimer.Stop();
+                _expireTimer = null;
             }
         }
 
@@ -133,13 +124,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "Soldier's Barricade";
-            }
-        }
+        public override string Name => "Soldier's Barricade";
 
         /// <summary>
         /// Remaining time of the effect in milliseconds
@@ -148,7 +133,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
+                RegionTimer timer = _expireTimer;
                 if (timer == null || !timer.IsAlive)
                 {
                     return 0;
@@ -161,32 +146,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override ushort Icon
-        {
-            get
-            {
-                return 3014;
-            }
-        }
-
-        // VaNaTiC->
-        /*
-        /// <summary>
-        /// Unique ID for identification in the effect list
-        /// </summary>
-        public UInt16 InternalID
-        {
-            get
-            {
-                return m_id;
-            }
-            set
-            {
-                m_id = value;
-            }
-        }*/
-
-        // VaNaTiC<-
+        public override ushort Icon => 3014;
 
         /// <summary>
         /// Delve information
@@ -195,16 +155,18 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>();
-                delveInfoList.Add(m_delveString);
-                delveInfoList.Add(" ");
-                delveInfoList.Add("Value: " + m_value + "%");
+                var delveInfoList = new List<string>
+                {
+                    DelveString,
+                    " ",
+                    $"Value: {_value}%"
+                };
 
-                int seconds = (int)(RemainingTime / 1000);
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" ");
-                    delveInfoList.Add("- " + seconds + " seconds remaining.");
+                    delveInfoList.Add($"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

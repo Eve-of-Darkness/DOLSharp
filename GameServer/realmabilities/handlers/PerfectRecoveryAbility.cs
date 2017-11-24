@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Specialized;
 using DOL.GS.PacketHandler;
 using DOL.GS.Effects;
@@ -11,9 +10,9 @@ namespace DOL.GS.RealmAbilities
     {
         public PerfectRecoveryAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        private int m_resurrectValue = 5;
-        private const string RESURRECT_CASTER_PROPERTY = "RESURRECT_CASTER";
-        protected readonly ListDictionary m_resTimersByLiving = new ListDictionary();
+        private int _resurrectValue = 5;
+        private const string ResurrectCasterProperty = "RESURRECT_CASTER";
+        private readonly ListDictionary _resTimersByLiving = new ListDictionary();
 
         public override void Execute(GameLiving living)
         {
@@ -22,9 +21,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }
@@ -42,7 +39,7 @@ namespace DOL.GS.RealmAbilities
 
                 if (targetPlayer == null ||
                     targetPlayer.IsAlive ||
-                    GameServer.ServerRules.IsSameRealm(living, player.TargetObject as GameLiving, true) == false)
+                    GameServer.ServerRules.IsSameRealm(living, (GameLiving) player.TargetObject, true) == false)
                 {
                     isGoodTarget = false;
                 }
@@ -58,24 +55,23 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (Level)
                 {
-                    case 1: m_resurrectValue = 10; break;
-                    case 2: m_resurrectValue = 25; break;
-                    case 3: m_resurrectValue = 50; break;
-                    case 4: m_resurrectValue = 75; break;
-                    case 5: m_resurrectValue = 100; break;
+                    case 1: _resurrectValue = 10; break;
+                    case 2: _resurrectValue = 25; break;
+                    case 3: _resurrectValue = 50; break;
+                    case 4: _resurrectValue = 75; break;
+                    case 5: _resurrectValue = 100; break;
                 }
             }
             else
             {
                 switch (Level)
                 {
-                    case 2: m_resurrectValue = 50; break;
-                    case 3: m_resurrectValue = 100; break;
+                    case 2: _resurrectValue = 50; break;
+                    case 3: _resurrectValue = 100; break;
                 }
             }
 
-            GameLiving resurrectionCaster = targetPlayer.TempProperties.getProperty<object>(RESURRECT_CASTER_PROPERTY, null) as GameLiving;
-            if (resurrectionCaster != null)
+            if (targetPlayer.TempProperties.getProperty<object>(ResurrectCasterProperty, null) is GameLiving)
             {
                 player.Out.SendMessage("Your target is already considering a resurrection!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                 return;
@@ -87,29 +83,25 @@ namespace DOL.GS.RealmAbilities
                 player.Out.SendMessage("You are too far away from your target to use this ability!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                 return;
             }
+            
+            SendCasterSpellEffectAndCastMessage(living, 7019, true);
+            DisableSkill(living);
 
-            if (targetPlayer != null)
+            // Lifeflight:
+            // don't rez just yet
+            // ResurrectLiving(targetPlayer, player);
+            // we need to add a dialogue response to the rez, copying from the rez spellhandler
+            targetPlayer.TempProperties.setProperty(ResurrectCasterProperty, living);
+            RegionTimer resurrectExpiredTimer = new RegionTimer(targetPlayer) {Callback = new RegionTimerCallback(ResurrectExpiredCallback)};
+            resurrectExpiredTimer.Properties.setProperty("targetPlayer", targetPlayer);
+            resurrectExpiredTimer.Start(15000);
+            lock (_resTimersByLiving.SyncRoot)
             {
-                SendCasterSpellEffectAndCastMessage(living, 7019, true);
-                DisableSkill(living);
-
-                // Lifeflight:
-                // don't rez just yet
-                // ResurrectLiving(targetPlayer, player);
-                // we need to add a dialogue response to the rez, copying from the rez spellhandler
-                targetPlayer.TempProperties.setProperty(RESURRECT_CASTER_PROPERTY, living);
-                RegionTimer resurrectExpiredTimer = new RegionTimer(targetPlayer);
-                resurrectExpiredTimer.Callback = new RegionTimerCallback(ResurrectExpiredCallback);
-                resurrectExpiredTimer.Properties.setProperty("targetPlayer", targetPlayer);
-                resurrectExpiredTimer.Start(15000);
-                lock (m_resTimersByLiving.SyncRoot)
-                {
-                    m_resTimersByLiving.Add(player.TargetObject, resurrectExpiredTimer);
-                }
-
-                // send resurrect dialog
-                targetPlayer.Out.SendCustomDialog("Do you allow " + living.GetName(0, true) + " to resurrect you\nwith " + m_resurrectValue + " percent hits?", new CustomDialogResponse(ResurrectResponceHandler));
+                _resTimersByLiving.Add(player.TargetObject, resurrectExpiredTimer);
             }
+
+            // send resurrect dialog
+            targetPlayer.Out.SendCustomDialog($"Do you allow {living.GetName(0, true)} to resurrect you\nwith {_resurrectValue} percent hits?", new CustomDialogResponse(ResurrectResponceHandler));
         }
 
         // Lifeflight add
@@ -121,19 +113,16 @@ namespace DOL.GS.RealmAbilities
         protected virtual void ResurrectResponceHandler(GamePlayer player, byte response)
         {
             // DOLConsole.WriteLine("resurrect responce: " + response);
-            GameTimer resurrectExpiredTimer = null;
-            lock (m_resTimersByLiving.SyncRoot)
+            GameTimer resurrectExpiredTimer;
+            lock (_resTimersByLiving.SyncRoot)
             {
-                resurrectExpiredTimer = (GameTimer)m_resTimersByLiving[player];
-                m_resTimersByLiving.Remove(player);
+                resurrectExpiredTimer = (GameTimer)_resTimersByLiving[player];
+                _resTimersByLiving.Remove(player);
             }
 
-            if (resurrectExpiredTimer != null)
-            {
-                resurrectExpiredTimer.Stop();
-            }
+            resurrectExpiredTimer?.Stop();
 
-            GameLiving rezzer = (GameLiving)player.TempProperties.getProperty<object>(RESURRECT_CASTER_PROPERTY, null);
+            GameLiving rezzer = (GameLiving)player.TempProperties.getProperty<object>(ResurrectCasterProperty, null);
             if (!player.IsAlive)
             {
                 if (rezzer == null)
@@ -154,12 +143,12 @@ namespace DOL.GS.RealmAbilities
                         // m_caster.Mana += CalculateNeededPower(player);
                         // but we do need to give them PR back
                         // Lifeflight: Seems like the best way to do this is to send a 0 duration to DisableSkill, which will enable to ability
-                        (rezzer as GameLiving).DisableSkill(this, 0);
+                        rezzer.DisableSkill(this, 0);
                     }
                 }
             }
 
-            player.TempProperties.removeProperty(RESURRECT_CASTER_PROPERTY);
+            player.TempProperties.removeProperty(ResurrectCasterProperty);
         }
 
         // Lifeflight add
@@ -176,7 +165,7 @@ namespace DOL.GS.RealmAbilities
                 return 0;
             }
 
-            player.TempProperties.removeProperty(RESURRECT_CASTER_PROPERTY);
+            player.TempProperties.removeProperty(ResurrectCasterProperty);
             player.Out.SendMessage("Your resurrection spell has expired.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return 0;
         }
@@ -193,39 +182,30 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            resurrectedPlayer.Health = (int)(resurrectedPlayer.MaxHealth * m_resurrectValue / 100);
-            resurrectedPlayer.Mana = (int)(resurrectedPlayer.MaxMana * m_resurrectValue / 100);
-            resurrectedPlayer.Endurance = (int)(resurrectedPlayer.MaxEndurance * m_resurrectValue / 100); // no endurance after any rez
+            resurrectedPlayer.Health = resurrectedPlayer.MaxHealth * _resurrectValue / 100;
+            resurrectedPlayer.Mana = resurrectedPlayer.MaxMana * _resurrectValue / 100;
+            resurrectedPlayer.Endurance = resurrectedPlayer.MaxEndurance * _resurrectValue / 100; // no endurance after any rez
             resurrectedPlayer.MoveTo(rezzer.CurrentRegionID, rezzer.X, rezzer.Y, rezzer.Z, rezzer.Heading);
 
-            GameLiving living = resurrectedPlayer as GameLiving;
-            GameTimer resurrectExpiredTimer = null;
-            lock (m_resTimersByLiving.SyncRoot)
+            GameLiving living = resurrectedPlayer;
+            GameTimer resurrectExpiredTimer;
+            lock (_resTimersByLiving.SyncRoot)
             {
-                resurrectExpiredTimer = (GameTimer)m_resTimersByLiving[living];
-                m_resTimersByLiving.Remove(living);
+                resurrectExpiredTimer = (GameTimer)_resTimersByLiving[living];
+                _resTimersByLiving.Remove(living);
             }
 
-            if (resurrectExpiredTimer != null)
-            {
-                resurrectExpiredTimer.Stop();
-            }
+            resurrectExpiredTimer?.Stop();
 
             resurrectedPlayer.StopReleaseTimer();
             resurrectedPlayer.Out.SendPlayerRevive(resurrectedPlayer);
             resurrectedPlayer.UpdatePlayerStatus();
 
             GameSpellEffect effect = SpellHandler.FindEffectOnTarget(resurrectedPlayer, GlobalSpells.PvEResurrectionIllnessSpellType);
-            if (effect != null)
-            {
-                effect.Cancel(false);
-            }
+            effect?.Cancel(false);
 
             GameSpellEffect effecttwo = SpellHandler.FindEffectOnTarget(resurrectedPlayer, GlobalSpells.RvRResurrectionIllnessSpellType);
-            if (effecttwo != null)
-            {
-                effecttwo.Cancel(false);
-            }
+            effecttwo?.Cancel(false);
 
             resurrectedPlayer.Out.SendMessage("You have been resurrected by " + rezzer.GetName(0, false) + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
@@ -234,10 +214,9 @@ namespace DOL.GS.RealmAbilities
             rezImmune.Start(resurrectedPlayer);
 
             // Lifeflight: We need to reward rez RPs
-            GamePlayer casterPlayer = rezzer as GamePlayer;
-            if (casterPlayer != null)
+            if (rezzer is GamePlayer casterPlayer)
             {
-                long rezRps = resurrectedPlayer.LastDeathRealmPoints * (m_resurrectValue + 50) / 1000;
+                long rezRps = resurrectedPlayer.LastDeathRealmPoints * (_resurrectValue + 50) / 1000;
                 if (rezRps > 0)
                 {
                     casterPlayer.GainRealmPoints(rezRps);

@@ -21,9 +21,9 @@ namespace DOL.GS.Effects
             base.Start(target);
             target.TempProperties.setProperty("Charging", true);
             target.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 2.5);
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                ((GamePlayer)target).Out.SendUpdateMaxSpeed();
+                player.Out.SendUpdateMaxSpeed();
             }
         }
 
@@ -32,21 +32,21 @@ namespace DOL.GS.Effects
             base.Stop();
             Owner.TempProperties.removeProperty("Charging");
             Owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
-            if (Owner is GamePlayer)
+            if (Owner is GamePlayer player)
             {
-                ((GamePlayer)Owner).Out.SendUpdateMaxSpeed();
+                player.Out.SendUpdateMaxSpeed();
             }
         }
 
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name { get { return "Arms Length"; } }
+        public override string Name => "Arms Length";
 
         /// <summary>
         /// Icon to show on players, can be id
         /// </summary>
-        public override ushort Icon { get { return 3057; } }
+        public override ushort Icon => 3057;
 
         /// <summary>
         /// Delve Info
@@ -55,8 +55,11 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Grants unbreakable extreme speed for 15 seconds.");
+                var list = new List<string>
+                {
+                    "Grants unbreakable extreme speed for 15 seconds."
+                };
+
                 list.AddRange(base.DelveInfo);
                 return list;
             }

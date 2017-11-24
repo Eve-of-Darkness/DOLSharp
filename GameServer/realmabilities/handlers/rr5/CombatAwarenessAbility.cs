@@ -22,8 +22,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 SendCasterSpellEffectAndCastMessage(player, 7068, true);
                 CombatAwarenessEffect effect = new CombatAwarenessEffect();

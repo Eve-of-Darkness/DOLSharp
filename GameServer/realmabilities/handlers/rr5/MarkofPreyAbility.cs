@@ -27,9 +27,7 @@ namespace DOL.GS.RealmAbilities
     {
         public MarkOfPreyAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        int RANGE = 1000;
-        public const int DURATION = 30 * 1000;
-        public const double VALUE = 5.1;
+        private readonly int _range = 1000;
 
         public override void Execute(GameLiving living)
         {
@@ -38,8 +36,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }
@@ -53,7 +50,7 @@ namespace DOL.GS.RealmAbilities
             {
                 foreach (GamePlayer grpMate in player.Group.GetPlayersInTheGroup())
                 {
-                    if (player.IsWithinRadius(grpMate, RANGE) && grpMate.IsAlive)
+                    if (player.IsWithinRadius(grpMate, _range) && grpMate.IsAlive)
                     {
                         targets.Add(grpMate);
                     }
@@ -62,11 +59,8 @@ namespace DOL.GS.RealmAbilities
 
             foreach (GamePlayer target in targets)
             {
-                MarkofPreyEffect MarkOfPrey = target.EffectList.GetOfType<MarkofPreyEffect>();
-                if (MarkOfPrey != null)
-                {
-                    MarkOfPrey.Cancel(false);
-                }
+                MarkofPreyEffect markOfPrey = target.EffectList.GetOfType<MarkofPreyEffect>();
+                markOfPrey?.Cancel(false);
 
                 new MarkofPreyEffect().Start(player,target);
             }

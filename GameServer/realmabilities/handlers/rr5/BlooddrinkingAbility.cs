@@ -29,10 +29,6 @@ namespace DOL.GS.RealmAbilities
     /// /// <author>Stexx</author>
     public class BloodDrinkingAbility : RR5RealmAbility
     {
-        public const int DURATION = 30 * 1000; // 30 secs
-        public const double HEALPERCENT = 20; // 20% heal
-        public const int EFFECT = 1567;
-
         public BloodDrinkingAbility(DBAbility dba, int level) : base(dba, level) { }
 
         /// <summary>
@@ -46,14 +42,10 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 BloodDrinkingEffect BloodDrinking = (BloodDrinkingEffect)player.EffectList.GetOfType<BloodDrinkingEffect>();
-                if (BloodDrinking != null)
-                {
-                    BloodDrinking.Cancel(false);
-                }
+                BloodDrinking?.Cancel(false);
 
                 new BloodDrinkingEffect().Start(player);
             }

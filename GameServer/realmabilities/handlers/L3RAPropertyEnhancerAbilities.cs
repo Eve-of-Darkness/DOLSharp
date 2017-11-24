@@ -5,11 +5,11 @@ namespace DOL.GS.RealmAbilities
     public class DualThreatAbility : L3RAPropertyEnhancer
     {
         public DualThreatAbility(DBAbility dba, int level)
-            : base(dba, level, new eProperty[] { eProperty.CriticalMeleeHitChance, eProperty.CriticalSpellHitChance, eProperty.CriticalHealHitChance })
+            : base(dba, level, new[] { eProperty.CriticalMeleeHitChance, eProperty.CriticalSpellHitChance, eProperty.CriticalHealHitChance })
         {
         }
 
-        protected override string ValueUnit { get { return "%"; } }
+        protected override string ValueUnit => "%";
 
         public override int GetAmountForLevel(int level)
         {
@@ -25,15 +25,13 @@ namespace DOL.GS.RealmAbilities
                     default: return 0;
                 }
             }
-            else
+
+            switch (level)
             {
-                switch (level)
-                {
-                    case 1: return 5;
-                    case 2: return 10;
-                    case 3: return 20;
-                    default: return 0;
-                }
+                case 1: return 5;
+                case 2: return 10;
+                case 3: return 20;
+                default: return 0;
             }
         }
     }
@@ -45,7 +43,7 @@ namespace DOL.GS.RealmAbilities
         {
         }
 
-        protected override string ValueUnit { get { return "%"; } }
+        protected override string ValueUnit => "%";
 
         public override int GetAmountForLevel(int level)
         {
@@ -61,15 +59,13 @@ namespace DOL.GS.RealmAbilities
                     default: return 0;
                 }
             }
-            else
+
+            switch (level)
             {
-                switch (level)
-                {
-                    case 1: return 5;
-                    case 2: return 15;
-                    case 3: return 30;
-                    default: return 0;
-                }
+                case 1: return 5;
+                case 2: return 15;
+                case 3: return 30;
+                default: return 0;
             }
         }
     }
@@ -81,7 +77,7 @@ namespace DOL.GS.RealmAbilities
         {
         }
 
-        protected override string ValueUnit { get { return "%"; } }
+        protected override string ValueUnit => "%";
 
         public override int GetAmountForLevel(int level)
         {
@@ -97,15 +93,13 @@ namespace DOL.GS.RealmAbilities
                     default: return 0;
                 }
             }
-            else
+
+            switch (level)
             {
-                switch (level)
-                {
-                    case 1: return 25;
-                    case 2: return 50;
-                    case 3: return 100;
-                    default: return 0;
-                }
+                case 1: return 25;
+                case 2: return 50;
+                case 3: return 100;
+                default: return 0;
             }
         }
     }

@@ -27,65 +27,68 @@ namespace DOL.GS.Effects
     /// </summary>
     public class MarkofPreyEffect : TimedEffect
     {
-        private GamePlayer EffectOwner;
-        private GamePlayer EffectCaster;
-        private Group m_playerGroup;
+        private const int Duration = 30 * 1000;
+        private const double Value = 5.1;
+
+        private GamePlayer _effectOwner;
+        private GamePlayer _effectCaster;
+        private Group _playerGroup;
 
         public MarkofPreyEffect()
-            : base(RealmAbilities.MarkOfPreyAbility.DURATION)
+            : base(Duration)
         { }
 
         /// <summary>
         /// Start guarding the player
         /// </summary>
-        /// <param name="Caster"></param>
-        /// <param name="CasterTarget"></param>
-        public void Start(GamePlayer Caster, GamePlayer CasterTarget)
+        /// <param name="caster"></param>
+        /// <param name="casterTarget"></param>
+        public void Start(GamePlayer caster, GamePlayer casterTarget)
         {
-            if (Caster == null || CasterTarget == null)
+            if (caster == null || casterTarget == null)
             {
                 return;
             }
 
-            m_playerGroup = Caster.Group;
-            if (m_playerGroup != CasterTarget.Group)
+            _playerGroup = caster.Group;
+            if (_playerGroup != casterTarget.Group)
             {
                 return;
             }
 
-            EffectCaster = Caster;
-            EffectOwner = CasterTarget;
-            foreach (GamePlayer p in EffectOwner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            _effectCaster = caster;
+            _effectOwner = casterTarget;
+            foreach (GamePlayer p in _effectOwner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                p.Out.SendSpellEffectAnimation(EffectCaster, EffectOwner, 7090, 0, false, 1);
+                p.Out.SendSpellEffectAnimation(_effectCaster, _effectOwner, 7090, 0, false, 1);
             }
 
-            GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-            if (m_playerGroup != null)
+            GameEventMgr.AddHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            if (_playerGroup != null)
             {
-                GameEventMgr.AddHandler(m_playerGroup, GroupEvent.MemberDisbanded, new DOLEventHandler(GroupDisbandCallback));
+                GameEventMgr.AddHandler(_playerGroup, GroupEvent.MemberDisbanded, new DOLEventHandler(GroupDisbandCallback));
             }
 
-            GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.AttackFinished, new DOLEventHandler(AttackFinished));
-            EffectOwner.Out.SendMessage("Your weapon begins channeling the strength of the vampiir!", DOL.GS.PacketHandler.eChatType.CT_Spell, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
-            base.Start(CasterTarget);
+            GameEventMgr.AddHandler(_effectOwner, GameLivingEvent.AttackFinished, new DOLEventHandler(AttackFinished));
+            _effectOwner.Out.SendMessage("Your weapon begins channeling the strength of the vampiir!", DOL.GS.PacketHandler.eChatType.CT_Spell, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
+            base.Start(casterTarget);
         }
 
         public override void Stop()
         {
-            if (EffectOwner != null)
+            if (_effectOwner != null)
             {
-                if (m_playerGroup != null)
+                if (_playerGroup != null)
                 {
-                    GameEventMgr.RemoveHandler(m_playerGroup, GroupEvent.MemberDisbanded, new DOLEventHandler(GroupDisbandCallback));
+                    GameEventMgr.RemoveHandler(_playerGroup, GroupEvent.MemberDisbanded, new DOLEventHandler(GroupDisbandCallback));
                 }
 
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.AttackFinished, new DOLEventHandler(AttackFinished));
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-                m_playerGroup = null;
+                GameEventMgr.RemoveHandler(_effectOwner, GameLivingEvent.AttackFinished, new DOLEventHandler(AttackFinished));
+                GameEventMgr.RemoveHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                _playerGroup = null;
             }
 
-            EffectOwner.Out.SendMessage("Your weapon returns to normal.", DOL.GS.PacketHandler.eChatType.CT_SpellExpires, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
+            _effectOwner.Out.SendMessage("Your weapon returns to normal.", DOL.GS.PacketHandler.eChatType.CT_SpellExpires, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
             base.Stop();
         }
 
@@ -97,8 +100,7 @@ namespace DOL.GS.Effects
         /// <param name="args">EventArgs associated with the event</param>
         private void AttackFinished(DOLEvent e, object sender, EventArgs args)
         {
-            AttackFinishedEventArgs atkArgs = args as AttackFinishedEventArgs;
-            if (atkArgs == null)
+            if (!(args is AttackFinishedEventArgs atkArgs))
             {
                 return;
             }
@@ -109,18 +111,9 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            if (atkArgs.AttackData.Target == null)
-            {
-                return;
-            }
-
             GameLiving target = atkArgs.AttackData.Target;
-            if (target == null)
-            {
-                return;
-            }
 
-            if (target.ObjectState != GameObject.eObjectState.Active)
+            if (target?.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -130,8 +123,7 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            GameLiving attacker = sender as GameLiving;
-            if (attacker == null)
+            if (!(sender is GameLiving attacker))
             {
                 return;
             }
@@ -146,27 +138,26 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            double dpsCap;
-            dpsCap = (1.2 + 0.3 * attacker.Level) * 0.7;
+            var dpsCap = (1.2 + 0.3 * attacker.Level) * 0.7;
 
-            double dps = Math.Min(RealmAbilities.MarkOfPreyAbility.VALUE, dpsCap);
+            double dps = Math.Min(Value, dpsCap);
             double damage = dps * atkArgs.AttackData.WeaponSpeed * 0.1;
             double damageResisted = damage * target.GetResist(eDamageType.Heat) * -0.01;
 
-            AttackData ad = new AttackData();
-            ad.Attacker = attacker;
-            ad.Target = target;
-            ad.Damage = (int)(damage + damageResisted);
-            ad.Modifier = (int)damageResisted;
-            ad.DamageType = eDamageType.Heat;
-            ad.AttackType = AttackData.eAttackType.Spell;
-            ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
-            target.OnAttackedByEnemy(ad);
-            EffectCaster.ChangeMana(EffectOwner, GameLiving.eManaChangeType.Spell, (int)ad.Damage);
-            if (attacker is GamePlayer)
+            AttackData ad = new AttackData
             {
-                (attacker as GamePlayer).Out.SendMessage(string.Format("You hit {0} for {1} extra damage!", target.Name, ad.Damage), DOL.GS.PacketHandler.eChatType.CT_Spell, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
-            }
+                Attacker = attacker,
+                Target = target,
+                Damage = (int) (damage + damageResisted),
+                Modifier = (int) damageResisted,
+                DamageType = eDamageType.Heat,
+                AttackType = AttackData.eAttackType.Spell,
+                AttackResult = GameLiving.eAttackResult.HitUnstyled
+            };
+
+            target.OnAttackedByEnemy(ad);
+            _effectCaster.ChangeMana(_effectOwner, GameLiving.eManaChangeType.Spell, ad.Damage);
+            (attacker as GamePlayer)?.Out.SendMessage($"You hit {target.Name} for {ad.Damage} extra damage!", PacketHandler.eChatType.CT_Spell, PacketHandler.eChatLoc.CL_SystemWindow);
 
             attacker.DealDamage(ad);
         }
@@ -179,13 +170,12 @@ namespace DOL.GS.Effects
         /// <param name="args"></param>
         protected void GroupDisbandCallback(DOLEvent e, object sender, EventArgs args)
         {
-            MemberDisbandedEventArgs eArgs = args as MemberDisbandedEventArgs;
-            if (eArgs == null)
+            if (!(args is MemberDisbandedEventArgs eArgs))
             {
                 return;
             }
 
-            if (eArgs.Member == EffectOwner)
+            if (eArgs.Member == _effectOwner)
             {
                 Cancel(false);
             }
@@ -202,17 +192,20 @@ namespace DOL.GS.Effects
             Cancel(false);
         }
 
-        public override string Name { get { return "Mark Of Prey"; } }
+        public override string Name => "Mark Of Prey";
 
-        public override ushort Icon { get { return 3089; } }
+        public override ushort Icon => 3089;
 
         // Delve Info
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Grants a 30 second damage add that stacks with all other forms of damage add. All damage done via the damage add will be returned to the Vampiir as power.");
+                var list = new List<string>
+                {
+                    "Grants a 30 second damage add that stacks with all other forms of damage add. All damage done via the damage add will be returned to the Vampiir as power."
+                };
+
                 return list;
             }
         }

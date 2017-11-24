@@ -37,8 +37,11 @@ namespace DOL.GS.RealmAbilities
 
                 if (seconds > 0)
                 {
-                    PurgeTimer timer = new PurgeTimer(living, this, seconds);
-                    timer.Interval = 1000;
+                    PurgeTimer timer = new PurgeTimer(living, this, seconds)
+                    {
+                        Interval = 1000
+                    };
+
                     timer.Start(1);
                     DisableSkill(living);
                 }
@@ -55,8 +58,11 @@ namespace DOL.GS.RealmAbilities
             {
                 if (Level < 2)
                 {
-                    PurgeTimer timer = new PurgeTimer(living, this, 5);
-                    timer.Interval = 1000;
+                    PurgeTimer timer = new PurgeTimer(living, this, 5)
+                    {
+                        Interval = 1000
+                    };
+
                     timer.Start(1);
                     DisableSkill(living);
                 }
@@ -92,7 +98,7 @@ namespace DOL.GS.RealmAbilities
                             continue;
                         }
 
-                        if (gsp is GameSpellAndImmunityEffect && ((GameSpellAndImmunityEffect)gsp).ImmunityState)
+                        if (gsp is GameSpellAndImmunityEffect immunityEffect && immunityEffect.ImmunityState)
                         {
                             continue;
                         }
@@ -118,7 +124,7 @@ namespace DOL.GS.RealmAbilities
                         continue;
                     }
 
-                    if (gsp is GameSpellAndImmunityEffect && ((GameSpellAndImmunityEffect)gsp).ImmunityState)
+                    if (gsp is GameSpellAndImmunityEffect immunityEffect && immunityEffect.ImmunityState)
                     {
                         continue; // ignore immunity effects
                     }
@@ -145,29 +151,26 @@ if (gsp.SpellHandler is RvRResurrectionIllness)
                 }
             }
 
-            if (player != null)
+            foreach (GamePlayer rangePlayer in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                foreach (GamePlayer rangePlayer in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                if (player.CharacterClass.ID == (int)eCharacterClass.Necromancer)
                 {
-                    if (player.CharacterClass.ID == (int)eCharacterClass.Necromancer)
-                    {
-                        rangePlayer.Out.SendSpellEffectAnimation(
-                            player.ControlledBrain.Body,
-                            player.ControlledBrain.Body, 7011, 0,
-                            false, (byte)(removed ? 1 : 0));
-                    }
-
-                    rangePlayer.Out.SendSpellEffectAnimation(player, player, 7011, 0, false, (byte)(removed ? 1 : 0));
+                    rangePlayer.Out.SendSpellEffectAnimation(
+                        player.ControlledBrain.Body,
+                        player.ControlledBrain.Body, 7011, 0,
+                        false, (byte)(removed ? 1 : 0));
                 }
 
-                if (removed)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PurgeAbility.RemoveNegativeEffects.FallFromYou"), eChatType.CT_Advise, eChatLoc.CL_SystemWindow);
-                }
-                else
-                {
-                    player.DisableSkill(purge, 5);
-                }
+                rangePlayer.Out.SendSpellEffectAnimation(player, player, 7011, 0, false, (byte)(removed ? 1 : 0));
+            }
+
+            if (removed)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PurgeAbility.RemoveNegativeEffects.FallFromYou"), eChatType.CT_Advise, eChatLoc.CL_SystemWindow);
+            }
+            else
+            {
+                player.DisableSkill(purge, 5);
             }
 
             if (removed)
@@ -180,45 +183,44 @@ if (gsp.SpellHandler is RvRResurrectionIllness)
 
         protected class PurgeTimer : GameTimer
         {
-            GameLiving m_caster;
-            PurgeAbility m_purge;
-            int counter;
+            private readonly GameLiving _caster;
+            private readonly PurgeAbility _purge;
+            private int _counter;
 
             public PurgeTimer(GameLiving caster, PurgeAbility purge, int count)
                 : base(caster.CurrentRegion.TimeManager)
             {
-                m_caster = caster;
-                m_purge = purge;
-                counter = count;
+                _caster = caster;
+                _purge = purge;
+                _counter = count;
             }
 
             protected override void OnTick()
             {
-                if (!m_caster.IsAlive)
+                if (!_caster.IsAlive)
                 {
                     Stop();
-                    if (m_caster is GamePlayer)
+                    if (_caster is GamePlayer player)
                     {
-                        ((GamePlayer)m_caster).DisableSkill(m_purge, 0);
+                        player.DisableSkill(_purge, 0);
                     }
 
                     return;
                 }
 
-                if (counter > 0)
+                if (_counter > 0)
                 {
-                    GamePlayer player = m_caster as GamePlayer;
-                    if (player != null)
+                    if (_caster is GamePlayer player)
                     {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PurgeAbility.OnTick.PurgeActivate", counter), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PurgeAbility.OnTick.PurgeActivate", _counter), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
 
-                    counter--;
+                    _counter--;
                     return;
                 }
 
-                m_purge.SendCastMessage(m_caster);
-                RemoveNegativeEffects(m_caster, m_purge);
+                _purge.SendCastMessage(_caster);
+                RemoveNegativeEffects(_caster, _purge);
                 Stop();
             }
         }
@@ -239,10 +241,8 @@ if (gsp.SpellHandler is RvRResurrectionIllness)
                         return 900;
                 }
             }
-            else
-            {
-                return (level < 3) ? 900 : 300;
-            }
+
+            return level < 3 ? 900 : 300;
         }
 
         public override void AddEffectsInfo(IList<string> list)

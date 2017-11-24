@@ -28,9 +28,6 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class SoldiersCitadelAbility : RR5RealmAbility
     {
-        public const int DURATION = 30 * 1000;
-        public const int SECOND_DURATION = 15 * 1000;
-
         public SoldiersCitadelAbility(DBAbility dba, int level) : base(dba, level) { }
 
         /// <summary>
@@ -44,14 +41,10 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 SoldiersCitadelEffect SoldiersCitadel = player.EffectList.GetOfType<SoldiersCitadelEffect>();
-                if (SoldiersCitadel != null)
-                {
-                    SoldiersCitadel.Cancel(false);
-                }
+                SoldiersCitadel?.Cancel(false);
 
                 new SoldiersCitadelEffect().Start(player);
             }

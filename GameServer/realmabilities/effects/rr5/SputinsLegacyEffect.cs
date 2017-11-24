@@ -25,37 +25,35 @@ namespace DOL.GS.Effects
 {
     public class SputinsLegacyEffect : TimedEffect
     {
-        private GamePlayer m_player = null;
+        private GamePlayer _player;
 
         public SputinsLegacyEffect() : base(20000) { }
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            m_player = target as GamePlayer;
-            GameEventMgr.AddHandler(m_player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
-            GameEventMgr.AddHandler(m_player, GameLivingEvent.Dying, new DOLEventHandler(OnRemove));
-            GameEventMgr.AddHandler(m_player, GamePlayerEvent.Quit, new DOLEventHandler(OnRemove));
-            GameEventMgr.AddHandler(m_player, GamePlayerEvent.Linkdeath, new DOLEventHandler(OnRemove));
-            GameEventMgr.AddHandler(m_player, GamePlayerEvent.RegionChanged, new DOLEventHandler(OnRemove));
+            _player = target as GamePlayer;
+            GameEventMgr.AddHandler(_player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
+            GameEventMgr.AddHandler(_player, GameLivingEvent.Dying, new DOLEventHandler(OnRemove));
+            GameEventMgr.AddHandler(_player, GamePlayerEvent.Quit, new DOLEventHandler(OnRemove));
+            GameEventMgr.AddHandler(_player, GamePlayerEvent.Linkdeath, new DOLEventHandler(OnRemove));
+            GameEventMgr.AddHandler(_player, GamePlayerEvent.RegionChanged, new DOLEventHandler(OnRemove));
         }
 
         private void OnAttacked(DOLEvent e, object sender, EventArgs args)
         {
-            AttackedByEnemyEventArgs attackArgs = args as AttackedByEnemyEventArgs;
-            if (attackArgs == null)
+            if (!(args is AttackedByEnemyEventArgs attackArgs))
             {
                 return;
             }
 
-            AttackData ad = null;
-            ad = attackArgs.AttackData;
+            var ad = attackArgs.AttackData;
 
-            int damageAbsorbed = (int)(ad.Damage + ad.CriticalDamage);
+            int damageAbsorbed = ad.Damage + ad.CriticalDamage;
 
-            if (m_player.Health < (damageAbsorbed + (int)Math.Round((double)m_player.MaxHealth / 20)))
+            if (_player.Health < (damageAbsorbed + (int)Math.Round((double)_player.MaxHealth / 20)))
             {
-                m_player.Health += damageAbsorbed;
+                _player.Health += damageAbsorbed;
             }
         }
 
@@ -67,29 +65,32 @@ namespace DOL.GS.Effects
 
         public override void Stop()
         {
-            if (m_player.EffectList.GetOfType<SputinsLegacyEffect>() != null)
+            if (_player.EffectList.GetOfType<SputinsLegacyEffect>() != null)
             {
-                m_player.EffectList.Remove(this);
+                _player.EffectList.Remove(this);
             }
 
-            GameEventMgr.RemoveHandler(m_player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
-            GameEventMgr.RemoveHandler(m_player, GameLivingEvent.Dying, new DOLEventHandler(OnRemove));
-            GameEventMgr.RemoveHandler(m_player, GamePlayerEvent.Quit, new DOLEventHandler(OnRemove));
-            GameEventMgr.RemoveHandler(m_player, GamePlayerEvent.Linkdeath, new DOLEventHandler(OnRemove));
-            GameEventMgr.RemoveHandler(m_player, GamePlayerEvent.RegionChanged, new DOLEventHandler(OnRemove));
+            GameEventMgr.RemoveHandler(_player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
+            GameEventMgr.RemoveHandler(_player, GameLivingEvent.Dying, new DOLEventHandler(OnRemove));
+            GameEventMgr.RemoveHandler(_player, GamePlayerEvent.Quit, new DOLEventHandler(OnRemove));
+            GameEventMgr.RemoveHandler(_player, GamePlayerEvent.Linkdeath, new DOLEventHandler(OnRemove));
+            GameEventMgr.RemoveHandler(_player, GamePlayerEvent.RegionChanged, new DOLEventHandler(OnRemove));
             base.Stop();
         }
 
-        public override string Name { get { return "Sputins Legacy"; } }
+        public override string Name => "Sputins Legacy";
 
-        public override ushort Icon { get { return 3069; } }
+        public override ushort Icon => 3069;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("The Healer won't die for 30sec.");
+                var list = new List<string>
+                {
+                    "The Healer won't die for 30sec."
+                };
+
                 return list;
             }
         }

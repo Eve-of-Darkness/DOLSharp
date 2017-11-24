@@ -47,8 +47,7 @@ namespace DOL.GS.RealmAbilities
 
             bool used = false;
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 if (player.Group == null)
                 {
@@ -83,7 +82,7 @@ namespace DOL.GS.RealmAbilities
 
                     if (healed > 0)
                     {
-                        p.Out.SendMessage(player.Name + " heals your for " + healed + " hit points.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                        p.Out.SendMessage($"{player.Name} heals your for {healed} hit points.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                     }
 
                     if (heal > healed)

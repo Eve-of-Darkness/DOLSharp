@@ -11,30 +11,32 @@ namespace DOL.GS.RealmAbilities.Statics
 
         protected override ushort GetStaticEffect() { return 7032; }
 
-        private DBSpell dbs;
-        private Spell s;
-        private SpellLine sl;
+        private readonly Spell _spell;
+        private readonly SpellLine _spellLine;
 
         public StaticTempestBase(int stunDuration)
         {
-            dbs = new DBSpell();
-            dbs.Name = GetStaticName();
-            dbs.Icon = GetStaticEffect();
-            dbs.ClientEffect = GetStaticEffect();
-            dbs.Damage = 0;
-            dbs.DamageType = (int)eDamageType.Energy;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "UnresistableStun";
-            dbs.Value = 0;
-            dbs.Duration = stunDuration;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
-            s = new Spell(dbs,1);
-            sl = new SpellLine("RAs","RealmAbilitys","RealmAbilitys",true);
+            var dbSpell = new DBSpell
+            {
+                Name = GetStaticName(),
+                Icon = GetStaticEffect(),
+                ClientEffect = GetStaticEffect(),
+                Damage = 0,
+                DamageType = (int)eDamageType.Energy,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "UnresistableStun",
+                Value = 0,
+                Duration = stunDuration,
+                Pulse = 0,
+                PulsePower = 0,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
+            _spell = new Spell(dbSpell,1);
+            _spellLine = new SpellLine("RAs","RealmAbilitys","RealmAbilitys",true);
         }
 
         protected override void CastSpell(GameLiving target) {
@@ -43,9 +45,9 @@ namespace DOL.GS.RealmAbilities.Statics
                 return;
             }
 
-            if (GameServer.ServerRules.IsAllowedToAttack(m_caster, target, true))
+            if (GameServer.ServerRules.IsAllowedToAttack(Caster, target, true))
             {
-                ISpellHandler stun = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+                ISpellHandler stun = ScriptMgr.CreateSpellHandler(Caster, _spell, _spellLine);
                 stun.StartSpell(target);
             }
         }

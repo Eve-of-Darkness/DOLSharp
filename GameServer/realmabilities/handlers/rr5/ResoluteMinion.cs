@@ -8,8 +8,6 @@ namespace DOL.GS.RealmAbilities
 {
     public class ResoluteMinionAbility : RR5RealmAbility
     {
-        public const int DURATION = 60000;
-
         public ResoluteMinionAbility(DBAbility dba, int level) : base(dba, level) { }
 
         public override void Execute(GameLiving living)
@@ -19,25 +17,19 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }
 
-            if (player.ControlledBrain == null)
-            {
-                return;
-            }
-
-            if (player.ControlledBrain.Body == null)
+            if (player.ControlledBrain?.Body == null)
             {
                 return;
             }
 
             player.ControlledBrain.Body.AddAbility(SkillBase.GetAbility(Abilities.CCImmunity));
             new ResoluteMinionEffect().Start(player.ControlledBrain.Body);
-            foreach (GamePlayer visPlayer in player.GetPlayersInRadius((ushort)WorldMgr.VISIBILITY_DISTANCE))
+            foreach (GamePlayer visPlayer in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 visPlayer.Out.SendSpellEffectAnimation(player, player.ControlledBrain.Body, 7047, 0, false, 0x01);
             }
@@ -53,30 +45,32 @@ namespace DOL.GS.Effects
 {
     public class ResoluteMinionEffect : TimedEffect
     {
-        public ResoluteMinionEffect() : base(RealmAbilities.ResoluteMinionAbility.DURATION) { }
+        private const int Duration = 60000;
 
-        private GameNPC m_pet;
+        public ResoluteMinionEffect() : base(Duration) { }
 
-        public void Start(GameNPC controllednpc) { base.Start(controllednpc); m_pet = controllednpc; }
+        private GameNPC _pet;
+
+        public void Start(GameNPC controllednpc) { base.Start(controllednpc); _pet = controllednpc; }
 
         public override void Stop()
         {
-            if (m_pet != null)
+            if (_pet != null)
             {
-                if (m_pet.EffectList.GetOfType<ResoluteMinionEffect>() != null)
+                if (_pet.EffectList.GetOfType<ResoluteMinionEffect>() != null)
                 {
-                    m_pet.EffectList.Remove(this);
+                    _pet.EffectList.Remove(this);
                 }
 
-                if (m_pet.HasAbility(Abilities.CCImmunity))
+                if (_pet.HasAbility(Abilities.CCImmunity))
                 {
-                    m_pet.RemoveAbility("CCImmunity");
+                    _pet.RemoveAbility("CCImmunity");
                 }
             }
 
             base.Stop();
         }
 
-        public override ushort Icon { get { return 7047; } }
+        public override ushort Icon => 7047;
     }
 }

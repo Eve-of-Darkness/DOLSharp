@@ -27,34 +27,37 @@ namespace DOL.GS.Effects
     /// </summary>
     public class FanatacismEffect : TimedEffect
     {
-        private GamePlayer EffectOwner;
+        private const int Duration = 45 * 1000;
+        private const int Value = 25;
+
+        private GamePlayer _effectOwner;
 
         public FanatacismEffect()
-            : base(RealmAbilities.FanatacismAbility.DURATION)
+            : base(Duration)
         { }
 
          public override void Start(GameLiving target)
         {
             base.Start(target);
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                EffectOwner = target as GamePlayer;
+                _effectOwner = player;
                 foreach (GamePlayer p in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
-                    p.Out.SendSpellEffectAnimation(EffectOwner, p, 7088, 0, false, 1);
+                    p.Out.SendSpellEffectAnimation(_effectOwner, p, 7088, 0, false, 1);
                 }
 
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.MagicAbsorption] += RealmAbilities.FanatacismAbility.VALUE;
+                GameEventMgr.AddHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.MagicAbsorption] += Value;
             }
         }
 
         public override void Stop()
         {
-            if (EffectOwner != null)
+            if (_effectOwner != null)
             {
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.MagicAbsorption] -= RealmAbilities.FanatacismAbility.VALUE;
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.MagicAbsorption] -= Value;
+                GameEventMgr.RemoveHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
             }
 
             base.Stop();
@@ -71,17 +74,20 @@ namespace DOL.GS.Effects
             Cancel(false);
         }
 
-        public override string Name { get { return "Fanatacism"; } }
+        public override string Name => "Fanatacism";
 
-        public override ushort Icon { get { return 7088; } }
+        public override ushort Icon => 7088;
 
         // Delve Info
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Grants a reduction in all spell damage taken for 45 seconds.");
+                var list = new List<string>
+                {
+                    "Grants a reduction in all spell damage taken for 45 seconds."
+                };
+
                 return list;
             }
         }

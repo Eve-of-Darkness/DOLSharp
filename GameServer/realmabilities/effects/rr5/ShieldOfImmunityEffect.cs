@@ -10,7 +10,7 @@ namespace DOL.GS.Effects
     /// </summary>
     public class ShieldOfImmunityEffect : TimedEffect
     {
-        private GameLiving owner;
+        private GameLiving _owner;
 
         public ShieldOfImmunityEffect()
             : base(20000)
@@ -20,9 +20,8 @@ namespace DOL.GS.Effects
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
-            GamePlayer player = target as GamePlayer;
-            if (player != null)
+            _owner = target;
+            if (target is GamePlayer player)
             {
                 foreach (GamePlayer p in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
@@ -35,8 +34,7 @@ namespace DOL.GS.Effects
 
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            if (!(sender is GameLiving living))
             {
                 return;
             }
@@ -48,7 +46,7 @@ namespace DOL.GS.Effects
                 ad = attackedByEnemy.AttackData;
             }
 
-            if (ad.Damage < 1)
+            if (ad == null || ad.Damage < 1)
             {
                 return;
             }
@@ -59,35 +57,37 @@ namespace DOL.GS.Effects
                 int critic = (int)(ad.CriticalDamage * 0.9);
                 ad.Damage -= absorb;
                 ad.CriticalDamage -= critic;
-                if (living is GamePlayer)
+                if (living is GamePlayer gamePlayer)
                 {
-                    ((GamePlayer)living).Out.SendMessage("Your Shield of Immunity absorbs " + (absorb + critic) + " points of damage", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    gamePlayer.Out.SendMessage($"Your Shield of Immunity absorbs {absorb + critic} points of damage", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
 
-                if (ad.Attacker is GamePlayer)
+                if (ad.Attacker is GamePlayer player)
                 {
-                    ((GamePlayer)ad.Attacker).Out.SendMessage(living.Name + "'s Shield of Immunity absorbs " + (absorb + critic) + " points of damage", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"{living.Name}\'s Shield of Immunity absorbs {absorb + critic} points of damage", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
             }
         }
 
         public override void Stop()
         {
-            GameEventMgr.RemoveHandler(owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
-
+            GameEventMgr.RemoveHandler(_owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
             base.Stop();
         }
 
-        public override string Name { get { return "Shield of Immunity"; } }
+        public override string Name => "Shield of Immunity";
 
-        public override ushort Icon { get { return 3047; } }
+        public override ushort Icon => 3047;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Shield that absorbs 90% melee/archer damage for 20 seconds.");
+                var list = new List<string>
+                {
+                    "Shield that absorbs 90% melee/archer damage for 20 seconds."
+                };
+
                 return list;
             }
         }

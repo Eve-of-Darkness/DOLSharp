@@ -7,8 +7,8 @@ namespace DOL.GS.RealmAbilities
     {
         public WallOfFlameAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        private int dmgValue = 400; // 400 Dmg
-        private uint duration = 15; // 15 Sec duration
+        private readonly int dmgValue = 400; // 400 Dmg
+        private readonly uint duration = 15; // 15 Sec duration
 
         public override void Execute(GameLiving living)
         {
@@ -19,8 +19,7 @@ namespace DOL.GS.RealmAbilities
 
             base.Execute(living);
 
-            GamePlayer caster = living as GamePlayer;
-            if (caster == null)
+            if (!(living is GamePlayer caster))
             {
                 return;
             }
@@ -31,18 +30,18 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            foreach (GamePlayer i_player in caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
+            foreach (GamePlayer iPlayer in caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
             {
-                if (i_player == caster)
+                if (iPlayer == caster)
                 {
-                    i_player.MessageToSelf("You cast " + Name + "!", eChatType.CT_Spell);
+                    iPlayer.MessageToSelf($"You cast {Name}!", eChatType.CT_Spell);
                 }
                 else
                 {
-                    i_player.MessageFromArea(caster, caster.Name + " casts a spell!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    iPlayer.MessageFromArea(caster, $"{caster.Name} casts a spell!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
 
-                i_player.Out.SendSpellCastAnimation(caster, 7028, 20);
+                iPlayer.Out.SendSpellCastAnimation(caster, 7028, 20);
             }
 
             Statics.WallOfFlameBase wof = new Statics.WallOfFlameBase(dmgValue);

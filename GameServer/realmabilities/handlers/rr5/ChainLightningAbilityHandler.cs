@@ -32,10 +32,10 @@ namespace DOL.GS.RealmAbilities
     {
         public ChainLightningAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        private double modifier;
-        private int damage;
-        private int resist;
-        private int basedamage;
+        private double _modifier;
+        private int _damage;
+        private int _resist;
+        private int _basedamage;
         /// <summary>
         /// Action
         /// </summary>
@@ -47,11 +47,12 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            bool deactivate = false;
-            AbstractServerRules rules = GameServer.ServerRules as AbstractServerRules;
-            GamePlayer player = living as GamePlayer;
-            GamePlayer target = living.TargetObject as GamePlayer;
-            if (player.TargetObject == null || target == null)
+            if (!(living is GamePlayer player))
+            {
+                return;
+            }
+
+            if (player.TargetObject == null || !(living.TargetObject is GamePlayer target))
             {
                 player.Out.SendMessage("You must target a player to launch this spell!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                 return;
@@ -71,32 +72,28 @@ namespace DOL.GS.RealmAbilities
 
             SendCasterSpellEffectAndCastMessage(living, 3505, true);
             DamageTarget(target, living, 0);
-            deactivate = true;
-            GamePlayer m_oldtarget = target;
-            GamePlayer m_newtarget = null;
+            GamePlayer oldtarget = target;
+            GamePlayer newtarget = null;
             for (int x = 1; x < 5; x++)
             {
-                if (m_newtarget != null)
+                if (newtarget != null)
                 {
-                    m_oldtarget = m_newtarget;
+                    oldtarget = newtarget;
                 }
 
-                foreach (GamePlayer p in m_oldtarget.GetPlayersInRadius(500))
+                foreach (GamePlayer p in oldtarget.GetPlayersInRadius(500))
                 {
-                    if (p != m_oldtarget && p != living && GameServer.ServerRules.IsAllowedToAttack(living, p, true))
+                    if (p != oldtarget && p != living && GameServer.ServerRules.IsAllowedToAttack(living, p, true))
                     {
                         DamageTarget(p, living, x);
                         p.StartInterruptTimer(3000, AttackData.eAttackType.Spell, living);
-                        m_newtarget = p;
+                        newtarget = p;
                         break;
                     }
                 }
             }
 
-            if (deactivate)
-            {
-                DisableSkill(living);
-            }
+            DisableSkill(living);
         }
 
         private void DamageTarget(GameLiving target, GameLiving caster, double counter)
@@ -107,19 +104,17 @@ namespace DOL.GS.RealmAbilities
                 level = 50;
             }
 
-            modifier = 0.5 + (level * 0.01) * Math.Pow(0.75, counter);
-            basedamage = (int)(450 * modifier);
-            resist = basedamage * target.GetResist(eDamageType.Energy) / -100;
-            damage = basedamage + resist;
+            _modifier = 0.5 + (level * 0.01) * Math.Pow(0.75, counter);
+            _basedamage = (int)(450 * _modifier);
+            _resist = _basedamage * target.GetResist(eDamageType.Energy) / -100;
+            _damage = _basedamage + _resist;
 
-            GamePlayer player = caster as GamePlayer;
-            if (player != null)
+            if (caster is GamePlayer player)
             {
-                player.Out.SendMessage("You hit " + target.Name + " for " + damage + "(" + resist + ") points of damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"You hit {target.Name} for {_damage}({_resist}) points of damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
             }
 
-            GamePlayer targetPlayer = target as GamePlayer;
-            if (targetPlayer != null)
+            if (target is GamePlayer targetPlayer)
             {
                 if (targetPlayer.IsStealthed)
                 {
@@ -134,12 +129,15 @@ namespace DOL.GS.RealmAbilities
             }
 
             // target.TakeDamage(caster, eDamageType.Spirit, damage, 0);
-            AttackData ad = new AttackData();
-            ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
-            ad.Attacker = caster;
-            ad.Target = target;
-            ad.DamageType = eDamageType.Energy;
-            ad.Damage = damage;
+            AttackData ad = new AttackData
+            {
+                AttackResult = GameLiving.eAttackResult.HitUnstyled,
+                Attacker = caster,
+                Target = target,
+                DamageType = eDamageType.Energy,
+                Damage = _damage
+            };
+
             target.OnAttackedByEnemy(ad);
             caster.DealDamage(ad);
         }

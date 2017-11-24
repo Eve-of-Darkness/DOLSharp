@@ -14,13 +14,17 @@ namespace DOL.GS.RealmAbilities
         public const string Dashing = "Dashing";
 
         // private RegionTimer m_expireTimer;
-        int m_duration = 1;
-        int m_range = 1000;
+        private int _duration = 1;
+        private int _range = 1000;
 
         // private GamePlayer m_player;
         public override void Execute(GameLiving living)
         {
-            GamePlayer player = living as GamePlayer;
+            if (!(living is GamePlayer player))
+            {
+                return;
+            }
+
             if (CheckPreconditions(living, DEAD | SITTING | MEZZED | STUNNED))
             {
                 return;
@@ -36,11 +40,11 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (Level)
                 {
-                    case 1: m_duration = 10; break;
-                    case 2: m_duration = 20; break;
-                    case 3: m_duration = 30; break;
-                    case 4: m_duration = 45; break;
-                    case 5: m_duration = 60; break;
+                    case 1: _duration = 10; break;
+                    case 2: _duration = 20; break;
+                    case 3: _duration = 30; break;
+                    case 4: _duration = 45; break;
+                    case 5: _duration = 60; break;
                     default: return;
                 }
             }
@@ -48,9 +52,9 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (Level)
                 {
-                    case 1: m_duration = 10; break;
-                    case 2: m_duration = 30; break;
-                    case 3: m_duration = 60; break;
+                    case 1: _duration = 10; break;
+                    case 2: _duration = 30; break;
+                    case 3: _duration = 60; break;
                     default: return;
                 }
             }
@@ -59,22 +63,19 @@ namespace DOL.GS.RealmAbilities
 
             ArrayList targets = new ArrayList();
             if (player.Group == null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DashingDefenseAbility.Execute.MustInGroup"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-                    return;
-                }
-            else
             {
-                foreach (GamePlayer grpMate in player.Group.GetPlayersInTheGroup())
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DashingDefenseAbility.Execute.MustInGroup"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            foreach (GamePlayer grpMate in player.Group.GetPlayersInTheGroup())
+            {
+                if (player.IsWithinRadius(grpMate, _range) && grpMate.IsAlive)
                 {
-                    if (player.IsWithinRadius(grpMate, m_range) && grpMate.IsAlive)
-                    {
-                        targets.Add(grpMate);
-                    }
+                    targets.Add(grpMate);
                 }
             }
 
-            bool success;
             foreach (GamePlayer target in targets)
             {
                 // send spelleffect
@@ -83,12 +84,12 @@ namespace DOL.GS.RealmAbilities
                     continue;
                 }
 
-                success = !target.TempProperties.getProperty(Dashing, false);
+                var success = !target.TempProperties.getProperty(Dashing, false);
                 if (success)
                 {
-                    if (target != null && target != player)
+                    if (target != player)
                     {
-                        new DashingDefenseEffect().Start(player, target, m_duration);
+                        new DashingDefenseEffect().Start(player, target, _duration);
                     }
                 }
             }

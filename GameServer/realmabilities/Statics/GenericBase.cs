@@ -11,28 +11,26 @@ namespace DOL.GS.RealmAbilities.Statics
 
         protected abstract ushort GetStaticEffect();
 
-        protected GamePlayer m_caster;
-        protected uint m_lifeTime;
-        protected ushort m_radius;
-        protected uint m_pulseFrequency;
-        int currentTick = 0;
-        int currentPulse = 0;
+        private uint _lifeTime;
+        private ushort _radius;
+        private uint _pulseFrequency;
+        private int _currentTick;
 
-        protected int getCurrentPulse()
-        { return currentPulse; }
+        protected GamePlayer Caster { get; private set; }
+        protected int CurrentPulse { get; private set; }
 
         public void CreateStatic(GamePlayer caster, Point3D gt, uint lifeTime, uint pulseFrequency, ushort radius)
         {
-            m_lifeTime = lifeTime;
-            m_caster = caster;
-            m_radius = radius;
-            m_pulseFrequency = pulseFrequency;
+            _lifeTime = lifeTime;
+            Caster = caster;
+            _radius = radius;
+            _pulseFrequency = pulseFrequency;
             Name = GetStaticName();
             Model = GetStaticModel();
             X = gt.X;
             Y = gt.Y;
             Z = gt.Z;
-            CurrentRegionID = m_caster.CurrentRegionID;
+            CurrentRegionID = Caster.CurrentRegionID;
             Level = caster.Level;
             Realm = caster.Realm;
             AddToWorld();
@@ -41,43 +39,42 @@ namespace DOL.GS.RealmAbilities.Statics
         public override bool AddToWorld()
         {
             new RegionTimer(this, new RegionTimerCallback(PulseTimer),1000);
-            GameEventMgr.AddHandler(m_caster, GamePlayerEvent.RemoveFromWorld, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.AddHandler(Caster, GameObjectEvent.RemoveFromWorld, new DOLEventHandler(PlayerLeftWorld));
             return base.AddToWorld();
         }
 
         protected virtual int PulseTimer(RegionTimer timer)
         {
-            if (currentTick >= m_lifeTime || m_caster == null)
+            if (_currentTick >= _lifeTime || Caster == null)
             {
                 RemoveFromWorld();
                 timer.Stop();
-                timer = null;
                 return 0;
             }
 
-            if (currentTick % m_pulseFrequency == 0) {
-                currentPulse++;
-                foreach (GamePlayer target in GetPlayersInRadius(m_radius))
+            if (_currentTick % _pulseFrequency == 0) {
+                CurrentPulse++;
+                foreach (GamePlayer target in GetPlayersInRadius(_radius))
                 {
                     CastSpell(target);
                 }
 
-                foreach (GameNPC npc in GetNPCsInRadius(m_radius))
+                foreach (GameNPC npc in GetNPCsInRadius(_radius))
                 {
                     CastSpell(npc);
                 }
             }
 
-            currentTick++;
+            _currentTick++;
             return 1000;
         }
 
         protected virtual void PlayerLeftWorld(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = (GamePlayer)sender;
-            if (m_caster == player)
+            if (Caster == player)
             {
-                currentTick = (int)m_lifeTime;
+                _currentTick = (int)_lifeTime;
             }
         }
 

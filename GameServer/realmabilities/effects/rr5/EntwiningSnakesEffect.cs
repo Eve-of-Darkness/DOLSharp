@@ -9,7 +9,7 @@ namespace DOL.GS.Effects
     /// </summary>
     public class EntwiningSnakesEffect : TimedEffect
     {
-        private GameLiving owner;
+        private GameLiving _owner;
 
         public EntwiningSnakesEffect()
             : base(20000)
@@ -20,8 +20,8 @@ namespace DOL.GS.Effects
         {
             base.Start(target);
             target.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 1.0 - 50 * 0.01);
-            owner = target;
-            GamePlayer player = owner as GamePlayer;
+            _owner = target;
+            GamePlayer player = _owner as GamePlayer;
             GameEventMgr.AddHandler(target, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
             if (player != null)
             {
@@ -29,30 +29,29 @@ namespace DOL.GS.Effects
             }
             else
             {
-                owner.CurrentSpeed = owner.MaxSpeed;
+                _owner.CurrentSpeed = _owner.MaxSpeed;
             }
         }
 
         public override void Stop()
         {
-            owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
+            _owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
             base.Stop();
-            GamePlayer player = owner as GamePlayer;
-            GameEventMgr.RemoveHandler(owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
+            GamePlayer player = _owner as GamePlayer;
+            GameEventMgr.RemoveHandler(_owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
             if (player != null)
             {
                 player.Out.SendUpdateMaxSpeed();
             }
-            else if (owner.CurrentSpeed > owner.MaxSpeed)
+            else if (_owner.CurrentSpeed > _owner.MaxSpeed)
             {
-                owner.CurrentSpeed = owner.MaxSpeed;
+                _owner.CurrentSpeed = _owner.MaxSpeed;
             }
         }
 
         protected virtual void OnAttacked(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackedByEnemyEventArgs attackArgs = arguments as AttackedByEnemyEventArgs;
-            if (attackArgs == null)
+            if (!(arguments is AttackedByEnemyEventArgs attackArgs))
             {
                 return;
             }
@@ -66,21 +65,21 @@ namespace DOL.GS.Effects
             }
         }
 
-        public override string Name { get { return "Entwining Snakes"; } }
+        public override string Name => "Entwining Snakes";
 
-        public override ushort Icon { get { return 3071; } }
+        public override ushort Icon => 3071;
 
-        public int SpellEffectiveness
-        {
-            get { return 0; }
-        }
+        public int SpellEffectiveness => 0;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("A breakable 50 % snare with 20 seconds duration");
+                var list = new List<string>
+                {
+                    "A breakable 50 % snare with 20 seconds duration"
+                };
+
                 return list;
             }
         }

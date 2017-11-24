@@ -30,6 +30,8 @@ namespace DOL.GS.Spells
     /// </summary>
     public abstract class AbstractCCSpellHandler : ImmunityEffectSpellHandler
     {
+        private const int CcChance = 75;
+
         /// <summary>
         /// Apply effect on target or do spell action if non duration spell
         /// </summary>
@@ -166,7 +168,7 @@ namespace DOL.GS.Spells
             // bonedancer rr5
             if (target.EffectList.GetOfType<AllureofDeathEffect>() != null)
             {
-                return AllureofDeathEffect.ccchance;
+                return CcChance;
             }
 
             if (SpellLine.KeyName == GlobalSpellsLines.Combat_Styles_Effect)

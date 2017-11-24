@@ -7,7 +7,7 @@ namespace DOL.GS.Effects
     /// </summary>
     public class DreamweaverEffect : TimedEffect
     {
-        private GameLiving owner;
+        private GameLiving _owner;
 
         /// <summary>
         /// </summary>
@@ -20,9 +20,8 @@ namespace DOL.GS.Effects
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
-            GamePlayer player = target as GamePlayer;
-            if (player != null)
+            _owner = target;
+            if (target is GamePlayer player)
             {
                 player.Model = GetRandomMorph();
             }
@@ -31,22 +30,21 @@ namespace DOL.GS.Effects
         public override void Stop()
         {
             base.Stop();
-            GamePlayer player = owner as GamePlayer;
-            if (player is GamePlayer)
+            if (_owner is GamePlayer player)
             {
-                player.Model = (ushort)player.CreationModel;
+                player.Model = player.CreationModel;
             }
         }
 
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name { get { return "Dreamweaver"; } }
+        public override string Name => "Dreamweaver";
 
         /// <summary>
         /// Icon to show on players, can be id
         /// </summary>
-        public override ushort Icon { get { return 3051; } }
+        public override ushort Icon => 3051;
 
         /// <summary>
         /// Delve Info
@@ -55,17 +53,19 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Transforms you into a random morph for 5 minutes.");
+                var list = new List<string>
+                {
+                    "Transforms you into a random morph for 5 minutes."
+                };
+
                 return list;
             }
         }
 
         public static ushort GetRandomMorph()
         {
-            return (ushort)Util.Random(1649, 1668);
-
             // Returns random morph/gender (like live..)
+            return (ushort)Util.Random(1649, 1668);
         }
     }
 }

@@ -7,20 +7,13 @@ namespace DOL.GS.Effects
     /// <summary>
     /// Effect handler for Barrier Of Fortitude
     /// </summary>
-    public class BarrierOfFortitudeEffect : StaticEffect, IGameEffect
+    public class BarrierOfFortitudeEffect : StaticEffect
     {
-        private const string m_delveString = "Grants the group a melee absorption bonus (Does not stack with Soldier's Barricade or Bedazzling Aura).";
-        private GamePlayer m_player;
-        private int m_effectDuration;
-        private RegionTimer m_expireTimer;
-        private int m_value;
-
-        /// <summary>
-        /// Default constructor for AmelioratingMelodiesEffect
-        /// </summary>
-        public BarrierOfFortitudeEffect()
-        {
-        }
+        private const string DelveString = "Grants the group a melee absorption bonus (Does not stack with Soldier's Barricade or Bedazzling Aura).";
+        private GamePlayer _player;
+        private int _effectDuration;
+        private RegionTimer _expireTimer;
+        private int _value;
 
         /// <summary>
         /// Called when effect is to be started
@@ -30,9 +23,9 @@ namespace DOL.GS.Effects
         /// <param name="value">The percentage additional value for melee absorb</param>
         public void Start(GamePlayer player, int duration, int value)
         {
-            m_player = player;
-            m_effectDuration = duration;
-            m_value = value;
+            _player = player;
+            _effectDuration = duration;
+            _value = value;
 
             if (player.TempProperties.getProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb, false))
             {
@@ -41,11 +34,11 @@ namespace DOL.GS.Effects
 
             StartTimers();
 
-            GameEventMgr.AddHandler(m_player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.AddHandler(_player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
 
-            m_player.AbilityBonus[(int)eProperty.ArmorAbsorption] += m_value;
+            _player.AbilityBonus[(int)eProperty.ArmorAbsorption] += _value;
 
-            m_player.EffectList.Add(this);
+            _player.EffectList.Add(this);
             player.TempProperties.setProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb, true);
         }
 
@@ -57,12 +50,10 @@ namespace DOL.GS.Effects
         /// <param name="args">EventArgs associated with the event</param>
         private static void PlayerLeftWorld(DOLEvent e, object sender, EventArgs args)
         {
-            GamePlayer player = (GamePlayer)sender;
-
-            BarrierOfFortitudeEffect BoFEffect = player.EffectList.GetOfType<BarrierOfFortitudeEffect>();
-            if (BoFEffect != null)
+            if (sender is GamePlayer player)
             {
-                BoFEffect.Cancel(false);
+                BarrierOfFortitudeEffect boFEffect = player.EffectList.GetOfType<BarrierOfFortitudeEffect>();
+                boFEffect?.Cancel(false);
             }
         }
 
@@ -74,10 +65,10 @@ namespace DOL.GS.Effects
         {
 
             StopTimers();
-            m_player.AbilityBonus[(int)eProperty.ArmorAbsorption] -= m_value;
-            m_player.EffectList.Remove(this);
-            GameEventMgr.RemoveHandler(m_player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-            m_player.TempProperties.removeProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb);
+            _player.AbilityBonus[(int)eProperty.ArmorAbsorption] -= _value;
+            _player.EffectList.Remove(this);
+            GameEventMgr.RemoveHandler(_player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            _player.TempProperties.removeProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb);
         }
 
         /// <summary>
@@ -86,7 +77,7 @@ namespace DOL.GS.Effects
         private void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(m_player, new RegionTimerCallback(ExpireCallback), m_effectDuration * 1000);
+            _expireTimer = new RegionTimer(_player, new RegionTimerCallback(ExpireCallback), _effectDuration * 1000);
         }
 
         /// <summary>
@@ -95,10 +86,10 @@ namespace DOL.GS.Effects
         private void StopTimers()
         {
 
-            if (m_expireTimer != null)
+            if (_expireTimer != null)
             {
-                m_expireTimer.Stop();
-                m_expireTimer = null;
+                _expireTimer.Stop();
+                _expireTimer = null;
             }
         }
 
@@ -116,13 +107,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "Barrier of Fortitude";
-            }
-        }
+        public override string Name => "Barrier of Fortitude";
 
         /// <summary>
         /// Remaining time of the effect in milliseconds
@@ -131,7 +116,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
+                RegionTimer timer = _expireTimer;
                 if (timer == null || !timer.IsAlive)
                 {
                     return 0;
@@ -144,13 +129,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override ushort Icon
-        {
-            get
-            {
-                return 3015;
-            }
-        }
+        public override ushort Icon => 3015;
 
         /// <summary>
         /// Delve information
@@ -159,16 +138,18 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>(8);
-                delveInfoList.Add(m_delveString);
-                delveInfoList.Add(" ");
-                delveInfoList.Add("Value: " + m_value + "%");
+                var delveInfoList = new List<string>
+                {
+                    DelveString,
+                    " ",
+                    $"Value: {_value}%"
+                };
 
-                int seconds = (int)(RemainingTime / 1000);
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" ");
-                    delveInfoList.Add("- " + seconds + " seconds remaining.");
+                    delveInfoList.Add($"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

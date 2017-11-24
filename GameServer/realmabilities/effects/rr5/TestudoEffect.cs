@@ -11,7 +11,7 @@ namespace DOL.GS.Effects
     /// </summary>
     public class TestudoEffect : TimedEffect
     {
-        private GameLiving owner;
+        private GameLiving _owner;
 
         public TestudoEffect()
             : base(45000)
@@ -21,7 +21,7 @@ namespace DOL.GS.Effects
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
+            _owner = target;
             GamePlayer player = target as GamePlayer;
             if (player != null)
             {
@@ -33,32 +33,27 @@ namespace DOL.GS.Effects
 
             target.StopAttack();
             GameEventMgr.AddHandler(target, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
-            GameEventMgr.AddHandler(target, GameLivingEvent.AttackFinished, new DOLEventHandler(attackEventHandler));
+            GameEventMgr.AddHandler(target, GameLivingEvent.AttackFinished, new DOLEventHandler(AttackEventHandler));
             if (player != null)
             {
                 player.Out.SendUpdateMaxSpeed();
             }
             else
             {
-                owner.CurrentSpeed = owner.MaxSpeed;
+                _owner.CurrentSpeed = _owner.MaxSpeed;
             }
         }
 
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            if (!(sender is GameLiving living))
             {
                 return;
             }
 
             InventoryItem shield = living.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
-            if (shield == null)
-            {
-                return;
-            }
 
-            if (shield.Object_Type != (int)eObjectType.Shield)
+            if (shield?.Object_Type != (int)eObjectType.Shield)
             {
                 return;
             }
@@ -85,7 +80,7 @@ namespace DOL.GS.Effects
                 ad = attackedByEnemy.AttackData;
             }
 
-            if (ad.Attacker.Realm == 0)
+            if (ad == null || ad.Attacker.Realm == 0)
             {
                 return;
             }
@@ -99,26 +94,20 @@ namespace DOL.GS.Effects
             int critic = (int)(ad.CriticalDamage * 0.9);
             ad.Damage -= absorb;
             ad.CriticalDamage -= critic;
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                ((GamePlayer)living).Out.SendMessage("Your Testudo Stance reduces the damage by " + (absorb + critic) + " points", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"Your Testudo Stance reduces the damage by {absorb + critic} points", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
 
-            if (ad.Attacker is GamePlayer)
+            if (ad.Attacker is GamePlayer gamePlayer)
             {
-                ((GamePlayer)ad.Attacker).Out.SendMessage(living.Name + "'s Testudo Stance reducec your damage by " + (absorb + critic) + " points", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                gamePlayer.Out.SendMessage($"{living.Name}\'s Testudo Stance reducec your damage by {absorb + critic} points", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
         }
 
-        protected void attackEventHandler(DOLEvent e, object sender, EventArgs args)
+        private void AttackEventHandler(DOLEvent e, object sender, EventArgs args)
         {
-            if (args == null)
-            {
-                return;
-            }
-
-            AttackFinishedEventArgs ag = args as AttackFinishedEventArgs;
-            if (ag == null)
+            if (!(args is AttackFinishedEventArgs ag))
             {
                 return;
             }
@@ -143,30 +132,32 @@ namespace DOL.GS.Effects
 
         public override void Stop()
         {
-            GameEventMgr.RemoveHandler(owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
-            GameEventMgr.RemoveHandler(owner, GameLivingEvent.AttackFinished, new DOLEventHandler(attackEventHandler));
+            GameEventMgr.RemoveHandler(_owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
+            GameEventMgr.RemoveHandler(_owner, GameLivingEvent.AttackFinished, new DOLEventHandler(AttackEventHandler));
             base.Stop();
-            GamePlayer player = owner as GamePlayer;
-            if (player != null)
+            if (_owner is GamePlayer player)
             {
                 player.Out.SendUpdateMaxSpeed();
             }
             else
             {
-                owner.CurrentSpeed = owner.MaxSpeed;
+                _owner.CurrentSpeed = _owner.MaxSpeed;
             }
         }
 
-        public override string Name { get { return "Testudo"; } }
+        public override string Name => "Testudo";
 
-        public override ushort Icon { get { return 3067; } }
+        public override ushort Icon => 3067;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Warrior with shield equipped covers up and takes 90% less damage for all attacks for 45 seconds. Can only move at reduced speed (speed buffs have no effect) and cannot attack. Using a style will break testudo form. This ability is only effective versus realm enemies.");
+                var list = new List<string>
+                {
+                    "Warrior with shield equipped covers up and takes 90% less damage for all attacks for 45 seconds. Can only move at reduced speed (speed buffs have no effect) and cannot attack. Using a style will break testudo form. This ability is only effective versus realm enemies."
+                };
+
                 return list;
             }
         }

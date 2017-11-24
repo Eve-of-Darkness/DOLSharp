@@ -10,18 +10,16 @@ namespace DOL.GS.Effects
         public RemedyEffect()
             : base(60000)
         {
-            ;
         }
 
-        private GameLiving owner;
-        private int healthdrain;
+        private GameLiving _owner;
+        private int _healthdrain;
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
-            GamePlayer player = target as GamePlayer;
-            if (player != null)
+            _owner = target;
+            if (target is GamePlayer player)
             {
                 foreach (GamePlayer p in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
@@ -29,42 +27,42 @@ namespace DOL.GS.Effects
                 }
             }
 
-            healthdrain = (int)(target.MaxHealth * 0.1);
-            if (target.Health <= healthdrain)
+            _healthdrain = (int)(target.MaxHealth * 0.1);
+            if (target.Health <= _healthdrain)
             {
                 return;
             }
 
-            target.TakeDamage(target, eDamageType.Body, healthdrain, 0);
+            target.TakeDamage(target, eDamageType.Body, _healthdrain, 0);
         }
 
-        public override string Name { get { return "Remedy"; } }
+        public override string Name => "Remedy";
 
-        public override ushort Icon { get { return 3059; } }
+        public override ushort Icon => 3059;
 
         public override void Stop()
         {
-            if (!owner.IsAlive)
+            if (!_owner.IsAlive)
             {
                 base.Stop();
                 return;
             }
 
-            owner.Health += healthdrain;
+            _owner.Health += _healthdrain;
             base.Stop();
         }
 
-        public int SpellEffectiveness
-        {
-            get { return 100; }
-        }
+        public int SpellEffectiveness => 100;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("For 60 seconds you're immune to all weapon poisons");
+                var list = new List<string>
+                {
+                    "For 60 seconds you're immune to all weapon poisons"
+                };
+
                 return list;
             }
         }

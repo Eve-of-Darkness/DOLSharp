@@ -26,10 +26,11 @@ namespace DOL.GS.Effects
 
     public class CallOfDarknessEffect : TimedEffect
     {
+        private const int Duration = 60 * 1000;
         private GamePlayer EffectOwner;
 
         public CallOfDarknessEffect()
-            : base(RealmAbilities.CallOfDarknessAbility.DURATION)
+            : base(Duration)
         { }
 
         public override void Start(GameLiving target)
@@ -68,17 +69,20 @@ namespace DOL.GS.Effects
             Cancel(false);
         }
 
-        public override string Name { get { return "Call Of Darkness"; } }
+        public override string Name => "Call Of Darkness";
 
-        public override ushort Icon { get { return 7051; } }
+        public override ushort Icon => 7051;
 
         // Delve Info
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Summon pet in 3 seconds.");
+                var list = new List<string>
+                {
+                    "Summon pet in 3 seconds."
+                };
+
                 return list;
             }
         }

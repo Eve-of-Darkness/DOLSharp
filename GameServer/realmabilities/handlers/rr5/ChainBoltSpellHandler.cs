@@ -28,10 +28,10 @@ namespace DOL.GS.Spells
 
         public ChainBoltSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
 
-        protected GameLiving m_currentSource;
-        protected int m_maxTick;
-        protected int m_currentTick;
-        protected double m_effetiveness = 1.0;
+        private GameLiving _currentSource;
+        private int _maxTick;
+        private int _currentTick;
+        private double _effetiveness = 1.0;
 
         /// <summary>
         /// called when spell effect has to be started and applied to targets
@@ -43,38 +43,38 @@ namespace DOL.GS.Spells
                 return false;
             }
 
-            if (m_maxTick >= 0)
+            if (_maxTick >= 0)
             {
-                m_maxTick = (Spell.Pulse > 1) ? Spell.Pulse : 1;
-                m_currentTick = 1;
-                m_currentSource = target;
+                _maxTick = (Spell.Pulse > 1) ? Spell.Pulse : 1;
+                _currentTick = 1;
+                _currentSource = target;
             }
 
-            int ticksToTarget = m_currentSource.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
+            int ticksToTarget = _currentSource.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
             int delay = 1 + ticksToTarget / 100;
             foreach (GamePlayer player in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                player.Out.SendSpellEffectAnimation(m_currentSource, target, Spell.ClientEffect, (ushort)delay, false, 1);
+                player.Out.SendSpellEffectAnimation(_currentSource, target, Spell.ClientEffect, (ushort)delay, false, 1);
             }
 
             BoltOnTargetAction bolt = new BoltOnTargetAction(Caster, target, this);
             bolt.Start(1 + ticksToTarget);
-            m_currentSource = target;
-            m_currentTick++;
+            _currentSource = target;
+            _currentTick++;
 
             return true;
         }
 
         public override void DamageTarget(AttackData ad, bool showEffectAnimation)
         {
-            ad.Damage = (int)(ad.Damage * m_effetiveness);
+            ad.Damage = (int)(ad.Damage * _effetiveness);
             base.DamageTarget(ad, showEffectAnimation);
-            if (m_currentTick < m_maxTick)
+            if (_currentTick < _maxTick)
             {
-                m_effetiveness -= 0.1;
+                _effetiveness -= 0.1;
 
                 // fetch next target
-                foreach (GamePlayer pl in m_currentSource.GetPlayersInRadius(500))
+                foreach (GamePlayer pl in _currentSource.GetPlayersInRadius(500))
                 {
                     if (GameServer.ServerRules.IsAllowedToAttack(Caster,pl,true)) {
                         StartSpell(pl);
