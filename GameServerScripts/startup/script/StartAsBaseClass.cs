@@ -34,7 +34,7 @@ namespace DOL.GS.GameEvents
         /// Should the server start characters as Base Class?
         /// </summary>
         [ServerProperty("startup", "start_as_base_class", "Should we start all players as their base class? true if yes (e.g. Armsmen become Fighters on Creation)", false)]
-        public static bool START_AS_BASE_CLASS;
+        public static bool START_AS_BASE_CLASS { get; set; }
 
         /// <summary>
         /// Register Character Creation Events

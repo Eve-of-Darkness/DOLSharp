@@ -45,19 +45,19 @@ namespace DOL.GS.DatabaseUpdate
         /// Enable or Disable the Auto XML Database Update Script
         /// </summary>
         [ServerProperty("xmlautoload", "xml_autoload_update_enable", "Enable or disable Auto XML Dataase Update Packages (Should be enabled for first run...)", true)]
-        public static bool XML_AUTOLOAD_UPDATE_ENABLE;
+        public static bool XML_AUTOLOAD_UPDATE_ENABLE { get; set; }
 
         /// <summary>
         /// Set Default Path for Loading "Insert" XML Package Directory
         /// </summary>
         [ServerProperty("xmlautoload", "xml_load_insert_directory", "Enforce directory path where the XML Insert Packages are Loaded To Database (Relative to Scripts or Absolute...)", "dbupdater/insert")]
-        public static string XML_LOAD_INSERT_DIRECTORY;
+        public static string XML_LOAD_INSERT_DIRECTORY { get; set; }
 
         /// <summary>
         /// Set Default Path for Loading "Replace" XML Package Directory
         /// </summary>
         [ServerProperty("xmlautoload", "xml_load_replace_directory", "Enforce directory path to where the XML Replace Packages are Loaded To Database (Relative to Scripts or Absolute...)", "dbupdater/replace")]
-        public static string XML_LOAD_REPLACE_DIRECTORY;
+        public static string XML_LOAD_REPLACE_DIRECTORY { get; set; }
         #endregion
 
         /// <summary>

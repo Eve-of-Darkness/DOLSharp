@@ -42,7 +42,7 @@ namespace DOL.GS.GameEvents
         /// What levels did we allow a DOL respec ? serialized
         /// </summary>
         [ServerProperty("startup", "give_dol_respec_at_level", "What levels does we give a DOL respec ? separated by a semi-colon or a range with a dash (ie 1-5;7;9)", "0")]
-        public static string GIVE_DOL_RESPEC_AT_LEVEL;
+        public static string GIVE_DOL_RESPEC_AT_LEVEL { get; set; }
 
         [ScriptLoadedEvent]
         public static void OnScriptLoaded(DOLEvent e, object sender, EventArgs args)
