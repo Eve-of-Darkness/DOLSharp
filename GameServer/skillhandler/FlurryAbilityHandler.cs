@@ -35,12 +35,12 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The reuse time in milliseconds for flurry ability
         /// </summary>
-        protected const int REUSE_TIMER = 60 * 2000; // 2 minutes
+        private const int ReuseTimer = 60 * 2000; // 2 minutes
 
         /// <summary>
         /// Execute the ability
@@ -51,9 +51,9 @@ namespace DOL.GS.SkillHandler
         {
             if (player == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("Could not retrieve player in FlurryAbilityHandler.");
+                    Log.Warn("Could not retrieve player in FlurryAbilityHandler.");
                 }
 
                 return;
@@ -114,27 +114,26 @@ namespace DOL.GS.SkillHandler
                 return;
             }
 
-            if (player.TargetObject is GamePlayer && SpellHandler.FindEffectOnTarget((GamePlayer)player.TargetObject, "Phaseshift") != null)
+            if (player.TargetObject is GamePlayer gamePlayer && SpellHandler.FindEffectOnTarget(gamePlayer, "Phaseshift") != null)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.TargetIsPhaseshifted", player.TargetObject.Name), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
                 return;
             }
 
-            if (player.TargetObject is GamePlayer)
+            SputinsLegacyEffect sputinLegacy = (player.TargetObject as GamePlayer)?.EffectList.GetOfType<SputinsLegacyEffect>();
+            if (sputinLegacy != null)
             {
-                SputinsLegacyEffect SputinLegacy = (player.TargetObject as GamePlayer).EffectList.GetOfType<SputinsLegacyEffect>();
-                if (SputinLegacy != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.TargetIsUnderSputinLegacy", player.TargetObject.Name), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
-                    return;
-                }
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.TargetIsUnderSputinLegacy", player.TargetObject.Name), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
+                return;
             }
+
             #endregion
 
             GameLiving target = (GameLiving)player.TargetObject;
-            int damage = 0;
-            int specc = (player.CharacterClass is PlayerClass.ClassBlademaster) ?
-                player.GetModifiedSpecLevel(Specs.Celtic_Dual) : player.GetModifiedSpecLevel(Specs.Dual_Wield);
+            int damage;
+            int specc = player.CharacterClass is PlayerClass.ClassBlademaster
+                ? player.GetModifiedSpecLevel(Specs.Celtic_Dual)
+                : player.GetModifiedSpecLevel(Specs.Dual_Wield);
 
             // damage = base HP / 100 * DWspec / 2.7 that would be the original calculation
             if (target is GamePlayer)
@@ -156,7 +155,7 @@ namespace DOL.GS.SkillHandler
             resistModifier += (int)(damage * (double)primaryResistModifier * -0.01);
 
             // secondary resists
-            resistModifier += (int)((damage + (double)resistModifier) * (double)secondaryResistModifier * -0.01);
+            resistModifier += (int)((damage + (double)resistModifier) * secondaryResistModifier * -0.01);
 
             // apply resists
             damage += resistModifier;
@@ -167,10 +166,7 @@ namespace DOL.GS.SkillHandler
             target.TakeDamage(player, eDamageType.Slash, damage, 0);
 
             GameSpellEffect mez = SpellHandler.FindEffectOnTarget(target, "Mesmerize");
-            if (mez != null)
-            {
-                mez.Cancel(false);
-            }
+            mez?.Cancel(false);
 
             // sending spell effect
             foreach (GamePlayer effPlayer in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
@@ -180,15 +176,12 @@ namespace DOL.GS.SkillHandler
 
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.Flurry.YouHit", target.GetName(0, false), damage), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
 
-            if (target is GamePlayer)
-            {
-                (target as GamePlayer).Out.SendMessage(LanguageMgr.GetTranslation((target as GamePlayer).Client, "Skill.Ability.Flurry.HitYou", player.Name, damage), eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
-            }
+            (target as GamePlayer)?.Out.SendMessage(LanguageMgr.GetTranslation((target as GamePlayer).Client, "Skill.Ability.Flurry.HitYou", player.Name, damage), eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
 
             player.LastAttackTickPvP = player.CurrentRegion.Time;
             target.LastAttackedByEnemyTickPvP = target.CurrentRegion.Time;
 
-            player.DisableSkill(ab, REUSE_TIMER);
+            player.DisableSkill(ab, ReuseTimer);
         }
     }
 }

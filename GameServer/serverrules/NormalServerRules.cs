@@ -34,17 +34,6 @@ namespace DOL.GS.ServerRules
             return "standard Normal server rules";
         }
 
-        /// <summary>
-        /// Invoked on NPC death and deals out
-        /// experience/realm points if needed
-        /// </summary>
-        /// <param name="killedNPC">npc that died</param>
-        /// <param name="killer">killer</param>
-        public override void OnNPCKilled(GameNPC killedNPC, GameObject killer)
-        {
-            base.OnNPCKilled(killedNPC, killer);
-        }
-
         public override bool IsAllowedToAttack(GameLiving attacker, GameLiving defender, bool quiet)
         {
             if (!base.IsAllowedToAttack(attacker, defender, quiet))
@@ -53,20 +42,18 @@ namespace DOL.GS.ServerRules
             }
 
             // if controlled NPC - do checks for owner instead
-            if (attacker is GameNPC)
+            if (attacker is GameNPC npc)
             {
-                IControlledBrain controlled = ((GameNPC)attacker).Brain as IControlledBrain;
-                if (controlled != null)
+                if (npc.Brain is IControlledBrain controlled)
                 {
                     attacker = controlled.GetLivingOwner();
                     quiet = true; // silence all attacks by controlled npc
                 }
             }
 
-            if (defender is GameNPC)
+            if (defender is GameNPC gameNpc)
             {
-                IControlledBrain controlled = ((GameNPC)defender).Brain as IControlledBrain;
-                if (controlled != null)
+                if (gameNpc.Brain is IControlledBrain controlled)
                 {
                     defender = controlled.GetLivingOwner();
                 }
@@ -116,20 +103,18 @@ namespace DOL.GS.ServerRules
             }
 
             // if controlled NPC - do checks for owner instead
-            if (source is GameNPC)
+            if (source is GameNPC npc)
             {
-                IControlledBrain controlled = ((GameNPC)source).Brain as IControlledBrain;
-                if (controlled != null)
+                if (npc.Brain is IControlledBrain controlled)
                 {
                     source = controlled.GetLivingOwner();
                     quiet = true; // silence all attacks by controlled npc
                 }
             }
 
-            if (target is GameNPC)
+            if (target is GameNPC gameNpc)
             {
-                IControlledBrain controlled = ((GameNPC)target).Brain as IControlledBrain;
-                if (controlled != null)
+                if (gameNpc.Brain is IControlledBrain controlled)
                 {
                     target = controlled.GetLivingOwner();
                 }
@@ -141,29 +126,29 @@ namespace DOL.GS.ServerRules
             }
 
             // clients with priv level > 1 are considered friendly by anyone
-            if (target is GamePlayer && ((GamePlayer)target).Client.Account.PrivLevel > 1)
+            if (target is GamePlayer player && player.Client.Account.PrivLevel > 1)
             {
                 return true;
             }
 
             // checking as a gm, targets are considered friendly
-            if (source is GamePlayer && ((GamePlayer)source).Client.Account.PrivLevel > 1)
+            if (source is GamePlayer gamePlayer && gamePlayer.Client.Account.PrivLevel > 1)
             {
                 return true;
             }
 
             // Peace flag NPCs are same realm
-            if (target is GameNPC)
+            if (target is GameNPC npc1)
             {
-                if ((((GameNPC)target).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((npc1.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return true;
                 }
             }
 
-            if (source is GameNPC)
+            if (source is GameNPC gameNpc1)
             {
-                if ((((GameNPC)source).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((gameNpc1.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return true;
                 }
@@ -173,7 +158,7 @@ namespace DOL.GS.ServerRules
             {
                 if (quiet == false)
                 {
-                    MessageToLiving(source, target.GetName(0, true) + " is not a member of your realm!");
+                    MessageToLiving(source, $"{target.GetName(0, true)} is not a member of your realm!");
                 }
 
                 return false;
@@ -240,26 +225,26 @@ namespace DOL.GS.ServerRules
             }
 
             // clients with priv level > 1 are allowed to trade with anyone
-            if (source is GamePlayer && target is GamePlayer)
+            if (source is GamePlayer player && target is GamePlayer)
             {
-                if ((source as GamePlayer).Client.Account.PrivLevel > 1 || (target as GamePlayer).Client.Account.PrivLevel > 1)
+                if (player.Client.Account.PrivLevel > 1 || ((GamePlayer) target).Client.Account.PrivLevel > 1)
                 {
                     return true;
                 }
             }
 
             // Peace flag NPCs can trade with everyone
-            if (target is GameNPC)
+            if (target is GameNPC npc)
             {
-                if ((((GameNPC)target).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((npc.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return true;
                 }
             }
 
-            if (source is GameNPC)
+            if (source is GameNPC gameNpc)
             {
-                if ((((GameNPC)source).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((gameNpc.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return true;
                 }
@@ -286,7 +271,7 @@ namespace DOL.GS.ServerRules
             }
 
             // clients with priv level > 1 are allowed to talk and hear anyone
-            if (source is GamePlayer && ((GamePlayer)source).Client.Account.PrivLevel > 1)
+            if (source is GamePlayer player && player.Client.Account.PrivLevel > 1)
             {
                 return true;
             }
@@ -297,9 +282,9 @@ namespace DOL.GS.ServerRules
             }
 
             // Peace flag NPCs can be understood by everyone
-            if (source is GameNPC)
+            if (source is GameNPC npc)
             {
-                if ((((GameNPC)source).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((npc.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return true;
                 }
@@ -350,44 +335,44 @@ namespace DOL.GS.ServerRules
             if (m_compatibleObjectTypes == null)
             {
                 m_compatibleObjectTypes = new Hashtable();
-                m_compatibleObjectTypes[(int)eObjectType.Staff] = new eObjectType[] { eObjectType.Staff };
-                m_compatibleObjectTypes[(int)eObjectType.Fired] = new eObjectType[] { eObjectType.Fired };
-                m_compatibleObjectTypes[(int)eObjectType.MaulerStaff] = new eObjectType[] { eObjectType.MaulerStaff };
-                m_compatibleObjectTypes[(int)eObjectType.FistWraps] = new eObjectType[] { eObjectType.FistWraps };
+                m_compatibleObjectTypes[(int)eObjectType.Staff] = new[] { eObjectType.Staff };
+                m_compatibleObjectTypes[(int)eObjectType.Fired] = new[] { eObjectType.Fired };
+                m_compatibleObjectTypes[(int)eObjectType.MaulerStaff] = new[] { eObjectType.MaulerStaff };
+                m_compatibleObjectTypes[(int)eObjectType.FistWraps] = new[] { eObjectType.FistWraps };
 
                 // alb
-                m_compatibleObjectTypes[(int)eObjectType.CrushingWeapon] = new eObjectType[] { eObjectType.CrushingWeapon };
-                m_compatibleObjectTypes[(int)eObjectType.SlashingWeapon] = new eObjectType[] { eObjectType.SlashingWeapon };
-                m_compatibleObjectTypes[(int)eObjectType.ThrustWeapon] = new eObjectType[] { eObjectType.ThrustWeapon };
-                m_compatibleObjectTypes[(int)eObjectType.TwoHandedWeapon] = new eObjectType[] { eObjectType.TwoHandedWeapon };
-                m_compatibleObjectTypes[(int)eObjectType.PolearmWeapon] = new eObjectType[] { eObjectType.PolearmWeapon };
-                m_compatibleObjectTypes[(int)eObjectType.Flexible] = new eObjectType[] { eObjectType.Flexible };
-                m_compatibleObjectTypes[(int)eObjectType.Longbow] = new eObjectType[] { eObjectType.Longbow };
-                m_compatibleObjectTypes[(int)eObjectType.Crossbow] = new eObjectType[] { eObjectType.Crossbow };
+                m_compatibleObjectTypes[(int)eObjectType.CrushingWeapon] = new[] { eObjectType.CrushingWeapon };
+                m_compatibleObjectTypes[(int)eObjectType.SlashingWeapon] = new[] { eObjectType.SlashingWeapon };
+                m_compatibleObjectTypes[(int)eObjectType.ThrustWeapon] = new[] { eObjectType.ThrustWeapon };
+                m_compatibleObjectTypes[(int)eObjectType.TwoHandedWeapon] = new[] { eObjectType.TwoHandedWeapon };
+                m_compatibleObjectTypes[(int)eObjectType.PolearmWeapon] = new[] { eObjectType.PolearmWeapon };
+                m_compatibleObjectTypes[(int)eObjectType.Flexible] = new[] { eObjectType.Flexible };
+                m_compatibleObjectTypes[(int)eObjectType.Longbow] = new[] { eObjectType.Longbow };
+                m_compatibleObjectTypes[(int)eObjectType.Crossbow] = new[] { eObjectType.Crossbow };
 
                 // TODO: case 5: abilityCheck = Abilities.Weapon_Thrown; break;
 
                 // mid
-                m_compatibleObjectTypes[(int)eObjectType.Hammer] = new eObjectType[] { eObjectType.Hammer };
-                m_compatibleObjectTypes[(int)eObjectType.Sword] = new eObjectType[] { eObjectType.Sword };
-                m_compatibleObjectTypes[(int)eObjectType.LeftAxe] = new eObjectType[] { eObjectType.LeftAxe };
-                m_compatibleObjectTypes[(int)eObjectType.Axe] = new eObjectType[] { eObjectType.Axe };
-                m_compatibleObjectTypes[(int)eObjectType.HandToHand] = new eObjectType[] { eObjectType.HandToHand };
-                m_compatibleObjectTypes[(int)eObjectType.Spear] = new eObjectType[] { eObjectType.Spear };
-                m_compatibleObjectTypes[(int)eObjectType.CompositeBow] = new eObjectType[] { eObjectType.CompositeBow };
-                m_compatibleObjectTypes[(int)eObjectType.Thrown] = new eObjectType[] { eObjectType.Thrown };
+                m_compatibleObjectTypes[(int)eObjectType.Hammer] = new[] { eObjectType.Hammer };
+                m_compatibleObjectTypes[(int)eObjectType.Sword] = new[] { eObjectType.Sword };
+                m_compatibleObjectTypes[(int)eObjectType.LeftAxe] = new[] { eObjectType.LeftAxe };
+                m_compatibleObjectTypes[(int)eObjectType.Axe] = new[] { eObjectType.Axe };
+                m_compatibleObjectTypes[(int)eObjectType.HandToHand] = new[] { eObjectType.HandToHand };
+                m_compatibleObjectTypes[(int)eObjectType.Spear] = new[] { eObjectType.Spear };
+                m_compatibleObjectTypes[(int)eObjectType.CompositeBow] = new[] { eObjectType.CompositeBow };
+                m_compatibleObjectTypes[(int)eObjectType.Thrown] = new[] { eObjectType.Thrown };
 
                 // hib
-                m_compatibleObjectTypes[(int)eObjectType.Blunt] = new eObjectType[] { eObjectType.Blunt };
-                m_compatibleObjectTypes[(int)eObjectType.Blades] = new eObjectType[] { eObjectType.Blades };
-                m_compatibleObjectTypes[(int)eObjectType.Piercing] = new eObjectType[] { eObjectType.Piercing };
-                m_compatibleObjectTypes[(int)eObjectType.LargeWeapons] = new eObjectType[] { eObjectType.LargeWeapons };
-                m_compatibleObjectTypes[(int)eObjectType.CelticSpear] = new eObjectType[] { eObjectType.CelticSpear };
-                m_compatibleObjectTypes[(int)eObjectType.Scythe] = new eObjectType[] { eObjectType.Scythe };
-                m_compatibleObjectTypes[(int)eObjectType.RecurvedBow] = new eObjectType[] { eObjectType.RecurvedBow };
+                m_compatibleObjectTypes[(int)eObjectType.Blunt] = new[] { eObjectType.Blunt };
+                m_compatibleObjectTypes[(int)eObjectType.Blades] = new[] { eObjectType.Blades };
+                m_compatibleObjectTypes[(int)eObjectType.Piercing] = new[] { eObjectType.Piercing };
+                m_compatibleObjectTypes[(int)eObjectType.LargeWeapons] = new[] { eObjectType.LargeWeapons };
+                m_compatibleObjectTypes[(int)eObjectType.CelticSpear] = new[] { eObjectType.CelticSpear };
+                m_compatibleObjectTypes[(int)eObjectType.Scythe] = new[] { eObjectType.Scythe };
+                m_compatibleObjectTypes[(int)eObjectType.RecurvedBow] = new[] { eObjectType.RecurvedBow };
 
-                m_compatibleObjectTypes[(int)eObjectType.Shield] = new eObjectType[] { eObjectType.Shield };
-                m_compatibleObjectTypes[(int)eObjectType.Poison] = new eObjectType[] { eObjectType.Poison };
+                m_compatibleObjectTypes[(int)eObjectType.Shield] = new[] { eObjectType.Shield };
+                m_compatibleObjectTypes[(int)eObjectType.Poison] = new[] { eObjectType.Poison };
 
                 // TODO: case 45: abilityCheck = Abilities.instruments; break;
             }
@@ -473,7 +458,7 @@ namespace DOL.GS.ServerRules
         public override void ResetKeep(GuardLord lord, GameObject killer)
         {
             base.ResetKeep(lord, killer);
-            lord.Component.AbstractKeep.Reset((eRealm)killer.Realm);
+            lord.Component.AbstractKeep.Reset(killer.Realm);
         }
     }
 }

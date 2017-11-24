@@ -49,7 +49,7 @@ namespace DOL.GS.ServerRules
         /// <summary>
         /// TempProperty set if killed by player
         /// </summary>
-        protected const string KILLED_BY_PLAYER_PROP = "PvP killed by player";
+        private const string KilledByPlayerProp = "PvP killed by player";
 
         public override void ImmunityExpiredCallback(GamePlayer player)
         {
@@ -63,7 +63,7 @@ namespace DOL.GS.ServerRules
                 return;
             }
 
-            if (player.Level < m_safetyLevel && player.SafetyFlag)
+            if (player.Level < _safetyLevel && player.SafetyFlag)
             {
                 player.Out.SendMessage("Your temporary invulnerability timer has expired, but your /safety flag is still on.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
@@ -71,14 +71,12 @@ namespace DOL.GS.ServerRules
             {
                 player.Out.SendMessage("Your temporary invulnerability timer has expired.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
-
-            return;
         }
 
         /// <summary>
         /// Level at which players safety flag has no effect
         /// </summary>
-        protected int m_safetyLevel = 10;
+        private int _safetyLevel = 10;
 
         /// <summary>
         /// Invoked on Player death and deals out
@@ -91,20 +89,20 @@ namespace DOL.GS.ServerRules
             base.OnPlayerKilled(killedPlayer, killer);
             if (killer == null || killer is GamePlayer)
             {
-                killedPlayer.TempProperties.setProperty(KILLED_BY_PLAYER_PROP, KILLED_BY_PLAYER_PROP);
+                killedPlayer.TempProperties.setProperty(KilledByPlayerProp, KilledByPlayerProp);
             }
             else
             {
-                killedPlayer.TempProperties.removeProperty(KILLED_BY_PLAYER_PROP);
+                killedPlayer.TempProperties.removeProperty(KilledByPlayerProp);
             }
         }
 
         public override void OnReleased(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = (GamePlayer)sender;
-            if (player.TempProperties.getProperty<object>(KILLED_BY_PLAYER_PROP, null) != null)
+            if (player.TempProperties.getProperty<object>(KilledByPlayerProp, null) != null)
             {
-                player.TempProperties.removeProperty(KILLED_BY_PLAYER_PROP);
+                player.TempProperties.removeProperty(KilledByPlayerProp);
                 StartImmunityTimer(player, ServerProperties.Properties.TIMER_KILLED_BY_PLAYER * 1000);// When Killed by a Player
             }
             else
@@ -132,7 +130,7 @@ namespace DOL.GS.ServerRules
         /// <summary>
         /// Regions where players can't be attacked
         /// </summary>
-        protected int[] m_safeRegions =
+        private int[] _safeRegions =
         {
             10,  // City of Camelot
             101, // Jordheim
@@ -151,7 +149,7 @@ namespace DOL.GS.ServerRules
         /// <summary>
         /// Regions unsafe for players with safety flag
         /// </summary>
-        protected int[] m_unsafeRegions =
+        private int[] _unsafeRegions =
         {
             163, // new frontiers
         };
@@ -164,20 +162,18 @@ namespace DOL.GS.ServerRules
             }
 
             // if controlled NPC - do checks for owner instead
-            if (attacker is GameNPC)
+            if (attacker is GameNPC npc)
             {
-                IControlledBrain controlled = ((GameNPC)attacker).Brain as IControlledBrain;
-                if (controlled != null)
+                if (npc.Brain is IControlledBrain controlled)
                 {
                     attacker = controlled.GetLivingOwner();
                     quiet = true; // silence all attacks by controlled npc
                 }
             }
 
-            if (defender is GameNPC)
+            if (defender is GameNPC gameNpc)
             {
-                IControlledBrain controlled = ((GameNPC)defender).Brain as IControlledBrain;
-                if (controlled != null)
+                if (gameNpc.Brain is IControlledBrain controlled)
                 {
                     defender = controlled.GetLivingOwner();
                 }
@@ -195,9 +191,8 @@ namespace DOL.GS.ServerRules
             }
 
             // ogre: sometimes other players shouldn't be attackable
-            GamePlayer playerAttacker = attacker as GamePlayer;
-            GamePlayer playerDefender = defender as GamePlayer;
-            if (playerAttacker != null && playerDefender != null)
+            GamePlayer playerAttacker = (GamePlayer) attacker;
+            if (playerAttacker != null && defender is GamePlayer playerDefender)
             {
                 // check group
                 if (playerAttacker.Group != null && playerAttacker.Group.IsInTheGroup(playerDefender))
@@ -237,9 +232,9 @@ namespace DOL.GS.ServerRules
                     }
 
                     // Safe regions
-                    if (m_safeRegions != null)
+                    if (_safeRegions != null)
                     {
-                        foreach (int reg in m_safeRegions)
+                        foreach (int reg in _safeRegions)
                         {
                             if (playerAttacker.CurrentRegionID == reg)
                             {
@@ -254,7 +249,7 @@ namespace DOL.GS.ServerRules
                     }
 
                     // Players with safety flag can not attack other players
-                    if (playerAttacker.Level < m_safetyLevel && playerAttacker.SafetyFlag)
+                    if (playerAttacker.Level < _safetyLevel && playerAttacker.SafetyFlag)
                     {
                         if (quiet == false)
                         {
@@ -265,10 +260,10 @@ namespace DOL.GS.ServerRules
                     }
 
                     // Players with safety flag can not be attacked in safe regions
-                    if (playerDefender.Level < m_safetyLevel && playerDefender.SafetyFlag)
+                    if (playerDefender.Level < _safetyLevel && playerDefender.SafetyFlag)
                     {
                         bool unsafeRegion = false;
-                        foreach (int regionID in m_unsafeRegions)
+                        foreach (int regionID in _unsafeRegions)
                         {
                             if (regionID == playerDefender.CurrentRegionID)
                             {
@@ -282,7 +277,7 @@ namespace DOL.GS.ServerRules
                             // "PLAYER has his safety flag on and is in a safe area, you can't attack him here."
                             if (quiet == false)
                             {
-                                MessageToLiving(attacker, playerDefender.Name + " has " + playerDefender.GetPronoun(1, false) + " safety flag on and is in a safe area, you can't attack " + playerDefender.GetPronoun(2, false) + " here.");
+                                MessageToLiving(attacker, $"{playerDefender.Name} has {playerDefender.GetPronoun(1, false)} safety flag on and is in a safe area, you can\'t attack {playerDefender.GetPronoun(2, false)} here.");
                             }
 
                             return false;
@@ -373,8 +368,7 @@ namespace DOL.GS.ServerRules
                 return false;
             }
 
-            GamePlayer casterPlayer = caster as GamePlayer;
-            if (casterPlayer != null)
+            if (caster is GamePlayer casterPlayer)
             {
                 if (casterPlayer.IsInvulnerableToAttack)
                 {
@@ -386,7 +380,7 @@ namespace DOL.GS.ServerRules
 
                     // only caster can be the target, can't buff/heal other players
                     // PBAE/GTAE doesn't need a target so we check spell type as well
-                    if (caster != target || spell.Target == "Area" || spell.Target == "Enemy" || (spell.Target == "Group" && spell.SpellType != "SpeedEnhancement"))
+                    if (caster != target || spell.Target == "Area" || spell.Target == "Enemy" || spell.Target == "Group" && spell.SpellType != "SpeedEnhancement")
                     {
                         MessageToLiving(caster, "You can only cast spells on yourself until your PvP invulnerability timer wears off!", eChatType.CT_Important);
                         return false;
@@ -405,20 +399,18 @@ namespace DOL.GS.ServerRules
             }
 
             // if controlled NPC - do checks for owner instead
-            if (source is GameNPC)
+            if (source is GameNPC npc)
             {
-                IControlledBrain controlled = ((GameNPC)source).Brain as IControlledBrain;
-                if (controlled != null)
+                if (npc.Brain is IControlledBrain controlled)
                 {
                     source = controlled.GetLivingOwner();
                     quiet = true; // silence all attacks by controlled npc
                 }
             }
 
-            if (target is GameNPC)
+            if (target is GameNPC gameNpc)
             {
-                IControlledBrain controlled = ((GameNPC)target).Brain as IControlledBrain;
-                if (controlled != null)
+                if (gameNpc.Brain is IControlledBrain controlled)
                 {
                     target = controlled.GetLivingOwner();
                 }
@@ -430,13 +422,13 @@ namespace DOL.GS.ServerRules
             }
 
             // clients with priv level > 1 are considered friendly by anyone
-            if (target is GamePlayer && ((GamePlayer)target).Client.Account.PrivLevel > 1)
+            if (target is GamePlayer player && player.Client.Account.PrivLevel > 1)
             {
                 return true;
             }
 
             // checking as a gm, targets are considered friendly
-            if (source is GamePlayer && ((GamePlayer)source).Client.Account.PrivLevel > 1)
+            if (source is GamePlayer gamePlayer && gamePlayer.Client.Account.PrivLevel > 1)
             {
                 return true;
             }
@@ -482,17 +474,17 @@ namespace DOL.GS.ServerRules
             }
 
             // Peace flag NPCs are same realm
-            if (target is GameNPC)
+            if (target is GameNPC npc1)
             {
-                if ((((GameNPC)target).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((npc1.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return true;
                 }
             }
 
-            if (source is GameNPC)
+            if (source is GameNPC gameNpc1)
             {
-                if ((((GameNPC)source).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((gameNpc1.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return true;
                 }
@@ -567,7 +559,7 @@ namespace DOL.GS.ServerRules
         {
             var stat = new List<string>();
 
-            int total = 0;
+            int total;
             #region Players Killed
 
             // only show if there is a kill [by Suncheck]
@@ -576,21 +568,21 @@ namespace DOL.GS.ServerRules
                 stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.Title"));
                 if (player.KillsAlbionPlayers > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.AlbionPlayer") + ": " + player.KillsAlbionPlayers.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.AlbionPlayer")}: {player.KillsAlbionPlayers:N0}");
                 }
 
                 if (player.KillsMidgardPlayers > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.MidgardPlayer") + ": " + player.KillsMidgardPlayers.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.MidgardPlayer")}: {player.KillsMidgardPlayers:N0}");
                 }
 
                 if (player.KillsHiberniaPlayers > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.HiberniaPlayer") + ": " + player.KillsHiberniaPlayers.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.HiberniaPlayer")}: {player.KillsHiberniaPlayers:N0}");
                 }
 
                 total = player.KillsMidgardPlayers + player.KillsAlbionPlayers + player.KillsHiberniaPlayers;
-                stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.TotalPlayers") + ": " + total.ToString("N0"));
+                stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.TotalPlayers")}: {total:N0}");
             }
             #endregion
             stat.Add(" ");
@@ -599,24 +591,23 @@ namespace DOL.GS.ServerRules
             // only show if there is a kill [by Suncheck]
             if ((player.KillsAlbionDeathBlows + player.KillsMidgardDeathBlows + player.KillsHiberniaDeathBlows) > 0)
             {
-                total = 0;
                 if (player.KillsAlbionDeathBlows > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.AlbionPlayer") + ": " + player.KillsAlbionDeathBlows.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.AlbionPlayer")}: {player.KillsAlbionDeathBlows:N0}");
                 }
 
                 if (player.KillsMidgardDeathBlows > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.MidgardPlayer") + ": " + player.KillsMidgardDeathBlows.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.MidgardPlayer")}: {player.KillsMidgardDeathBlows:N0}");
                 }
 
                 if (player.KillsHiberniaDeathBlows > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.HiberniaPlayer") + ": " + player.KillsHiberniaDeathBlows.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.HiberniaPlayer")}: {player.KillsHiberniaDeathBlows:N0}");
                 }
 
                 total = player.KillsMidgardDeathBlows + player.KillsAlbionDeathBlows + player.KillsHiberniaDeathBlows;
-                stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.TotalPlayers") + ": " + total.ToString("N0"));
+                stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.TotalPlayers")}: {total:N0}");
             }
             #endregion
             stat.Add(" ");
@@ -628,21 +619,21 @@ namespace DOL.GS.ServerRules
                 total = 0;
                 if (player.KillsAlbionSolo > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.AlbionPlayer") + ": " + player.KillsAlbionSolo.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.AlbionPlayer")}: {player.KillsAlbionSolo:N0}");
                 }
 
                 if (player.KillsMidgardSolo > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.MidgardPlayer") + ": " + player.KillsMidgardSolo.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.MidgardPlayer")}: {player.KillsMidgardSolo:N0}");
                 }
 
                 if (player.KillsHiberniaSolo > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.HiberniaPlayer") + ": " + player.KillsHiberniaSolo.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.HiberniaPlayer")}: {player.KillsHiberniaSolo:N0}");
                 }
 
                 total = player.KillsMidgardSolo + player.KillsAlbionSolo + player.KillsHiberniaSolo;
-                stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.TotalPlayers") + ": " + total.ToString("N0"));
+                stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.TotalPlayers")}: {total:N0}");
             }
             #endregion
             stat.Add(" ");
@@ -652,30 +643,16 @@ namespace DOL.GS.ServerRules
             if ((player.CapturedKeeps + player.CapturedTowers) > 0)
             {
                 stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Title"));
-
-                // stat.Add("Relics Taken: " + player.RelicsTaken.ToString("N0"));
-                // stat.Add("Albion Keeps Captured: " + player.CapturedAlbionKeeps.ToString("N0"));
-                // stat.Add("Midgard Keeps Captured: " + player.CapturedMidgardKeeps.ToString("N0"));
-                // stat.Add("Hibernia Keeps Captured: " + player.CapturedHiberniaKeeps.ToString("N0"));
+                
                 if (player.CapturedKeeps > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Keeps") + ": " + player.CapturedKeeps.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Keeps")}: {player.CapturedKeeps:N0}");
                 }
-
-                // stat.Add("Keep Lords Slain: " + player.KeepLordsSlain.ToString("N0"));
-                // stat.Add("Albion Towers Captured: " + player.CapturedAlbionTowers.ToString("N0"));
-                // stat.Add("Midgard Towers Captured: " + player.CapturedMidgardTowers.ToString("N0"));
-                // stat.Add("Hibernia Towers Captured: " + player.CapturedHiberniaTowers.ToString("N0"));
+                
                 if (player.CapturedTowers > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Towers") + ": " + player.CapturedTowers.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Towers")}: {player.CapturedTowers:N0}");
                 }
-
-                // stat.Add("Tower Captains Slain: " + player.TowerCaptainsSlain.ToString("N0"));
-                // stat.Add("Realm Guard Kills Albion: " + player.RealmGuardTotalKills.ToString("N0"));
-                // stat.Add("Realm Guard Kills Midgard: " + player.RealmGuardTotalKills.ToString("N0"));
-                // stat.Add("Realm Guard Kills Hibernia: " + player.RealmGuardTotalKills.ToString("N0"));
-                // stat.Add("Total Realm Guard Kills: " + player.RealmGuardTotalKills.ToString("N0"));
             }
             #endregion
             stat.Add(" ");
@@ -687,17 +664,17 @@ namespace DOL.GS.ServerRules
                 stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.Title"));
                 if (player.KillsDragon > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsDragon") + ": " + player.KillsDragon.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsDragon")}: {player.KillsDragon:N0}");
                 }
 
                 if (player.KillsEpicBoss > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsEpic") + ": " + player.KillsEpicBoss.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsEpic")}: {player.KillsEpicBoss:N0}");
                 }
 
                 if (player.KillsLegion > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsLegion") + ": " + player.KillsLegion.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsLegion")}: {player.KillsLegion:N0}");
                 }
             }
             #endregion
@@ -716,35 +693,21 @@ namespace DOL.GS.ServerRules
             eRealm realm = eRealm.None;
 
             // pvp servers, the realm changes to the group leaders realm
-            if (killer is GamePlayer)
+            if (killer is GamePlayer gamePlayer)
             {
-                Group group = (killer as GamePlayer).Group;
-                if (group != null)
-                {
-                    realm = (eRealm)group.Leader.Realm;
-                }
-                else
-                {
-                    realm = (eRealm)killer.Realm;
-                }
+                Group group = gamePlayer.Group;
+                realm = group?.Leader.Realm ?? killer.Realm;
             }
-            else if (killer is GameNPC && (killer as GameNPC).Brain is IControlledBrain)
+            else if ((killer as GameNPC)?.Brain is IControlledBrain)
             {
-                GamePlayer player = ((killer as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
+                GamePlayer player = (((GameNPC) killer).Brain as IControlledBrain)?.GetPlayerOwner();
                 Group group = null;
                 if (player != null)
                 {
                     group = player.Group;
                 }
 
-                if (group != null)
-                {
-                    realm = (eRealm)group.Leader.Realm;
-                }
-                else
-                {
-                    realm = (eRealm)killer.Realm;
-                }
+                realm = group?.Leader.Realm ?? killer.Realm;
             }
 
             lord.Component.AbstractKeep.Reset(realm);

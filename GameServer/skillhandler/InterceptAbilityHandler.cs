@@ -43,7 +43,7 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Intercept reuse timer in milliseconds
         /// </summary>
-        public const int REUSE_TIMER = 60 * 1000;
+        private const int ReuseTimer = 60 * 1000;
 
         /// <summary>
         /// Executes the ability
@@ -82,8 +82,7 @@ namespace DOL.GS.SkillHandler
             // Only attacks on other players may be intercepted.
             // You cannot intercept attacks on yourself
             Group group = player.Group;
-            GamePlayer interceptTarget = targetObject as GamePlayer;
-            if (interceptTarget == null || group == null || !group.IsInTheGroup(interceptTarget) || interceptTarget == player)
+            if (!(targetObject is GamePlayer interceptTarget) || group == null || !group.IsInTheGroup(interceptTarget) || interceptTarget == player)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.Intercept.CannotUse.NotInGroup"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
@@ -115,7 +114,7 @@ namespace DOL.GS.SkillHandler
                 intercept.Cancel(false);
             }
 
-            player.DisableSkill(ab, REUSE_TIMER);
+            player.DisableSkill(ab, ReuseTimer);
 
             new InterceptEffect().Start(player, interceptTarget);
         }

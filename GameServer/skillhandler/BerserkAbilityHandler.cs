@@ -33,17 +33,12 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The reuse time in milliseconds for berserk ability
         /// </summary>
-        protected const int REUSE_TIMER = 60000 * 7; // 7 minutes
-
-        /// <summary>
-        /// The effect duration in milliseconds
-        /// </summary>
-        public const int DURATION = 20000;
+        private const int ReuseTimer = 60000 * 7; // 7 minutes
 
         /// <summary>
         /// Execute the ability
@@ -54,9 +49,9 @@ namespace DOL.GS.SkillHandler
         {
             if (player == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("Could not retrieve player in BerserkAbilityHandler.");
+                    Log.Warn("Could not retrieve player in BerserkAbilityHandler.");
                 }
 
                 return;
@@ -94,7 +89,7 @@ namespace DOL.GS.SkillHandler
                 return;
             }
 
-            player.DisableSkill(ab, REUSE_TIMER);
+            player.DisableSkill(ab, ReuseTimer);
 
             new BerserkEffect().Start(player);
         }

@@ -5,52 +5,19 @@ namespace DOL.GS.SkillHandler
 {
     public class SpellCastingAbilityHandler : IAbilityActionHandler, ISpellCastingAbilityHandler
     {
-        protected Ability m_ability = null;
+        public Ability Ability { get; protected set; }
 
-        public Ability Ability
-        {
-            get { return m_ability; }
-        }
+        public virtual int SpellID => 0;
 
-        public virtual int SpellID
-        {
-            get { return 0; }
-        }
+        public virtual long Preconditions => 0;
 
-        public virtual long Preconditions
-        {
-            get { return 0; }
-        }
+        private Spell _spell;
 
-        protected Spell m_spell = null;
+        public virtual Spell Spell => _spell ?? (_spell = SkillBase.GetSpellByID(SpellID));
 
-        public virtual Spell Spell
-        {
-            get
-            {
-                if (m_spell == null)
-                {
-                    m_spell = SkillBase.GetSpellByID(SpellID);
-                }
+        private SpellLine _spellLine;
 
-                return m_spell;
-            }
-        }
-
-        protected SpellLine m_spellLine = null;
-
-        public virtual SpellLine SpellLine
-        {
-            get
-            {
-                if (m_spellLine == null)
-                {
-                    m_spellLine = SkillBase.GetSpellLine(GlobalSpellsLines.Character_Abilities);
-                }
-
-                return m_spellLine;
-            }
-        }
+        public virtual SpellLine SpellLine => _spellLine ?? (_spellLine = SkillBase.GetSpellLine(GlobalSpellsLines.Character_Abilities));
 
         public void Execute(Ability ab, GamePlayer player)
         {
@@ -59,7 +26,7 @@ namespace DOL.GS.SkillHandler
                 return;
             }
 
-            m_ability = ab;
+            Ability = ab;
 
             if (CheckPreconditions(player, Preconditions))
             {
@@ -84,70 +51,49 @@ namespace DOL.GS.SkillHandler
             GamePlayer player = living as GamePlayer;
             if ((bitmask & DEAD) != 0 && !living.IsAlive)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseDead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseDead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return true;
             }
 
             if ((bitmask & MEZZED) != 0 && living.IsMezzed)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseMezzed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseMezzed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return true;
             }
 
             if ((bitmask & STUNNED) != 0 && living.IsStunned)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseStunned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseStunned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return true;
             }
 
             if ((bitmask & SITTING) != 0 && living.IsSitting)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseStanding"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseStanding"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return true;
             }
 
             if ((bitmask & INCOMBAT) != 0 && living.InCombat)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseInCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseInCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return true;
             }
 
             if ((bitmask & NOTINCOMBAT) != 0 && !living.InCombat)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseInCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseInCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return true;
             }
 
             if ((bitmask & STEALTHED) != 0 && living.IsStealthed)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseWhileStealthed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
+                player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseWhileStealthed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return true;
             }

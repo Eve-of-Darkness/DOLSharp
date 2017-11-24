@@ -17,7 +17,6 @@
  *
  */
 using System;
-
 using DOL.Database;
 using DOL.Events;
 
@@ -67,7 +66,7 @@ namespace DOL.GS.ServerRules
         [ScriptLoadedEvent]
         public static void OnScriptLoaded(DOLEvent e, object sender, EventArgs args)
         {
-            CheckDFOwner();
+            CheckDfOwner();
             GameEventMgr.AddHandler(KeepEvent.KeepTaken,new DOLEventHandler(OnKeepTaken));
         }
 
@@ -76,7 +75,7 @@ namespace DOL.GS.ServerRules
         /// to know the DF owner
         /// </summary>
 
-        private static void CheckDFOwner()
+        private static void CheckDfOwner()
         {
             int albcount = GameServer.KeepManager.GetTowerCountByRealm(eRealm.Albion);
             int midcount = GameServer.KeepManager.GetTowerCountByRealm(eRealm.Midgard);
@@ -106,16 +105,22 @@ namespace DOL.GS.ServerRules
         /// <param name="arguments"></param>
         public static void OnKeepTaken(DOLEvent e, object sender, EventArgs arguments)
         {
-            KeepEventArgs args = arguments as KeepEventArgs;
-            eRealm realm = (eRealm)args.Keep.Realm ;
-            if (realm != DarknessFallOwner)
+            if (!(arguments is KeepEventArgs args))
             {
-                int currentDFOwnerTowerCount = GameServer.KeepManager.GetTowerCountByRealm(DarknessFallOwner);
-                int challengerOwnerTowerCount = GameServer.KeepManager.GetTowerCountByRealm(realm);
-                if (currentDFOwnerTowerCount < challengerOwnerTowerCount)
-                {
-                    DarknessFallOwner = realm;
-                }
+                return;
+            }
+
+            eRealm realm = args.Keep.Realm;
+            if (realm == DarknessFallOwner)
+            {
+                return;
+            }
+
+            int currentDfOwnerTowerCount = GameServer.KeepManager.GetTowerCountByRealm(DarknessFallOwner);
+            int challengerOwnerTowerCount = GameServer.KeepManager.GetTowerCountByRealm(realm);
+            if (currentDfOwnerTowerCount < challengerOwnerTowerCount)
+            {
+                DarknessFallOwner = realm;
             }
         }
     }

@@ -65,7 +65,7 @@ namespace DOL.GS.SkillHandler
                 }
 
                 // Can't stealth if in attack mode
-                if (player.AttackState || (player.CurrentSpellHandler != null && player.CurrentSpellHandler.IsCasting))
+                if (player.AttackState || player.CurrentSpellHandler != null && player.CurrentSpellHandler.IsCasting)
                 {
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.Stealth.CannotUseCombatState"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;
@@ -172,20 +172,19 @@ namespace DOL.GS.SkillHandler
             attackers.AddRange(player.Attackers);
             foreach (GameLiving attacker in attackers)
             {
-                if (attacker.TargetObject == (GameLiving)player)
+                if (attacker.TargetObject == player)
                 {
                     attacker.TargetObject = null;
-                    if (attacker is GamePlayer)
+                    if (attacker is GamePlayer gamePlayer)
                     {
-                        ((GamePlayer)attacker).Out.SendChangeTarget(attacker.TargetObject);
+                        gamePlayer.Out.SendChangeTarget(attacker.TargetObject);
                     }
 
-                    if (attacker is GameNPC)
+                    if (attacker is GameNPC npc)
                     {
-                        GameNPC npc = (GameNPC)attacker;
-                        if (npc.Brain is IOldAggressiveBrain)
+                        if (npc.Brain is IOldAggressiveBrain brain)
                         {
-                            ((IOldAggressiveBrain)npc.Brain).RemoveFromAggroList(player);
+                            brain.RemoveFromAggroList(player);
                         }
 
                         attacker.StopAttack();

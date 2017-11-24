@@ -20,7 +20,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Events;
@@ -38,7 +37,7 @@ namespace DOL.GS.ServerRules
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// This is called after the rules are created to do any event binding or other tasks
@@ -51,7 +50,7 @@ namespace DOL.GS.ServerRules
             GameEventMgr.AddHandler(GamePlayerEvent.GameEntered, new DOLEventHandler(OnGameEntered));
             GameEventMgr.AddHandler(GamePlayerEvent.RegionChanged, new DOLEventHandler(OnRegionChanged));
             GameEventMgr.AddHandler(GamePlayerEvent.Released, new DOLEventHandler(OnReleased));
-            m_invExpiredCallback = new GamePlayer.InvulnerabilityExpiredCallback(ImmunityExpiredCallback);
+            _invExpiredCallback = new GamePlayer.InvulnerabilityExpiredCallback(ImmunityExpiredCallback);
         }
 
         /// <summary>
@@ -79,7 +78,7 @@ namespace DOL.GS.ServerRules
             {
                 client.IsConnected = false;
                 client.Out.SendLoginDenied(eLoginError.AccountIsBannedFromThisServerType);
-                log.Debug("IsAllowedToConnect deny access to username " + username);
+                Log.Debug("IsAllowedToConnect deny access to username " + username);
                 return false;
             }
 
@@ -90,7 +89,7 @@ namespace DOL.GS.ServerRules
             {
                 client.IsConnected = false;
                 client.Out.SendLoginDenied(eLoginError.AccountIsBannedFromThisServerType);
-                log.Debug("IsAllowedToConnect deny access to IP " + accip);
+                Log.Debug($"IsAllowedToConnect deny access to IP {accip}");
                 return false;
             }
 
@@ -99,7 +98,7 @@ namespace DOL.GS.ServerRules
             {
                 client.IsConnected = false;
                 client.Out.SendLoginDenied(eLoginError.ClientVersionTooLow);
-                log.Debug("IsAllowedToConnect deny access to client version (too low) " + client.Version);
+                Log.Debug($"IsAllowedToConnect deny access to client version (too low) {client.Version}");
                 return false;
             }
 
@@ -108,7 +107,7 @@ namespace DOL.GS.ServerRules
             {
                 client.IsConnected = false;
                 client.Out.SendLoginDenied(eLoginError.NotAuthorizedToUseExpansionVersion);
-                log.Debug("IsAllowedToConnect deny access to client version (too high) " + client.Version);
+                Log.Debug($"IsAllowedToConnect deny access to client version (too high) {client.Version}");
                 return false;
             }
 
@@ -119,7 +118,7 @@ namespace DOL.GS.ServerRules
                 {
                     client.IsConnected = false;
                     client.Out.SendLoginDenied(eLoginError.ExpansionPacketNotAllowed);
-                    log.Debug("IsAllowedToConnect deny access to expansion pack.");
+                    Log.Debug("IsAllowedToConnect deny access to expansion pack.");
                     return false;
                 }
             }
@@ -160,7 +159,7 @@ namespace DOL.GS.ServerRules
                         // Normal Players will not be allowed over the max
                         client.IsConnected = false;
                         client.Out.SendLoginDenied(eLoginError.TooManyPlayersLoggedIn);
-                        log.Debug("IsAllowedToConnect deny access due to too many players.");
+                        Log.Debug("IsAllowedToConnect deny access due to too many players.");
                         return false;
                     }
                 }
@@ -174,7 +173,7 @@ namespace DOL.GS.ServerRules
                     // Normal Players will not be allowed to Log in
                     client.IsConnected = false;
                     client.Out.SendLoginDenied(eLoginError.GameCurrentlyClosed);
-                    log.Debug("IsAllowedToConnect deny access; staff only login");
+                    Log.Debug("IsAllowedToConnect deny access; staff only login");
                     return false;
                 }
             }
@@ -199,7 +198,7 @@ namespace DOL.GS.ServerRules
 
                             client.IsConnected = false;
                             client.Out.SendLoginDenied(eLoginError.AccountAlreadyLoggedIntoOtherServer);
-                            log.Debug("IsAllowedToConnect deny access; dual login not allowed");
+                            Log.Debug("IsAllowedToConnect deny access; dual login not allowed");
                             return false;
                         }
                     }
@@ -217,7 +216,7 @@ namespace DOL.GS.ServerRules
         /// <param name="args"></param>
         public virtual void OnGameEntered(DOLEvent e, object sender, EventArgs args)
         {
-            StartImmunityTimer((GamePlayer)sender, ServerProperties.Properties.TIMER_GAME_ENTERED * 1000);
+            StartImmunityTimer((GamePlayer)sender, Properties.TIMER_GAME_ENTERED * 1000);
         }
 
         /// <summary>
@@ -228,7 +227,7 @@ namespace DOL.GS.ServerRules
         /// <param name="args"></param>
         public virtual void OnRegionChanged(DOLEvent e, object sender, EventArgs args)
         {
-            StartImmunityTimer((GamePlayer)sender, ServerProperties.Properties.TIMER_REGION_CHANGED * 1000);
+            StartImmunityTimer((GamePlayer)sender, Properties.TIMER_REGION_CHANGED * 1000);
         }
 
         /// <summary>
@@ -240,7 +239,7 @@ namespace DOL.GS.ServerRules
         public virtual void OnReleased(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = (GamePlayer)sender;
-            StartImmunityTimer(player, ServerProperties.Properties.TIMER_KILLED_BY_MOB * 1000);// When Killed by a Mob
+            StartImmunityTimer(player, Properties.TIMER_KILLED_BY_MOB * 1000);// When Killed by a Mob
         }
 
         /// <summary>
@@ -263,14 +262,14 @@ namespace DOL.GS.ServerRules
         {
             if (duration > 0)
             {
-                player.StartInvulnerabilityTimer(duration, m_invExpiredCallback);
+                player.StartInvulnerabilityTimer(duration, _invExpiredCallback);
             }
         }
 
         /// <summary>
         /// Holds the delegate called when PvP invulnerability is expired
         /// </summary>
-        protected GamePlayer.InvulnerabilityExpiredCallback m_invExpiredCallback;
+        private GamePlayer.InvulnerabilityExpiredCallback _invExpiredCallback;
 
         /// <summary>
         /// Removes immunity from the players
@@ -289,8 +288,6 @@ namespace DOL.GS.ServerRules
             }
 
             player.Out.SendMessage("Your temporary invulnerability timer has expired.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-
-            return;
         }
 
         public abstract bool IsSameRealm(GameLiving source, GameLiving target, bool quiet);
@@ -341,27 +338,21 @@ namespace DOL.GS.ServerRules
             GamePlayer playerDefender = defender as GamePlayer;
 
             // if Pet, let's define the controller once
-            if (defender is GameNPC)
+            if ((defender as GameNPC)?.Brain is IControlledBrain)
             {
-                if ((defender as GameNPC).Brain is IControlledBrain)
-                {
-                    playerDefender = ((defender as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
-                }
+                playerDefender = (((GameNPC) defender).Brain as IControlledBrain)?.GetPlayerOwner();
             }
 
-            if (attacker is GameNPC)
+            if ((attacker as GameNPC)?.Brain is IControlledBrain)
             {
-                if ((attacker as GameNPC).Brain is IControlledBrain)
-                {
-                    playerAttacker = ((attacker as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
-                }
+                playerAttacker = (((GameNPC) attacker).Brain as IControlledBrain)?.GetPlayerOwner();
             }
 
             if (playerDefender != null && (playerDefender.Client.ClientState == GameClient.eClientState.WorldEnter || playerDefender.IsInvulnerableToAttack))
             {
                 if (!quiet)
                 {
-                    MessageToLiving(attacker, defender.Name + " is entering the game and is temporarily immune to PvP attacks!");
+                    MessageToLiving(attacker, $"{defender.Name} is entering the game and is temporarily immune to PvP attacks!");
                 }
 
                 return false;
@@ -385,7 +376,7 @@ namespace DOL.GS.ServerRules
                 {
                     if (quiet == false)
                     {
-                        MessageToLiving(attacker, defender.Name + " is temporarily immune to PvP attacks!");
+                        MessageToLiving(attacker, $"{defender.Name} is temporarily immune to PvP attacks!");
                     }
 
                     return false;
@@ -393,26 +384,26 @@ namespace DOL.GS.ServerRules
             }
 
             // PEACE NPCs can't be attacked/attack
-            if (attacker is GameNPC)
+            if (attacker is GameNPC npc)
             {
-                if ((((GameNPC)attacker).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((npc.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return false;
                 }
             }
 
-            if (defender is GameNPC)
+            if (defender is GameNPC gameNpc)
             {
-                if ((((GameNPC)defender).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((gameNpc.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return false;
                 }
             }
 
             // Players can't attack mobs while they have immunity
-            if (playerAttacker != null && defender != null)
+            if (playerAttacker != null)
             {
-                if ((defender is GameNPC) && playerAttacker.IsInvulnerableToAttack)
+                if (defender is GameNPC && playerAttacker.IsInvulnerableToAttack)
                 {
                     if (quiet == false)
                     {
@@ -426,9 +417,7 @@ namespace DOL.GS.ServerRules
             // Your pet can only attack stealthed players you have selected
             if (defender.IsStealthed && attacker is GameNPC)
             {
-                if (((attacker as GameNPC).Brain is IControlledBrain) &&
-                    defender is GamePlayer &&
-                    playerAttacker.TargetObject != defender)
+                if (((GameNPC) attacker).Brain is IControlledBrain && defender is GamePlayer && playerAttacker.TargetObject != defender)
                 {
                     return false;
                 }
@@ -462,7 +451,7 @@ namespace DOL.GS.ServerRules
             // safe area support for attacker
             foreach (AbstractArea area in attacker.CurrentAreas)
             {
-                if (area.IsSafeArea && (defender is GamePlayer) && (attacker is GamePlayer))
+                if (area.IsSafeArea && defender is GamePlayer && attacker is GamePlayer)
                 {
                     if (quiet == false)
                     {
@@ -480,20 +469,14 @@ namespace DOL.GS.ServerRules
             }
 
             // Checking for shadowed necromancer, can't be attacked.
-            if (defender.ControlledBrain != null)
+            if (defender.ControlledBrain?.Body is NecromancerPet)
             {
-                if (defender.ControlledBrain.Body != null)
+                if (quiet == false)
                 {
-                    if (defender.ControlledBrain.Body is NecromancerPet)
-                    {
-                        if (quiet == false)
-                        {
-                            MessageToLiving(attacker, "You can't attack a shadowed necromancer!");
-                        }
-
-                        return false;
-                    }
+                    MessageToLiving(attacker, "You can't attack a shadowed necromancer!");
                 }
+
+                return false;
             }
 
             return true;
@@ -555,9 +538,9 @@ namespace DOL.GS.ServerRules
                         break;
                 }
 
-                if (!isAllowed && caster is GamePlayer)
+                if (!isAllowed)
                 {
-                    (caster as GamePlayer).Client.Out.SendMessage("You can't cast this spell on the " + target.Name, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    (caster as GamePlayer)?.Client.Out.SendMessage($"You can\'t cast this spell on the {target.Name}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
 
                 return isAllowed;
@@ -570,7 +553,7 @@ namespace DOL.GS.ServerRules
         {
             if (source.IsAlive == false)
             {
-                MessageToLiving(source, "Hmmmm...you can't " + communicationType + " while dead!");
+                MessageToLiving(source, $"Hmmmm...you can\'t {communicationType} while dead!");
                 return false;
             }
 
@@ -674,9 +657,9 @@ namespace DOL.GS.ServerRules
             // zones checks:
             // white list: always allows
             string currentRegion = player.CurrentRegion.ID.ToString();
-            if (ServerProperties.Properties.ALLOW_PERSONNAL_MOUNT_IN_REGIONS.Contains(currentRegion))
+            if (Properties.ALLOW_PERSONNAL_MOUNT_IN_REGIONS.Contains(currentRegion))
             {
-                var regions = ServerProperties.Properties.ALLOW_PERSONNAL_MOUNT_IN_REGIONS.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var regions = Properties.ALLOW_PERSONNAL_MOUNT_IN_REGIONS.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var region in regions)
                 {
                     if (region == currentRegion)
@@ -721,7 +704,7 @@ namespace DOL.GS.ServerRules
 
         public virtual long GetExperienceForLiving(int level)
         {
-            level = (level < 0) ? 0 : level;
+            level = level < 0 ? 0 : level;
 
             // use exp table
             if (level < GameLiving.XPForLiving.Length)
@@ -797,7 +780,7 @@ namespace DOL.GS.ServerRules
             }
 
             // on some servers we may wish for dropped items to be used by all realms regardless of what is set in the db
-            if (!ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+            if (!Properties.ALLOW_CROSS_REALM_ITEMS)
             {
                 if (item.Realm != 0 && item.Realm != (int)living.Realm)
                 {
@@ -819,23 +802,34 @@ namespace DOL.GS.ServerRules
             {
                 int armorAbility = -1;
 
-                if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && item.Item_Type != (int)eEquipmentItems.HEAD)
+                if (Properties.ALLOW_CROSS_REALM_ITEMS && item.Item_Type != (int)eEquipmentItems.HEAD)
                 {
                     switch (player.Realm) // Choose based on player rather than item region
                     {
-                        case eRealm.Albion: armorAbility = living.GetAbilityLevel(Abilities.AlbArmor); break;
-                        case eRealm.Hibernia: armorAbility = living.GetAbilityLevel(Abilities.HibArmor); break;
-                        case eRealm.Midgard: armorAbility = living.GetAbilityLevel(Abilities.MidArmor); break;
-                        default: break;
+                        case eRealm.Albion:
+                            armorAbility = living.GetAbilityLevel(Abilities.AlbArmor);
+                            break;
+                        case eRealm.Hibernia:
+                            armorAbility = living.GetAbilityLevel(Abilities.HibArmor);
+                            break;
+                        case eRealm.Midgard:
+                            armorAbility = living.GetAbilityLevel(Abilities.MidArmor);
+                            break;
                     }
                 }
                 else
                 {
-                    switch ((eRealm)item.Realm)
+                    switch ((eRealm) item.Realm)
                     {
-                        case eRealm.Albion: armorAbility = living.GetAbilityLevel(Abilities.AlbArmor); break;
-                        case eRealm.Hibernia: armorAbility = living.GetAbilityLevel(Abilities.HibArmor); break;
-                        case eRealm.Midgard: armorAbility = living.GetAbilityLevel(Abilities.MidArmor); break;
+                        case eRealm.Albion:
+                            armorAbility = living.GetAbilityLevel(Abilities.AlbArmor);
+                            break;
+                        case eRealm.Hibernia:
+                            armorAbility = living.GetAbilityLevel(Abilities.HibArmor);
+                            break;
+                        case eRealm.Midgard:
+                            armorAbility = living.GetAbilityLevel(Abilities.MidArmor);
+                            break;
                         default: // use old system
                             armorAbility = Math.Max(armorAbility, living.GetAbilityLevel(Abilities.AlbArmor));
                             armorAbility = Math.Max(armorAbility, living.GetAbilityLevel(Abilities.HibArmor));
@@ -844,17 +838,24 @@ namespace DOL.GS.ServerRules
                     }
                 }
 
-                switch ((eObjectType)item.Object_Type)
+                switch ((eObjectType) item.Object_Type)
                 {
-                    case eObjectType.GenericArmor: return armorAbility >= ArmorLevel.GenericArmor;
-                    case eObjectType.Cloth: return armorAbility >= ArmorLevel.Cloth;
-                    case eObjectType.Leather: return armorAbility >= ArmorLevel.Leather;
+                    case eObjectType.GenericArmor:
+                        return armorAbility >= ArmorLevel.GenericArmor;
+                    case eObjectType.Cloth:
+                        return armorAbility >= ArmorLevel.Cloth;
+                    case eObjectType.Leather:
+                        return armorAbility >= ArmorLevel.Leather;
                     case eObjectType.Reinforced:
-                    case eObjectType.Studded: return armorAbility >= ArmorLevel.Studded;
+                    case eObjectType.Studded:
+                        return armorAbility >= ArmorLevel.Studded;
                     case eObjectType.Scale:
-                    case eObjectType.Chain: return armorAbility >= ArmorLevel.Chain;
-                    case eObjectType.Plate: return armorAbility >= ArmorLevel.Plate;
-                    default: return false;
+                    case eObjectType.Chain:
+                        return armorAbility >= ArmorLevel.Chain;
+                    case eObjectType.Plate:
+                        return armorAbility >= ArmorLevel.Plate;
+                    default:
+                        return false;
                 }
             }
 
@@ -863,26 +864,39 @@ namespace DOL.GS.ServerRules
             string[] otherCheck = new string[0];
 
             // http://dol.kitchenhost.de/files/dol/Info/itemtable.txt
-            switch ((eObjectType)item.Object_Type)
+            switch ((eObjectType) item.Object_Type)
             {
                 case eObjectType.GenericItem: return true;
                 case eObjectType.GenericArmor: return true;
                 case eObjectType.GenericWeapon: return true;
-                case eObjectType.Staff: abilityCheck = Abilities.Weapon_Staves; break;
-                case eObjectType.Fired: abilityCheck = Abilities.Weapon_Shortbows; break;
-                case eObjectType.FistWraps: abilityCheck = Abilities.Weapon_FistWraps; break;
-                case eObjectType.MaulerStaff: abilityCheck = Abilities.Weapon_MaulerStaff; break;
+                case eObjectType.Staff:
+                    abilityCheck = Abilities.Weapon_Staves;
+                    break;
+                case eObjectType.Fired:
+                    abilityCheck = Abilities.Weapon_Shortbows;
+                    break;
+                case eObjectType.FistWraps:
+                    abilityCheck = Abilities.Weapon_FistWraps;
+                    break;
+                case eObjectType.MaulerStaff:
+                    abilityCheck = Abilities.Weapon_MaulerStaff;
+                    break;
 
                 // alb
                 case eObjectType.CrushingWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Crushing; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blunt; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Hammers; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Crushing;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_Blunt;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Hammers;
+                                break;
                         }
                     }
                     else
@@ -892,14 +906,19 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.SlashingWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blades; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Swords; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Slashing;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_Blades;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Swords;
+                                break;
                         }
                     }
                     else
@@ -909,7 +928,7 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.ThrustWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
                     {
                         abilityCheck = Abilities.Weapon_Piercing;
                     }
@@ -920,7 +939,7 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.TwoHandedWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
                     {
                         abilityCheck = Abilities.Weapon_LargeWeapons;
                     }
@@ -931,14 +950,19 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.PolearmWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Polearms; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_CelticSpear; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Spears; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Polearms;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_CelticSpear;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Spears;
+                                break;
                         }
                     }
                     else
@@ -948,23 +972,32 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.Longbow:
-                    otherCheck = new string[] { Abilities.Weapon_Longbows, Abilities.Weapon_Archery };
+                    otherCheck = new[] {Abilities.Weapon_Longbows, Abilities.Weapon_Archery};
                     break;
-                case eObjectType.Crossbow: abilityCheck = Abilities.Weapon_Crossbow; break;
-                case eObjectType.Flexible: abilityCheck = Abilities.Weapon_Flexible; break;
+                case eObjectType.Crossbow:
+                    abilityCheck = Abilities.Weapon_Crossbow;
+                    break;
+                case eObjectType.Flexible:
+                    abilityCheck = Abilities.Weapon_Flexible;
+                    break;
 
                 // TODO: case 5: abilityCheck = Abilities.Weapon_Thrown;break;
 
                 // mid
                 case eObjectType.Sword:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blades; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Swords; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Slashing;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_Blades;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Swords;
+                                break;
                         }
                     }
                     else
@@ -974,14 +1007,19 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.Hammer:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Crushing; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Hammers; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blunt; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Crushing;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Hammers;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_Blunt;
+                                break;
                         }
                     }
                     else
@@ -992,14 +1030,19 @@ namespace DOL.GS.ServerRules
                     break;
                 case eObjectType.LeftAxe:
                 case eObjectType.Axe:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blades; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Axes; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Slashing;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_Blades;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Axes;
+                                break;
                         }
                     }
                     else
@@ -1009,14 +1052,19 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.Spear:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Polearms; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_CelticSpear; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Spears; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Polearms;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_CelticSpear;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Spears;
+                                break;
                         }
                     }
                     else
@@ -1026,24 +1074,33 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.CompositeBow:
-                    otherCheck = new string[] { Abilities.Weapon_CompositeBows, Abilities.Weapon_Archery };
+                    otherCheck = new[] {Abilities.Weapon_CompositeBows, Abilities.Weapon_Archery};
                     break;
-                case eObjectType.Thrown: abilityCheck = Abilities.Weapon_Thrown; break;
-                case eObjectType.HandToHand: abilityCheck = Abilities.Weapon_HandToHand; break;
+                case eObjectType.Thrown:
+                    abilityCheck = Abilities.Weapon_Thrown;
+                    break;
+                case eObjectType.HandToHand:
+                    abilityCheck = Abilities.Weapon_HandToHand;
+                    break;
 
                 // hib
                 case eObjectType.RecurvedBow:
-                    otherCheck = new string[] { Abilities.Weapon_RecurvedBows, Abilities.Weapon_Archery };
+                    otherCheck = new[] {Abilities.Weapon_RecurvedBows, Abilities.Weapon_Archery};
                     break;
                 case eObjectType.Blades:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blades; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Swords; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Slashing;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_Blades;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Swords;
+                                break;
                         }
                     }
                     else
@@ -1053,14 +1110,19 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.Blunt:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Crushing; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blunt; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Hammers; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Crushing;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_Blunt;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Hammers;
+                                break;
                         }
                     }
                     else
@@ -1070,7 +1132,7 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.Piercing:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
                     {
                         abilityCheck = Abilities.Weapon_Thrusting;
                     }
@@ -1081,7 +1143,7 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.LargeWeapons:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
                     {
                         abilityCheck = Abilities.Weapon_TwoHanded;
                     }
@@ -1092,14 +1154,19 @@ namespace DOL.GS.ServerRules
 
                     break;
                 case eObjectType.CelticSpear:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                     {
                         switch (living.Realm)
                         {
-                            case eRealm.Albion: abilityCheck = Abilities.Weapon_Polearms; break;
-                            case eRealm.Hibernia: abilityCheck = Abilities.Weapon_CelticSpear; break;
-                            case eRealm.Midgard: abilityCheck = Abilities.Weapon_Spears; break;
-                            default: break;
+                            case eRealm.Albion:
+                                abilityCheck = Abilities.Weapon_Polearms;
+                                break;
+                            case eRealm.Hibernia:
+                                abilityCheck = Abilities.Weapon_CelticSpear;
+                                break;
+                            case eRealm.Midgard:
+                                abilityCheck = Abilities.Weapon_Spears;
+                                break;
                         }
                     }
                     else
@@ -1108,17 +1175,27 @@ namespace DOL.GS.ServerRules
                     }
 
                     break;
-                case eObjectType.Scythe: abilityCheck = Abilities.Weapon_Scythe; break;
+                case eObjectType.Scythe:
+                    abilityCheck = Abilities.Weapon_Scythe;
+                    break;
 
                 // misc
                 case eObjectType.Magical: return true;
                 case eObjectType.Shield: return living.GetAbilityLevel(Abilities.Shield) >= item.Type_Damage;
-                case eObjectType.Bolt: abilityCheck = Abilities.Weapon_Crossbow; break;
-                case eObjectType.Arrow: otherCheck = new string[] { Abilities.Weapon_CompositeBows, Abilities.Weapon_Longbows, Abilities.Weapon_RecurvedBows, Abilities.Weapon_Shortbows }; break;
+                case eObjectType.Bolt:
+                    abilityCheck = Abilities.Weapon_Crossbow;
+                    break;
+                case eObjectType.Arrow:
+                    otherCheck = new[]
+                    {
+                        Abilities.Weapon_CompositeBows, Abilities.Weapon_Longbows, Abilities.Weapon_RecurvedBows,
+                        Abilities.Weapon_Shortbows
+                    };
+                    break;
                 case eObjectType.Poison: return living.GetModifiedSpecLevel(Specs.Envenom) > 0;
                 case eObjectType.Instrument: return living.HasAbility(Abilities.Weapon_Instruments);
 
-                    // TODO: different shield sizes
+                // TODO: different shield sizes
             }
 
             if (abilityCheck != null && living.HasAbility(abilityCheck))
@@ -1206,7 +1283,7 @@ namespace DOL.GS.ServerRules
         /// <summary>
         /// Holds arrays of compatible object types
         /// </summary>
-        protected Hashtable m_compatibleObjectTypes = null;
+        protected Hashtable m_compatibleObjectTypes;
 
         /// <summary>
         /// Translates object type to compatible object types based on server type
@@ -1218,45 +1295,45 @@ namespace DOL.GS.ServerRules
             if (m_compatibleObjectTypes == null)
             {
                 m_compatibleObjectTypes = new Hashtable();
-                m_compatibleObjectTypes[(int)eObjectType.Staff] = new eObjectType[] { eObjectType.Staff };
-                m_compatibleObjectTypes[(int)eObjectType.Fired] = new eObjectType[] { eObjectType.Fired };
+                m_compatibleObjectTypes[(int)eObjectType.Staff] = new[] { eObjectType.Staff };
+                m_compatibleObjectTypes[(int)eObjectType.Fired] = new[] { eObjectType.Fired };
 
-                m_compatibleObjectTypes[(int)eObjectType.FistWraps] = new eObjectType[] { eObjectType.FistWraps };
-                m_compatibleObjectTypes[(int)eObjectType.MaulerStaff] = new eObjectType[] { eObjectType.MaulerStaff };
+                m_compatibleObjectTypes[(int)eObjectType.FistWraps] = new[] { eObjectType.FistWraps };
+                m_compatibleObjectTypes[(int)eObjectType.MaulerStaff] = new[] { eObjectType.MaulerStaff };
 
                 // alb
-                m_compatibleObjectTypes[(int)eObjectType.CrushingWeapon] = new eObjectType[] { eObjectType.CrushingWeapon, eObjectType.Blunt, eObjectType.Hammer };
-                m_compatibleObjectTypes[(int)eObjectType.SlashingWeapon] = new eObjectType[] { eObjectType.SlashingWeapon, eObjectType.Blades, eObjectType.Sword, eObjectType.Axe };
-                m_compatibleObjectTypes[(int)eObjectType.ThrustWeapon] = new eObjectType[] { eObjectType.ThrustWeapon, eObjectType.Piercing };
-                m_compatibleObjectTypes[(int)eObjectType.TwoHandedWeapon] = new eObjectType[] { eObjectType.TwoHandedWeapon, eObjectType.LargeWeapons };
-                m_compatibleObjectTypes[(int)eObjectType.PolearmWeapon] = new eObjectType[] { eObjectType.PolearmWeapon, eObjectType.CelticSpear, eObjectType.Spear };
-                m_compatibleObjectTypes[(int)eObjectType.Flexible] = new eObjectType[] { eObjectType.Flexible };
-                m_compatibleObjectTypes[(int)eObjectType.Longbow] = new eObjectType[] { eObjectType.Longbow };
-                m_compatibleObjectTypes[(int)eObjectType.Crossbow] = new eObjectType[] { eObjectType.Crossbow };
+                m_compatibleObjectTypes[(int)eObjectType.CrushingWeapon] = new[] { eObjectType.CrushingWeapon, eObjectType.Blunt, eObjectType.Hammer };
+                m_compatibleObjectTypes[(int)eObjectType.SlashingWeapon] = new[] { eObjectType.SlashingWeapon, eObjectType.Blades, eObjectType.Sword, eObjectType.Axe };
+                m_compatibleObjectTypes[(int)eObjectType.ThrustWeapon] = new[] { eObjectType.ThrustWeapon, eObjectType.Piercing };
+                m_compatibleObjectTypes[(int)eObjectType.TwoHandedWeapon] = new[] { eObjectType.TwoHandedWeapon, eObjectType.LargeWeapons };
+                m_compatibleObjectTypes[(int)eObjectType.PolearmWeapon] = new[] { eObjectType.PolearmWeapon, eObjectType.CelticSpear, eObjectType.Spear };
+                m_compatibleObjectTypes[(int)eObjectType.Flexible] = new[] { eObjectType.Flexible };
+                m_compatibleObjectTypes[(int)eObjectType.Longbow] = new[] { eObjectType.Longbow };
+                m_compatibleObjectTypes[(int)eObjectType.Crossbow] = new[] { eObjectType.Crossbow };
 
                 // TODO: case 5: abilityCheck = Abilities.Weapon_Thrown; break;
 
                 // mid
-                m_compatibleObjectTypes[(int)eObjectType.Hammer] = new eObjectType[] { eObjectType.Hammer, eObjectType.CrushingWeapon, eObjectType.Blunt };
-                m_compatibleObjectTypes[(int)eObjectType.Sword] = new eObjectType[] { eObjectType.Sword, eObjectType.SlashingWeapon, eObjectType.Blades };
-                m_compatibleObjectTypes[(int)eObjectType.LeftAxe] = new eObjectType[] { eObjectType.LeftAxe };
-                m_compatibleObjectTypes[(int)eObjectType.Axe] = new eObjectType[] { eObjectType.Axe, eObjectType.SlashingWeapon, eObjectType.Blades, eObjectType.LeftAxe };
-                m_compatibleObjectTypes[(int)eObjectType.HandToHand] = new eObjectType[] { eObjectType.HandToHand };
-                m_compatibleObjectTypes[(int)eObjectType.Spear] = new eObjectType[] { eObjectType.Spear, eObjectType.CelticSpear, eObjectType.PolearmWeapon };
-                m_compatibleObjectTypes[(int)eObjectType.CompositeBow] = new eObjectType[] { eObjectType.CompositeBow };
-                m_compatibleObjectTypes[(int)eObjectType.Thrown] = new eObjectType[] { eObjectType.Thrown };
+                m_compatibleObjectTypes[(int)eObjectType.Hammer] = new[] { eObjectType.Hammer, eObjectType.CrushingWeapon, eObjectType.Blunt };
+                m_compatibleObjectTypes[(int)eObjectType.Sword] = new[] { eObjectType.Sword, eObjectType.SlashingWeapon, eObjectType.Blades };
+                m_compatibleObjectTypes[(int)eObjectType.LeftAxe] = new[] { eObjectType.LeftAxe };
+                m_compatibleObjectTypes[(int)eObjectType.Axe] = new[] { eObjectType.Axe, eObjectType.SlashingWeapon, eObjectType.Blades, eObjectType.LeftAxe };
+                m_compatibleObjectTypes[(int)eObjectType.HandToHand] = new[] { eObjectType.HandToHand };
+                m_compatibleObjectTypes[(int)eObjectType.Spear] = new[] { eObjectType.Spear, eObjectType.CelticSpear, eObjectType.PolearmWeapon };
+                m_compatibleObjectTypes[(int)eObjectType.CompositeBow] = new[] { eObjectType.CompositeBow };
+                m_compatibleObjectTypes[(int)eObjectType.Thrown] = new[] { eObjectType.Thrown };
 
                 // hib
-                m_compatibleObjectTypes[(int)eObjectType.Blunt] = new eObjectType[] { eObjectType.Blunt, eObjectType.CrushingWeapon, eObjectType.Hammer };
-                m_compatibleObjectTypes[(int)eObjectType.Blades] = new eObjectType[] { eObjectType.Blades, eObjectType.SlashingWeapon, eObjectType.Sword, eObjectType.Axe };
-                m_compatibleObjectTypes[(int)eObjectType.Piercing] = new eObjectType[] { eObjectType.Piercing, eObjectType.ThrustWeapon };
-                m_compatibleObjectTypes[(int)eObjectType.LargeWeapons] = new eObjectType[] { eObjectType.LargeWeapons, eObjectType.TwoHandedWeapon };
-                m_compatibleObjectTypes[(int)eObjectType.CelticSpear] = new eObjectType[] { eObjectType.CelticSpear, eObjectType.Spear, eObjectType.PolearmWeapon };
-                m_compatibleObjectTypes[(int)eObjectType.Scythe] = new eObjectType[] { eObjectType.Scythe };
-                m_compatibleObjectTypes[(int)eObjectType.RecurvedBow] = new eObjectType[] { eObjectType.RecurvedBow };
+                m_compatibleObjectTypes[(int)eObjectType.Blunt] = new[] { eObjectType.Blunt, eObjectType.CrushingWeapon, eObjectType.Hammer };
+                m_compatibleObjectTypes[(int)eObjectType.Blades] = new[] { eObjectType.Blades, eObjectType.SlashingWeapon, eObjectType.Sword, eObjectType.Axe };
+                m_compatibleObjectTypes[(int)eObjectType.Piercing] = new[] { eObjectType.Piercing, eObjectType.ThrustWeapon };
+                m_compatibleObjectTypes[(int)eObjectType.LargeWeapons] = new[] { eObjectType.LargeWeapons, eObjectType.TwoHandedWeapon };
+                m_compatibleObjectTypes[(int)eObjectType.CelticSpear] = new[] { eObjectType.CelticSpear, eObjectType.Spear, eObjectType.PolearmWeapon };
+                m_compatibleObjectTypes[(int)eObjectType.Scythe] = new[] { eObjectType.Scythe };
+                m_compatibleObjectTypes[(int)eObjectType.RecurvedBow] = new[] { eObjectType.RecurvedBow };
 
-                m_compatibleObjectTypes[(int)eObjectType.Shield] = new eObjectType[] { eObjectType.Shield };
-                m_compatibleObjectTypes[(int)eObjectType.Poison] = new eObjectType[] { eObjectType.Poison };
+                m_compatibleObjectTypes[(int)eObjectType.Shield] = new[] { eObjectType.Shield };
+                m_compatibleObjectTypes[(int)eObjectType.Poison] = new[] { eObjectType.Poison };
 
                 // TODO: case 45: abilityCheck = Abilities.instruments; break;
             }
@@ -1294,8 +1371,7 @@ namespace DOL.GS.ServerRules
                 {
                     foreach (DictionaryEntry de in killedNPC.XPGainers)
                     {
-                        GamePlayer player = de.Key as GamePlayer;
-                        if (player != null)
+                        if (de.Key is GamePlayer player)
                         {
                             player.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }
@@ -1326,7 +1402,7 @@ namespace DOL.GS.ServerRules
                     if (player.Group != null)
                     {
                         // checking to see if any group members are in range of the killer
-                        if (player != (killer as GamePlayer))
+                        if (player != killer as GamePlayer)
                         {
                             isGroupInRange = true;
                         }
@@ -1386,7 +1462,7 @@ namespace DOL.GS.ServerRules
 
                     // realm points
                     int rpCap = living.RealmPointsValue * 2;
-                    int realmPoints = 0;
+                    int realmPoints;
 
                     // Keep and Tower captures reward full RP and BP value to each player
                     if (killedNPC is GuardLord)
@@ -1399,7 +1475,7 @@ namespace DOL.GS.ServerRules
 
                         // rp bonuses from RR and Group
                         // 100% if full group,scales down according to player count in group and their range to target
-                        if (player != null && player.Group != null && plrGrpExp.ContainsKey(player.Group))
+                        if (player?.Group != null && plrGrpExp.ContainsKey(player.Group))
                         {
                             realmPoints = (int)(realmPoints * (1.0 + plrGrpExp[player.Group] * 0.125));
                         }
@@ -1421,7 +1497,7 @@ namespace DOL.GS.ServerRules
 
                     // bounty points
                     int bpCap = living.BountyPointsValue * 2;
-                    int bountyPoints = 0;
+                    int bountyPoints;
 
                     // Keep and Tower captures reward full RP and BP value to each player
                     if (killedNPC is GuardLord)
@@ -1446,8 +1522,7 @@ namespace DOL.GS.ServerRules
                     #endregion
 
                     // experience points
-                    long xpReward = 0;
-                    long campBonus = 0;
+                    long xpReward;
                     long groupExp = 0;
                     long outpostXP = 0;
 
@@ -1469,16 +1544,16 @@ namespace DOL.GS.ServerRules
                     This change has two effects: it will allow lower level players in a group to gain more experience faster (15% faster),
                     and it will also let higher level players (the 35-50s who tend to hit this clamp more often) to gain experience faster.
                      */
-                    long expCap = (long)(GameServer.ServerRules.GetExperienceForLiving(living.Level) * ServerProperties.Properties.XP_CAP_PERCENT / 100);
+                    long expCap = GameServer.ServerRules.GetExperienceForLiving(living.Level) * Properties.XP_CAP_PERCENT / 100;
 
                     if (player != null)
                     {
-                        expCap = (long)(GameServer.ServerRules.GetExperienceForLiving(player.Level) * ServerProperties.Properties.XP_CAP_PERCENT / 100);
+                        expCap = GameServer.ServerRules.GetExperienceForLiving(player.Level) * Properties.XP_CAP_PERCENT / 100;
 
                         if (player.Group != null && isGroupInRange)
                         {
                             // Optional group cap can be set different from standard player cap
-                            expCap = (long)(GameServer.ServerRules.GetExperienceForLiving(player.Level) * ServerProperties.Properties.XP_GROUP_CAP_PERCENT / 100);
+                            expCap = GameServer.ServerRules.GetExperienceForLiving(player.Level) * Properties.XP_GROUP_CAP_PERCENT / 100;
                         }
                     }
 
@@ -1503,7 +1578,7 @@ namespace DOL.GS.ServerRules
                     if (player != null && highestPlayer != null && highestConValue < 0)
                     {
                         // challenge success, the xp needs to be reduced to the proper con
-                        expCap = (long)GameServer.ServerRules.GetExperienceForLiving(GameObject.GetLevelFromCon(player.Level, highestConValue));
+                        expCap = GameServer.ServerRules.GetExperienceForLiving(GameObject.GetLevelFromCon(player.Level, highestConValue));
                     }
 
                     #endregion
@@ -1518,8 +1593,8 @@ namespace DOL.GS.ServerRules
                     #region Camp Bonus
 
                     // average max camp bonus is somewhere between 50 and 60%
-                    double fullCampBonus = ServerProperties.Properties.MAX_CAMP_BONUS;
-                    double campBonusPerc = 0;
+                    double fullCampBonus = Properties.MAX_CAMP_BONUS;
+                    double campBonusPerc;
 
                     if (killedNPC.CurrentRegion.Time - killedNPC.SpawnTick > 1800000) // spawn of this NPC was more than 30 minutes ago -> full camp bonus
                     {
@@ -1551,7 +1626,7 @@ namespace DOL.GS.ServerRules
                         campBonusPerc = fullCampBonus;
                     }
 
-                    campBonus = (long)(xpReward * campBonusPerc);
+                    var campBonus = (long)(xpReward * campBonusPerc);
                     #endregion
 
                     #region Outpost Bonus
@@ -1583,11 +1658,11 @@ namespace DOL.GS.ServerRules
 
                         // FIXME: [WARN] this is a guess, I do not know the real way this is applied
                         // apply the keep bonus for experience
-                        if (Keeps.KeepBonusMgr.RealmHasBonus(eKeepBonusType.Experience_5, living.Realm))
+                        if (KeepBonusMgr.RealmHasBonus(eKeepBonusType.Experience_5, living.Realm))
                         {
                             outpostXP += (xpReward / 100) * 5;
                         }
-                        else if (Keeps.KeepBonusMgr.RealmHasBonus(eKeepBonusType.Experience_3, living.Realm))
+                        else if (KeepBonusMgr.RealmHasBonus(eKeepBonusType.Experience_3, living.Realm))
                         {
                             outpostXP += (xpReward / 100) * 3;
                         }
@@ -1596,20 +1671,17 @@ namespace DOL.GS.ServerRules
 
                     if (xpReward > 0)
                     {
-                        if (player != null)
+                        if (player?.Group != null && plrGrpExp.ContainsKey(player.Group))
                         {
-                            if (player.Group != null && plrGrpExp.ContainsKey(player.Group))
-                            {
-                                groupExp += (long)(0.125 * xpReward * (int)plrGrpExp[player.Group]);
-                            }
-
-                            // tolakram - remove this for now.  Correct calculation should be reduced XP based on damage pet did, not a flat reduction
-                            // if (player.ControlledNpc != null)
-                            //    xpReward = (long)(xpReward * 0.75);
+                            groupExp += (long)(0.125 * xpReward * plrGrpExp[player.Group]);
                         }
 
+                        // tolakram - remove this for now.  Correct calculation should be reduced XP based on damage pet did, not a flat reduction
+                        // if (player.ControlledNpc != null)
+                        //    xpReward = (long)(xpReward * 0.75);
+
                         // Ok we've calculated all the base experience.  Now let's add them all together.
-                        xpReward += (long)campBonus + groupExp + outpostXP;
+                        xpReward += campBonus + groupExp + outpostXP;
 
                         if (!living.IsAlive) // Dead living gets 25% exp only
                         {
@@ -1639,11 +1711,11 @@ namespace DOL.GS.ServerRules
                 foreach (DictionaryEntry de in killedLiving.XPGainers)
                 {
                     GameObject obj = (GameObject)de.Key;
-                    if (obj is GamePlayer)
+                    if (obj is GamePlayer player)
                     {
                         // If a gameplayer with privlevel > 1 attacked the
                         // mob, then the players won't gain xp ...
-                        if (((GamePlayer)obj).Client.Account.PrivLevel > 1)
+                        if (player.Client.Account.PrivLevel > 1)
                         {
                             dealNoXP = true;
                             break;
@@ -1666,13 +1738,8 @@ namespace DOL.GS.ServerRules
                 foreach (DictionaryEntry de in killedLiving.XPGainers)
                 {
                     GameLiving living = de.Key as GameLiving;
-                    GamePlayer expGainPlayer = living as GamePlayer;
-                    if (living == null)
-                    {
-                        continue;
-                    }
 
-                    if (living.ObjectState != GameObject.eObjectState.Active)
+                    if (living?.ObjectState != GameObject.eObjectState.Active)
                     {
                         continue;
                     }
@@ -1704,26 +1771,23 @@ namespace DOL.GS.ServerRules
                     // rp bonuses from RR and Group
                     // 20% if R1L0 char kills RR10,if RR10 char kills R1L0 he will get -20% bonus
                     // 100% if full group,scales down according to player count in group and their range to target
-                    if (living is GamePlayer)
+                    GamePlayer killerPlayer = living as GamePlayer;
+                    if (killerPlayer?.Group != null && killerPlayer.Group.MemberCount > 1)
                     {
-                        GamePlayer killerPlayer = living as GamePlayer;
-                        if (killerPlayer.Group != null && killerPlayer.Group.MemberCount > 1)
+                        lock (killerPlayer.Group)
                         {
-                            lock (killerPlayer.Group)
+                            int count = 0;
+                            foreach (GamePlayer player in killerPlayer.Group.GetPlayersInTheGroup())
                             {
-                                int count = 0;
-                                foreach (GamePlayer player in killerPlayer.Group.GetPlayersInTheGroup())
+                                if (!player.IsWithinRadius(killedLiving, WorldMgr.MAX_EXPFORKILL_DISTANCE))
                                 {
-                                    if (!player.IsWithinRadius(killedLiving, WorldMgr.MAX_EXPFORKILL_DISTANCE))
-                                    {
-                                        continue;
-                                    }
-
-                                    count++;
+                                    continue;
                                 }
 
-                                realmPoints = (int)(realmPoints * (1.0 + count * 0.125));
+                                count++;
                             }
+
+                            realmPoints = (int)(realmPoints * (1.0 + count * 0.125));
                         }
                     }
 
@@ -1782,7 +1846,7 @@ namespace DOL.GS.ServerRules
         /// <param name="killer">killer</param>
         public virtual void OnPlayerKilled(GamePlayer killedPlayer, GameObject killer)
         {
-            if (ServerProperties.Properties.ENABLE_WARMAPMGR && killer is GamePlayer && killer.CurrentRegion.ID == 163)
+            if (Properties.ENABLE_WARMAPMGR && killer is GamePlayer && killer.CurrentRegion.ID == 163)
             {
                 WarMapMgr.AddFight((byte)killer.CurrentZone.ID, killer.X, killer.Y, (byte)killer.Realm, (byte)killedPlayer.Realm);
             }
@@ -1790,17 +1854,17 @@ namespace DOL.GS.ServerRules
             killedPlayer.LastDeathRealmPoints = 0;
 
             // "player has been killed recently"
-            long noExpSeconds = ServerProperties.Properties.RP_WORTH_SECONDS;
+            long noExpSeconds = Properties.RP_WORTH_SECONDS;
             if (killedPlayer.DeathTime + noExpSeconds > killedPlayer.PlayedTime)
             {
                 lock (killedPlayer.XPGainers.SyncRoot)
                 {
                     foreach (DictionaryEntry de in killedPlayer.XPGainers)
                     {
-                        if (de.Key is GamePlayer)
+                        if (de.Key is GamePlayer player)
                         {
-                            ((GamePlayer)de.Key).Out.SendMessage(killedPlayer.Name + " has been killed recently and is worth no realm points!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                            ((GamePlayer)de.Key).Out.SendMessage(killedPlayer.Name + " has been killed recently and is worth no experience!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            player.Out.SendMessage($"{killedPlayer.Name} has been killed recently and is worth no realm points!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            player.Out.SendMessage($"{killedPlayer.Name} has been killed recently and is worth no experience!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         }
                     }
                 }
@@ -1817,11 +1881,11 @@ namespace DOL.GS.ServerRules
                 foreach (DictionaryEntry de in killedPlayer.XPGainers)
                 {
                     GameObject obj = (GameObject)de.Key;
-                    if (obj is GamePlayer)
+                    if (obj is GamePlayer player)
                     {
                         // If a gameplayer with privlevel > 1 attacked the
                         // mob, then the players won't gain xp ...
-                        if (((GamePlayer)obj).Client.Account.PrivLevel > 1)
+                        if (player.Client.Account.PrivLevel > 1)
                         {
                             dealNoXP = true;
                             break;
@@ -1835,8 +1899,7 @@ namespace DOL.GS.ServerRules
                 {
                     foreach (DictionaryEntry de in killedPlayer.XPGainers)
                     {
-                        GamePlayer player = de.Key as GamePlayer;
-                        if (player != null)
+                        if (de.Key is GamePlayer player)
                         {
                             player.Out.SendMessage("You gain no experience from this kill!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }
@@ -1846,12 +1909,12 @@ namespace DOL.GS.ServerRules
                 }
 
                 long playerExpValue = killedPlayer.ExperienceValue;
-                playerExpValue = (long)(playerExpValue * ServerProperties.Properties.XP_RATE);
+                playerExpValue = (long)(playerExpValue * Properties.XP_RATE);
                 int playerRPValue = killedPlayer.RealmPointsValue;
                 int playerBPValue = 0;
 
                 bool BG = false;
-                if (!ServerProperties.Properties.ALLOW_BPS_IN_BGS)
+                if (!Properties.ALLOW_BPS_IN_BGS)
                 {
                     foreach (AbstractGameKeep keep in GameServer.KeepManager.GetKeepsOfRegion(killedPlayer.CurrentRegionID))
                     {
@@ -1877,23 +1940,19 @@ namespace DOL.GS.ServerRules
                 {
                     GameLiving living = de.Key as GameLiving;
                     GamePlayer expGainPlayer = living as GamePlayer;
-                    if (living == null)
-                    {
-                        continue;
-                    }
 
-                    if (living.ObjectState != GameObject.eObjectState.Active)
+                    if (living?.ObjectState != GameObject.eObjectState.Active)
                     {
                         continue;
                     }
 
                     /*
-* http://www.camelotherald.com/more/2289.shtml
-* Dead players will now continue to retain and receive their realm point credit
-* on targets until they release. This will work for solo players as well as
-* grouped players in terms of continuing to contribute their share to the kill
-* if a target is being attacked by another non grouped player as well.
-*/
+                    * http://www.camelotherald.com/more/2289.shtml
+                    * Dead players will now continue to retain and receive their realm point credit
+                    * on targets until they release. This will work for solo players as well as
+                    * grouped players in terms of continuing to contribute their share to the kill
+                    * if a target is being attacked by another non grouped player as well.
+                    */
 
                     // if (!living.Alive) continue;
                     if (!living.IsWithinRadius(killedPlayer, WorldMgr.MAX_EXPFORKILL_DISTANCE))
@@ -1972,11 +2031,11 @@ namespace DOL.GS.ServerRules
                     // apply the keep bonus for bounty points
                     if (killer != null)
                     {
-                        if (Keeps.KeepBonusMgr.RealmHasBonus(eKeepBonusType.Bounty_Points_5, (eRealm)killer.Realm))
+                        if (KeepBonusMgr.RealmHasBonus(eKeepBonusType.Bounty_Points_5, killer.Realm))
                         {
                             bountyPoints += (bountyPoints / 100) * 5;
                         }
-                        else if (Keeps.KeepBonusMgr.RealmHasBonus(eKeepBonusType.Bounty_Points_3, (eRealm)killer.Realm))
+                        else if (KeepBonusMgr.RealmHasBonus(eKeepBonusType.Bounty_Points_3, killer.Realm))
                         {
                             bountyPoints += (bountyPoints / 100) * 3;
                         }
@@ -1991,7 +2050,7 @@ namespace DOL.GS.ServerRules
                     // TODO: pets take 25% and owner gets 75%
                     long xpReward = (long)(playerExpValue * damagePercent); // exp for damage percent
 
-                    long expCap = (long)(living.ExperienceValue * ServerProperties.Properties.XP_PVP_CAP_PERCENT / 100);
+                    long expCap = living.ExperienceValue * Properties.XP_PVP_CAP_PERCENT / 100;
                     if (xpReward > expCap)
                     {
                         xpReward = expCap;
@@ -2015,8 +2074,7 @@ namespace DOL.GS.ServerRules
                             {
                                 bonus = 20;
                             }
-                            else if (GameServer.Instance.Configuration.ServerType == eGameServerType.GST_Normal &&
-                                     keep.Realm == living.Realm)
+                            else if (GameServer.Instance.Configuration.ServerType == eGameServerType.GST_Normal && keep.Realm == living.Realm)
                             {
                                 bonus = 10;
                             }
@@ -2046,7 +2104,7 @@ namespace DOL.GS.ServerRules
 
                     if (killedPlayer.ReleaseType != GamePlayer.eReleaseType.Duel && expGainPlayer != null)
                     {
-                        switch ((eRealm)killedPlayer.Realm)
+                        switch (killedPlayer.Realm)
                         {
                             case eRealm.Albion:
                                 expGainPlayer.KillsAlbionPlayers++;
@@ -2092,23 +2150,24 @@ namespace DOL.GS.ServerRules
                     }
                 }
 
-                if (ServerProperties.Properties.LOG_PVP_KILLS && playerKillers.Count > 0)
+                if (Properties.LOG_PVP_KILLS && playerKillers.Count > 0)
                 {
                     try
                     {
                         foreach (KeyValuePair<GamePlayer, int> pair in playerKillers)
                         {
-
-                            DOL.Database.PvPKillsLog killLog = new DOL.Database.PvPKillsLog();
-                            killLog.KilledIP = killedPlayer.Client.TcpEndpointAddress;
-                            killLog.KilledName = killedPlayer.Name;
-                            killLog.KilledRealm = GlobalConstants.RealmToName(killedPlayer.Realm);
-                            killLog.KillerIP = pair.Key.Client.TcpEndpointAddress;
-                            killLog.KillerName = pair.Key.Name;
-                            killLog.KillerRealm = GlobalConstants.RealmToName(pair.Key.Realm);
-                            killLog.RPReward = pair.Value;
-                            killLog.RegionName = killedPlayer.CurrentRegion.Description;
-                            killLog.IsInstance = killedPlayer.CurrentRegion.IsInstance;
+                            PvPKillsLog killLog = new PvPKillsLog
+                            {
+                                KilledIP = killedPlayer.Client.TcpEndpointAddress,
+                                KilledName = killedPlayer.Name,
+                                KilledRealm = GlobalConstants.RealmToName(killedPlayer.Realm),
+                                KillerIP = pair.Key.Client.TcpEndpointAddress,
+                                KillerName = pair.Key.Name,
+                                KillerRealm = GlobalConstants.RealmToName(pair.Key.Realm),
+                                RPReward = pair.Value,
+                                RegionName = killedPlayer.CurrentRegion.Description,
+                                IsInstance = killedPlayer.CurrentRegion.IsInstance
+                            };
 
                             if (killedPlayer.Client.TcpEndpointAddress == pair.Key.Client.TcpEndpointAddress)
                             {
@@ -2118,9 +2177,9 @@ namespace DOL.GS.ServerRules
                             GameServer.Database.AddObject(killLog);
                         }
                     }
-                    catch (System.Exception ex)
+                    catch (Exception ex)
                     {
-                        log.Error(ex);
+                        Log.Error(ex);
                     }
                 }
             }
@@ -2140,8 +2199,7 @@ namespace DOL.GS.ServerRules
             }
 
             // clients with priv level > 1 are considered friendly by anyone
-            GamePlayer playerTarget = target as GamePlayer;
-            if (playerTarget != null && playerTarget.Client.Account.PrivLevel > 1)
+            if (target is GamePlayer playerTarget && playerTarget.Client.Account.PrivLevel > 1)
             {
                 return (byte)player.Realm;
             }
@@ -2264,17 +2322,17 @@ namespace DOL.GS.ServerRules
             if ((player.KillsAlbionPlayers + player.KillsMidgardPlayers + player.KillsHiberniaPlayers) > 0)
             {
                 stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.Title"));
-                switch ((eRealm)player.Realm)
+                switch (player.Realm)
                 {
                     case eRealm.Albion:
                         if (player.KillsMidgardPlayers > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.MidgardPlayer") + ": " + player.KillsMidgardPlayers.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.MidgardPlayer")}: {player.KillsMidgardPlayers:N0}");
                         }
 
                         if (player.KillsHiberniaPlayers > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.HiberniaPlayer") + ": " + player.KillsHiberniaPlayers.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.HiberniaPlayer")}: {player.KillsHiberniaPlayers:N0}");
                         }
 
                         total = player.KillsMidgardPlayers + player.KillsHiberniaPlayers;
@@ -2282,12 +2340,12 @@ namespace DOL.GS.ServerRules
                     case eRealm.Midgard:
                         if (player.KillsAlbionPlayers > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.AlbionPlayer") + ": " + player.KillsAlbionPlayers.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.AlbionPlayer")}: {player.KillsAlbionPlayers:N0}");
                         }
 
                         if (player.KillsHiberniaPlayers > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.HiberniaPlayer") + ": " + player.KillsHiberniaPlayers.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.HiberniaPlayer")}: {player.KillsHiberniaPlayers:N0}");
                         }
 
                         total = player.KillsAlbionPlayers + player.KillsHiberniaPlayers;
@@ -2295,19 +2353,19 @@ namespace DOL.GS.ServerRules
                     case eRealm.Hibernia:
                         if (player.KillsAlbionPlayers > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.AlbionPlayer") + ": " + player.KillsAlbionPlayers.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.AlbionPlayer")}: {player.KillsAlbionPlayers:N0}");
                         }
 
                         if (player.KillsMidgardPlayers > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.MidgardPlayer") + ": " + player.KillsMidgardPlayers.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.MidgardPlayer")}: {player.KillsMidgardPlayers:N0}");
                         }
 
                         total = player.KillsMidgardPlayers + player.KillsAlbionPlayers;
                         break;
                 }
 
-                stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.TotalPlayers") + ": " + total.ToString("N0"));
+                stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.TotalPlayers")}: {total:N0}");
             }
             #endregion
             stat.Add(" ");
@@ -2317,17 +2375,17 @@ namespace DOL.GS.ServerRules
             if ((player.KillsAlbionDeathBlows + player.KillsMidgardDeathBlows + player.KillsHiberniaDeathBlows) > 0)
             {
                 total = 0;
-                switch ((eRealm)player.Realm)
+                switch (player.Realm)
                 {
                     case eRealm.Albion:
                         if (player.KillsMidgardDeathBlows > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.MidgardPlayer") + ": " + player.KillsMidgardDeathBlows.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.MidgardPlayer")}: {player.KillsMidgardDeathBlows:N0}");
                         }
 
                         if (player.KillsHiberniaDeathBlows > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.HiberniaPlayer") + ": " + player.KillsHiberniaDeathBlows.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.HiberniaPlayer")}: {player.KillsHiberniaDeathBlows:N0}");
                         }
 
                         total = player.KillsMidgardDeathBlows + player.KillsHiberniaDeathBlows;
@@ -2335,12 +2393,12 @@ namespace DOL.GS.ServerRules
                     case eRealm.Midgard:
                         if (player.KillsAlbionDeathBlows > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.AlbionPlayer") + ": " + player.KillsAlbionDeathBlows.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.AlbionPlayer")}: {player.KillsAlbionDeathBlows:N0}");
                         }
 
                         if (player.KillsHiberniaDeathBlows > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.HiberniaPlayer") + ": " + player.KillsHiberniaDeathBlows.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.HiberniaPlayer")}: {player.KillsHiberniaDeathBlows:N0}");
                         }
 
                         total = player.KillsAlbionDeathBlows + player.KillsHiberniaDeathBlows;
@@ -2348,19 +2406,19 @@ namespace DOL.GS.ServerRules
                     case eRealm.Hibernia:
                         if (player.KillsAlbionDeathBlows > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.AlbionPlayer") + ": " + player.KillsAlbionDeathBlows.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.AlbionPlayer")}: {player.KillsAlbionDeathBlows:N0}");
                         }
 
                         if (player.KillsMidgardDeathBlows > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.MidgardPlayer") + ": " + player.KillsMidgardDeathBlows.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.MidgardPlayer")}: {player.KillsMidgardDeathBlows:N0}");
                         }
 
                         total = player.KillsMidgardDeathBlows + player.KillsAlbionDeathBlows;
                         break;
                 }
 
-                stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.TotalPlayers") + ": " + total.ToString("N0"));
+                stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.TotalPlayers")}: {total:N0}");
             }
             #endregion
             stat.Add(" ");
@@ -2370,17 +2428,17 @@ namespace DOL.GS.ServerRules
             if ((player.KillsAlbionSolo + player.KillsMidgardSolo + player.KillsHiberniaSolo) > 0)
             {
                 total = 0;
-                switch ((eRealm)player.Realm)
+                switch (player.Realm)
                 {
                     case eRealm.Albion:
                         if (player.KillsMidgardSolo > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.MidgardPlayer") + ": " + player.KillsMidgardSolo.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.MidgardPlayer")}: {player.KillsMidgardSolo:N0}");
                         }
 
                         if (player.KillsHiberniaSolo > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.HiberniaPlayer") + ": " + player.KillsHiberniaSolo.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.HiberniaPlayer")}: {player.KillsHiberniaSolo:N0}");
                         }
 
                         total = player.KillsMidgardSolo + player.KillsHiberniaSolo;
@@ -2388,12 +2446,12 @@ namespace DOL.GS.ServerRules
                     case eRealm.Midgard:
                         if (player.KillsAlbionSolo > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.AlbionPlayer") + ": " + player.KillsAlbionSolo.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.AlbionPlayer")}: {player.KillsAlbionSolo:N0}");
                         }
 
                         if (player.KillsHiberniaSolo > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.HiberniaPlayer") + ": " + player.KillsHiberniaSolo.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.HiberniaPlayer")}: {player.KillsHiberniaSolo:N0}");
                         }
 
                         total = player.KillsAlbionSolo + player.KillsHiberniaSolo;
@@ -2401,19 +2459,19 @@ namespace DOL.GS.ServerRules
                     case eRealm.Hibernia:
                         if (player.KillsAlbionSolo > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.AlbionPlayer") + ": " + player.KillsAlbionSolo.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.AlbionPlayer")}: {player.KillsAlbionSolo:N0}");
                         }
 
                         if (player.KillsMidgardSolo > 0)
                         {
-                            stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.MidgardPlayer") + ": " + player.KillsMidgardSolo.ToString("N0"));
+                            stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.MidgardPlayer")}: {player.KillsMidgardSolo:N0}");
                         }
 
                         total = player.KillsMidgardSolo + player.KillsAlbionSolo;
                         break;
                 }
 
-                stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.TotalPlayers") + ": " + total.ToString("N0"));
+                stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.TotalPlayers")}: {total:N0}");
             }
             #endregion
             stat.Add(" ");
@@ -2423,30 +2481,16 @@ namespace DOL.GS.ServerRules
             if ((player.CapturedKeeps + player.CapturedTowers) > 0)
             {
                 stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Title"));
-
-                // stat.Add("Relics Taken: " + player.RelicsTaken.ToString("N0"));
-                // stat.Add("Albion Keeps Captured: " + player.CapturedAlbionKeeps.ToString("N0"));
-                // stat.Add("Midgard Keeps Captured: " + player.CapturedMidgardKeeps.ToString("N0"));
-                // stat.Add("Hibernia Keeps Captured: " + player.CapturedHiberniaKeeps.ToString("N0"));
+                
                 if (player.CapturedKeeps > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Keeps") + ": " + player.CapturedKeeps.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Keeps")}: {player.CapturedKeeps:N0}");
                 }
-
-                // stat.Add("Keep Lords Slain: " + player.KeepLordsSlain.ToString("N0"));
-                // stat.Add("Albion Towers Captured: " + player.CapturedAlbionTowers.ToString("N0"));
-                // stat.Add("Midgard Towers Captured: " + player.CapturedMidgardTowers.ToString("N0"));
-                // stat.Add("Hibernia Towers Captured: " + player.CapturedHiberniaTowers.ToString("N0"));
+                
                 if (player.CapturedTowers > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Towers") + ": " + player.CapturedTowers.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Towers")}: {player.CapturedTowers:N0}");
                 }
-
-                // stat.Add("Tower Captains Slain: " + player.TowerCaptainsSlain.ToString("N0"));
-                // stat.Add("Realm Guard Kills Albion: " + player.RealmGuardTotalKills.ToString("N0"));
-                // stat.Add("Realm Guard Kills Midgard: " + player.RealmGuardTotalKills.ToString("N0"));
-                // stat.Add("Realm Guard Kills Hibernia: " + player.RealmGuardTotalKills.ToString("N0"));
-                // stat.Add("Total Realm Guard Kills: " + player.RealmGuardTotalKills.ToString("N0"));
             }
             #endregion
             stat.Add(" ");
@@ -2458,17 +2502,17 @@ namespace DOL.GS.ServerRules
                 stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.Title"));
                 if (player.KillsDragon > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsDragon") + ": " + player.KillsDragon.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsDragon")}: {player.KillsDragon:N0}");
                 }
 
                 if (player.KillsEpicBoss > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsEpic") + ": " + player.KillsEpicBoss.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsEpic")}: {player.KillsEpicBoss:N0}");
                 }
 
                 if (player.KillsLegion > 0)
                 {
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsLegion") + ": " + player.KillsLegion.ToString("N0"));
+                    stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsLegion")}: {player.KillsLegion:N0}");
                 }
             }
             #endregion
@@ -2508,18 +2552,18 @@ namespace DOL.GS.ServerRules
         /// <returns></returns>
         public virtual int GetRealmPointsForKeep(AbstractGameKeep keep)
         {
-            int value = 0;
+            int value;
 
             if (keep is GameKeep)
             {
-                value = Math.Max(50, ServerProperties.Properties.KEEP_RP_BASE + ((keep.BaseLevel - 50) * ServerProperties.Properties.KEEP_RP_MULTIPLIER));
+                value = Math.Max(50, Properties.KEEP_RP_BASE + ((keep.BaseLevel - 50) * Properties.KEEP_RP_MULTIPLIER));
             }
             else
             {
-                value = Math.Max(5, ServerProperties.Properties.TOWER_RP_BASE + ((keep.BaseLevel - 50) * ServerProperties.Properties.TOWER_RP_MULTIPLIER));
+                value = Math.Max(5, Properties.TOWER_RP_BASE + ((keep.BaseLevel - 50) * Properties.TOWER_RP_MULTIPLIER));
             }
 
-            value += (keep.Level - ServerProperties.Properties.STARTING_KEEP_LEVEL) * ServerProperties.Properties.UPGRADE_MULTIPLIER;
+            value += (keep.Level - Properties.STARTING_KEEP_LEVEL) * Properties.UPGRADE_MULTIPLIER;
 
             return Math.Max(5, value);
         }
@@ -2607,7 +2651,7 @@ namespace DOL.GS.ServerRules
         /// </summary>
         /// <param name="player"></param>
         /// <param name="merchantType"></param>
-        public virtual void SendHousingMerchantWindow(GamePlayer player, DOL.GS.PacketHandler.eMerchantWindowType merchantType)
+        public virtual void SendHousingMerchantWindow(GamePlayer player, eMerchantWindowType merchantType)
         {
             switch (merchantType)
             {
@@ -2631,7 +2675,7 @@ namespace DOL.GS.ServerRules
                     break;
                 default:
                     player.Out.SendMessage("Unknown merchant type!", eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
-                    log.ErrorFormat("Unknown merchant type {0}", merchantType);
+                    Log.Error($"Unknown merchant type {merchantType}");
                     break;
             }
         }
@@ -2681,17 +2725,17 @@ namespace DOL.GS.ServerRules
         /// <param name="heading"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        public virtual GameNPC PlaceHousingNPC(DOL.GS.Housing.House house, ItemTemplate item, IPoint3D location, ushort heading)
+        public virtual GameNPC PlaceHousingNPC(House house, ItemTemplate item, IPoint3D location, ushort heading)
         {
             NpcTemplate npcTemplate = NpcTemplateMgr.GetTemplate(item.Bonus);
 
             try
             {
-                string defaultClassType = ServerProperties.Properties.GAMENPC_DEFAULT_CLASSTYPE;
+                string defaultClassType = Properties.GAMENPC_DEFAULT_CLASSTYPE;
 
-                if (npcTemplate == null || string.IsNullOrEmpty(npcTemplate.ClassType))
+                if (string.IsNullOrEmpty(npcTemplate?.ClassType))
                 {
-                    log.Warn("[Housing] null classtype in hookpoint attachment, using GAMENPC_DEFAULT_CLASSTYPE instead");
+                    Log.Warn("[Housing] null classtype in hookpoint attachment, using GAMENPC_DEFAULT_CLASSTYPE instead");
                 }
                 else
                 {
@@ -2713,7 +2757,7 @@ namespace DOL.GS.ServerRules
 
                 if (npc == null)
                 {
-                    HouseMgr.log.Error("[Housing] Can't create instance of type: " + defaultClassType);
+                    HouseMgr.log.Error($"[Housing] Can\'t create instance of type: {defaultClassType}");
                     return null;
                 }
 
@@ -2769,27 +2813,29 @@ namespace DOL.GS.ServerRules
             }
             catch (Exception ex)
             {
-                log.Error("Error filling housing hookpoint using npc template ID " + item.Bonus, ex);
+                Log.Error($"Error filling housing hookpoint using npc template ID {item.Bonus}", ex);
             }
 
             return null;
         }
 
-        public virtual GameStaticItem PlaceHousingInteriorItem(DOL.GS.Housing.House house, ItemTemplate item, IPoint3D location, ushort heading)
+        public virtual GameStaticItem PlaceHousingInteriorItem(House house, ItemTemplate item, IPoint3D location, ushort heading)
         {
-            GameStaticItem hookpointObject = new GameStaticItem();
-            hookpointObject.CurrentHouse = house;
-            hookpointObject.InHouse = true;
-            hookpointObject.OwnerID = item.Id_nb;
-            hookpointObject.X = location.X;
-            hookpointObject.Y = location.Y;
-            hookpointObject.Z = location.Z;
-            hookpointObject.Heading = heading;
-            hookpointObject.CurrentRegionID = house.RegionID;
-            hookpointObject.Name = item.Name;
-            hookpointObject.Model = (ushort)item.Model;
-            hookpointObject.AddToWorld();
+            GameStaticItem hookpointObject = new GameStaticItem
+            {
+                CurrentHouse = house,
+                InHouse = true,
+                OwnerID = item.Id_nb,
+                X = location.X,
+                Y = location.Y,
+                Z = location.Z,
+                Heading = heading,
+                CurrentRegionID = house.RegionID,
+                Name = item.Name,
+                Model = (ushort) item.Model
+            };
 
+            hookpointObject.AddToWorld();
             return hookpointObject;
         }
 
@@ -2800,8 +2846,11 @@ namespace DOL.GS.ServerRules
         /// <returns></returns>
         public virtual GameConsignmentMerchant CreateHousingConsignmentMerchant(House house)
         {
-            var m = new GameConsignmentMerchant();
-            m.Name = "Consignment Merchant";
+            var m = new GameConsignmentMerchant
+            {
+                Name = "Consignment Merchant"
+            };
+
             return m;
         }
 

@@ -33,7 +33,7 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The Protect Distance
@@ -44,9 +44,9 @@ namespace DOL.GS.SkillHandler
         {
             if (player == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("Could not retrieve player in ProtectAbilityHandler.");
+                    Log.Warn("Could not retrieve player in ProtectAbilityHandler.");
                 }
 
                 return;

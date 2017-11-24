@@ -33,7 +33,7 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// wait 5 sec to engage after attack
@@ -54,9 +54,9 @@ namespace DOL.GS.SkillHandler
         {
             if (player == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("Could not retrieve player in EngageAbilityHandler.");
+                    Log.Warn("Could not retrieve player in EngageAbilityHandler.");
                 }
 
                 return;
@@ -92,15 +92,14 @@ namespace DOL.GS.SkillHandler
                 return;
             }
 
-            GameLiving target = player.TargetObject as GameLiving;
-            if (target == null)
+            if (!(player.TargetObject is GameLiving target))
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.Engage.NoTarget"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
             // You cannot engage a mob that was attacked within the last 5 seconds...
-            if (target.LastAttackedByEnemyTick > target.CurrentRegion.Time - EngageAbilityHandler.ENGAGE_ATTACK_DELAY_TICK)
+            if (target.LastAttackedByEnemyTick > target.CurrentRegion.Time - ENGAGE_ATTACK_DELAY_TICK)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.Engage.TargetAttackedRecently", target.GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
@@ -115,7 +114,6 @@ namespace DOL.GS.SkillHandler
             // Cancel old engage effects on player
             foreach (EngageEffect engage in player.EffectList.GetAllOfType<EngageEffect>())
             {
-
                 if (engage != null)
                 {
                     engage.Cancel(false);

@@ -27,23 +27,11 @@ namespace DOL.GS.SkillHandler
     [SkillHandler(Abilities.ClimbSpikes)]
     public class ClimbingAbilityHandler : SpellCastingAbilityHandler
     {
-        private static int spellid = -1;
+        private static int _spellid = -1;
 
-        public override long Preconditions
-        {
-            get
-            {
-                return DEAD | SITTING | MEZZED | STUNNED;
-            }
-        }
+        public override long Preconditions => DEAD | SITTING | MEZZED | STUNNED;
 
-        public override int SpellID
-        {
-            get
-            {
-                return spellid;
-            }
-        }
+        public override int SpellID => _spellid;
 
         public ClimbingAbilityHandler()
         {
@@ -52,13 +40,13 @@ namespace DOL.GS.SkillHandler
             //      - matching vs ability name / spell name needed
             //      - spell name is not indexed
             // perhaps a basis to think about, but definitively not the design we want.
-            if (spellid == -1)
+            if (_spellid == -1)
             {
-                spellid = 0;
+                _spellid = 0;
                 DBSpell climbSpell = GameServer.Database.SelectObjects<DBSpell>("`Name` = @Name", new QueryParameter("@Name", Abilities.ClimbSpikes)).FirstOrDefault();
                 if (climbSpell != null)
                 {
-                    spellid = climbSpell.SpellID;
+                    _spellid = climbSpell.SpellID;
                 }
             }
         }

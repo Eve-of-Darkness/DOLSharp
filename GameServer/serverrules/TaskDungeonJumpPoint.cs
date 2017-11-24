@@ -45,14 +45,13 @@ namespace DOL.GS.ServerRules
             if (player.Group != null)
             {
                 Group grp = player.Group;
-                if (grp.Mission != null && grp.Mission is TaskDungeonMission)
+                if (grp.Mission is TaskDungeonMission task)
                 {
                     // Attempt to get the instance entrance location...
-                    TaskDungeonMission task = (TaskDungeonMission)grp.Mission;
                     loc = task.TaskRegion.InstanceEntranceLocation;
                 }
             }
-            else if (player.Mission != null && player.Mission is TaskDungeonMission)
+            else if (player.Mission is TaskDungeonMission)
             {
                 // Then, try personal missions...
                 TaskDungeonMission task = (TaskDungeonMission)player.Mission;

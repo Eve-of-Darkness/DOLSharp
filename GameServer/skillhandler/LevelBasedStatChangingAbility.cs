@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-
 using DOL.Database;
 
 namespace DOL.GS.SkillHandler
@@ -46,7 +45,7 @@ namespace DOL.GS.SkillHandler
             set
             {
                 // Override Setter to have Living Level Updated if available.
-                base.Level = m_activeLiving == null ? value : m_activeLiving.Level;
+                base.Level = m_activeLiving?.Level ?? value;
             }
         }
 
@@ -54,7 +53,7 @@ namespace DOL.GS.SkillHandler
         /// Name with stat amount appended
         /// </summary>
         public override string Name {
-            get { return m_activeLiving != null ? string.Format("{0} +{1}", base.Name, GetAmountForLevel(Level)) : base.Name; }
+            get { return m_activeLiving != null ? $"{base.Name} +{GetAmountForLevel(Level)}" : base.Name; }
             set { base.Name = value; }
         }
 
