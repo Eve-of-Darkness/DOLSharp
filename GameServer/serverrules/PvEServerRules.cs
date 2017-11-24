@@ -40,20 +40,18 @@ namespace DOL.GS.ServerRules
             }
 
             // if controlled NPC - do checks for owner instead
-            if (attacker is GameNPC)
+            if (attacker is GameNPC npc)
             {
-                IControlledBrain controlled = ((GameNPC)attacker).Brain as IControlledBrain;
-                if (controlled != null)
+                if (npc.Brain is IControlledBrain controlled)
                 {
                     attacker = controlled.GetPlayerOwner();
                     quiet = true; // silence all attacks by controlled npc
                 }
             }
 
-            if (defender is GameNPC)
+            if (defender is GameNPC gameNpc)
             {
-                IControlledBrain controlled = ((GameNPC)defender).Brain as IControlledBrain;
-                if (controlled != null)
+                if (gameNpc.Brain is IControlledBrain controlled)
                 {
                     defender = controlled.GetPlayerOwner();
                 }
@@ -78,7 +76,7 @@ namespace DOL.GS.ServerRules
 
             if (attacker.Realm != eRealm.None && defender.Realm != eRealm.None)
             {
-                if (attacker is GamePlayer && ((GamePlayer)attacker).DuelTarget == defender)
+                if (attacker is GamePlayer player && player.DuelTarget == defender)
                 {
                     return true;
                 }
@@ -95,7 +93,7 @@ namespace DOL.GS.ServerRules
             if (attacker.Realm == defender.Realm)
             {
                 // allow confused mobs to attack same realm
-                if (attacker is GameNPC && (attacker as GameNPC).IsConfused)
+                if (attacker is GameNPC && ((GameNPC) attacker).IsConfused)
                 {
                     return true;
                 }
@@ -125,20 +123,18 @@ namespace DOL.GS.ServerRules
             }
 
             // if controlled NPC - do checks for owner instead
-            if (source is GameNPC)
+            if (source is GameNPC npc)
             {
-                IControlledBrain controlled = ((GameNPC)source).Brain as IControlledBrain;
-                if (controlled != null)
+                if (npc.Brain is IControlledBrain controlled)
                 {
                     source = controlled.GetPlayerOwner();
                     quiet = true; // silence all attacks by controlled npc
                 }
             }
 
-            if (target is GameNPC)
+            if (target is GameNPC gameNpc)
             {
-                IControlledBrain controlled = ((GameNPC)target).Brain as IControlledBrain;
-                if (controlled != null)
+                if (gameNpc.Brain is IControlledBrain controlled)
                 {
                     target = controlled.GetPlayerOwner();
                 }
@@ -150,7 +146,7 @@ namespace DOL.GS.ServerRules
             }
 
             // clients with priv level > 1 are considered friendly by anyone
-            if (target is GamePlayer && ((GamePlayer)target).Client.Account.PrivLevel > 1)
+            if (target is GamePlayer player && player.Client.Account.PrivLevel > 1)
             {
                 return true;
             }
@@ -167,17 +163,17 @@ namespace DOL.GS.ServerRules
             }
 
             // Peace flag NPCs are same realm
-            if (target is GameNPC)
+            if (target is GameNPC npc1)
             {
-                if ((((GameNPC)target).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((npc1.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return true;
                 }
             }
 
-            if (source is GameNPC)
+            if (source is GameNPC gameNpc1)
             {
-                if ((((GameNPC)source).Flags & GameNPC.eFlags.PEACE) != 0)
+                if ((gameNpc1.Flags & GameNPC.eFlags.PEACE) != 0)
                 {
                     return true;
                 }
@@ -185,7 +181,7 @@ namespace DOL.GS.ServerRules
 
             if (quiet == false)
             {
-                MessageToLiving(source, target.GetName(0, true) + " is not a member of your realm!");
+                MessageToLiving(source, $"{target.GetName(0, true)} is not a member of your realm!");
             }
 
             return false;

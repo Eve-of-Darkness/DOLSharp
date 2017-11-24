@@ -17,7 +17,6 @@
  *
  */
 using DOL.GS.PacketHandler;
-using DOL.GS.SkillHandler;
 using DOL.Language;
 using System.Collections.Generic;
 
@@ -28,12 +27,18 @@ namespace DOL.GS.Effects
     /// </summary>
     public class BerserkEffect : TimedEffect, IGameEffect
     {
-        protected ushort m_startModel = 0;
+        protected ushort m_startModel;
+
+        /// <summary>
+        /// The effect duration in milliseconds
+        /// </summary>
+        private const int Duration = 20000;
+
         /// <summary>
         /// Creates a new berserk effect
         /// </summary>
         public BerserkEffect()
-            : base(BerserkAbilityHandler.DURATION)
+            : base(Duration)
         {
         }
 

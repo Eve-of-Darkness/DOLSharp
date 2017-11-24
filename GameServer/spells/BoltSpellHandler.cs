@@ -200,7 +200,7 @@ namespace DOL.GS.Spells
                 {
                     ad.AttackResult = GameLiving.eAttackResult.Missed;
                     m_handler.MessageToCaster("You miss!", eChatType.CT_YouHit);
-                    m_handler.MessageToLiving(target, caster.GetName(0, false) + " missed!", eChatType.CT_Missed);
+                    m_handler.MessageToLiving(target, $"{caster.GetName(0, false)} missed!", eChatType.CT_Missed);
                     target.OnAttackedByEnemy(ad);
                     target.StartInterruptTimer(target.SpellInterruptDuration, ad.AttackType, caster);
                     if (target is GameNPC)

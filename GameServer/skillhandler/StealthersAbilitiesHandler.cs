@@ -17,17 +17,13 @@
  *
  */
 using System;
-using System.Reflection;
 using DOL.Database;
 using DOL.Events;
-using log4net;
 
 namespace DOL.GS
 {
     public class StealtherAbilities
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
         {
@@ -36,119 +32,130 @@ namespace DOL.GS
 
         private static void AssassinsAbilities(DOLEvent e, object sender, EventArgs arguments)
         {
-            GamePlayer player = sender as GamePlayer;
+            if (!(sender is GamePlayer player))
+            {
+                return;
+            }
 
             // Shadowblade-Blood Rage
             if (player.HasAbility(Abilities.BloodRage))
             {
-                player.CastSpell(BR, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
+                player.CastSpell(Br, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
             }
 
             // Infiltrator-Heightened Awareness
             if (player.HasAbility(Abilities.HeightenedAwareness))
             {
-                player.CastSpell(HA, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
+                player.CastSpell(Ha, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
             }
 
             // Nightshade-Subtle Kills
             if (player.HasAbility(Abilities.SubtleKills))
             {
-                player.CastSpell(SK, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
+                player.CastSpell(Sk, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
             }
         }
 
         #region Blood Rage Spell
-        protected static Spell Blood_Rage;
+        private static Spell _bloodRage;
 
-        public static Spell BR
+        private static Spell Br
         {
             get
             {
-                if (Blood_Rage == null)
+                if (_bloodRage == null)
                 {
-                    DBSpell spell = new DBSpell();
-                    spell.AllowAdd = true;
-                    spell.CastTime = 0;
-                    spell.Uninterruptible = true;
-                    spell.Icon = 10541;
-                    spell.ClientEffect = 10541;
-                    spell.Description = "Movement speed of the player in stealth is increased by 25% for 1 minute after they get a killing blow on a realm enemy.";
-                    spell.Name = "Blood Rage";
-                    spell.Range = 0;
-                    spell.Value = 25;
-                    spell.Duration = 60;
-                    spell.SpellID = 900090;
-                    spell.Target = "Self";
-                    spell.Type = "BloodRage";
-                    Blood_Rage = new Spell(spell, 50);
-                    SkillBase.AddScriptedSpell(GlobalSpellsLines.Reserved_Spells, Blood_Rage);
+                    DBSpell spell = new DBSpell
+                    {
+                        AllowAdd = true,
+                        CastTime = 0,
+                        Uninterruptible = true,
+                        Icon = 10541,
+                        ClientEffect = 10541,
+                        Description = "Movement speed of the player in stealth is increased by 25% for 1 minute after they get a killing blow on a realm enemy.",
+                        Name = "Blood Rage",
+                        Range = 0,
+                        Value = 25,
+                        Duration = 60,
+                        SpellID = 900090,
+                        Target = "Self",
+                        Type = "BloodRage"
+                    };
+
+                    _bloodRage = new Spell(spell, 50);
+                    SkillBase.AddScriptedSpell(GlobalSpellsLines.Reserved_Spells, _bloodRage);
                 }
 
-                return Blood_Rage;
+                return _bloodRage;
             }
         }
         #endregion
 
         #region Heightened Awareness Spell
-        protected static Spell Heightened_Awareness;
+        private static Spell _heightenedAwareness;
 
-        public static Spell HA
+        private static Spell Ha
         {
             get
             {
-                if (Heightened_Awareness == null)
+                if (_heightenedAwareness == null)
                 {
-                    DBSpell spell = new DBSpell();
-                    spell.AllowAdd = true;
-                    spell.CastTime = 0;
-                    spell.Uninterruptible = true;
-                    spell.Icon = 10541;
-                    spell.ClientEffect = 10541;
-                    spell.Description = "Greater Chance to Detect Stealthed Enemies for 1 minute after executing a klling blow on a realm opponent.";
-                    spell.Name = "Heightened Awareness";
-                    spell.Range = 0;
-                    spell.Value = 25;
-                    spell.Duration = 60;
-                    spell.SpellID = 900091;
-                    spell.Target = "Self";
-                    spell.Type = "HeightenedAwareness";
-                    Heightened_Awareness = new Spell(spell, 50);
-                    SkillBase.AddScriptedSpell(GlobalSpellsLines.Reserved_Spells, Heightened_Awareness);
+                    DBSpell spell = new DBSpell
+                    {
+                        AllowAdd = true,
+                        CastTime = 0,
+                        Uninterruptible = true,
+                        Icon = 10541,
+                        ClientEffect = 10541,
+                        Description = "Greater Chance to Detect Stealthed Enemies for 1 minute after executing a klling blow on a realm opponent.",
+                        Name = "Heightened Awareness",
+                        Range = 0,
+                        Value = 25,
+                        Duration = 60,
+                        SpellID = 900091,
+                        Target = "Self",
+                        Type = "HeightenedAwareness"
+                    };
+
+                    _heightenedAwareness = new Spell(spell, 50);
+                    SkillBase.AddScriptedSpell(GlobalSpellsLines.Reserved_Spells, _heightenedAwareness);
                 }
 
-                return Heightened_Awareness;
+                return _heightenedAwareness;
             }
         }
         #endregion
 
         #region Subtle Kills Spell
-        protected static Spell Subtle_Kills;
+        private static Spell _subtleKills;
 
-        public static Spell SK
+        private static Spell Sk
         {
             get
             {
-                if (Subtle_Kills == null)
+                if (_subtleKills == null)
                 {
-                    DBSpell spell = new DBSpell();
-                    spell.AllowAdd = true;
-                    spell.CastTime = 0;
-                    spell.Uninterruptible = true;
-                    spell.Icon = 10541;
-                    spell.ClientEffect = 10541;
-                    spell.Description = "Greater chance of remaining hidden while stealthed for 1 minute after executing a killing blow on a realm opponent.";
-                    spell.Name = "Subtle Kills";
-                    spell.Range = 0;
-                    spell.Value = 25;
-                    spell.Duration = 60;
-                    spell.SpellID = 900092;
-                    spell.Target = "Self";
-                    spell.Type = "SubtleKills";
-                    Subtle_Kills = new Spell(spell, 50);
-                    SkillBase.AddScriptedSpell(GlobalSpellsLines.Reserved_Spells, Subtle_Kills);
+                    DBSpell spell = new DBSpell
+                    {
+                        AllowAdd = true,
+                        CastTime = 0,
+                        Uninterruptible = true,
+                        Icon = 10541,
+                        ClientEffect = 10541,
+                        Description = "Greater chance of remaining hidden while stealthed for 1 minute after executing a killing blow on a realm opponent.",
+                        Name = "Subtle Kills",
+                        Range = 0,
+                        Value = 25,
+                        Duration = 60,
+                        SpellID = 900092,
+                        Target = "Self",
+                        Type = "SubtleKills"
+                    };
+                    _subtleKills = new Spell(spell, 50);
+                    SkillBase.AddScriptedSpell(GlobalSpellsLines.Reserved_Spells, _subtleKills);
                 }
 
-                return Subtle_Kills;
+                return _subtleKills;
             }
         }
         #endregion

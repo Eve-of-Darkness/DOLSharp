@@ -28,7 +28,7 @@ namespace DOL.GS.SkillHandler
     public class MemoriesOfWar : StatChangingAbility
     {
         public MemoriesOfWar(DBAbility dba, int level)
-            : base(dba, level, new eProperty[] {
+            : base(dba, level, new[] {
                             eProperty.Resist_Body,
                             eProperty.Resist_Cold,
                             eProperty.Resist_Energy,

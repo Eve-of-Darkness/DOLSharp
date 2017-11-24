@@ -18,31 +18,28 @@
  */
 
 using DOL.Database;
+using log4net;
 
 namespace DOL.GS.SkillHandler
 {
     public class PropertyChangingAbility : Ability
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         // property to modify
-        protected eProperty[] m_property;
 
-        public eProperty[] Properties
-        {
-            get { return m_property; }
-        }
+        public eProperty[] Properties { get; }
 
         public PropertyChangingAbility(DBAbility dba, int level, eProperty[] property)
             : base(dba, level)
         {
-            m_property = property;
+            Properties = property;
         }
 
         public PropertyChangingAbility(DBAbility dba, int level, eProperty property)
             : base(dba, level)
         {
-            m_property = new eProperty[] { property };
+            Properties = new[] { property };
         }
 
         /// <summary>
@@ -58,13 +55,7 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// The bonus amount at this abilities level
         /// </summary>
-        public int Amount
-        {
-            get
-            {
-                return GetAmountForLevel(Level);
-            }
-        }
+        public int Amount => GetAmountForLevel(Level);
 
         /// <summary>
         /// send updates about the changes
@@ -77,14 +68,14 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Unit for values like %
         /// </summary>
-        protected virtual string ValueUnit { get { return string.Empty; } }
+        protected virtual string ValueUnit => string.Empty;
 
         public override void Activate(GameLiving living, bool sendUpdates)
         {
             if (m_activeLiving == null)
             {
                 m_activeLiving = living;
-                foreach (eProperty property in m_property)
+                foreach (eProperty property in Properties)
                 {
                     living.AbilityBonus[(int)property] += GetAmountForLevel(living.CalculateSkillLevel(this));
                 }
@@ -96,7 +87,7 @@ namespace DOL.GS.SkillHandler
             }
             else
             {
-                log.WarnFormat("ability {0} already activated on {1}", Name, living.Name);
+                Log.Warn($"ability {Name} already activated on {living.Name}");
             }
         }
 
@@ -104,7 +95,7 @@ namespace DOL.GS.SkillHandler
         {
             if (m_activeLiving != null)
             {
-                foreach (eProperty property in m_property)
+                foreach (eProperty property in Properties)
                 {
                     living.AbilityBonus[(int)property] -= GetAmountForLevel(living.CalculateSkillLevel(this));
                 }
@@ -118,7 +109,7 @@ namespace DOL.GS.SkillHandler
             }
             else
             {
-                log.Warn("ability " + Name + " already deactivated on " + living.Name);
+                Log.Warn($"ability {Name} already deactivated on {living.Name}");
             }
         }
 
@@ -129,7 +120,7 @@ namespace DOL.GS.SkillHandler
                 newLevel = Level;
             }
 
-            foreach (eProperty property in m_property)
+            foreach (eProperty property in Properties)
             {
                 m_activeLiving.AbilityBonus[(int)property] += GetAmountForLevel(newLevel) - GetAmountForLevel(oldLevel);
             }

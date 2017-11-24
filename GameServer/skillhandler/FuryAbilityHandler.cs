@@ -25,20 +25,8 @@ namespace DOL.GS.SkillHandler
     [SkillHandler(Abilities.Fury)]
     public class FuryAbilityHandler : SpellCastingAbilityHandler
     {
-        public override long Preconditions
-        {
-            get
-            {
-                return DEAD | SITTING | MEZZED | STUNNED;
-            }
-        }
+        public override long Preconditions => DEAD | SITTING | MEZZED | STUNNED;
 
-        public override int SpellID
-        {
-            get
-            {
-                return 14374;
-            }
-        }
+        public override int SpellID => 14374;
     }
 }

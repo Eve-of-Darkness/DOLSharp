@@ -33,25 +33,20 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The ability reuse time in milliseconds
         /// </summary>
-        protected const int REUSE_TIMER = 60000 * 20;
-
-        /// <summary>
-        /// The ability effect duration in milliseconds
-        /// </summary>
-        public const int DURATION = 30 * 1000; // 30 seconds
+        private const int ReuseTimer = 60000 * 20;
 
         public void Execute(Ability ab, GamePlayer player)
         {
             if (player == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("Could not retrieve player in StagAbilityHandler.");
+                    Log.Warn("Could not retrieve player in StagAbilityHandler.");
                 }
 
                 return;
@@ -89,7 +84,7 @@ namespace DOL.GS.SkillHandler
                 return;
             }
 
-            player.DisableSkill(ab, REUSE_TIMER);
+            player.DisableSkill(ab, ReuseTimer);
 
             new StagEffect(ab.Level).Start(player);
         }

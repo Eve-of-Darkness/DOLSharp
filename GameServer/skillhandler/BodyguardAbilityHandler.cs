@@ -33,7 +33,7 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The guard distance
@@ -42,19 +42,19 @@ namespace DOL.GS.SkillHandler
 
         public void Execute(Ability ab, GamePlayer player)
         {
-            if (!player.IsAlive)
+            if (player == null)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUse.Bodyguard.Dead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                if (Log.IsWarnEnabled)
+                {
+                    Log.Warn("Could not retrieve player in BodyguardAbilityHandler.");
+                }
+
                 return;
             }
 
-            if (player == null)
+            if (!player.IsAlive)
             {
-                if (log.IsWarnEnabled)
-                {
-                    log.Warn("Could not retrieve player in BodyguardAbilityHandler.");
-                }
-
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUse.Bodyguard.Dead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
@@ -110,11 +110,11 @@ namespace DOL.GS.SkillHandler
 
             foreach (BodyguardEffect bg in player.EffectList.GetAllOfType<BodyguardEffect>())
             {
-                    if (bg != null && player == bg.GuardTarget)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUse.Bodyguard.GuardSourceBodyGuarded"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        return;
-                    }
+                if (bg != null && player == bg.GuardTarget)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUse.Bodyguard.GuardSourceBodyGuarded"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
             }
 
             // cancel all guard effects by this player before adding a new one

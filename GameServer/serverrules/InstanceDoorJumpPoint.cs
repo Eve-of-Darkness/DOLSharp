@@ -45,10 +45,8 @@ namespace DOL.GS.ServerRules
             {
                 return true;
             }
-            else
-            {
-                return false; // Let instance handle zoning by itself in this case...
-            }
+
+            return false; // Let instance handle zoning by itself in this case...
         }
     }
 }

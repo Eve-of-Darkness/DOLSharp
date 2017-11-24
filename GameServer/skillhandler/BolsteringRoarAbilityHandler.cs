@@ -28,21 +28,9 @@ namespace DOL.GS.SkillHandler
     [SkillHandler(Abilities.BolsteringRoar)]
     public class BolsteringRoarAbilityHandler : SpellCastingAbilityHandler
     {
-        public override long Preconditions
-        {
-            get
-            {
-                return DEAD | SITTING | MEZZED | STUNNED | NOTINGROUP;
-            }
-        }
+        public override long Preconditions => DEAD | SITTING | MEZZED | STUNNED | NOTINGROUP;
 
-        public override int SpellID
-        {
-            get
-            {
-                return 14376;
-            }
-        }
+        public override int SpellID => 14376;
 
         public override bool CheckPreconditions(GameLiving living, long bitmask)
         {
@@ -50,13 +38,11 @@ namespace DOL.GS.SkillHandler
              {
                 foreach (IGameEffect effect in living.EffectList)
                 {
-                    if (effect is GameSpellEffect)
+                    if (effect is GameSpellEffect oEffect)
                     {
-                        GameSpellEffect oEffect = (GameSpellEffect)effect;
                         if (oEffect.Spell.SpellType.ToLower().IndexOf("speeddecrease") != -1 && oEffect.Spell.Value != 99)
                         {
-                            GamePlayer player = living as GamePlayer;
-                            if (player != null)
+                            if (living is GamePlayer player)
                             {
                                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseSnared"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             }

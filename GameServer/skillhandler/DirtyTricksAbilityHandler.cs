@@ -37,16 +37,16 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         /// <summary>
         /// The ability reuse time in seconds
         /// </summary>
-        protected const int REUSE_TIMER = 60000 * 7; // 7 minutes
+        private const int ReuseTimer = 60000 * 7; // 7 minutes
 
         /// <summary>
         /// The ability effect duration in seconds
         /// </summary>
-        public const int DURATION = 30;
+        private const int Duration = 30;
 
         /// <summary>
         /// Execute dirtytricks ability
@@ -57,9 +57,9 @@ namespace DOL.GS.SkillHandler
         {
             if (player == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("Could not retrieve player in DirtyTricksAbilityHandler.");
+                    Log.Warn("Could not retrieve player in DirtyTricksAbilityHandler.");
                 }
 
                 return;
@@ -89,8 +89,8 @@ namespace DOL.GS.SkillHandler
                 return;
             }
 
-            player.DisableSkill(ab, REUSE_TIMER);
-            DirtyTricksEffect dt = new DirtyTricksEffect(DURATION * 1000);
+            player.DisableSkill(ab, ReuseTimer);
+            DirtyTricksEffect dt = new DirtyTricksEffect(Duration * 1000);
             dt.Start(player);
         }
     }
@@ -103,11 +103,6 @@ namespace DOL.GS.Effects
     /// </summary>
     public class DirtyTricksEffect : TimedEffect
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public DirtyTricksEffect(int duration)
             : base(duration)
         {
@@ -118,11 +113,6 @@ namespace DOL.GS.Effects
             base.Start(target);
             GamePlayer player = target as GamePlayer;
 
-            // foreach(GamePlayer p in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-            //    {
-            //      p.Out.SendSpellEffectAnimation(player, player, Icon, 0, false, 1);
-            //      p.Out.SendSpellCastAnimation(player, Icon, 0);
-            //   }
             GameEventMgr.AddHandler(player, GameLivingEvent.AttackFinished, new DOLEventHandler(EventHandler));
         }
 
@@ -135,8 +125,7 @@ namespace DOL.GS.Effects
 
         protected void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackFinishedEventArgs atkArgs = arguments as AttackFinishedEventArgs;
-            if (atkArgs == null)
+            if (!(arguments is AttackFinishedEventArgs atkArgs))
             {
                 return;
             }
@@ -147,18 +136,9 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            if (atkArgs.AttackData.Target == null)
-            {
-                return;
-            }
-
             GameLiving target = atkArgs.AttackData.Target;
-            if (target == null)
-            {
-                return;
-            }
 
-            if (target.ObjectState != GameObject.eObjectState.Active)
+            if (target?.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -168,8 +148,7 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            GameLiving attacker = sender as GameLiving;
-            if (attacker == null)
+            if (!(sender is GameLiving attacker))
             {
                 return;
             }
@@ -203,16 +182,19 @@ namespace DOL.GS.Effects
             }
         }
 
-        public override string Name { get { return LanguageMgr.GetTranslation(((GamePlayer)Owner).Client, "Skill.Ability.DirtyTricks.Name"); } }
+        public override string Name => LanguageMgr.GetTranslation(((GamePlayer)Owner).Client, "Skill.Ability.DirtyTricks.Name");
 
-        public override ushort Icon { get { return 478; } }
+        public override ushort Icon => 478;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add(LanguageMgr.GetTranslation(((GamePlayer)Owner).Client, "Skill.Ability.DirtyTricks.Description"));
+                var list = new List<string>
+                {
+                    LanguageMgr.GetTranslation(((GamePlayer) Owner).Client, "Skill.Ability.DirtyTricks.Description")
+                };
+
                 list.AddRange(base.DelveInfo);
                 return list;
             }
@@ -225,52 +207,39 @@ namespace DOL.GS.Effects
     /// <summary>
     /// The helper class for the berserk ability
     /// </summary>
-    public class DTdetrimentalEffect : StaticEffect, IGameEffect
+    public class DTdetrimentalEffect : StaticEffect
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// The ability description
         /// </summary>
-        protected const string delveString = "Causes target's fumble rate to increase.";
+        private const string DelveString = "Causes target's fumble rate to increase.";
 
         /// <summary>
         /// The owner of the effect
         /// </summary>
-        GameLiving m_player;
+        private GameLiving _player;
 
         /// <summary>
         /// The timer that will cancel the effect
         /// </summary>
-        protected RegionTimer m_expireTimer;
-
-        /// <summary>
-        /// Creates a new berserk effect
-        /// </summary>
-        public DTdetrimentalEffect()
-        {
-        }
+        private RegionTimer _expireTimer;
 
         /// <summary>
         /// Start the berserk on a player
         /// </summary>
         public override void Start(GameLiving living)
         {
-            m_player = living;
+            _player = living;
 
             // Log.Debug("Effect Started from DT detrimental effect on " + m_player.Name);
             StartTimers(); // start the timers before adding to the list!
-            m_player.EffectList.Add(this);
-            m_player.DebuffCategory[(int)eProperty.FumbleChance] += 50;
+            _player.EffectList.Add(this);
+            _player.DebuffCategory[(int)eProperty.FumbleChance] += 50;
 
             // foreach (GamePlayer visiblePlayer in m_player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             //  {
             //  }
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.DirtyTricks.EffectStart"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
@@ -288,10 +257,9 @@ namespace DOL.GS.Effects
 
             // Log.Debug("Effect Canceled from DT Detrimental effect on "+ m_player.Name);
             StopTimers();
-            m_player.EffectList.Remove(this);
-            m_player.DebuffCategory[(int)eProperty.FumbleChance] -= 50;
-            GamePlayer player = m_player as GamePlayer;
-            if (player != null)
+            _player.EffectList.Remove(this);
+            _player.DebuffCategory[(int)eProperty.FumbleChance] -= 50;
+            if (_player is GamePlayer player)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.DirtyTricks.EffectCancel"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
@@ -303,7 +271,7 @@ namespace DOL.GS.Effects
         protected virtual void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(m_player, new RegionTimerCallback(ExpiredCallback), 10000);
+            _expireTimer = new RegionTimer(_player, new RegionTimerCallback(ExpiredCallback), 10000);
         }
 
         /// <summary>
@@ -311,11 +279,11 @@ namespace DOL.GS.Effects
         /// </summary>
         protected virtual void StopTimers()
         {
-            if (m_expireTimer != null)
+            if (_expireTimer != null)
             {
                 // DOLConsole.WriteLine("effect stop expire on "+Owner.Name+" "+this.InternalID);
-                m_expireTimer.Stop();
-                m_expireTimer = null;
+                _expireTimer.Stop();
+                _expireTimer = null;
             }
         }
 
@@ -337,7 +305,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-                if (Owner != null && Owner is GamePlayer && (Owner as GamePlayer).Client != null)
+                if ((Owner as GamePlayer)?.Client != null)
                 {
                     return LanguageMgr.GetTranslation(((GamePlayer)Owner).Client, "Skill.Ability.DirtyTricks.Name");
                 }
@@ -353,7 +321,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
+                RegionTimer timer = _expireTimer;
                 if (timer == null || !timer.IsAlive)
                 {
                     return 0;
@@ -366,7 +334,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Icon to show on players, can be id
         /// </summary>
-        public override ushort Icon { get { return 478; } }
+        public override ushort Icon => 478;
 
         /// <summary>
         /// Delve Info
@@ -375,8 +343,10 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>(4);
-                delveInfoList.Add(delveString);
+                var delveInfoList = new List<string>
+                {
+                    DelveString
+                };
 
                 int seconds = RemainingTime / 1000;
                 if (seconds > 0)
@@ -384,11 +354,11 @@ namespace DOL.GS.Effects
                     delveInfoList.Add(" "); // empty line
                     if (seconds > 60)
                     {
-                        delveInfoList.Add("- " + seconds / 60 + ":" + (seconds % 60).ToString("00") + LanguageMgr.GetTranslation(((GamePlayer)Owner).Client, "Skill.Ability.MinRemaining"));
+                        delveInfoList.Add($"- {seconds / 60}:{seconds % 60:00}{LanguageMgr.GetTranslation(((GamePlayer) Owner).Client, "Skill.Ability.MinRemaining")}");
                     }
                     else
                     {
-                        delveInfoList.Add("- " + seconds + LanguageMgr.GetTranslation(((GamePlayer)Owner).Client, "Skill.Ability.SecRemaining"));
+                        delveInfoList.Add($"- {seconds}{LanguageMgr.GetTranslation(((GamePlayer) Owner).Client, "Skill.Ability.SecRemaining")}");
                     }
                 }
 

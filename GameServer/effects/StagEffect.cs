@@ -27,7 +27,7 @@ namespace DOL.GS.Effects
     /// <summary>
     /// The helper class for the stag ability
     /// </summary>
-    public class StagEffect : TimedEffect, IGameEffect
+    public class StagEffect : TimedEffect
     {
         /*
         1.42
@@ -49,6 +49,11 @@ namespace DOL.GS.Effects
         // some time after a lurikeen model was added for luri's
 
         /// <summary>
+        /// The ability effect duration in milliseconds
+        /// </summary>
+        private const int Duration = 30 * 1000; // 30 seconds
+
+        /// <summary>
         /// The amount of max health gained
         /// </summary>
         protected int m_amount;
@@ -61,7 +66,7 @@ namespace DOL.GS.Effects
         /// Creates a new stag effect
         /// </summary>
         public StagEffect(int level)
-            : base(StagAbilityHandler.DURATION)
+            : base(Duration)
         {
             m_level = level;
         }

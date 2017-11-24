@@ -23,8 +23,6 @@ namespace DOL.GS.SkillHandler
 {
     public class StatChangingAbility : PropertyChangingAbility
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         public StatChangingAbility(DBAbility dba, int level, eProperty[] property)
             : base(dba, level, property)
         {
@@ -41,8 +39,7 @@ namespace DOL.GS.SkillHandler
         /// <param name="target"></param>
         public override void SendUpdates(GameLiving target)
         {
-            GamePlayer player = target as GamePlayer;   // need new prop system to not worry about updates
-            if (player != null)
+            if (target is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
                 player.Out.SendCharResistsUpdate();
@@ -51,34 +48,36 @@ namespace DOL.GS.SkillHandler
                 player.UpdatePlayerStatus();
             }
 
-            if (target.IsAlive)
+            if (!target.IsAlive)
             {
-                if (target.Health < target.MaxHealth)
-                {
-                    target.StartHealthRegeneration();
-                }
-                else if (target.Health > target.MaxHealth)
-                {
-                    target.Health = target.MaxHealth;
-                }
+                return;
+            }
 
-                if (target.Mana < target.MaxMana)
-                {
-                    target.StartPowerRegeneration();
-                }
-                else if (target.Mana > target.MaxMana)
-                {
-                    target.Mana = target.MaxMana;
-                }
+            if (target.Health < target.MaxHealth)
+            {
+                target.StartHealthRegeneration();
+            }
+            else if (target.Health > target.MaxHealth)
+            {
+                target.Health = target.MaxHealth;
+            }
 
-                if (target.Endurance < target.MaxEndurance)
-                {
-                    target.StartEnduranceRegeneration();
-                }
-                else if (target.Endurance > target.MaxEndurance)
-                {
-                    target.Endurance = target.MaxEndurance;
-                }
+            if (target.Mana < target.MaxMana)
+            {
+                target.StartPowerRegeneration();
+            }
+            else if (target.Mana > target.MaxMana)
+            {
+                target.Mana = target.MaxMana;
+            }
+
+            if (target.Endurance < target.MaxEndurance)
+            {
+                target.StartEnduranceRegeneration();
+            }
+            else if (target.Endurance > target.MaxEndurance)
+            {
+                target.Endurance = target.MaxEndurance;
             }
         }
     }

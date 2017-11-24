@@ -15,25 +15,25 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The ability reuse time in seconds
         /// </summary>
-        protected const int REUSE_TIMER = 7 * 60; // 7 minutes
+        private const int ReuseTimer = 7 * 60; // 7 minutes
 
         /// <summary>
         /// The ability effect duration in seconds
         /// </summary>
-        public const int DURATION = 30;
+        private const int Duration = 30;
 
         public void Execute(Ability ab, GamePlayer player)
         {
             if (player == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("Could not retrieve player in TripleWieldAbilityHandler.");
+                    Log.Warn("Could not retrieve player in TripleWieldAbilityHandler.");
                 }
 
                 return;
@@ -70,9 +70,9 @@ namespace DOL.GS.SkillHandler
                 return;
             }
 
-            TripleWieldEffect twe = new TripleWieldEffect(DURATION * 1000);
+            TripleWieldEffect twe = new TripleWieldEffect(Duration * 1000);
             twe.Start(player);
-            player.DisableSkill(ab, REUSE_TIMER * 1000);
+            player.DisableSkill(ab, ReuseTimer * 1000);
         }
     }
 }

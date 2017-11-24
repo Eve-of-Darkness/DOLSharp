@@ -20,6 +20,7 @@
 using DOL.Database;
 using DOL.GS.PacketHandler;
 using System.Collections.Generic;
+using log4net;
 
 namespace DOL.GS.ServerRules
 {
@@ -31,7 +32,7 @@ namespace DOL.GS.ServerRules
     public class AdventureWingJumpPoint : IJumpPointHandler
     {
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Decides whether player can jump to the target point.
@@ -45,7 +46,6 @@ namespace DOL.GS.ServerRules
         {
 
             // Handles zoning INTO an instance.
-            GameLocation loc = null;
             AdventureWingInstance previousInstance = null;
 
             // Do we have a group ?
@@ -54,13 +54,14 @@ namespace DOL.GS.ServerRules
                 // Check if there is an instance dedicated to this group
                 foreach (Region region in WorldMgr.GetAllRegions())
                 {
-                    if (region is AdventureWingInstance && ((AdventureWingInstance)region).Group != null && ((AdventureWingInstance)region).Group == player.Group)
+                    if ((region as AdventureWingInstance)?.Group != null && ((AdventureWingInstance)region).Group == player.Group)
                     {
                         // Our group has an instance !
                         previousInstance = (AdventureWingInstance)region;
                         break;
                     }
-                    else if (region is AdventureWingInstance && ((AdventureWingInstance)region).Player != null && ((AdventureWingInstance)region).Player == player.Group.Leader)
+
+                    if ((region as AdventureWingInstance)?.Player != null && ((AdventureWingInstance)region).Player == player.Group.Leader)
                     {
                         // Our leader has an instance !
                         previousInstance = (AdventureWingInstance)region;
@@ -74,10 +75,10 @@ namespace DOL.GS.ServerRules
                 // Check if there is an instance dedicated to me
                 foreach (Region region in WorldMgr.GetAllRegions())
                 {
-                    if (region is AdventureWingInstance && ((AdventureWingInstance)region).Player != null && ((AdventureWingInstance)region).Player == player)
+                    if (region is AdventureWingInstance instance && instance.Player != null && instance.Player == player)
                     {
                         // I have an Instance !
-                        previousInstance = (AdventureWingInstance)region;
+                        previousInstance = instance;
                         previousInstance.Group = player.Group;
                         break;
                     }
@@ -94,15 +95,13 @@ namespace DOL.GS.ServerRules
                     if (previousInstance.NumPlayers > 0)
                     {
                         // We can't jump !
-                        player.Out.SendMessage("You have another instance (" + previousInstance.Description + ") running with people in it !", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"You have another instance ({previousInstance.Description}) running with people in it !", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return false;
                     }
-                    else
-                    {
-                        log.Warn("Player : " + player.Name + " requested new Instance, destroying instance " + previousInstance.Description + ", ID: " + previousInstance.ID + ", type=" + previousInstance.GetType().ToString() + ".");
-                        WorldMgr.RemoveInstance(previousInstance);
-                        previousInstance = null;
-                    }
+
+                    Log.Warn($"Player : {player.Name} requested new Instance, destroying instance {previousInstance.Description}, ID: {previousInstance.ID}, type={previousInstance.GetType()}.");
+                    WorldMgr.RemoveInstance(previousInstance);
+                    previousInstance = null;
                 }
             }
 
@@ -134,11 +133,11 @@ namespace DOL.GS.ServerRules
 
                 previousInstance.LoadFromDatabase(previousInstance.RegionData.Mobs, ref mobs, ref merchants, ref items, ref bindpoints);
 
-                if (log.IsInfoEnabled)
+                if (Log.IsInfoEnabled)
                 {
-                    log.Info("Total Mobs: " + mobs);
-                    log.Info("Total Merchants: " + merchants);
-                    log.Info("Total Items: " + items);
+                    Log.Info($"Total Mobs: {mobs}");
+                    Log.Info($"Total Merchants: {merchants}");
+                    Log.Info($"Total Items: {items}");
                 }
 
                 // Attach Loot Generator
@@ -146,59 +145,46 @@ namespace DOL.GS.ServerRules
 
                 // Player created new instance
                 // Destroy all other instance that should be...
-                List<Region> to_delete = new List<Region>();
+                List<Region> toDelete = new List<Region>();
                 foreach (Region region in WorldMgr.GetAllRegions())
                 {
-                    if (region is AdventureWingInstance && (AdventureWingInstance)region != previousInstance)
+                    if (region is AdventureWingInstance toClean && toClean != previousInstance)
                     {
-                        AdventureWingInstance to_clean = (AdventureWingInstance)region;
-
                         // Won't clean up populated Instance
-                        if (to_clean.NumPlayers == 0)
+                        if (toClean.NumPlayers == 0)
                         {
-
-                            if (to_clean.Group != null && player.Group != null && to_clean.Group == player.Group)
+                            if (toClean.Group != null && player.Group != null && toClean.Group == player.Group)
                             {
                                 // Got another instance for the same group... Destroy it !
-                                to_delete.Add(to_clean);
+                                toDelete.Add(toClean);
                             }
-                            else if (to_clean.Player != null && (to_clean.Player == player || (player.Group != null && player.Group.Leader == to_clean.Player)))
+                            else if (toClean.Player != null && (toClean.Player == player || (player.Group != null && player.Group.Leader == toClean.Player)))
                             {
                                 // Got another instance for the same player... Destroy it !
-                                to_delete.Add(to_clean);
+                                toDelete.Add(toClean);
                             }
-                            else if (to_clean.Group == null && to_clean.Player == null)
+                            else if (toClean.Group == null && toClean.Player == null)
                             {
                                 // nobody owns this instance anymore
-                                to_delete.Add(to_clean);
+                                toDelete.Add(toClean);
                             }
                         }
                     }
                 }
 
                 // enumerate to_delete
-                foreach (Region region in to_delete)
+                foreach (Region region in toDelete)
                 {
-                    log.Warn("Player : " + player.Name + " has provoked an instance cleanup - " + region.Description + ", ID: " + region.ID + ", type=" + region.GetType().ToString() + ".");
+                    Log.Warn($"Player : {player.Name} has provoked an instance cleanup - {region.Description}, ID: {region.ID}, type={region.GetType()}.");
                     WorldMgr.RemoveInstance((BaseInstance)region);
                 }
             }
 
             // get loc of instance
-            if (previousInstance != null)
-            {
-                loc = new GameLocation(previousInstance.Description + " (instance)", previousInstance.ID, targetPoint.TargetX,  targetPoint.TargetY,  targetPoint.TargetZ,  targetPoint.TargetHeading);
-            }
+            var loc = new GameLocation($"{previousInstance.Description} (instance)", previousInstance.ID, targetPoint.TargetX,  targetPoint.TargetY,  targetPoint.TargetZ,  targetPoint.TargetHeading);
 
-            if (loc != null)
-            {
-
-                // Move Player, changing target destination is failing !!
-                player.MoveTo(loc);
-                return false;
-            }
-
-            player.Out.SendMessage("Something went Wrong when creating Instance !", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            // Move Player, changing target destination is failing !!
+            player.MoveTo(loc);
             return false;
         }
     }
