@@ -42,7 +42,7 @@ namespace DOL.GS.GameEvents
         /// Enable Starter Guilds
         /// </summary>
         [ServerProperty("startup", "starting_guild", "Starter Guild - Edit this to enable/disable the starter guilds", true)]
-        public static bool STARTING_GUILD;
+        public static bool STARTING_GUILD { get; set; }
 
         /// <summary>
         /// This method runs the checks and listen to new player creation.

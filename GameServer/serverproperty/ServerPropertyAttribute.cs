@@ -23,14 +23,9 @@ namespace DOL.GS.ServerProperties
     /// <summary>
     /// The server property attribute
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class ServerPropertyAttribute : Attribute
     {
-        private string m_category;
-        private string m_key;
-        private string m_description;
-        private object m_defaultValue;
-
         /// <summary>
         /// Constructor of serverproperty
         /// </summary>
@@ -40,54 +35,30 @@ namespace DOL.GS.ServerProperties
         /// <param name="category">property category (previously area)</param>
         public ServerPropertyAttribute(string category, string key, string description, object defaultValue)
         {
-            m_category = category;
-            m_key = key;
-            m_description = description;
-            m_defaultValue = defaultValue;
+            Category = category;
+            Key = key;
+            Description = description;
+            DefaultValue = defaultValue;
         }
 
         /// <summary>
         /// The property category
         /// </summary>
-        public string Category
-        {
-            get
-            {
-                return m_category;
-            }
-        }
+        public string Category { get; }
 
         /// <summary>
         /// The property key
         /// </summary>
-        public string Key
-        {
-            get
-            {
-                return m_key;
-            }
-        }
+        public string Key { get; }
 
         /// <summary>
         /// The property description
         /// </summary>
-        public string Description
-        {
-            get
-            {
-                return m_description;
-            }
-        }
+        public string Description { get; }
 
         /// <summary>
         /// The property default value
         /// </summary>
-        public object DefaultValue
-        {
-            get
-            {
-                return m_defaultValue;
-            }
-        }
+        public object DefaultValue { get; }
     }
 }
