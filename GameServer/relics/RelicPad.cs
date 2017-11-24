@@ -28,30 +28,26 @@ namespace DOL.GS.Relics
         /// <summary>
         /// The pillar this pad triggers.
         /// </summary>
-        private RelicPillar m_relicPillar;
+        private readonly RelicPillar _relicPillar;
 
         public RelicPad(RelicPillar relicPillar)
         {
-            m_relicPillar = relicPillar;
+            _relicPillar = relicPillar;
         }
 
         /// <summary>
         /// Relic pad radius.
         /// </summary>
-        static public int Radius
-        {
-            get { return 200; }
-        }
+        public static int Radius => 200;
 
-        private int m_playersOnPad = 0;
+        private int _playersOnPad;
 
         /// <summary>
         /// The number of players currently on the pad.
         /// </summary>
         public int PlayersOnPad
         {
-            get { return m_playersOnPad; }
-
+            get => _playersOnPad;
             set
             {
                 if (value < 0)
@@ -59,16 +55,16 @@ namespace DOL.GS.Relics
                     return;
                 }
 
-                m_playersOnPad = value;
+                _playersOnPad = value;
 
-                if (m_playersOnPad >= ServerProperties.Properties.RELIC_PLAYERS_REQUIRED_ON_PAD &&
-                    m_relicPillar.State == eDoorState.Closed)
+                if (_playersOnPad >= ServerProperties.Properties.RELIC_PLAYERS_REQUIRED_ON_PAD &&
+                    _relicPillar.State == eDoorState.Closed)
                 {
-                    m_relicPillar.Open();
+                    _relicPillar.Open();
                 }
-                else if (m_relicPillar.State == eDoorState.Open && m_playersOnPad <= 0)
+                else if (_relicPillar.State == eDoorState.Open && _playersOnPad <= 0)
                 {
-                    m_relicPillar.Close();
+                    _relicPillar.Close();
                 }
             }
         }
@@ -96,22 +92,22 @@ namespace DOL.GS.Relics
         /// </summary>
         public class Surface : Area.Circle
         {
-            private RelicPad m_relicPad;
+            private readonly RelicPad _relicPad;
 
             public Surface(RelicPad relicPad)
                 : base(string.Empty, relicPad.X, relicPad.Y, relicPad.Z, RelicPad.Radius)
             {
-                m_relicPad = relicPad;
+                _relicPad = relicPad;
             }
 
             public override void OnPlayerEnter(GamePlayer player)
             {
-                m_relicPad.OnPlayerEnter(player);
+                _relicPad.OnPlayerEnter(player);
             }
 
             public override void OnPlayerLeave(GamePlayer player)
             {
-                m_relicPad.OnPlayerLeave(player);
+                _relicPad.OnPlayerLeave(player);
             }
         }
     }

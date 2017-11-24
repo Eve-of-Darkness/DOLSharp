@@ -29,11 +29,6 @@ namespace DOL.GS.RealmAbilities
     /// <author>Stexx</author>
     public class ShadowShroudAbility : RR5RealmAbility
     {
-        public const int DURATION = 30 * 1000;
-        public const double ABSPERCENT = 10; // 10% damage absorb
-        public const int MISSHITBONUS = 10; // 10% misshit bonus
-        public const int EFFECT = 1565;
-
         public ShadowShroudAbility(DBAbility dba, int level) : base(dba, level) { }
 
         /// <summary>
@@ -47,14 +42,10 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
-                ShadowShroudEffect ShadowShroud = (ShadowShroudEffect)player.EffectList.GetOfType<ShadowShroudEffect>();
-                if (ShadowShroud != null)
-                {
-                    ShadowShroud.Cancel(false);
-                }
+                ShadowShroudEffect shadowShroud = player.EffectList.GetOfType<ShadowShroudEffect>();
+                shadowShroud?.Cancel(false);
 
                 new ShadowShroudEffect().Start(player);
             }

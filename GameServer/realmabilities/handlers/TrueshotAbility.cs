@@ -21,20 +21,13 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 SureShotEffect sureShot = player.EffectList.GetOfType<SureShotEffect>();
-                if (sureShot != null)
-                {
-                    sureShot.Cancel(false);
-                }
+                sureShot?.Cancel(false);
 
                 RapidFireEffect rapidFire = player.EffectList.GetOfType<RapidFireEffect>();
-                if (rapidFire != null)
-                {
-                    rapidFire.Cancel(false);
-                }
+                rapidFire?.Cancel(false);
 
                 new TrueshotEffect().Start(player);
             }

@@ -50,10 +50,7 @@ namespace DOL.GS.RealmAbilities
         /// <summary>
         /// max level this RA can reach
         /// </summary>
-        public virtual int MaxLevel
-        {
-            get { return 0; }
-        }
+        public virtual int MaxLevel => 0;
 
         /// <summary>
         /// Delve for this RA
@@ -71,7 +68,7 @@ namespace DOL.GS.RealmAbilities
             {
                 if (CostForUpgrade(i) > 0)
                 {
-                    w.AddKeyValuePair(string.Format("TrainingCost_{0}", i + 1), CostForUpgrade(i));
+                    w.AddKeyValuePair($"TrainingCost_{i + 1}", CostForUpgrade(i));
                 }
             }
         }
@@ -86,20 +83,12 @@ namespace DOL.GS.RealmAbilities
                 {
                     return m_name;
                 }
-                else
-                {
-                    return (Level <= 1) ? base.Name : m_name + " " + getRomanLevel();
-                }
+
+                return Level <= 1 ? base.Name : $"{m_name} {getRomanLevel()}";
             }
         }
 
-        public override eSkillPage SkillType
-        {
-            get
-            {
-                return eSkillPage.RealmAbilities;
-            }
-        }
+        public override eSkillPage SkillType => eSkillPage.RealmAbilities;
     }
 
     public class TimedRealmAbility : RealmAbility
@@ -121,10 +110,8 @@ namespace DOL.GS.RealmAbilities
                     default: return 1000;
                 }
             }
-            else
-            {
-                return (level + 1) * 5;
-            }
+
+            return (level + 1) * 5;
         }
 
         public override bool CheckRequirement(GamePlayer player)
@@ -141,12 +128,10 @@ namespace DOL.GS.RealmAbilities
         {
             if (seconds >= 60)
             {
-                return string.Format("{0:00}:{1:00} min", seconds / 60, seconds % 60);
+                return $"{seconds / 60:00}:{seconds % 60:00} min";
             }
-            else
-            {
-                return seconds + " sec";
-            }
+
+            return seconds + " sec";
         }
 
         public virtual void AddReUseDelayInfo(IList<string> list)
@@ -154,7 +139,7 @@ namespace DOL.GS.RealmAbilities
             for (int i = 1; i <= MaxLevel; i++)
             {
                 int reUseTime = GetReUseDelay(i);
-                list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "RealmAbility.AddReUseDelayInfo.Every", i, (reUseTime == 0) ? "always" : FormatTimespan(reUseTime)));
+                list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "RealmAbility.AddReUseDelayInfo.Every", i, reUseTime == 0 ? "always" : FormatTimespan(reUseTime)));
             }
         }
 
@@ -170,10 +155,8 @@ namespace DOL.GS.RealmAbilities
                 {
                     return 5;
                 }
-                else
-                {
-                    return 3;
-                }
+
+                return 3;
             }
         }
 
@@ -183,7 +166,7 @@ namespace DOL.GS.RealmAbilities
 
             for (int i = 1; i <= MaxLevel; i++)
             {
-                w.AddKeyValuePair(string.Format("ReuseTimer_{0}", i), GetReUseDelay(i));
+                w.AddKeyValuePair($"ReuseTimer_{i}", GetReUseDelay(i));
             }
         }
 
@@ -230,14 +213,11 @@ namespace DOL.GS.RealmAbilities
 
                 if (caster.IsWithinRadius(player, WorldMgr.INFO_DISTANCE))
                 {
-                    if (player == caster)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCasterSpellEffectAndCastMessage.You", m_name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                    }
-                    else
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCasterSpellEffectAndCastMessage.Caster", caster.Name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                    }
+                    var message = player == caster
+                        ? LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCasterSpellEffectAndCastMessage.You", m_name)
+                        : LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCasterSpellEffectAndCastMessage.Caster", caster.Name);
+
+                    player.Out.SendMessage(message, eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
             }
         }
@@ -251,14 +231,11 @@ namespace DOL.GS.RealmAbilities
             {
                 if (caster.IsWithinRadius(player, WorldMgr.INFO_DISTANCE))
                 {
-                    if (player == caster)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCastMessage.YouCast", m_name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                    }
-                    else
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCastMessage.PlayerCasts", player.Name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                    }
+                    var message = player == caster
+                        ? LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCastMessage.YouCast", m_name)
+                        : LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCastMessage.PlayerCasts", player.Name);
+
+                    player.Out.SendMessage(message, eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
             }
         }
@@ -272,78 +249,54 @@ namespace DOL.GS.RealmAbilities
         /// <returns></returns>
         public virtual bool CheckPreconditions(GameLiving living, long bitmask)
         {
-            GamePlayer player = living as GamePlayer;
+            if (!(living is GamePlayer player))
+            {
+                return false;
+            }
+
             if ((bitmask & DEAD) != 0 && !living.IsAlive)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Dead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Dead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
             }
 
             if ((bitmask & MEZZED) != 0 && living.IsMezzed)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Mesmerized"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Mesmerized"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
             }
 
             if ((bitmask & STUNNED) != 0 && living.IsStunned)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Stunned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Stunned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
             }
 
             if ((bitmask & SITTING) != 0 && living.IsSitting)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Sitting"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Sitting"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
             }
 
             if ((bitmask & INCOMBAT) != 0 && living.InCombat)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Combat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Combat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
             }
 
             if ((bitmask & NOTINCOMBAT) != 0 && !living.InCombat)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.BeInCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.BeInCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
             }
 
             if ((bitmask & STEALTHED) != 0 && living.IsStealthed)
             {
-                if (player != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Stealthed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Stealthed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
             }
 
-            if (player != null && (bitmask & NOTINGROUP) != 0 && player.Group == null)
+            if ((bitmask & NOTINGROUP) != 0 && player.Group == null)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.BeInGroup"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
@@ -390,29 +343,27 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (level)
                 {
-                        case 0: return 1;
-                        case 1: return 1;
-                        case 2: return 2;
-                        case 3: return 3;
-                        case 4: return 3;
-                        case 5: return 5;
-                        case 6: return 5;
-                        case 7: return 7;
-                        case 8: return 7;
-                        default: return 1000;
+                    case 0: return 1;
+                    case 1: return 1;
+                    case 2: return 2;
+                    case 3: return 3;
+                    case 4: return 3;
+                    case 5: return 5;
+                    case 6: return 5;
+                    case 7: return 7;
+                    case 8: return 7;
+                    default: return 1000;
                 }
             }
-            else
+
+            switch (level)
             {
-                switch (level)
-                {
-                        case 0: return 1;
-                        case 1: return 3;
-                        case 2: return 6;
-                        case 3: return 10;
-                        case 4: return 14;
-                        default: return 1000;
-                }
+                case 0: return 1;
+                case 1: return 3;
+                case 2: return 6;
+                case 3: return 10;
+                case 4: return 14;
+                default: return 1000;
             }
         }
 
@@ -422,10 +373,8 @@ namespace DOL.GS.RealmAbilities
             {
                 return Level <= 9;
             }
-            else
-            {
-                return Level <= 5;
-            }
+
+            return Level <= 5;
         }
 
         public override int MaxLevel
@@ -436,10 +385,8 @@ namespace DOL.GS.RealmAbilities
                 {
                     return 9;
                 }
-                else
-                {
-                    return 5;
-                }
+
+                return 5;
             }
         }
     }
@@ -448,13 +395,7 @@ namespace DOL.GS.RealmAbilities
     {
         public RR5RealmAbility(DBAbility ability, int level) : base(ability, level) { }
 
-        public override int MaxLevel
-        {
-            get
-            {
-                return 1;
-            }
-        }
+        public override int MaxLevel => 1;
 
         public override bool CheckRequirement(GamePlayer player)
         {

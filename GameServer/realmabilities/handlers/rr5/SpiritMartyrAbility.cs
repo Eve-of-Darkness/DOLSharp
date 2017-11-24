@@ -27,8 +27,8 @@ namespace DOL.GS.RealmAbilities
     {
         public SpiritMartyrAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        const int m_healRange = 2000;
-        double m_healthpool = 3200;
+        private const int HealRange = 2000;
+        private double _healthpool = 3200;
 
         public override void Execute(GameLiving living)
         {
@@ -37,18 +37,12 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }
 
-            if (player.ControlledBrain == null)
-            {
-                return;
-            }
-
-            if (player.ControlledBrain.Body == null)
+            if (player.ControlledBrain?.Body == null)
             {
                 return;
             }
@@ -67,7 +61,7 @@ namespace DOL.GS.RealmAbilities
             {
                 foreach (GamePlayer tplayer in player.Group.GetPlayersInTheGroup())
                 {
-                    if (tplayer.IsAlive && player.IsWithinRadius(tplayer, m_healRange)
+                    if (tplayer.IsAlive && player.IsWithinRadius(tplayer, HealRange)
                         && tplayer.Health < tplayer.MaxHealth)
                     {
                         targets.Add(player);
@@ -77,35 +71,35 @@ namespace DOL.GS.RealmAbilities
 
             if (targets.Count == 0)
             {
-                player.Out.SendMessage(((player.Group != null) ? "Your group is" : "You are") + " fully healed!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"{(player.Group != null ? "Your group is" : "You are")} fully healed!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                 return;
             }
 
             // send spelleffect
-            foreach (GamePlayer visPlayer in player.GetPlayersInRadius((ushort)WorldMgr.VISIBILITY_DISTANCE))
+            foreach (GamePlayer visPlayer in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 visPlayer.Out.SendSpellEffectAnimation(player, player, 7075, 0, false, 0x01);
             }
 
             int petHealthPercent = player.ControlledBrain.Body.HealthPercent;
-            m_healthpool *= petHealthPercent * 0.01;
+            _healthpool *= petHealthPercent * 0.01;
 
             // [StephenxPimentel]
             // 1.108 - This ability will no longer stun or sacrifice the pet.
 
             // player.ControlledBrain.Body.Die(player);
-            int pool = (int)m_healthpool;
+            int pool = (int)_healthpool;
             while (pool > 0 && targets.Count > 0)
             {
                 // get most injured player
                 GamePlayer mostInjuredPlayer = null;
-                int LowestHealthPercent = 100;
+                int lowestHealthPercent = 100;
                 foreach (GamePlayer tp in targets)
                 {
                     byte tpHealthPercent = tp.HealthPercent;
-                    if (tpHealthPercent < LowestHealthPercent)
+                    if (tpHealthPercent < lowestHealthPercent)
                     {
-                        LowestHealthPercent = tpHealthPercent;
+                        lowestHealthPercent = tpHealthPercent;
                         mostInjuredPlayer = tp;
                     }
                 }

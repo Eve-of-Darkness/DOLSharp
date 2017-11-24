@@ -11,15 +11,14 @@ namespace DOL.GS.Effects
         public CombatAwarenessEffect()
             : base(30000)
         {
-            ;
         }
 
-        private GameLiving owner;
+        private GameLiving _owner;
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
+            _owner = target;
             GamePlayer player = target as GamePlayer;
             if (player != null)
             {
@@ -36,24 +35,20 @@ namespace DOL.GS.Effects
             target.BuffBonusCategory4[(int)eProperty.EvadeChance] += 50;
             target.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 0.5);
 
-            if (player != null)
-            {
-                player.Out.SendUpdateMaxSpeed();
-            }
+            player?.Out.SendUpdateMaxSpeed();
         }
 
-        public override string Name { get { return "Combat Awareness"; } }
+        public override string Name => "Combat Awareness";
 
-        public override ushort Icon { get { return 3090; } }
+        public override ushort Icon => 3090;
 
         public override void Stop()
         {
             // owner.DebuffCategory[(int)eProperty.MissHit] += 50;
-            owner.BuffBonusCategory4[(int)eProperty.EvadeChance] -= 50;
-            owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
+            _owner.BuffBonusCategory4[(int)eProperty.EvadeChance] -= 50;
+            _owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
 
-            GamePlayer player = owner as GamePlayer;
-            if (player != null)
+            if (_owner is GamePlayer player)
             {
                 player.Out.SendUpdateMaxSpeed();
             }
@@ -61,17 +56,17 @@ namespace DOL.GS.Effects
             base.Stop();
         }
 
-        public int SpellEffectiveness
-        {
-            get { return 100; }
-        }
+        public int SpellEffectiveness => 100;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Grants 50% Evade and reduces Melee combat accuracy and movement by 50%");
+                var list = new List<string>
+                {
+                    "Grants 50% Evade and reduces Melee combat accuracy and movement by 50%"
+                };
+
                 return list;
             }
         }

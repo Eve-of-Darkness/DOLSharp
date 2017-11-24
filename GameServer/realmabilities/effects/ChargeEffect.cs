@@ -1,40 +1,34 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-
 using DOL.AI.Brain;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Effects
 {
 
-    public class ChargeEffect : StaticEffect, IGameEffect
+    public class ChargeEffect : StaticEffect
     {
-        protected const string delveString = "Grants unbreakable speed 3 for 15 second duration. Grants immunity to roots, stun, snare and mesmerize spells. Target will still take damage from snare/root spells that do damage.";
-        GameLiving m_living;
-        protected long m_startTick;
-        protected RegionTimer m_expireTimer;
+        private const int Duration = 15;
+        private const string DelveString = "Grants unbreakable speed 3 for 15 second duration. Grants immunity to roots, stun, snare and mesmerize spells. Target will still take damage from snare/root spells that do damage.";
+        private GameLiving _living;
+        private long _startTick;
+        private RegionTimer _expireTimer;
 
         public override void Start(GameLiving living)
         {
-            m_living = living;
+            _living = living;
 
             // Send messages
-            if (m_living is GamePlayer)
+            if (_living is GamePlayer player)
             {
-                ((GamePlayer)m_living).Out.SendMessage("You begin to charge wildly!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage("You begin to charge wildly!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
-            else if (m_living is GameNPC)
+            else if (_living is GameNPC)
             {
-                IControlledBrain icb = ((GameNPC)m_living).Brain as IControlledBrain;
-                if (icb != null && icb.Body != null)
+                if (((GameNPC)_living).Brain is IControlledBrain icb && icb.Body != null)
                 {
                     GamePlayer playerowner = icb.GetPlayerOwner();
-
-                    if (playerowner != null)
-                    {
-                        playerowner.Out.SendMessage("The " + icb.Body.Name + " charges its prey!", eChatType.CT_Say, eChatLoc.CL_SystemWindow);
-                    }
+                    playerowner?.Out.SendMessage($"The {icb.Body.Name} charges its prey!", eChatType.CT_Say, eChatLoc.CL_SystemWindow);
                 }
             }
             else
@@ -42,14 +36,14 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            m_startTick = living.CurrentRegion.Time;
-            foreach (GamePlayer t_player in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            _startTick = living.CurrentRegion.Time;
+            foreach (GamePlayer tPlayer in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                t_player.Out.SendSpellEffectAnimation(living, living, 7035, 0, false, 1);
+                tPlayer.Out.SendSpellEffectAnimation(living, living, 7035, 0, false, 1);
             }
 
             // sets player into combat mode
-            living.LastAttackTickPvP = m_startTick;
+            living.LastAttackTickPvP = _startTick;
             ArrayList speedSpells = new ArrayList();
             lock (living.EffectList)
             {
@@ -72,41 +66,35 @@ namespace DOL.GS.Effects
                 spell.Cancel(false);
             }
 
-            m_living.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, PropertyCalc.MaxSpeedCalculator.SPEED3);
-            m_living.TempProperties.setProperty("Charging", true);
-            if (m_living is GamePlayer)
+            _living.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, PropertyCalc.MaxSpeedCalculator.SPEED3);
+            _living.TempProperties.setProperty("Charging", true);
+            if (_living is GamePlayer gamePlayer)
             {
-                ((GamePlayer)m_living).Out.SendUpdateMaxSpeed();
+                gamePlayer.Out.SendUpdateMaxSpeed();
             }
 
             StartTimers();
-            m_living.EffectList.Add(this);
+            _living.EffectList.Add(this);
         }
 
         public override void Cancel(bool playerCancel)
         {
-            m_living.TempProperties.removeProperty("Charging");
-            m_living.EffectList.Remove(this);
-            m_living.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
+            _living.TempProperties.removeProperty("Charging");
+            _living.EffectList.Remove(this);
+            _living.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
 
             // Send messages
-            if (m_living is GamePlayer)
+            if (_living is GamePlayer player)
             {
-                GamePlayer player = m_living as GamePlayer;
                 player.Out.SendUpdateMaxSpeed();
                 player.Out.SendMessage("You no longer seem so crazy!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
-            else if (m_living is GameNPC)
+            else if (_living is GameNPC)
             {
-                IControlledBrain icb = ((GameNPC)m_living).Brain as IControlledBrain;
-                if (icb != null && icb.Body != null)
+                if (((GameNPC)_living).Brain is IControlledBrain icb && icb.Body != null)
                 {
                     GamePlayer playerowner = icb.GetPlayerOwner();
-
-                    if (playerowner != null)
-                    {
-                        playerowner.Out.SendMessage("The " + icb.Body.Name + " ceases its charge!", eChatType.CT_Say, eChatLoc.CL_SystemWindow);
-                    }
+                    playerowner?.Out.SendMessage($"The {icb.Body.Name} ceases its charge!", eChatType.CT_Say, eChatLoc.CL_SystemWindow);
                 }
             }
 
@@ -116,16 +104,16 @@ namespace DOL.GS.Effects
         protected virtual void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(m_living, new RegionTimerCallback(ExpiredCallback), RealmAbilities.ChargeAbility.DURATION * 1000);
+            _expireTimer = new RegionTimer(_living, new RegionTimerCallback(ExpiredCallback), Duration * 1000);
         }
 
         // Stops the timers for this effect
         protected virtual void StopTimers()
         {
-            if (m_expireTimer != null)
+            if (_expireTimer != null)
             {
-                m_expireTimer.Stop();
-                m_expireTimer = null;
+                _expireTimer.Stop();
+                _expireTimer = null;
             }
         }
 
@@ -137,7 +125,7 @@ namespace DOL.GS.Effects
         }
 
         // Name of the effect
-        public override string Name { get { return "Charge"; } }
+        public override string Name => "Charge";
 
         /// <summary>
         /// Remaining time of the effect in milliseconds
@@ -146,7 +134,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
+                RegionTimer timer = _expireTimer;
                 if (timer == null || !timer.IsAlive)
                 {
                     return 0;
@@ -161,7 +149,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-                if (m_living is GameNPC)
+                if (_living is GameNPC)
                 {
                     return 411;
                 }
@@ -177,21 +165,18 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>(4);
-                delveInfoList.Add(delveString);
+                var delveInfoList = new List<string>
+                {
+                    DelveString
+                };
 
-                int seconds = (int)(RemainingTime / 1000);
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" "); // empty line
-                    if (seconds > 60)
-                    {
-                        delveInfoList.Add("- " + seconds / 60 + ":" + (seconds % 60).ToString("00") + " minutes remaining.");
-                    }
-                    else
-                    {
-                        delveInfoList.Add("- " + seconds + " seconds remaining.");
-                    }
+                    delveInfoList.Add(seconds > 60
+                        ? $"- {seconds / 60}:{seconds % 60:00} minutes remaining."
+                        : $"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

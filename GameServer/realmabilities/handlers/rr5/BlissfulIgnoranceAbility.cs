@@ -22,6 +22,7 @@ using System.Collections;
 using DOL.Database;
 using DOL.GS.Spells;
 using System.Collections.Generic;
+using log4net;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -30,9 +31,7 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class BlissfulIgnoranceAbility : RR5RealmAbility
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        public const int DURATION = 30 * 1000;
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public BlissfulIgnoranceAbility(DBAbility dba, int level) : base(dba, level) { }
 
@@ -47,16 +46,9 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
-                /*BlissfulIgnoranceEffect BlissfulIgnorance = (BlissfulIgnoranceEffect)player.EffectList.GetOfType(typeof(BlissfulIgnoranceEffect));
-                if (BlissfulIgnorance != null)
-                    BlissfulIgnorance.Cancel(false);
-
-                new BlissfulIgnoranceEffect().Start(player);*/
-
-                Hashtable table_spells = new Hashtable();
+                Hashtable tableSpells = new Hashtable();
                 foreach (Spell spell in SkillBase.GetSpellList("Savagery"))
                 {
                     if (spell.Group == 0 || spell.Target.ToLower() != "self")
@@ -66,59 +58,57 @@ namespace DOL.GS.RealmAbilities
 
                     if (spell.Level <= player.GetSpellLine("Savagery").Level)
                     {
-                        if (!table_spells.ContainsKey(spell.Group))
+                        if (!tableSpells.ContainsKey(spell.Group))
                         {
-                            table_spells.Add(spell.Group, spell);
+                            tableSpells.Add(spell.Group, spell);
                         }
                         else
                         {
-                            Spell oldspell = (Spell)table_spells[spell.Group];
+                            Spell oldspell = (Spell)tableSpells[spell.Group];
                             if (spell.Level > oldspell.Level)
                             {
-                                table_spells[spell.Group] = spell;
+                                tableSpells[spell.Group] = spell;
                             }
                         }
                     }
                 }
 
-                foreach (object obj in table_spells.Values)
+                foreach (object obj in tableSpells.Values)
                 {
-                    if (obj == null || !(obj is Spell))
+                    if (!(obj is Spell spell))
                     {
                         continue;
                     }
 
-                    Spell spell = obj as Spell;
                     try
                     {
-                        DBSpell db = new DBSpell();
-                        db.ClientEffect = spell.ClientEffect;
-                        db.Icon = spell.Icon;
-                        db.Name = spell.Name;
-                        db.Description = spell.Description;
-                        db.Duration = spell.Duration / 1000;
-                        db.Power = 0;
-                        db.Value = spell.Value;
-                        db.Message1 = string.Empty;
-                        db.Message2 = string.Empty;
-                        db.Message3 = string.Empty;
-                        db.Message4 = string.Empty;
-                        db.Type = spell.SpellType;
-                        db.Target = "Self";
-                        db.MoveCast = true;
-                        db.Uninterruptible = true;
+                        DBSpell db = new DBSpell
+                        {
+                            ClientEffect = spell.ClientEffect,
+                            Icon = spell.Icon,
+                            Name = spell.Name,
+                            Description = spell.Description,
+                            Duration = spell.Duration / 1000,
+                            Power = 0,
+                            Value = spell.Value,
+                            Message1 = string.Empty,
+                            Message2 = string.Empty,
+                            Message3 = string.Empty,
+                            Message4 = string.Empty,
+                            Type = spell.SpellType,
+                            Target = "Self",
+                            MoveCast = true,
+                            Uninterruptible = true
+                        };
 
                         SpellHandler handler = new SpellHandler(player, new Spell(db, 0), SkillBase.GetSpellLine("Savagery"));
-                        if (handler != null)
-                        {
-                            handler.CastSpell();
-                        }
+                        handler.CastSpell();
                     }
                     catch (Exception e)
                     {
-                        if (log.IsErrorEnabled)
+                        if (Log.IsErrorEnabled)
                         {
-                            log.Error("RR5 Savage : use spell, ", e);
+                            Log.Error("RR5 Savage : use spell, ", e);
                         }
                     }
                 }

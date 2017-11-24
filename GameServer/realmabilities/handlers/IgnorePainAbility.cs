@@ -49,12 +49,11 @@ namespace DOL.GS.RealmAbilities
 
             SendCasterSpellEffectAndCastMessage(living, 7004, healed > 0);
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 if (healed > 0)
                 {
-                    player.Out.SendMessage("You heal yourself for " + healed + " hit points.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"You heal yourself for {healed} hit points.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
 
                 if (heal > healed)

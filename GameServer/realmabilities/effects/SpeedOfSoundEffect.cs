@@ -7,13 +7,13 @@ namespace DOL.GS.Effects
     /// <summary>
     /// Effect handler for Barrier Of Fortitude
     /// </summary>
-    public class SpeedOfSoundEffect : TimedEffect, IGameEffect
+    public class SpeedOfSoundEffect : TimedEffect
     {
         public SpeedOfSoundEffect(int duration)
             : base(duration)
         { }
 
-        DOLEventHandler m_attackFinished = new DOLEventHandler(AttackFinished);
+        private readonly DOLEventHandler _attackFinished = new DOLEventHandler(AttackFinished);
 
         /// <summary>
         /// Called when effect is to be started
@@ -23,13 +23,10 @@ namespace DOL.GS.Effects
         {
             base.Start(living);
             living.TempProperties.setProperty("Charging", true);
-            GameEventMgr.AddHandler(living, GameLivingEvent.AttackFinished, m_attackFinished);
-            GameEventMgr.AddHandler(living, GameLivingEvent.CastFinished, m_attackFinished);
+            GameEventMgr.AddHandler(living, GameLivingEvent.AttackFinished, _attackFinished);
+            GameEventMgr.AddHandler(living, GameLivingEvent.CastFinished, _attackFinished);
             living.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, PropertyCalc.MaxSpeedCalculator.SPEED4);
-            if (living is GamePlayer)
-            {
-                (living as GamePlayer).Out.SendUpdateMaxSpeed();
-            }
+            (living as GamePlayer)?.Out.SendUpdateMaxSpeed();
         }
 
         /// <summary>
@@ -54,16 +51,12 @@ namespace DOL.GS.Effects
                 if (!cfea.SpellHandler.HasPositiveEffect)
                 {
                     SpeedOfSoundEffect effect = player.EffectList.GetOfType<SpeedOfSoundEffect>();
-                    if (effect != null)
-                    {
-                        effect.Cancel(false);
-                    }
+                    effect?.Cancel(false);
                 }
             }
             else if (e == GameLivingEvent.AttackFinished)
             {
-                AttackFinishedEventArgs afargs = args as AttackFinishedEventArgs;
-                if (afargs == null)
+                if (!(args is AttackFinishedEventArgs afargs))
                 {
                     return;
                 }
@@ -83,10 +76,7 @@ namespace DOL.GS.Effects
                     case GameLiving.eAttackResult.Missed:
                     case GameLiving.eAttackResult.Parried:
                         SpeedOfSoundEffect effect = player.EffectList.GetOfType<SpeedOfSoundEffect>();
-                        if (effect != null)
-                        {
-                            effect.Cancel(false);
-                        }
+                        effect?.Cancel(false);
 
                         break;
                 }
@@ -98,36 +88,24 @@ namespace DOL.GS.Effects
             base.Stop();
             m_owner.TempProperties.removeProperty("Charging");
             m_owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
-            if (m_owner is GamePlayer)
+            if (m_owner is GamePlayer player)
             {
-                (m_owner as GamePlayer).Out.SendUpdateMaxSpeed();
+                player.Out.SendUpdateMaxSpeed();
             }
 
-            GameEventMgr.RemoveHandler(m_owner, GameLivingEvent.AttackFinished, m_attackFinished);
-            GameEventMgr.RemoveHandler(m_owner, GameLivingEvent.CastFinished, m_attackFinished);
+            GameEventMgr.RemoveHandler(m_owner, GameLivingEvent.AttackFinished, _attackFinished);
+            GameEventMgr.RemoveHandler(m_owner, GameLivingEvent.CastFinished, _attackFinished);
         }
 
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "Speed of Sound";
-            }
-        }
+        public override string Name => "Speed of Sound";
 
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override ushort Icon
-        {
-            get
-            {
-                return 3020;
-            }
-        }
+        public override ushort Icon => 3020;
 
         /// <summary>
         /// Delve information
@@ -136,15 +114,17 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>();
-                delveInfoList.Add("Gives immunity to stun/snare/root and mesmerize spells and provides unbreakeable speed.");
-                delveInfoList.Add(" ");
+                var delveInfoList = new List<string>
+                {
+                    "Gives immunity to stun/snare/root and mesmerize spells and provides unbreakeable speed.",
+                    " "
+                };
 
-                int seconds = (int)(RemainingTime / 1000);
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" ");
-                    delveInfoList.Add("- " + seconds + " seconds remaining.");
+                    delveInfoList.Add($"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

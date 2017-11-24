@@ -48,12 +48,11 @@ namespace DOL.GS.RealmAbilities
 
             SendCasterSpellEffectAndCastMessage(living, 7009, healed > 0);
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 if (healed > 0)
                 {
-                    player.Out.SendMessage("You gain " + healed + " mana.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"You gain {healed} mana.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
 
                 if (heal > healed)

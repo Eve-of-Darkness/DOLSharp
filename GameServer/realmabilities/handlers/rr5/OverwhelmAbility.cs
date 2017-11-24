@@ -29,9 +29,7 @@ namespace DOL.GS.RealmAbilities
     /// /// <author>Stexx</author>
     public class OverwhelmAbility : RR5RealmAbility
     {
-        public const int DURATION = 30 * 1000; // 30 secs
-        public const double BONUS = 0.15; // 15% bonus
-        public const int EFFECT = 1564;
+        public const double Bonus = 0.15; // 15% bonus
 
         public OverwhelmAbility(DBAbility dba, int level) : base(dba, level) { }
 
@@ -46,14 +44,10 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
-                OverwhelmEffect Overwhelm = (OverwhelmEffect)player.EffectList.GetOfType<OverwhelmEffect>();
-                if (Overwhelm != null)
-                {
-                    Overwhelm.Cancel(false);
-                }
+                OverwhelmEffect overwhelm = player.EffectList.GetOfType<OverwhelmEffect>();
+                overwhelm?.Cancel(false);
 
                 new OverwhelmEffect().Start(player);
             }

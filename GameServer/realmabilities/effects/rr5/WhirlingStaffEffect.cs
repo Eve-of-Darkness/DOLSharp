@@ -10,17 +10,12 @@ namespace DOL.GS.Effects
         public WhirlingStaffEffect()
             : base(6000)
         {
-            ;
         }
-
-        private GameLiving owner;
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
-            GamePlayer player = target as GamePlayer;
-            if (player != null)
+            if (target is GamePlayer player)
             {
                 foreach (GamePlayer p in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
@@ -33,27 +28,21 @@ namespace DOL.GS.Effects
             target.StopAttack();
         }
 
-        public override string Name { get { return "Whirling Staff"; } }
+        public override string Name => "Whirling Staff";
 
-        public override ushort Icon { get { return 3042; } }
+        public override ushort Icon => 3042;
 
-        public override void Stop()
-        {
-            // owner.IsDisarmed = false;
-            base.Stop();
-        }
-
-        public int SpellEffectiveness
-        {
-            get { return 100; }
-        }
+        public int SpellEffectiveness => 100;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Disarms you for 6 seconds!");
+                var list = new List<string>
+                {
+                    "Disarms you for 6 seconds!"
+                };
+
                 return list;
             }
         }

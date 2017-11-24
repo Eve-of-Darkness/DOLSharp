@@ -9,7 +9,7 @@ namespace DOL.GS.RealmAbilities
         {
         }
 
-        protected override string ValueUnit { get { return "%"; } }
+        protected override string ValueUnit => "%";
 
         public override int GetAmountForLevel(int level)
         {
@@ -34,17 +34,15 @@ namespace DOL.GS.RealmAbilities
                     default: return 80;
                 }
             }
-            else
+
+            switch (level)
             {
-                switch (level)
-                {
-                    case 1: return 10;
-                    case 2: return 20;
-                    case 3: return 40;
-                    case 4: return 60;
-                    case 5: return 80;
-                    default: return 0;
-                }
+                case 1: return 10;
+                case 2: return 20;
+                case 3: return 40;
+                case 4: return 60;
+                case 5: return 80;
+                default: return 0;
             }
         }
     }

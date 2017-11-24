@@ -12,11 +12,11 @@ namespace DOL.GS.RealmAbilities
     {
         public IchorOfTheDeepAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        private RegionTimer m_expireTimerID;
-        private RegionTimer m_rootExpire;
-        private int dmgValue = 0;
-        private int duration = 0;
-        private GamePlayer caster;
+        private RegionTimer _expireTimerId;
+        private RegionTimer _rootExpire;
+        private int _dmgValue;
+        private int _duration;
+        private GamePlayer _caster;
 
         public override void Execute(GameLiving living)
         {
@@ -25,37 +25,37 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            caster = living as GamePlayer;
-            if (caster == null)
+            _caster = living as GamePlayer;
+            if (_caster == null)
             {
                 return;
             }
 
-            if (caster.TargetObject == null)
+            if (_caster.TargetObject == null)
             {
-                caster.Out.SendMessage("You need a target for this ability!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                caster.DisableSkill(this, 3 * 1000);
+                _caster.Out.SendMessage("You need a target for this ability!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                _caster.DisableSkill(this, 3 * 1000);
                 return;
             }
 
-            if (!caster.TargetInView)
+            if (!_caster.TargetInView)
             {
-                caster.Out.SendMessage(caster.TargetObject.Name + " is not in view.", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-                caster.DisableSkill(this, 3 * 1000);
+                _caster.Out.SendMessage($"{_caster.TargetObject.Name} is not in view.", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                _caster.DisableSkill(this, 3 * 1000);
                 return;
             }
 
-            if (!caster.IsWithinRadius(caster.TargetObject, 1875))
+            if (!_caster.IsWithinRadius(_caster.TargetObject, 1875))
             {
-                caster.Out.SendMessage(caster.TargetObject.Name + " is too far away.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                caster.DisableSkill(this, 3 * 1000);
+                _caster.Out.SendMessage($"{_caster.TargetObject.Name} is too far away.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                _caster.DisableSkill(this, 3 * 1000);
                 return;
             }
 
-            if (m_expireTimerID != null && m_expireTimerID.IsAlive)
+            if (_expireTimerId != null && _expireTimerId.IsAlive)
             {
-                caster.Out.SendMessage("You are already casting this ability.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                caster.DisableSkill(this, 3 * 1000);
+                _caster.Out.SendMessage("You are already casting this ability.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                _caster.DisableSkill(this, 3 * 1000);
                 return;
             }
 
@@ -63,11 +63,11 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (Level)
                 {
-                        case 1: dmgValue = 150; duration = 10000; break;
-                        case 2: dmgValue = 275; duration = 15000; break;
-                        case 3: dmgValue = 400; duration = 20000; break;
-                        case 4: dmgValue = 500; duration = 25000; break;
-                        case 5: dmgValue = 600; duration = 30000; break;
+                        case 1: _dmgValue = 150; _duration = 10000; break;
+                        case 2: _dmgValue = 275; _duration = 15000; break;
+                        case 3: _dmgValue = 400; _duration = 20000; break;
+                        case 4: _dmgValue = 500; _duration = 25000; break;
+                        case 5: _dmgValue = 600; _duration = 30000; break;
                         default: return;
                 }
             }
@@ -75,111 +75,109 @@ namespace DOL.GS.RealmAbilities
                 // 150 dam/10 sec || 400/20  || 600/30
                 switch (Level)
                 {
-                        case 1: dmgValue = 150; duration = 10000; break;
-                        case 2: dmgValue = 400; duration = 20000; break;
-                        case 3: dmgValue = 600; duration = 30000; break;
+                        case 1: _dmgValue = 150; _duration = 10000; break;
+                        case 2: _dmgValue = 400; _duration = 20000; break;
+                        case 3: _dmgValue = 600; _duration = 30000; break;
                         default: return;
                 }
 
             #region resist and det
-            GameLiving m_target = caster.TargetObject as GameLiving;
-
-            int primaryResistModifier = m_target.GetResist(eDamageType.Spirit);
-            int secondaryResistModifier = m_target.SpecBuffBonusCategory[(int)eProperty.Resist_Spirit];
-            int rootdet = (m_target.GetModified(eProperty.SpeedDecreaseDurationReduction) - 100) * -1;
-
-            int ResistModifier = 0;
-            ResistModifier += (int)((dmgValue * (double)primaryResistModifier) * -0.01);
-            ResistModifier += (int)((dmgValue + (double)ResistModifier) * (double)secondaryResistModifier * -0.01);
-
-            if (m_target is GamePlayer)
+            if (_caster.TargetObject is GameLiving target)
             {
-                dmgValue += ResistModifier;
+                int primaryResistModifier = target.GetResist(eDamageType.Spirit);
+                int secondaryResistModifier = target.SpecBuffBonusCategory[(int)eProperty.Resist_Spirit];
+                int rootdet = (target.GetModified(eProperty.SpeedDecreaseDurationReduction) - 100) * -1;
+
+                int resistModifier = 0;
+                resistModifier += (int)((_dmgValue * (double)primaryResistModifier) * -0.01);
+                resistModifier += (int)((_dmgValue + (double)resistModifier) * secondaryResistModifier * -0.01);
+
+                if (target is GamePlayer)
+                {
+                    _dmgValue += resistModifier;
+                }
+
+                if (target is GameNPC)
+                {
+                    _dmgValue += resistModifier;
+                }
+
+                int rootmodifier = 0;
+                rootmodifier += (int)((_duration * (double)primaryResistModifier) * -0.01);
+                rootmodifier += (int)((_duration + (double)primaryResistModifier) * secondaryResistModifier * -0.01);
+                rootmodifier += (int)((_duration + (double)rootmodifier) * rootdet * -0.01);
+
+                _duration += rootmodifier;
             }
 
-            if (m_target is GameNPC)
+            if (_duration < 1)
             {
-                dmgValue += ResistModifier;
-            }
-
-            int rootmodifier = 0;
-            rootmodifier += (int)((duration * (double)primaryResistModifier) * -0.01);
-            rootmodifier += (int)((duration + (double)primaryResistModifier) * (double)secondaryResistModifier * -0.01);
-            rootmodifier += (int)((duration + (double)rootmodifier) * (double)rootdet * -0.01);
-
-            duration += rootmodifier;
-
-            if (duration < 1)
-            {
-                duration = 1;
+                _duration = 1;
             }
             #endregion
 
-            foreach (GamePlayer i_player in caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
+            foreach (GamePlayer iPlayer in _caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
             {
-                if (i_player == caster)
+                if (iPlayer == _caster)
                 {
-                    i_player.MessageToSelf("You cast " + Name + "!", eChatType.CT_Spell);
+                    iPlayer.MessageToSelf($"You cast {Name}!", eChatType.CT_Spell);
                 }
                 else
                 {
-                    i_player.MessageFromArea(caster, caster.Name + " casts a spell!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    iPlayer.MessageFromArea(_caster, $"{_caster.Name} casts a spell!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
 
-                i_player.Out.SendSpellCastAnimation(caster, 7029, 20);
+                iPlayer.Out.SendSpellCastAnimation(_caster, 7029, 20);
             }
 
-            m_expireTimerID = new RegionTimer(caster, new RegionTimerCallback(EndCast), 2000);
+            _expireTimerId = new RegionTimer(_caster, new RegionTimerCallback(EndCast), 2000);
         }
 
         protected virtual int EndCast(RegionTimer timer)
         {
-            if (caster.TargetObject == null)
+            if (_caster.TargetObject == null)
             {
-                caster.Out.SendMessage("You need a target for this ability!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                caster.DisableSkill(this, 3 * 1000);
+                _caster.Out.SendMessage("You need a target for this ability!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                _caster.DisableSkill(this, 3 * 1000);
                 return 0;
             }
 
-            if (caster.IsMoving)
+            if (_caster.IsMoving)
             {
-                caster.Out.SendMessage(LanguageMgr.GetTranslation(caster.Client, "SpellHandler.CasterMove"), eChatType.CT_Say, eChatLoc.CL_SystemWindow);
-                caster.DisableSkill(this, 3000);
+                _caster.Out.SendMessage(LanguageMgr.GetTranslation(_caster.Client, "SpellHandler.CasterMove"), eChatType.CT_Say, eChatLoc.CL_SystemWindow);
+                _caster.DisableSkill(this, 3000);
                 return 0;
             }
 
-            if (!caster.IsWithinRadius(caster.TargetObject, 1875))
+            if (!_caster.IsWithinRadius(_caster.TargetObject, 1875))
             {
-                caster.Out.SendMessage(caster.TargetObject.Name + " is too far away.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                caster.DisableSkill(this, 3 * 1000);
+                _caster.Out.SendMessage(_caster.TargetObject.Name + " is too far away.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                _caster.DisableSkill(this, 3 * 1000);
                 return 0;
             }
 
-            GameLiving living = caster.TargetObject as GameLiving;
-
-            if (living == null)
+            if (!(_caster.TargetObject is GameLiving living))
             {
                 timer.Stop();
-                timer = null;
                 return 0;
             }
 
             if (living.EffectList.GetOfType<ChargeEffect>() == null && living.EffectList.GetOfType<SpeedOfSoundEffect>() != null)
             {
                 living.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 1.0 - 99 * 0.01);
-                m_rootExpire = new RegionTimer(living, new RegionTimerCallback(RootExpires), duration);
+                _rootExpire = new RegionTimer(living, new RegionTimerCallback(RootExpires), _duration);
                 GameEventMgr.AddHandler(living, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
                 SendUpdates(living);
             }
 
             foreach (GamePlayer player in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                player.Out.SendSpellEffectAnimation(caster, caster.TargetObject as GameLiving, 7029, 0, false, 1);
+                player.Out.SendSpellEffectAnimation(_caster, (GameLiving) _caster.TargetObject, 7029, 0, false, 1);
             }
 
             foreach (GameNPC mob in living.GetNPCsInRadius(500))
             {
-                if (!GameServer.ServerRules.IsAllowedToAttack(caster, mob, true))
+                if (!GameServer.ServerRules.IsAllowedToAttack(_caster, mob, true))
                 {
                     continue;
                 }
@@ -190,78 +188,69 @@ namespace DOL.GS.RealmAbilities
                 }
 
                 GameSpellEffect mez = SpellHandler.FindEffectOnTarget(mob, "Mesmerize");
-                if (mez != null)
-                {
-                    mez.Cancel(false);
-                }
+                mez?.Cancel(false);
 
-                mob.TakeDamage(caster, eDamageType.Spirit, dmgValue, 0);
+                mob.TakeDamage(_caster, eDamageType.Spirit, _dmgValue, 0);
 
                 if (mob.EffectList.GetOfType<ChargeEffect>() == null && mob.EffectList.GetOfType<SpeedOfSoundEffect>() == null)
                 {
                     mob.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 1.0 - 99 * 0.01);
-                    m_rootExpire = new RegionTimer(mob, new RegionTimerCallback(RootExpires), duration);
+                    _rootExpire = new RegionTimer(mob, new RegionTimerCallback(RootExpires), _duration);
                     GameEventMgr.AddHandler(mob, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
                     SendUpdates(mob);
                 }
 
-                caster.Out.SendMessage("You hit the " + mob.Name + " for " + dmgValue + " damage.", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                _caster.Out.SendMessage("You hit the " + mob.Name + " for " + _dmgValue + " damage.", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
 
                 foreach (GamePlayer player2 in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
-                    player2.Out.SendSpellEffectAnimation(caster, mob, 7029, 0, false, 1);
+                    player2.Out.SendSpellEffectAnimation(_caster, mob, 7029, 0, false, 1);
                 }
             }
 
             foreach (GamePlayer aeplayer in living.GetPlayersInRadius(500))
             {
-                if (!GameServer.ServerRules.IsAllowedToAttack(caster, aeplayer, true))
+                if (!GameServer.ServerRules.IsAllowedToAttack(_caster, aeplayer, true))
                 {
                     continue;
                 }
 
                 GameSpellEffect mez = SpellHandler.FindEffectOnTarget(aeplayer, "Mesmerize");
-                if (mez != null)
-                {
-                    mez.Cancel(false);
-                }
+                mez?.Cancel(false);
 
-                aeplayer.TakeDamage(caster, eDamageType.Spirit, dmgValue, 0);
-                aeplayer.StartInterruptTimer(3000, AttackData.eAttackType.Spell, caster);
+                aeplayer.TakeDamage(_caster, eDamageType.Spirit, _dmgValue, 0);
+                aeplayer.StartInterruptTimer(3000, AttackData.eAttackType.Spell, _caster);
 
                 if (aeplayer.EffectList.GetOfType<ChargeEffect>() == null && aeplayer.EffectList.GetOfType<SpeedOfSoundEffect>() == null)
                 {
-                    (aeplayer as GameLiving).BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 1.0 - 99 * 0.01);
-                    m_rootExpire = new RegionTimer(aeplayer, new RegionTimerCallback(RootExpires), duration);
+                    aeplayer.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 1.0 - 99 * 0.01);
+                    _rootExpire = new RegionTimer(aeplayer, new RegionTimerCallback(RootExpires), _duration);
                     GameEventMgr.AddHandler(aeplayer, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
                     SendUpdates(aeplayer);
                 }
 
-                caster.Out.SendMessage("You hit " + aeplayer.Name + " for " + dmgValue + " damage.", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                _caster.Out.SendMessage($"You hit {aeplayer.Name} for {_dmgValue} damage.", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
 
                 foreach (GamePlayer player3 in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
-                    player3.Out.SendSpellEffectAnimation(caster, aeplayer, 7029, 0, false, 1);
+                    player3.Out.SendSpellEffectAnimation(_caster, aeplayer, 7029, 0, false, 1);
                 }
             }
 
-            DisableSkill(caster);
+            DisableSkill(_caster);
             timer.Stop();
-            timer = null;
             return 0;
         }
 
         protected virtual int RootExpires(RegionTimer timer)
         {
-            GameLiving living = timer.Owner as GameLiving;
-            if (living != null)
+            if (timer.Owner is GameLiving living)
             {
                 living.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
                 SendUpdates(living);
             }
 
             timer.Stop();
-            timer = null;
             return 0;
         }
 
@@ -276,14 +265,12 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = owner as GamePlayer;
-            if (player != null)
+            if (owner is GamePlayer player)
             {
                 player.Out.SendUpdateMaxSpeed();
             }
 
-            GameNPC npc = owner as GameNPC;
-            if (npc != null)
+            if (owner is GameNPC npc)
             {
                 short maxSpeed = npc.MaxSpeed;
                 if (npc.CurrentSpeed > maxSpeed)

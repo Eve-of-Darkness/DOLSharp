@@ -23,9 +23,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 if (player.TempProperties.getProperty("Charging", false)
                     || player.EffectList.CountOfType(typeof(SpeedOfSoundEffect), typeof(ArmsLengthEffect), typeof(ChargeEffect)) > 0)
@@ -35,10 +33,7 @@ namespace DOL.GS.RealmAbilities
                 }
 
                 GameSpellEffect speed = Spells.SpellHandler.FindEffectOnTarget(player, "SpeedEnhancement");
-                if (speed != null)
-                {
-                    speed.Cancel(false);
-                }
+                speed?.Cancel(false);
 
                 new ArmsLengthEffect().Start(player);
                 SendCasterSpellEffectAndCastMessage(player, 7068, true);

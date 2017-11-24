@@ -7,16 +7,16 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class DeterminationAbility : RAPropertyEnhancer
     {
-        public static eProperty[] properties = new eProperty[]
+        private static readonly eProperty[] Properties =
         {
             eProperty.MesmerizeDurationReduction,
             eProperty.StunDurationReduction,
             eProperty.SpeedDecreaseDurationReduction,
         };
 
-        public DeterminationAbility(DBAbility dba, int level) : base(dba, level, properties) { }
+        public DeterminationAbility(DBAbility dba, int level) : base(dba, level, Properties) { }
 
-        protected override string ValueUnit { get { return "%"; } }
+        protected override string ValueUnit => "%";
 
         public override int GetAmountForLevel(int level)
         {
@@ -41,36 +41,34 @@ namespace DOL.GS.RealmAbilities
                         default: return 55;
                 }
             }
-            else
+
+            int amount = 0;
+            if (level >= 1)
             {
-                int amount = 0;
-                if (level >= 1)
-                {
-                    amount += 4;
-                }
-
-                if (level >= 2)
-                {
-                    amount += 4;
-                }
-
-                if (level >= 3)
-                {
-                    amount += 12;
-                }
-
-                if (level >= 4)
-                {
-                    amount += 18;
-                }
-
-                if (level >= 5)
-                {
-                    amount += 17;
-                }
-
-                return amount;
+                amount += 4;
             }
+
+            if (level >= 2)
+            {
+                amount += 4;
+            }
+
+            if (level >= 3)
+            {
+                amount += 12;
+            }
+
+            if (level >= 4)
+            {
+                amount += 18;
+            }
+
+            if (level >= 5)
+            {
+                amount += 17;
+            }
+
+            return amount;
         }
     }
 }

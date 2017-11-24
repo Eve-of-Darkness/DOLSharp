@@ -15,12 +15,11 @@ namespace DOL.GS.RealmAbilities
         private int x;
         private int y;
         private int z;*/
-        private Area.Circle traparea;
-        private GameLiving owner;
-        private RegionTimer ticktimer;
-        private const int TICKS = 6;
-        private int effectiveness;
-        private ushort region;
+        private Area.Circle _traparea;
+        private GameLiving _owner;
+        private RegionTimer _ticktimer;
+        private int _effectiveness;
+        private ushort _region;
 
         public DecimationTrapAbility(DBAbility dba, int level) : base(dba, level) { }
 
@@ -35,28 +34,28 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            ushort Icon = 7026;
-            effectiveness = 0;
-            owner = living;
+            const ushort icon = 7026;
+            _effectiveness = 0;
+            _owner = living;
 
             if (ServerProperties.Properties.USE_NEW_ACTIVES_RAS_SCALING)
             {
                 switch (Level)
                 {
-                    case 1: effectiveness = 300; break;
-                    case 2: effectiveness = 450; break;
-                    case 3: effectiveness = 600; break;
-                    case 4: effectiveness = 750; break;
-                    case 5: effectiveness = 900; break;
+                    case 1: _effectiveness = 300; break;
+                    case 2: _effectiveness = 450; break;
+                    case 3: _effectiveness = 600; break;
+                    case 4: _effectiveness = 750; break;
+                    case 5: _effectiveness = 900; break;
                 }
             }
             else
             {
                 switch (Level)
                 {
-                    case 1: effectiveness = 300; break;
-                    case 2: effectiveness = 600; break;
-                    case 3: effectiveness = 900; break;
+                    case 1: _effectiveness = 300; break;
+                    case 2: _effectiveness = 600; break;
+                    case 3: _effectiveness = 900; break;
                 }
             }
 
@@ -70,8 +69,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }
@@ -85,11 +83,14 @@ namespace DOL.GS.RealmAbilities
 
             foreach (GamePlayer p in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                p.Out.SendSpellCastAnimation(living, Icon, 20);
+                p.Out.SendSpellCastAnimation(living, icon, 20);
             }
 
-            player.RealmAbilityCastTimer = new RegionTimer(player);
-            player.RealmAbilityCastTimer.Callback = new RegionTimerCallback(startSpell);
+            player.RealmAbilityCastTimer = new RegionTimer(player)
+            {
+                Callback = new RegionTimerCallback(StartSpell)
+            };
+
             player.RealmAbilityCastTimer.Start(2000);
         }
 
@@ -98,29 +99,32 @@ namespace DOL.GS.RealmAbilities
             return player.Level >= 40;
         }
 
-        private int startSpell(RegionTimer timer)
+        private int StartSpell(RegionTimer timer)
         {
-            if (!owner.IsAlive)
+            if (!_owner.IsAlive)
             {
                 return 0;
             }
 
-            traparea = new Area.Circle("decimation trap", owner.X, owner.Y, owner.Z, 50);
+            _traparea = new Area.Circle("decimation trap", _owner.X, _owner.Y, _owner.Z, 50);
 
-            owner.CurrentRegion.AddArea(traparea);
-            region = owner.CurrentRegionID;
+            _owner.CurrentRegion.AddArea(_traparea);
+            _region = _owner.CurrentRegionID;
 
-            GameEventMgr.AddHandler(traparea, AreaEvent.PlayerEnter, new DOLEventHandler(EventHandler));
-            ticktimer = new RegionTimer(owner);
-            ticktimer.Callback = new RegionTimerCallback(onTick);
-            ticktimer.Start(600000);
+            GameEventMgr.AddHandler(_traparea, AreaEvent.PlayerEnter, new DOLEventHandler(EventHandler));
+            _ticktimer = new RegionTimer(_owner)
+            {
+                Callback = new RegionTimerCallback(OnTick)
+            };
+
+            _ticktimer.Start(600000);
             getTargets();
-            DisableSkill(owner);
+            DisableSkill(_owner);
 
             return 0;
         }
 
-        private int onTick(RegionTimer timer)
+        private int OnTick(RegionTimer timer)
         {
             removeHandlers();
             return 0;
@@ -128,19 +132,17 @@ namespace DOL.GS.RealmAbilities
 
         protected void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AreaEventArgs args = arguments as AreaEventArgs;
-            if (args == null)
+            if (!(arguments is AreaEventArgs args))
             {
                 return;
             }
 
-            GameLiving living = args.GameObject as GameLiving;
-            if (living == null)
+            if (!(args.GameObject is GameLiving living))
             {
                 return;
             }
 
-            if (!GameServer.ServerRules.IsAllowedToAttack(owner, living, true))
+            if (!GameServer.ServerRules.IsAllowedToAttack(_owner, living, true))
             {
                 return;
             }
@@ -150,23 +152,23 @@ namespace DOL.GS.RealmAbilities
 
         private void removeHandlers()
         {
-            owner.CurrentRegion.RemoveArea(traparea);
-            GameEventMgr.RemoveHandler(traparea, AreaEvent.PlayerEnter, new DOLEventHandler(EventHandler));
+            _owner.CurrentRegion.RemoveArea(_traparea);
+            GameEventMgr.RemoveHandler(_traparea, AreaEvent.PlayerEnter, new DOLEventHandler(EventHandler));
         }
 
         private void getTargets()
         {
-            foreach (GamePlayer target in WorldMgr.GetPlayersCloseToSpot(region, traparea.X, traparea.Y, traparea.Z, 350))
+            foreach (GamePlayer target in WorldMgr.GetPlayersCloseToSpot(_region, _traparea.X, _traparea.Y, _traparea.Z, 350))
             {
-                if (GameServer.ServerRules.IsAllowedToAttack(owner, target, true))
+                if (GameServer.ServerRules.IsAllowedToAttack(_owner, target, true))
                 {
                     DamageTarget(target);
                 }
             }
 
-            foreach (GameNPC target in WorldMgr.GetNPCsCloseToSpot(region, traparea.X, traparea.Y, traparea.Z, 350))
+            foreach (GameNPC target in WorldMgr.GetNPCsCloseToSpot(_region, _traparea.X, _traparea.Y, _traparea.Z, 350))
             {
-                if (GameServer.ServerRules.IsAllowedToAttack(owner, target, true))
+                if (GameServer.ServerRules.IsAllowedToAttack(_owner, target, true))
                 {
                     DamageTarget(target);
                 }
@@ -175,7 +177,7 @@ namespace DOL.GS.RealmAbilities
 
         private void DamageTarget(GameLiving target)
         {
-            if (!GameServer.ServerRules.IsAllowedToAttack(owner, target, true))
+            if (!GameServer.ServerRules.IsAllowedToAttack(_owner, target, true))
             {
                 return;
             }
@@ -185,31 +187,29 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            if (ticktimer.IsAlive)
+            if (_ticktimer.IsAlive)
             {
-                ticktimer.Stop();
+                _ticktimer.Stop();
                 removeHandlers();
             }
 
-            int dist = target.GetDistanceTo(new Point3D(traparea.X, traparea.Y, traparea.Z));
+            int dist = target.GetDistanceTo(new Point3D(_traparea.X, _traparea.Y, _traparea.Z));
             double mod = 1;
             if (dist > 0)
             {
                 mod = 1 - ((double)dist / 350);
             }
 
-            int basedamage = (int)(effectiveness * mod);
+            int basedamage = (int)(_effectiveness * mod);
             int resist = (int)(basedamage * target.GetModified(eProperty.Resist_Energy) * -0.01);
             int damage = basedamage + resist;
 
-            GamePlayer player = owner as GamePlayer;
-            if (player != null)
+            if (_owner is GamePlayer player)
             {
-                player.Out.SendMessage("You hit " + target.Name + " for " + damage + "(" + resist + ") points of damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"You hit {target.Name} for {damage}({resist}) points of damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
             }
 
-            GamePlayer targetPlayer = target as GamePlayer;
-            if (targetPlayer != null)
+            if (target is GamePlayer targetPlayer)
             {
                 if (targetPlayer.IsStealthed)
                 {
@@ -219,19 +219,22 @@ namespace DOL.GS.RealmAbilities
 
             foreach (GamePlayer p in target.GetPlayersInRadius(false, WorldMgr.VISIBILITY_DISTANCE))
             {
-                p.Out.SendSpellEffectAnimation(owner, target, 7026, 0, false, 1);
-                p.Out.SendCombatAnimation(owner, target, 0, 0, 0, 0, 0x14, target.HealthPercent);
+                p.Out.SendSpellEffectAnimation(_owner, target, 7026, 0, false, 1);
+                p.Out.SendCombatAnimation(_owner, target, 0, 0, 0, 0, 0x14, target.HealthPercent);
             }
 
             // target.TakeDamage(owner, eDamageType.Energy, damage, 0);
-            AttackData ad = new AttackData();
-            ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
-            ad.Attacker = owner;
-            ad.Target = target;
-            ad.DamageType = eDamageType.Energy;
-            ad.Damage = damage;
+            AttackData ad = new AttackData
+            {
+                AttackResult = GameLiving.eAttackResult.HitUnstyled,
+                Attacker = _owner,
+                Target = target,
+                DamageType = eDamageType.Energy,
+                Damage = damage
+            };
+
             target.OnAttackedByEnemy(ad);
-            owner.DealDamage(ad);
+            _owner.DealDamage(ad);
         }
 
         public override int GetReUseDelay(int level)

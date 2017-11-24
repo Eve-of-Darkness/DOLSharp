@@ -29,7 +29,6 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class GiftOfPerizorAbility : RR5RealmAbility
     {
-        public const int DURATION = 60 * 1000;
         private const int SpellRadius = 1500;
 
         public GiftOfPerizorAbility(DBAbility dba, int level) : base(dba, level) { }
@@ -45,8 +44,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 ArrayList targets = new ArrayList();
                 if (player.Group == null)
@@ -72,11 +70,8 @@ namespace DOL.GS.RealmAbilities
                         continue;
                     }
 
-                    GiftOfPerizorEffect GiftOfPerizor = target.EffectList.GetOfType<GiftOfPerizorEffect>();
-                    if (GiftOfPerizor != null)
-                    {
-                        GiftOfPerizor.Cancel(false);
-                    }
+                    GiftOfPerizorEffect giftOfPerizor = target.EffectList.GetOfType<GiftOfPerizorEffect>();
+                    giftOfPerizor?.Cancel(false);
 
                     target.TempProperties.setProperty("GiftOfPerizorOwner", player);
                     new GiftOfPerizorEffect().Start(target);

@@ -24,8 +24,7 @@ namespace DOL.GS.RealmAbilities
 
             SendCasterSpellEffectAndCastMessage(living, 7006, true);
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 player.RemoveDisabledSkill(SkillBase.GetAbility(Abilities.Quickcast));
             }

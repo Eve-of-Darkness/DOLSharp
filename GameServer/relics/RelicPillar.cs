@@ -28,7 +28,7 @@ namespace DOL.GS.Relics
         /// <summary>
         /// Creates a new relic pillar.
         /// </summary>
-        public RelicPillar() : base()
+        public RelicPillar()
         {
             Realm = 0;
             Close();
@@ -37,53 +37,40 @@ namespace DOL.GS.Relics
         /// <summary>
         /// Object used for thread synchronization.
         /// </summary>
-        private object m_syncPillar = new object();
+        private static readonly object Lock = new object();
 
         #region IDoor Implementation
-
-        private int m_pillarID;
 
         /// <summary>
         /// ID for this pillar.
         /// </summary>
-        public int DoorID
-        {
-            get { return m_pillarID; }
-            set { m_pillarID = value; }
-        }
+        public int DoorID { get; set; }
 
         /// <summary>
         /// Get the ZoneID of this door
         /// </summary>
-        public ushort ZoneID
-        {
-            get { return (ushort)(DoorID / 1000000); }
-        }
+        public ushort ZoneID => (ushort)(DoorID / 1000000);
 
         /// <summary>
         /// Pillars behave like regular doors.
         /// </summary>
-        public uint Flag
-        {
-            get { return 0; }
-        }
+        public uint Flag => 0;
 
-        private eDoorState m_pillarState;
+        private eDoorState _pillarState;
 
         /// <summary>
         /// State of this pillar (up == closed, down == open).
         /// </summary>
         public eDoorState State
         {
-            get { return m_pillarState; }
-
+            get => _pillarState;
             set
             {
-                if (m_pillarState != value)
+                if (_pillarState != value)
                 {
-                    lock (m_syncPillar)
+                    lock (Lock)
                     {
-                        m_pillarState = value;
+                        _pillarState = value;
 
                         foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                         {

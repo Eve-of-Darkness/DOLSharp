@@ -31,8 +31,6 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class BoilingCauldronAbility : RR5RealmAbility
     {
-        public const int DURATION = 4500;
-
         public BoilingCauldronAbility(DBAbility dba, int level) : base(dba, level) { }
 
         /// <summary>
@@ -46,14 +44,10 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
-                BoilingCauldronEffect BoilingCauldron = player.EffectList.GetOfType<BoilingCauldronEffect>();
-                if (BoilingCauldron != null)
-                {
-                    BoilingCauldron.Cancel(false);
-                }
+                BoilingCauldronEffect boilingCauldron = player.EffectList.GetOfType<BoilingCauldronEffect>();
+                boilingCauldron?.Cancel(false);
 
                 new BoilingCauldronEffect().Start(player);
             }

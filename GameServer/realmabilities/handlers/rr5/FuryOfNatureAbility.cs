@@ -22,8 +22,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 SendCasterSpellEffectAndCastMessage(player, 5103, true);
                 FuryOfNatureEffect effect = new FuryOfNatureEffect();

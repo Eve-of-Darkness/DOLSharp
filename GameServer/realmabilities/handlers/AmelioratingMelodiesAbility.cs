@@ -19,8 +19,7 @@ namespace DOL.GS.RealmAbilities
         /// <param name="living"></param>
         public override void Execute(GameLiving living)
         {
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }
@@ -31,10 +30,7 @@ namespace DOL.GS.RealmAbilities
             }
 
             AmelioratingMelodiesEffect ameffect = player.EffectList.GetOfType<AmelioratingMelodiesEffect>();
-            if (ameffect != null)
-            {
-                ameffect.Cancel(false);
-            }
+            ameffect?.Cancel(false);
 
             SendCasterSpellEffectAndCastMessage(living, 3021, true);
 

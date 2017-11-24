@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.Language;
+using log4net;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -9,28 +10,25 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class RAStatEnhancer : L5RealmAbility
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        eProperty m_property = eProperty.Undefined;
-
-        public eProperty Property
-        {
-            get { return m_property; }
-        }
+        private readonly eProperty _property;
 
         public RAStatEnhancer(DBAbility dba, int level, eProperty property)
             : base(dba, level)
         {
-            m_property = property;
+            _property = property;
         }
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add(m_description);
-                list.Add(string.Empty);
+                var list = new List<string>
+                {
+                    m_description, string.Empty
+                };
+
                 for (int i = 1; i <= MaxLevel; i++)
                 {
                     list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "RAStatEnhancer.DelveInfo.Info1", i, GetAmountForLevel(i)));
@@ -51,29 +49,27 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (level)
                 {
-                        case 1: return 4;
-                        case 2: return 8;
-                        case 3: return 12;
-                        case 4: return 17;
-                        case 5: return 22;
-                        case 6: return 28;
-                        case 7: return 34;
-                        case 8: return 41;
-                        case 9: return 48;
-                        default: return 48;
+                    case 1: return 4;
+                    case 2: return 8;
+                    case 3: return 12;
+                    case 4: return 17;
+                    case 5: return 22;
+                    case 6: return 28;
+                    case 7: return 34;
+                    case 8: return 41;
+                    case 9: return 48;
+                    default: return 48;
                 }
             }
-            else
+
+            switch (level)
             {
-                switch (level)
-                {
-                        case 1: return 4;
-                        case 2: return 12;
-                        case 3: return 22;
-                        case 4: return 34;
-                        case 5: return 48;
-                        default: return 48;
-                }
+                case 1: return 4;
+                case 2: return 12;
+                case 3: return 22;
+                case 4: return 34;
+                case 5: return 48;
+                default: return 48;
             }
         }
 
@@ -83,8 +79,7 @@ namespace DOL.GS.RealmAbilities
         /// <param name="target"></param>
         public virtual void SendUpdates(GameLiving target)
         {
-            GamePlayer player = target as GamePlayer;   // need new prop system to not worry about updates
-            if (player != null)
+            if (target is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
                 player.Out.SendUpdateWeaponAndArmorStats();
@@ -92,34 +87,36 @@ namespace DOL.GS.RealmAbilities
                 player.UpdatePlayerStatus();
             }
 
-            if (target.IsAlive)
+            if (!target.IsAlive)
             {
-                if (target.Health < target.MaxHealth)
-                {
-                    target.StartHealthRegeneration();
-                }
-                else if (target.Health > target.MaxHealth)
-                {
-                    target.Health = target.MaxHealth;
-                }
+                return;
+            }
 
-                if (target.Mana < target.MaxMana)
-                {
-                    target.StartPowerRegeneration();
-                }
-                else if (target.Mana > target.MaxMana)
-                {
-                    target.Mana = target.MaxMana;
-                }
+            if (target.Health < target.MaxHealth)
+            {
+                target.StartHealthRegeneration();
+            }
+            else if (target.Health > target.MaxHealth)
+            {
+                target.Health = target.MaxHealth;
+            }
 
-                if (target.Endurance < target.MaxEndurance)
-                {
-                    target.StartEnduranceRegeneration();
-                }
-                else if (target.Endurance > target.MaxEndurance)
-                {
-                    target.Endurance = target.MaxEndurance;
-                }
+            if (target.Mana < target.MaxMana)
+            {
+                target.StartPowerRegeneration();
+            }
+            else if (target.Mana > target.MaxMana)
+            {
+                target.Mana = target.MaxMana;
+            }
+
+            if (target.Endurance < target.MaxEndurance)
+            {
+                target.StartEnduranceRegeneration();
+            }
+            else if (target.Endurance > target.MaxEndurance)
+            {
+                target.Endurance = target.MaxEndurance;
             }
         }
 
@@ -127,7 +124,7 @@ namespace DOL.GS.RealmAbilities
         {
             if (m_activeLiving == null)
             {
-                living.AbilityBonus[(int)m_property] += GetAmountForLevel(Level);
+                living.AbilityBonus[(int)_property] += GetAmountForLevel(Level);
                 m_activeLiving = living;
                 if (sendUpdates)
                 {
@@ -136,7 +133,7 @@ namespace DOL.GS.RealmAbilities
             }
             else
             {
-                log.Warn("ability " + Name + " already activated on " + living.Name);
+                Log.Warn($"ability {Name} already activated on {living.Name}");
             }
         }
 
@@ -144,7 +141,7 @@ namespace DOL.GS.RealmAbilities
         {
             if (m_activeLiving != null)
             {
-                living.AbilityBonus[(int)m_property] -= GetAmountForLevel(Level);
+                living.AbilityBonus[(int)_property] -= GetAmountForLevel(Level);
                 if (sendUpdates)
                 {
                     SendUpdates(living);
@@ -154,7 +151,7 @@ namespace DOL.GS.RealmAbilities
             }
             else
             {
-                log.Warn("ability " + Name + " already deactivated on " + living.Name);
+                Log.Warn($"ability {Name} already deactivated on {living.Name}");
             }
         }
 
@@ -165,7 +162,7 @@ namespace DOL.GS.RealmAbilities
                 newLevel = Level;
             }
 
-            m_activeLiving.AbilityBonus[(int)m_property] += GetAmountForLevel(newLevel) - GetAmountForLevel(oldLevel);
+            m_activeLiving.AbilityBonus[(int)_property] += GetAmountForLevel(newLevel) - GetAmountForLevel(oldLevel);
             SendUpdates(m_activeLiving);
         }
     }

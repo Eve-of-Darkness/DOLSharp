@@ -35,8 +35,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 SendCasterSpellEffectAndCastMessage(player, 7062, true);
                 FungalUnionEffect effect = new FungalUnionEffect();

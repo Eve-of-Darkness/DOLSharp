@@ -28,8 +28,6 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class CallOfDarknessAbility : RR5RealmAbility
     {
-        public const int DURATION = 60 * 1000;
-
         public CallOfDarknessAbility(DBAbility dba, int level) : base(dba, level) { }
 
         /// <summary>
@@ -43,14 +41,10 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 CallOfDarknessEffect CallOfDarkness = player.EffectList.GetOfType<CallOfDarknessEffect>();
-                if (CallOfDarkness != null)
-                {
-                    CallOfDarkness.Cancel(false);
-                }
+                CallOfDarkness?.Cancel(false);
 
                 new CallOfDarknessEffect().Start(player);
             }

@@ -29,6 +29,8 @@ namespace DOL.GS.Spells
     [SpellHandler("Nearsight")]
     public class NearsightSpellHandler : ImmunityEffectSpellHandler
     {
+        private const int NsChance = 100;
+
         /// <summary>
         /// Calculates chance of spell getting resisted
         /// </summary>
@@ -39,7 +41,7 @@ namespace DOL.GS.Spells
             // Bonedancer rr5
             if (target.EffectList.GetOfType<AllureofDeathEffect>() != null)
             {
-                return AllureofDeathEffect.nschance;
+                return NsChance;
             }
 
             return base.CalculateSpellResistChance(target);

@@ -6,22 +6,15 @@ namespace DOL.GS.Effects
     /// <summary>
     /// Effect handler for Juggernaut
     /// </summary>
-    public class JuggernautEffect : StaticEffect, IGameEffect
+    public class JuggernautEffect : StaticEffect
     {
-        private const string m_delveString = "Increases the effective level of the pet by the listed number (capped at level 70).";
-        private GameNPC m_living;
-        private int m_effectDuration;
-        private RegionTimer m_expireTimer;
-        private byte m_value;
-        private int m_growSize = 15;
-        public const int JUGGERNAUT_CAP_EFFECT = 70;
-
-        /// <summary>
-        /// Default constructor for JuggernautEffect
-        /// </summary>
-        public JuggernautEffect()
-        {
-        }
+        private const string DelveString = "Increases the effective level of the pet by the listed number (capped at level 70).";
+        private const int JuggernautCapEffect = 70;
+        private GameNPC _living;
+        private int _effectDuration;
+        private RegionTimer _expireTimer;
+        private byte _value;
+        private int _growSize = 15;
 
         /// <summary>
         /// Called when effect is to be started
@@ -36,15 +29,15 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            m_living = living.ControlledBrain.Body;
-            m_effectDuration = duration;
-            m_value = value;
+            _living = living.ControlledBrain.Body;
+            _effectDuration = duration;
+            _value = value;
 
             StartTimers();
 
-            m_living.Size += (byte)m_growSize;
-            m_living.Level = (byte)Math.Min(m_living.Level + m_value, JUGGERNAUT_CAP_EFFECT);
-            m_living.EffectList.Add(this);
+            _living.Size += (byte)_growSize;
+            _living.Level = (byte)Math.Min(_living.Level + _value, JuggernautCapEffect);
+            _living.EffectList.Add(this);
         }
 
         /// <summary>
@@ -54,9 +47,9 @@ namespace DOL.GS.Effects
         public override void Cancel(bool playerCancel)
         {
             StopTimers();
-            m_living.Size -= (byte)m_growSize;
-            m_living.Level -= m_value;
-            m_living.EffectList.Remove(this);
+            _living.Size -= (byte)_growSize;
+            _living.Level -= _value;
+            _living.EffectList.Remove(this);
         }
 
         /// <summary>
@@ -65,7 +58,7 @@ namespace DOL.GS.Effects
         private void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(m_living, new RegionTimerCallback(ExpireCallback), m_effectDuration * 1000);
+            _expireTimer = new RegionTimer(_living, new RegionTimerCallback(ExpireCallback), _effectDuration * 1000);
         }
 
         /// <summary>
@@ -74,10 +67,10 @@ namespace DOL.GS.Effects
         private void StopTimers()
         {
 
-            if (m_expireTimer != null)
+            if (_expireTimer != null)
             {
-                m_expireTimer.Stop();
-                m_expireTimer = null;
+                _expireTimer.Stop();
+                _expireTimer = null;
             }
         }
 
@@ -95,13 +88,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "Juggernaut";
-            }
-        }
+        public override string Name => "Juggernaut";
 
         /// <summary>
         /// Remaining time of the effect in milliseconds
@@ -110,7 +97,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
+                RegionTimer timer = _expireTimer;
                 if (timer == null || !timer.IsAlive)
                 {
                     return 0;
@@ -123,13 +110,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override ushort Icon
-        {
-            get
-            {
-                return 3030;
-            }
-        }
+        public override ushort Icon => 3030;
 
         /// <summary>
         /// Delve information
@@ -138,16 +119,18 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var delveInfoList = new List<string>();
-                delveInfoList.Add(m_delveString);
-                delveInfoList.Add(" ");
-                delveInfoList.Add("Value: " + m_value + "%");
+                var delveInfoList = new List<string>
+                {
+                    DelveString,
+                    " ",
+                    $"Value: {_value}%"
+                };
 
-                int seconds = (int)(RemainingTime / 1000);
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" ");
-                    delveInfoList.Add("- " + seconds + " seconds remaining.");
+                    delveInfoList.Add($"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

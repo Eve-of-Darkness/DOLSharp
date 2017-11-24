@@ -15,14 +15,13 @@ namespace DOL.GS.Effects
         {
         }
 
-        private GameLiving owner;
+        private GameLiving _owner;
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
-            GamePlayer player = target as GamePlayer;
-            if (player != null)
+            _owner = target;
+            if (target is GamePlayer player)
             {
                 foreach (GamePlayer p in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
@@ -30,30 +29,30 @@ namespace DOL.GS.Effects
                 }
             }
 
-            owner.BaseBuffBonusCategory[(int)eProperty.ArmorAbsorption] += m_currentBonus;
+            _owner.BaseBuffBonusCategory[(int)eProperty.ArmorAbsorption] += m_currentBonus;
         }
 
-        public override string Name { get { return "Ferocious Will"; } }
+        public override string Name => "Ferocious Will";
 
-        public override ushort Icon { get { return 3064; } }
+        public override ushort Icon => 3064;
 
         public override void Stop()
         {
-            owner.BaseBuffBonusCategory[(int)eProperty.ArmorAbsorption] -= m_currentBonus;
+            _owner.BaseBuffBonusCategory[(int)eProperty.ArmorAbsorption] -= m_currentBonus;
             base.Stop();
         }
 
-        public int SpellEffectiveness
-        {
-            get { return 100; }
-        }
+        public int SpellEffectiveness => 100;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Gives the Berzerker an ABS buff of 25%. Lasts 30 seconds total.");
+                var list = new List<string>
+                {
+                    "Gives the Berzerker an ABS buff of 25%. Lasts 30 seconds total."
+                };
+
                 return list;
             }
         }

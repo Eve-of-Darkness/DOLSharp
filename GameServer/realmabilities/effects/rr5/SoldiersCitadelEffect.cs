@@ -26,48 +26,50 @@ namespace DOL.GS.Effects
 
     public class SoldiersCitadelEffect : TimedEffect
     {
-        private GamePlayer EffectOwner;
+        private const int Duration = 15 * 1000;
+
+        private GamePlayer _effectOwner;
 
         public SoldiersCitadelEffect()
-            : base(RealmAbilities.SoldiersCitadelAbility.DURATION)
+            : base(Duration)
         { }
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                EffectOwner = target as GamePlayer;
-                foreach (GamePlayer p in EffectOwner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                _effectOwner = player;
+                foreach (GamePlayer p in _effectOwner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
-                    p.Out.SendSpellEffectAnimation(EffectOwner, EffectOwner, 7093, 0, false, 1);
+                    p.Out.SendSpellEffectAnimation(_effectOwner, _effectOwner, 7093, 0, false, 1);
                 }
 
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.ParryChance] += 50;
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.BlockChance] += 50;
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.ParryChance] += 50;
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.BlockChance] += 50;
 
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(_effectOwner, GameLivingEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(_effectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(_effectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
         }
 
         public override void Stop()
         {
-            if (EffectOwner != null)
+            if (_effectOwner != null)
             {
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.ParryChance] -= 50;
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.BlockChance] -= 50;
-                if (EffectOwner.IsAlive)
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.ParryChance] -= 50;
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.BlockChance] -= 50;
+                if (_effectOwner.IsAlive)
                 {
-                    new SoldiersCitadelSecondaryEffect().Start(EffectOwner);
+                    new SoldiersCitadelSecondaryEffect().Start(_effectOwner);
                 }
 
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(_effectOwner, GameLivingEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(_effectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(_effectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
 
             base.Stop();
@@ -81,26 +83,27 @@ namespace DOL.GS.Effects
         /// <param name="args">EventArgs associated with the event</param>
         protected void PlayerLeftWorld(DOLEvent e, object sender, EventArgs args)
         {
-            GamePlayer player = sender as GamePlayer;
-
-            SoldiersCitadelEffect SoldiersCitadel = player.EffectList.GetOfType<SoldiersCitadelEffect>();
-            if (SoldiersCitadel != null)
+            if (sender is GamePlayer player)
             {
-                SoldiersCitadel.Cancel(false);
+                SoldiersCitadelEffect soldiersCitadel = player.EffectList.GetOfType<SoldiersCitadelEffect>();
+                soldiersCitadel?.Cancel(false);
             }
         }
 
-        public override string Name { get { return "Soldier's Citadel"; } }
+        public override string Name => "Soldier's Citadel";
 
-        public override ushort Icon { get { return 3091; } }
+        public override ushort Icon => 3091;
 
         // Delve Info
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Grants +50% block/parry for 30s.");
+                var list = new List<string>
+                {
+                    "Grants +50% block/parry for 30s."
+                };
+
                 return list;
             }
         }
@@ -108,39 +111,41 @@ namespace DOL.GS.Effects
 
     public class SoldiersCitadelSecondaryEffect : TimedEffect
     {
-        private GamePlayer EffectOwner;
+        private const int Duration = 30 * 1000;
+
+        private GamePlayer _effectOwner;
 
         public SoldiersCitadelSecondaryEffect()
-            : base(RealmAbilities.SoldiersCitadelAbility.SECOND_DURATION)
+            : base(Duration)
         { }
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                EffectOwner = target as GamePlayer;
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.ParryChance] -= 10;
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.BlockChance] -= 10;
+                _effectOwner = player;
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.ParryChance] -= 10;
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.BlockChance] -= 10;
 
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(_effectOwner, GameLivingEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(_effectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(_effectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
         }
 
         public override void Stop()
         {
-            if (EffectOwner != null)
+            if (_effectOwner != null)
             {
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.ParryChance] += 10;
-                EffectOwner.BaseBuffBonusCategory[(int)eProperty.BlockChance] += 10;
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.ParryChance] += 10;
+                _effectOwner.BaseBuffBonusCategory[(int)eProperty.BlockChance] += 10;
 
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(_effectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(_effectOwner, GameLivingEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(_effectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(_effectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
 
             base.Stop();
@@ -154,26 +159,27 @@ namespace DOL.GS.Effects
         /// <param name="args">EventArgs associated with the event</param>
         private static void PlayerLeftWorld(DOLEvent e, object sender, EventArgs args)
         {
-            GamePlayer player = sender as GamePlayer;
-
-            SoldiersCitadelSecondaryEffect SoldiersCitadel = player.EffectList.GetOfType<SoldiersCitadelSecondaryEffect>();
-            if (SoldiersCitadel != null)
+            if (sender is GamePlayer player)
             {
-                SoldiersCitadel.Cancel(false);
+                SoldiersCitadelSecondaryEffect soldiersCitadel = player.EffectList.GetOfType<SoldiersCitadelSecondaryEffect>();
+                soldiersCitadel?.Cancel(false);
             }
         }
 
-        public override string Name { get { return "Soldier's Citadel"; } }
+        public override string Name => "Soldier's Citadel";
 
-        public override ushort Icon { get { return 3091; } }
+        public override ushort Icon => 3091;
 
         // Delve Info
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Penality -10% block/parry for 15s");
+                var list = new List<string>
+                {
+                    "Penality -10% block/parry for 15s"
+                };
+
                 return list;
             }
         }

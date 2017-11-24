@@ -13,42 +13,32 @@ namespace DOL.GS.Effects
         public ShieldTripDisarmEffect()
             : base(15000)
         {
-            ;
         }
-
-        private GameLiving owner;
 
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
 
             // target.IsDisarmed = true;
             target.DisarmedTime = target.CurrentRegion.Time + m_duration;
             target.StopAttack();
         }
 
-        public override string Name { get { return "Shield Trip"; } }
+        public override string Name => "Shield Trip";
 
-        public override ushort Icon { get { return 3045; } }
+        public override ushort Icon { get; } = 3045;
 
-        public override void Stop()
-        {
-            // owner.IsDisarmed = false;
-            base.Stop();
-        }
-
-        public int SpellEffectiveness
-        {
-            get { return 100; }
-        }
+        public int SpellEffectiveness => 100;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Disarms you for 15 seconds!");
+                var list = new List<string>
+                {
+                    "Disarms you for 15 seconds!"
+                };
+
                 return list;
             }
         }
@@ -56,7 +46,7 @@ namespace DOL.GS.Effects
 
     public class ShieldTripRootEffect : TimedEffect
     {
-        private GameLiving owner;
+        private GameLiving _owner;
 
         public ShieldTripRootEffect()
             : base(10000)
@@ -67,31 +57,29 @@ namespace DOL.GS.Effects
         {
             base.Start(target);
             target.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 1.0 - 99 * 0.01);
-            owner = target;
+            _owner = target;
             GameEventMgr.AddHandler(target, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
-            GamePlayer player = owner as GamePlayer;
-            if (player != null)
+            if (_owner is GamePlayer player)
             {
                 player.Out.SendUpdateMaxSpeed();
             }
             else
             {
-                owner.CurrentSpeed = owner.MaxSpeed;
+                _owner.CurrentSpeed = _owner.MaxSpeed;
             }
         }
 
         public override void Stop()
         {
-            owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
-            GameEventMgr.RemoveHandler(owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
-            GamePlayer player = owner as GamePlayer;
-            if (player != null)
+            _owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
+            GameEventMgr.RemoveHandler(_owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
+            if (_owner is GamePlayer player)
             {
                 player.Out.SendUpdateMaxSpeed();
             }
             else
             {
-                owner.CurrentSpeed = owner.MaxSpeed;
+                _owner.CurrentSpeed = _owner.MaxSpeed;
             }
 
             base.Stop();
@@ -99,8 +87,7 @@ namespace DOL.GS.Effects
 
         protected virtual void OnAttacked(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackedByEnemyEventArgs attackArgs = arguments as AttackedByEnemyEventArgs;
-            if (attackArgs == null)
+            if (!(arguments is AttackedByEnemyEventArgs attackArgs))
             {
                 return;
             }
@@ -114,21 +101,21 @@ namespace DOL.GS.Effects
             }
         }
 
-        public override string Name { get { return "Shield Trip"; } }
+        public override string Name => "Shield Trip";
 
-        public override ushort Icon { get { return 7046; } }
+        public override ushort Icon => 7046;
 
-        public int SpellEffectiveness
-        {
-            get { return 0; }
-        }
+        public int SpellEffectiveness => 0;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Root Effect");
+                var list = new List<string>
+                {
+                    "Root Effect"
+                };
+
                 return list;
             }
         }

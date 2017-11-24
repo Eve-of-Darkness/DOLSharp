@@ -8,8 +8,8 @@ namespace DOL.GS.Effects
     public class RestorativeMindEffect : TimedEffect
     {
 
-        private GamePlayer m_playerOwner;
-        private RegionTimer m_tickTimer;
+        private GamePlayer _playerOwner;
+        private RegionTimer _tickTimer;
 
         public RestorativeMindEffect()
             : base(30000)
@@ -19,89 +19,94 @@ namespace DOL.GS.Effects
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            GamePlayer player = target as GamePlayer;
-            if (player != null)
+            if (target is GamePlayer player)
             {
-                m_playerOwner = player;
+                _playerOwner = player;
                 foreach (GamePlayer p in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
                     p.Out.SendSpellEffectAnimation(player, player, Icon, 0, false, 1);
                 }
 
-                healTarget();
-                startTimer();
+                HealTarget();
+                StartTimer();
             }
         }
 
         public override void Stop()
         {
-            if (m_tickTimer.IsAlive)
+            if (_tickTimer.IsAlive)
             {
-                m_tickTimer.Stop();
+                _tickTimer.Stop();
             }
 
             base.Stop();
         }
 
-        private void healTarget()
+        private void HealTarget()
         {
-            if (m_playerOwner != null)
+            if (_playerOwner != null)
             {
-                int healthtick = (int)(m_playerOwner.MaxHealth * 0.05);
-                int manatick = (int)(m_playerOwner.MaxMana * 0.05);
-                int endutick = (int)(m_playerOwner.MaxEndurance * 0.05);
-                if (!m_playerOwner.IsAlive)
+                int healthtick = (int)(_playerOwner.MaxHealth * 0.05);
+                int manatick = (int)(_playerOwner.MaxMana * 0.05);
+                int endutick = (int)(_playerOwner.MaxEndurance * 0.05);
+                if (!_playerOwner.IsAlive)
                 {
                     Stop();
                 }
 
-                int modendu = m_playerOwner.MaxEndurance - m_playerOwner.Endurance;
+                int modendu = _playerOwner.MaxEndurance - _playerOwner.Endurance;
                 if (modendu > endutick)
                 {
                     modendu = endutick;
                 }
 
-                m_playerOwner.Endurance += modendu;
-                int modheal = m_playerOwner.MaxHealth - m_playerOwner.Health;
+                _playerOwner.Endurance += modendu;
+                int modheal = _playerOwner.MaxHealth - _playerOwner.Health;
                 if (modheal > healthtick)
                 {
                     modheal = healthtick;
                 }
 
-                m_playerOwner.Health += modheal;
-                int modmana = m_playerOwner.MaxMana - m_playerOwner.Mana;
+                _playerOwner.Health += modheal;
+                int modmana = _playerOwner.MaxMana - _playerOwner.Mana;
                 if (modmana > manatick)
                 {
                     modmana = manatick;
                 }
 
-                m_playerOwner.Mana += modmana;
+                _playerOwner.Mana += modmana;
             }
         }
 
         private int onTick(RegionTimer timer)
         {
-            healTarget();
+            HealTarget();
             return 3000;
         }
 
-        private void startTimer()
+        private void StartTimer()
         {
-            m_tickTimer = new RegionTimer(m_playerOwner);
-            m_tickTimer.Callback = new RegionTimerCallback(onTick);
-            m_tickTimer.Start(3000);
+            _tickTimer = new RegionTimer(_playerOwner)
+            {
+                Callback = new RegionTimerCallback(onTick)
+            };
+
+            _tickTimer.Start(3000);
         }
 
-        public override string Name { get { return "Restorative Mind"; } }
+        public override string Name => "Restorative Mind";
 
-        public override ushort Icon { get { return 3070; } }
+        public override ushort Icon => 3070;
 
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Heals you for 5% mana/endu/hits each tick (3 seconds)");
+                var list = new List<string>
+                {
+                    "Heals you for 5% mana/endu/hits each tick (3 seconds)"
+                };
+
                 return list;
             }
         }

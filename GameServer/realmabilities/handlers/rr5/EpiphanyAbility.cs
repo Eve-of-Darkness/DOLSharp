@@ -21,8 +21,7 @@ namespace DOL.GS.RealmAbilities
 
             bool deactivate = false;
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 if (player.Group != null)
                 {
@@ -31,7 +30,7 @@ namespace DOL.GS.RealmAbilities
                     {
                         if (!CheckPreconditions(member, DEAD) && living.IsWithinRadius(member, 2000))
                         {
-                            if (restoreMana(member, player))
+                            if (RestoreMana(member, player))
                             {
                                 deactivate = true;
                             }
@@ -42,7 +41,7 @@ namespace DOL.GS.RealmAbilities
                 {
                     if (!CheckPreconditions(player, DEAD))
                     {
-                        if (restoreMana(player, player))
+                        if (RestoreMana(player, player))
                         {
                             deactivate = true;
                         }
@@ -56,7 +55,7 @@ namespace DOL.GS.RealmAbilities
             }
         }
 
-        private bool restoreMana(GameLiving target, GamePlayer owner)
+        private bool RestoreMana(GameLiving target, GamePlayer owner)
         {
             int mana = (int)(target.MaxMana * 0.25);
             int modheal = target.MaxMana - target.Mana;
@@ -70,19 +69,19 @@ namespace DOL.GS.RealmAbilities
                 modheal = mana;
             }
 
-            if (target is GamePlayer && target != owner)
+            if (target is GamePlayer player && target != owner)
             {
-                ((GamePlayer)target).Out.SendMessage(owner.Name + " restores you " + modheal + " points of mana, and 50% of your endurance.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"{owner.Name} restores you {modheal} points of mana, and 50% of your endurance.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
 
             if (target != owner)
             {
-                owner.Out.SendMessage("You restore" + target.Name + " " + modheal + " points of mana, and 50% of their endurance.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                owner.Out.SendMessage($"You restore{target.Name} {modheal} points of mana, and 50% of their endurance.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
 
             if (target == owner)
             {
-                owner.Out.SendMessage("You restore yourself " + modheal + " points of mana, and 50% of your endurance.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                owner.Out.SendMessage($"You restore yourself {modheal} points of mana, and 50% of your endurance.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
 
             target.Mana += modheal;

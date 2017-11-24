@@ -1984,7 +1984,7 @@ namespace DOL.GS.ServerProperties
         /// Returns the ServerPropertyAttribute, the Static Field with current Value, and the according DataObject
         /// Create a default dataObject if value wasn't found in Database
         /// </summary>
-        public static IDictionary<string, Tuple<ServerPropertyAttribute, PropertyInfo, ServerProperty>> AllDomainProperties
+        private static IDictionary<string, Tuple<ServerPropertyAttribute, PropertyInfo, ServerProperty>> AllDomainProperties
         {
             get
             {
@@ -2047,7 +2047,7 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         /// <param name="attrib">The attribute</param>
         /// <returns>The real property value</returns>
-        public static void Load(ServerPropertyAttribute attrib, PropertyInfo property, ServerProperty prop)
+        private static void Load(ServerPropertyAttribute attrib, PropertyInfo property, ServerProperty prop)
         {
             string key = attrib.Key;
 

@@ -8,9 +8,9 @@ namespace DOL.GS.RealmAbilities
     /// <summary>
     /// Effect handler for Barrier Of Fortitude
     /// </summary>
-    public class BedazzlingAuraEffect : TimedEffect, IGameEffect
+    public class BedazzlingAuraEffect : TimedEffect
     {
-        private int m_value;
+        private int _value;
 
         /// <summary>
         /// Default constructor for AmelioratingMelodiesEffect
@@ -27,29 +27,29 @@ namespace DOL.GS.RealmAbilities
         /// <param name="value"></param>
         public void Start(GameLiving living, int value)
         {
-            m_value = value;
+            _value = value;
 
-            if (living.TempProperties.getProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb, false))
+            if (living.TempProperties.getProperty(BarrierOfFortitudeAbility.BofBaSb, false))
             {
                 return;
             }
 
             base.Start(living);
 
-            living.AbilityBonus[(int)eProperty.Resist_Body] += m_value;
-            living.AbilityBonus[(int)eProperty.Resist_Cold] += m_value;
-            living.AbilityBonus[(int)eProperty.Resist_Energy] += m_value;
-            living.AbilityBonus[(int)eProperty.Resist_Heat] += m_value;
-            living.AbilityBonus[(int)eProperty.Resist_Matter] += m_value;
-            living.AbilityBonus[(int)eProperty.Resist_Spirit] += m_value;
+            living.AbilityBonus[(int)eProperty.Resist_Body] += _value;
+            living.AbilityBonus[(int)eProperty.Resist_Cold] += _value;
+            living.AbilityBonus[(int)eProperty.Resist_Energy] += _value;
+            living.AbilityBonus[(int)eProperty.Resist_Heat] += _value;
+            living.AbilityBonus[(int)eProperty.Resist_Matter] += _value;
+            living.AbilityBonus[(int)eProperty.Resist_Spirit] += _value;
 
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                GameEventMgr.AddHandler(living, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-                (living as GamePlayer).Out.SendCharResistsUpdate();
+                GameEventMgr.AddHandler(player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                player.Out.SendCharResistsUpdate();
             }
 
-            living.TempProperties.setProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb, true);
+            living.TempProperties.setProperty(BarrierOfFortitudeAbility.BofBaSb, true);
         }
 
         /// <summary>
@@ -60,12 +60,10 @@ namespace DOL.GS.RealmAbilities
         /// <param name="args">EventArgs associated with the event</param>
         private static void PlayerLeftWorld(DOLEvent e, object sender, EventArgs args)
         {
-            GamePlayer player = (GamePlayer)sender;
-
-            BarrierOfFortitudeEffect BoFEffect = player.EffectList.GetOfType<BarrierOfFortitudeEffect>();
-            if (BoFEffect != null)
+            if (sender is GamePlayer player)
             {
-                BoFEffect.Cancel(false);
+                BarrierOfFortitudeEffect boFEffect = player.EffectList.GetOfType<BarrierOfFortitudeEffect>();
+                boFEffect?.Cancel(false);
             }
         }
 
@@ -73,42 +71,30 @@ namespace DOL.GS.RealmAbilities
         {
             base.Stop();
 
-            m_owner.AbilityBonus[(int)eProperty.Resist_Body] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Cold] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Energy] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Heat] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Matter] -= m_value;
-            m_owner.AbilityBonus[(int)eProperty.Resist_Spirit] -= m_value;
-            if (m_owner is GamePlayer)
+            m_owner.AbilityBonus[(int)eProperty.Resist_Body] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Cold] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Energy] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Heat] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Matter] -= _value;
+            m_owner.AbilityBonus[(int)eProperty.Resist_Spirit] -= _value;
+            if (m_owner is GamePlayer player)
             {
-                (m_owner as GamePlayer).Out.SendCharResistsUpdate();
-                GameEventMgr.RemoveHandler(m_owner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+                player.Out.SendCharResistsUpdate();
+                GameEventMgr.RemoveHandler(player, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
             }
 
-            m_owner.TempProperties.removeProperty(RealmAbilities.BarrierOfFortitudeAbility.BofBaSb);
+            m_owner.TempProperties.removeProperty(BarrierOfFortitudeAbility.BofBaSb);
         }
 
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "Bedazzling Aura";
-            }
-        }
+        public override string Name => "Bedazzling Aura";
 
         /// <summary>
         /// Icon ID
         /// </summary>
-        public override ushort Icon
-        {
-            get
-            {
-                return 3029;
-            }
-        }
+        public override ushort Icon => 3029;
 
         /// <summary>
         /// Delve information
@@ -117,16 +103,18 @@ namespace DOL.GS.RealmAbilities
         {
             get
             {
-                var delveInfoList = new List<string>(8);
-                delveInfoList.Add("Grants the group increased resistance to magical damage (Does not stack with Soldier's Barricade or Barrier of Fortitude).");
-                delveInfoList.Add(" ");
-                delveInfoList.Add("Value: " + m_value + "%");
+                var delveInfoList = new List<string>(8)
+                {
+                    "Grants the group increased resistance to magical damage (Does not stack with Soldier's Barricade or Barrier of Fortitude).",
+                    " ",
+                    $"Value: {_value}%"
+                };
 
-                int seconds = (int)(RemainingTime / 1000);
+                int seconds = RemainingTime / 1000;
                 if (seconds > 0)
                 {
                     delveInfoList.Add(" ");
-                    delveInfoList.Add("- " + seconds + " seconds remaining.");
+                    delveInfoList.Add($"- {seconds} seconds remaining.");
                 }
 
                 return delveInfoList;

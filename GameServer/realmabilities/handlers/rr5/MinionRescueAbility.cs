@@ -28,7 +28,6 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class MinionRescueAbility : RR5RealmAbility
     {
-        public const int DURATION = 6 * 1000;
         public const int SpellRadius = 500;
 
         public MinionRescueAbility(DBAbility dba, int level) : base(dba, level) { }
@@ -44,15 +43,14 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return;
             }
 
-            foreach (GamePlayer Targetplayer in player.GetPlayersInRadius((ushort)SpellRadius))
+            foreach (GamePlayer targetplayer in player.GetPlayersInRadius(SpellRadius))
             {
-                if (Targetplayer != null && Targetplayer.IsAlive && GameServer.ServerRules.IsAllowedToAttack(player, Targetplayer, true))
+                if (targetplayer != null && targetplayer.IsAlive && GameServer.ServerRules.IsAllowedToAttack(player, targetplayer, true))
                 {
                     MinionRescueEffect raEffect = new MinionRescueEffect();
                     raEffect.Start(player);

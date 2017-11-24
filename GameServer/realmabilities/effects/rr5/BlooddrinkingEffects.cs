@@ -31,10 +31,14 @@ namespace DOL.GS.Effects
     /// /// <author>Stexx</author>
     public class BloodDrinkingEffect : TimedEffect
     {
+        private const int Duration = 30 * 1000; // 30 secs
+        private const double Healpercent = 20; // 20% heal
+        private const int Effect = 1567;
+
         private GamePlayer EffectOwner;
 
         public BloodDrinkingEffect()
-            : base(RealmAbilities.BloodDrinkingAbility.DURATION)
+            : base(Duration)
         { }
 
         public override void Start(GameLiving target)
@@ -45,12 +49,12 @@ namespace DOL.GS.Effects
                 EffectOwner = target as GamePlayer;
                 foreach (GamePlayer p in EffectOwner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
-                    p.Out.SendSpellEffectAnimation(EffectOwner, EffectOwner, BloodDrinkingAbility.EFFECT, 0, false, 1);
+                    p.Out.SendSpellEffectAnimation(EffectOwner, EffectOwner, Effect, 0, false, 1);
                 }
 
                 GameEventMgr.AddHandler(EffectOwner, GameLivingEvent.AttackFinished, new DOLEventHandler(OnAttack));
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.AddHandler(EffectOwner, GameLivingEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
@@ -62,7 +66,7 @@ namespace DOL.GS.Effects
             {
                 GameEventMgr.RemoveHandler(EffectOwner, GameLivingEvent.AttackFinished, new DOLEventHandler(OnAttack));
                 GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-                GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
+                GameEventMgr.RemoveHandler(EffectOwner, GameLivingEvent.Dying, new DOLEventHandler(PlayerLeftWorld));
                 GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Linkdeath, new DOLEventHandler(PlayerLeftWorld));
                 GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.RegionChanged, new DOLEventHandler(PlayerLeftWorld));
             }
@@ -78,12 +82,10 @@ namespace DOL.GS.Effects
         /// <param name="args">EventArgs associated with the event</param>
         protected void PlayerLeftWorld(DOLEvent e, object sender, EventArgs args)
         {
-            GamePlayer player = sender as GamePlayer;
-
-            BloodDrinkingEffect BloodDrinking = (BloodDrinkingEffect)player.EffectList.GetOfType<BloodDrinkingEffect>();
-            if (BloodDrinking != null)
+            if (sender is GamePlayer player)
             {
-                BloodDrinking.Cancel(false);
+                BloodDrinkingEffect bloodDrinking = player.EffectList.GetOfType<BloodDrinkingEffect>();
+                bloodDrinking?.Cancel(false);
             }
         }
 
@@ -95,8 +97,7 @@ namespace DOL.GS.Effects
         /// <param name="args">EventArgs associated with the event</param>
         protected void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-            if (args == null || args.AttackData == null)
+            if (!(arguments is AttackFinishedEventArgs args) || args.AttackData == null)
             {
                 return;
             }
@@ -113,9 +114,8 @@ namespace DOL.GS.Effects
             }
 
             AttackData ad = args.AttackData;
-            GameLiving living = sender as GameLiving;
 
-            if (living == null)
+            if (!(sender is GameLiving living))
             {
                 return;
             }
@@ -125,14 +125,14 @@ namespace DOL.GS.Effects
                 return;
             }
 
-            double healPercent = BloodDrinkingAbility.HEALPERCENT;
+            double healPercent = Healpercent;
             int healAbsorbed = (int)(0.01 * healPercent * (ad.Damage + ad.CriticalDamage));
             if (healAbsorbed > 0)
             {
                 if (living.Health < living.MaxHealth)
                 {
                     // TODO correct messages
-                    MessageToLiving(living, string.Format("Blooddrinking ability is healing you for {0} health points!", healAbsorbed), eChatType.CT_Spell);
+                    MessageToLiving(living, $"Blooddrinking ability is healing you for {healAbsorbed} health points!", eChatType.CT_Spell);
                     foreach (GamePlayer p in EffectOwner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                     {
                         // heal effect
@@ -143,7 +143,7 @@ namespace DOL.GS.Effects
                 }
                 else
                 {
-                    MessageToLiving(living, string.Format("You are already fully healed!"), eChatType.CT_Spell);
+                    MessageToLiving(living, "You are already fully healed!", eChatType.CT_Spell);
                 }
             }
         }
@@ -173,23 +173,26 @@ namespace DOL.GS.Effects
         /// <param name="type"></param>
         public void MessageToLiving(GameLiving living, string message, eChatType type)
         {
-            if (living is GamePlayer && message != null && message.Length > 0)
+            if (living is GamePlayer && !string.IsNullOrEmpty(message))
             {
                 living.MessageToSelf(message, type);
             }
         }
 
-        public override string Name { get { return "Blooddrinking"; } }
+        public override string Name => "Blooddrinking";
 
-        public override ushort Icon { get { return 1843; } }
+        public override ushort Icon => 1843;
 
         // Delve Info
         public override IList<string> DelveInfo
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Cause the Shadowblade to be healed for 20% of all damage he does for 30 seconds");
+                var list = new List<string>
+                {
+                    "Cause the Shadowblade to be healed for 20% of all damage he does for 30 seconds"
+                };
+
                 return list;
             }
         }

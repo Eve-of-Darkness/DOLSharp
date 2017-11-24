@@ -4,6 +4,7 @@ using DOL.GS.Effects;
 using DOL.GS.PropertyCalc;
 using DOL.GS.Spells;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -33,25 +34,48 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (Level)
                 {
-                    case 1: duration = 3000; speedBonus = 1.0; break;
-                    case 2: duration = 3000; speedBonus = MaxSpeedCalculator.SPEED1; break;
-                    case 3: duration = 4000; speedBonus = MaxSpeedCalculator.SPEED3; break;
-                    case 4: duration = 5000; speedBonus = MaxSpeedCalculator.SPEED4; break;
-                    case 5: duration = 6000; speedBonus = MaxSpeedCalculator.SPEED5; break;
+                    case 1:
+                        duration = 3000;
+                        speedBonus = 1.0;
+                        break;
+                    case 2:
+                        duration = 3000;
+                        speedBonus = MaxSpeedCalculator.SPEED1;
+                        break;
+                    case 3:
+                        duration = 4000;
+                        speedBonus = MaxSpeedCalculator.SPEED3;
+                        break;
+                    case 4:
+                        duration = 5000;
+                        speedBonus = MaxSpeedCalculator.SPEED4;
+                        break;
+                    case 5:
+                        duration = 6000;
+                        speedBonus = MaxSpeedCalculator.SPEED5;
+                        break;
                 }
             }
             else
             {
                 switch (Level)
                 {
-                    case 1: duration = 1000; speedBonus = 1.0; break;
-                    case 2: duration = 2000; speedBonus = MaxSpeedCalculator.SPEED1; break;
-                    case 3: duration = 5000; speedBonus = MaxSpeedCalculator.SPEED5; break;
+                    case 1:
+                        duration = 1000;
+                        speedBonus = 1.0;
+                        break;
+                    case 2:
+                        duration = 2000;
+                        speedBonus = MaxSpeedCalculator.SPEED1;
+                        break;
+                    case 3:
+                        duration = 5000;
+                        speedBonus = MaxSpeedCalculator.SPEED5;
+                        break;
                 }
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 VanishEffect vanish = new VanishEffect(duration, speedBonus);
                 vanish.Start(player);
@@ -74,22 +98,21 @@ namespace DOL.GS.RealmAbilities
                 attackers.AddRange(living.Attackers);
             }
 
-            foreach (GameLiving attacker in attackers)
+            foreach (GameLiving attacker in attackers.Cast<GameLiving>())
             {
                 if (attacker.TargetObject == living)
                 {
                     attacker.TargetObject = null;
-                    if (attacker is GamePlayer)
+                    if (attacker is GamePlayer gamePlayer)
                     {
-                        ((GamePlayer)attacker).Out.SendChangeTarget(attacker.TargetObject);
+                        gamePlayer.Out.SendChangeTarget(attacker.TargetObject);
                     }
 
-                    if (attacker is GameNPC)
+                    if (attacker is GameNPC npc)
                     {
-                        GameNPC npc = (GameNPC)attacker;
-                        if (npc.Brain is IOldAggressiveBrain)
+                        if (npc.Brain is IOldAggressiveBrain brain)
                         {
-                            ((IOldAggressiveBrain)npc.Brain).RemoveFromAggroList(living);
+                            brain.RemoveFromAggroList(living);
                         }
 
                         attacker.StopAttack();

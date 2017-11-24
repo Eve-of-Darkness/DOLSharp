@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
 using DOL.GS.PacketHandler;
 using DOL.GS.Effects;
 using DOL.Database;
@@ -36,23 +35,21 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer caster = living as GamePlayer;
-
-            if (caster == null)
+            if (!(living is GamePlayer caster))
             {
                 return;
             }
 
-            MasteryofConcentrationEffect MoCEffect = caster.EffectList.GetOfType<MasteryofConcentrationEffect>();
-            if (MoCEffect != null)
+            MasteryofConcentrationEffect moCEffect = caster.EffectList.GetOfType<MasteryofConcentrationEffect>();
+            if (moCEffect != null)
             {
-                MoCEffect.Cancel(false);
+                moCEffect.Cancel(false);
                 return;
             }
 
             // Check for the RA5L on the Sorceror: he cannot cast MoC when the other is up
-            ShieldOfImmunityEffect ra5l = caster.EffectList.GetOfType<ShieldOfImmunityEffect>();
-            if (ra5l != null)
+            ShieldOfImmunityEffect ra5L = caster.EffectList.GetOfType<ShieldOfImmunityEffect>();
+            if (ra5L != null)
             {
                 caster.Out.SendMessage("You cannot currently use this ability", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                 return;
@@ -61,18 +58,17 @@ namespace DOL.GS.RealmAbilities
             SendCasterSpellEffectAndCastMessage(living, 7007, true);
             foreach (GamePlayer player in caster.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-
                 if (caster.IsWithinRadius(player, WorldMgr.INFO_DISTANCE))
                 {
                     if (player == caster)
                     {
-                        player.MessageToSelf("You cast " + Name + "!", eChatType.CT_Spell);
+                        player.MessageToSelf($"You cast {Name}!", eChatType.CT_Spell);
                         player.MessageToSelf("You become steadier in your casting abilities!", eChatType.CT_Spell);
                     }
                     else
                     {
-                        player.MessageFromArea(caster, caster.Name + " casts a spell!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                        player.Out.SendMessage(caster.Name + "'s castings have perfect poise!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.MessageFromArea(caster, $"{caster.Name} casts a spell!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"{caster.Name}\'s castings have perfect poise!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                 }
             }

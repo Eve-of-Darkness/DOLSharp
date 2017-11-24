@@ -3850,7 +3850,7 @@ namespace DOL.GS
                 !stealthStyle)
             {
                 // check distance
-                if (dashing.GuardSource.IsWithinRadius(dashing.GuardTarget, DashingDefenseEffect.GUARD_DISTANCE))
+                if (dashing.GuardSource.IsWithinRadius(dashing.GuardTarget, DashingDefenseEffect.GuardDistance))
                 {
                     // check player is wearing shield and NO two handed weapon
                     InventoryItem leftHand = dashing.GuardSource.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
@@ -4223,7 +4223,7 @@ namespace DOL.GS
                 OverwhelmEffect Overwhelm = (OverwhelmEffect)p.EffectList.GetOfType<OverwhelmEffect>();
                 if (Overwhelm != null)
                 {
-                    evadeChance = Math.Max(evadeChance - OverwhelmAbility.BONUS, 0);
+                    evadeChance = Math.Max(evadeChance - OverwhelmAbility.Bonus, 0);
                 }
             }
 
@@ -4319,7 +4319,7 @@ namespace DOL.GS
                 OverwhelmEffect Overwhelm = (OverwhelmEffect)p.EffectList.GetOfType<OverwhelmEffect>();
                 if (Overwhelm != null)
                 {
-                    parryChance = Math.Max(parryChance - OverwhelmAbility.BONUS, 0);
+                    parryChance = Math.Max(parryChance - OverwhelmAbility.Bonus, 0);
                 }
             }
 
@@ -4461,7 +4461,7 @@ namespace DOL.GS
                 OverwhelmEffect Overwhelm = (OverwhelmEffect)p.EffectList.GetOfType<OverwhelmEffect>();
                 if (Overwhelm != null)
                 {
-                    blockChance = Math.Max(blockChance - OverwhelmAbility.BONUS, 0);
+                    blockChance = Math.Max(blockChance - OverwhelmAbility.Bonus, 0);
                 }
             }
 

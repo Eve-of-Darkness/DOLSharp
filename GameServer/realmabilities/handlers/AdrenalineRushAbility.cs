@@ -26,10 +26,7 @@ namespace DOL.GS.RealmAbilities
             }
 
             SendCasterSpellEffectAndCastMessage(living, 7002, true);
-            if (player != null)
-            {
-                new AdrenalineRushEffect(m_duration, m_value).Start(living);
-            }
+            new AdrenalineRushEffect(m_duration, m_value).Start(living);
 
             DisableSkill(living);
         }

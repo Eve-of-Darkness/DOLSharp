@@ -29,8 +29,6 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class SearingPetAbility : RR5RealmAbility
     {
-        public const int DURATION = 19 * 1000;
-
         public SearingPetAbility(DBAbility dba, int level) : base(dba, level) { }
 
         /// <summary>
@@ -45,16 +43,13 @@ namespace DOL.GS.RealmAbilities
             }
 
             GamePlayer player = living as GamePlayer;
-            if (player != null && player.ControlledBrain != null && player.ControlledBrain.Body != null)
+            if (player != null && player.ControlledBrain?.Body != null)
             {
-                GameNPC pet = player.ControlledBrain.Body as GameNPC;
+                GameNPC pet = player.ControlledBrain.Body;
                 if (pet.IsAlive)
                 {
                     SearingPetEffect SearingPet = pet.EffectList.GetOfType<SearingPetEffect>();
-                    if (SearingPet != null)
-                    {
-                        SearingPet.Cancel(false);
-                    }
+                    SearingPet?.Cancel(false);
 
                     new SearingPetEffect(player).Start(pet);
                 }

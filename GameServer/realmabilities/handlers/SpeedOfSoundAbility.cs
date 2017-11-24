@@ -9,8 +9,8 @@ namespace DOL.GS.RealmAbilities
     {
         public SpeedOfSoundAbility(DBAbility dba, int level) : base(dba, level) { }
 
-        int m_range = 2000;
-        int m_duration = 1;
+        private int _range = 2000;
+        private int _duration = 1;
 
         public override void Execute(GameLiving living)
         {
@@ -19,15 +19,12 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            GamePlayer player = living as GamePlayer;
-            /* if (player.IsSpeedWarped)
-             {
-                 player.Out.SendMessage("You cannot use this ability while speed warped!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                 return;
-             }*/
+            if (!(living is GamePlayer player))
+            {
+                return;
+            }
 
-            if (player.TempProperties.getProperty("Charging", false)
-                || player.EffectList.CountOfType(typeof(SpeedOfSoundEffect), typeof(ArmsLengthEffect), typeof(ChargeEffect)) > 0)
+            if (player.TempProperties.getProperty("Charging", false) || player.EffectList.CountOfType(typeof(SpeedOfSoundEffect), typeof(ArmsLengthEffect), typeof(ChargeEffect)) > 0)
             {
                 player.Out.SendMessage("You already an effect of that type!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                 return;
@@ -37,11 +34,11 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (Level)
                 {
-                    case 1: m_duration = 10000; break;
-                    case 2: m_duration = 20000; break;
-                    case 3: m_duration = 30000; break;
-                    case 4: m_duration = 45000; break;
-                    case 5: m_duration = 60000; break;
+                    case 1: _duration = 10000; break;
+                    case 2: _duration = 20000; break;
+                    case 3: _duration = 30000; break;
+                    case 4: _duration = 45000; break;
+                    case 5: _duration = 60000; break;
                     default: return;
                 }
             }
@@ -49,9 +46,9 @@ namespace DOL.GS.RealmAbilities
             {
                 switch (Level)
                 {
-                    case 1: m_duration = 10000; break;
-                    case 2: m_duration = 30000; break;
-                    case 3: m_duration = 60000; break;
+                    case 1: _duration = 10000; break;
+                    case 2: _duration = 30000; break;
+                    case 3: _duration = 60000; break;
                     default: return;
                 }
             }
@@ -68,18 +65,17 @@ namespace DOL.GS.RealmAbilities
             {
                 foreach (GamePlayer p in player.Group.GetPlayersInTheGroup())
                 {
-                    if (player.IsWithinRadius(p, m_range) && p.IsAlive)
+                    if (player.IsWithinRadius(p, _range) && p.IsAlive)
                     {
                         targets.Add(p);
                     }
                 }
             }
 
-            bool success;
             foreach (GamePlayer target in targets)
             {
                 // send spelleffect
-                success = target.EffectList.CountOfType<SpeedOfSoundEffect>() == 0;
+                var success = target.EffectList.CountOfType<SpeedOfSoundEffect>() == 0;
                 foreach (GamePlayer visPlayer in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
                     visPlayer.Out.SendSpellEffectAnimation(player, target, 7021, 0, false, CastSuccess(success));
@@ -88,26 +84,16 @@ namespace DOL.GS.RealmAbilities
                 if (success)
                 {
                     GameSpellEffect speed = Spells.SpellHandler.FindEffectOnTarget(target, "SpeedEnhancement");
-                    if (speed != null)
-                    {
-                        speed.Cancel(false);
-                    }
+                    speed?.Cancel(false);
 
-                    new SpeedOfSoundEffect(m_duration).Start(target);
+                    new SpeedOfSoundEffect(_duration).Start(target);
                 }
             }
         }
 
         private byte CastSuccess(bool suc)
         {
-            if (suc)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            return (byte) (suc ? 1 : 0);
         }
 
         public override int GetReUseDelay(int level)

@@ -26,14 +26,11 @@ namespace DOL.GS.Effects
     /// </summary>
     public class AllureofDeathEffect : TimedEffect
     {
-        private GameLiving owner;
+        private GameLiving _owner;
 
         /// <summary>
         /// </summary>
         public AllureofDeathEffect() : base(60000) { }
-
-        public const int ccchance = 75;
-        public const int nschance = 100;
 
         /// <summary>
         /// Start the effect on player
@@ -42,9 +39,8 @@ namespace DOL.GS.Effects
         public override void Start(GameLiving target)
         {
             base.Start(target);
-            owner = target;
-            GamePlayer player = target as GamePlayer;
-            if (player != null)
+            _owner = target;
+            if (target is GamePlayer player)
             {
                 player.Model = 1669;
             }
@@ -53,22 +49,21 @@ namespace DOL.GS.Effects
         public override void Stop()
         {
             base.Stop();
-            GamePlayer player = owner as GamePlayer;
-            if (player is GamePlayer)
+            if (_owner is GamePlayer player)
             {
-                player.Model = (ushort)player.CreationModel;
+                player.Model = player.CreationModel;
             }
         }
 
         /// <summary>
         /// Name of the effect
         /// </summary>
-        public override string Name { get { return "Allure of Death"; } }
+        public override string Name => "Allure of Death";
 
         /// <summary>
         /// Icon to show on players, can be id
         /// </summary>
-        public override ushort Icon { get { return 3075; } }
+        public override ushort Icon => 3075;
 
         /// <summary>
         /// Delve Info
@@ -77,8 +72,11 @@ namespace DOL.GS.Effects
         {
             get
             {
-                var list = new List<string>();
-                list.Add("Changes your Skin for 30 seconds and grantz you 75% CC Imunity.");
+                var list = new List<string>
+                {
+                    "Changes your Skin for 30 seconds and grantz you 75% CC Imunity."
+                };
+
                 return list;
             }
         }
