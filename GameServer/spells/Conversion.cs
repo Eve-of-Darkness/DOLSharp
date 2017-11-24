@@ -32,7 +32,7 @@ namespace DOL.GS.Spells
 
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -60,8 +60,7 @@ namespace DOL.GS.Spells
 
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            if (!(sender is GameLiving living))
             {
                 return;
             }
@@ -87,25 +86,23 @@ namespace DOL.GS.Spells
 
             if (ad.Damage > 0)
             {
-                MessageToLiving(ad.Target, string.Format("You convert {0} damage into " + damageConverted + " Health.", damageConverted), eChatType.CT_Spell);
+                MessageToLiving(ad.Target, $"You convert {damageConverted} damage into {damageConverted} Health.", eChatType.CT_Spell);
             }
 
-            MessageToLiving(ad.Attacker, string.Format("A magical spell absorbs {0} damage of your attack!", damageConverted), eChatType.CT_Spell);
+            MessageToLiving(ad.Attacker, $"A magical spell absorbs {damageConverted} damage of your attack!", eChatType.CT_Spell);
 
             if (Caster.Health != Caster.MaxHealth)
             {
-                MessageToCaster("You convert " + damageConverted + " damage into health.", eChatType.CT_Spell);
+                MessageToCaster($"You convert {damageConverted} damage into health.", eChatType.CT_Spell);
                 Caster.Health = Caster.Health + damageConverted;
 
                 #region PVP DAMAGE
 
-                if (ad.Target is NecromancerPet &&
-                    ((ad.Target as NecromancerPet).Brain as IControlledBrain).GetPlayerOwner() != null
-                    || ad.Target is GamePlayer)
+                if (((ad.Target as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || ad.Target is GamePlayer)
                 {
                     if (ad.Target.DamageRvRMemory > 0)
                     {
-                        ad.Target.DamageRvRMemory -= (long)Math.Max(damageConverted, 0);
+                        ad.Target.DamageRvRMemory -= Math.Max(damageConverted, 0);
                     }
                 }
 
@@ -119,7 +116,7 @@ namespace DOL.GS.Spells
 
             if (Caster.Endurance != Caster.MaxEndurance)
             {
-                MessageToCaster("You convert " + damageConverted + " damage into endurance", eChatType.CT_Spell);
+                MessageToCaster($"You convert {damageConverted} damage into endurance", eChatType.CT_Spell);
                 Caster.Endurance = Caster.Endurance + damageConverted;
             }
             else
@@ -129,7 +126,7 @@ namespace DOL.GS.Spells
 
             if (Caster.Mana != Caster.MaxMana)
             {
-                MessageToCaster("You convert " + damageConverted + " damage into mana.", eChatType.CT_Spell);
+                MessageToCaster($"You convert {damageConverted} damage into mana.", eChatType.CT_Spell);
                 Caster.Mana = Caster.Mana + damageConverted;
             }
             else
@@ -140,10 +137,7 @@ namespace DOL.GS.Spells
             if (reduceddmg <= 0)
             {
                 GameSpellEffect effect = FindEffectOnTarget(living, this);
-                if (effect != null)
-                {
-                    effect.Cancel(false);
-                }
+                effect?.Cancel(false);
             }
         }
 
@@ -152,15 +146,15 @@ namespace DOL.GS.Spells
             get
             {
                 var list = new List<string>();
-                list.Add("Name: " + Spell.Name);
-                list.Add("Description: " + Spell.Description);
-                list.Add("Target: " + Spell.Target);
+                list.Add($"Name: {Spell.Name}");
+                list.Add($"Description: {Spell.Description}");
+                list.Add($"Target: {Spell.Target}");
                 if (Spell.Damage != 0)
                 {
-                    list.Add("Damage Absorb: " + Spell.Damage + "%");
-                    list.Add("Health Return: " + Spell.Damage + "%");
-                    list.Add("Power Return: " + Spell.Damage + "%");
-                    list.Add("Endurance Return: " + Spell.Damage + "%");
+                    list.Add($"Damage Absorb: {Spell.Damage}%");
+                    list.Add($"Health Return: {Spell.Damage}%");
+                    list.Add($"Power Return: {Spell.Damage}%");
+                    list.Add($"Endurance Return: {Spell.Damage}%");
                 }
 
                 return list;
@@ -176,8 +170,7 @@ namespace DOL.GS.Spells
         // public const string ConvertDamage = "Conversion";
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            if (!(sender is GameLiving living))
             {
                 return;
             }
@@ -209,17 +202,14 @@ namespace DOL.GS.Spells
                             if (reduceddmg <= 0)
                             {
                                 GameSpellEffect effect = FindEffectOnTarget(living, this);
-                                if (effect != null)
-                                {
-                                    effect.Cancel(false);
-                                }
+                                effect?.Cancel(false);
                             }
 
-                            MessageToLiving(ad.Target, string.Format("You convert {0} damage into " + damageConverted + " Health.", damageConverted), eChatType.CT_Spell);
-                            MessageToLiving(ad.Attacker, string.Format("A magical spell absorbs {0} damage of your attack!", damageConverted), eChatType.CT_Spell);
+                            MessageToLiving(ad.Target, $"You convert {damageConverted} damage into {damageConverted} Health.", eChatType.CT_Spell);
+                            MessageToLiving(ad.Attacker, $"A magical spell absorbs {damageConverted} damage of your attack!", eChatType.CT_Spell);
                             if (Caster.Health != Caster.MaxHealth)
                             {
-                                MessageToCaster("You convert " + damageConverted + " damage into health.", eChatType.CT_Spell);
+                                MessageToCaster($"You convert {damageConverted} damage into health.", eChatType.CT_Spell);
                                 Caster.Health = Caster.Health + damageConverted;
                             }
                             else
@@ -229,7 +219,7 @@ namespace DOL.GS.Spells
 
                             if (Caster.Endurance != Caster.MaxEndurance)
                             {
-                                MessageToCaster("You convert " + damageConverted + " damage into endurance", eChatType.CT_Spell);
+                                MessageToCaster($"You convert {damageConverted} damage into endurance", eChatType.CT_Spell);
                                 Caster.Endurance = Caster.Endurance + damageConverted;
                             }
                             else
@@ -239,7 +229,7 @@ namespace DOL.GS.Spells
 
                             if (Caster.Mana != Caster.MaxMana)
                             {
-                                MessageToCaster("You convert " + damageConverted + " damage into mana.", eChatType.CT_Spell);
+                                MessageToCaster($"You convert {damageConverted} damage into mana.", eChatType.CT_Spell);
                                 Caster.Mana = Caster.Mana + damageConverted;
                             }
                             else

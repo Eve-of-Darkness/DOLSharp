@@ -36,7 +36,7 @@ namespace DOL.GS.Spells
 
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -53,13 +53,13 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!effect.Owner.IsAlive || effect.Owner.ObjectState != GameLiving.eObjectState.Active)
+            if (!effect.Owner.IsAlive || effect.Owner.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
 
             // SendEffectAnimation(effect.Owner, 0, false, 1); //send the effect
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
                 /*
                  *Q: What does the confusion spell do against players?
@@ -68,14 +68,13 @@ namespace DOL.GS.Spells
                 if (Spell.Value < 0 || Util.Chance(Convert.ToInt32(Math.Abs(Spell.Value))))
                 {
                     // Spell value below 0 means it's 100% chance to confuse.
-                    GamePlayer player = effect.Owner as GamePlayer;
 
                     player.StartInterruptTimer(player.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
                 }
 
                 effect.Cancel(false);
             }
-            else if (effect.Owner is GameNPC)
+            else if (effect.Owner is GameNPC npc)
             {
                 // check if we should do anything at all.
                 bool doConfuse = Spell.Value < 0 || Util.Chance(Convert.ToInt32(Spell.Value));
@@ -87,19 +86,17 @@ namespace DOL.GS.Spells
 
                 bool doAttackFriend = Spell.Value < 0 && Util.Chance(Convert.ToInt32(Math.Abs(Spell.Value)));
 
-                GameNPC npc = effect.Owner as GameNPC;
-
                 npc.IsConfused = true;
 
                 if (log.IsDebugEnabled)
                 {
-                    log.Debug("CONFUSION: " + npc.Name + " was confused(true," + doAttackFriend.ToString() + ")");
+                    log.Debug($"CONFUSION: {npc.Name} was confused(true,{doAttackFriend})");
                 }
 
-                if (npc is GamePet && npc.Brain != null && (npc.Brain as IControlledBrain) != null)
+                if (npc is GamePet && npc.Brain is IControlledBrain)
                 {
                     // it's a pet.
-                    GamePlayer playerowner = (npc.Brain as IControlledBrain).GetPlayerOwner();
+                    GamePlayer playerowner = ((IControlledBrain) npc.Brain).GetPlayerOwner();
                     if (playerowner != null && playerowner.CharacterClass.ID == (int)eCharacterClass.Theurgist)
                     {
                         // Theurgist pets die.
@@ -179,22 +176,16 @@ namespace DOL.GS.Spells
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
             // every 5 seconds?
-            return new GameSpellEffect(this, m_spell.Duration, 5000, 1);
+            return new GameSpellEffect(this, Spell.Duration, 5000, 1);
         }
 
-        public override bool HasPositiveEffect
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool HasPositiveEffect => false;
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            if (effect != null && effect.Owner != null && effect.Owner is GameNPC)
+            if (effect?.Owner is GameNPC)
             {
-                GameNPC npc = effect.Owner as GameNPC;
+                GameNPC npc = (GameNPC) effect.Owner;
                 npc.IsConfused = false;
             }
 

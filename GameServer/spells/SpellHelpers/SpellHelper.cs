@@ -39,7 +39,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence GameSpellEffect build from spell in target's effect list or null</returns>
         public static GameSpellEffect FindEffectOnTarget(this GameLiving target, Spell spell)
         {
-            GameSpellEffect effect = null;
+            GameSpellEffect effect;
             lock (target.EffectList)
             {
                 effect = target.EffectsOnTarget(spell).FirstOrDefault();
@@ -56,7 +56,7 @@ namespace DOL.GS.Spells
         /// <returns>All GameSpellEffect build from spell in target's effect list or null</returns>
         public static List<GameSpellEffect> FindEffectsOnTarget(this GameLiving target, Spell spell)
         {
-            List<GameSpellEffect> effects = null;
+            List<GameSpellEffect> effects;
             lock (target.EffectList)
             {
                 effects = target.EffectsOnTarget(spell).ToList();
@@ -89,7 +89,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence GameSpellEffect matching Type and Name in target's effect list or null</returns>
         public static GameSpellEffect FindEffectOnTarget(this GameLiving target, string spellType, string spellName)
         {
-            GameSpellEffect effect = null;
+            GameSpellEffect effect;
             lock (target.EffectList)
             {
                 effect = target.EffectsOnTarget(spellType, spellName).FirstOrDefault();
@@ -107,7 +107,7 @@ namespace DOL.GS.Spells
         /// <returns>All GameSpellEffect matching Type and Name in target's effect list or null</returns>
         public static List<GameSpellEffect> FindEffectsOnTarget(this GameLiving target, string spellType, string spellName)
         {
-            List<GameSpellEffect> effects = null;
+            List<GameSpellEffect> effects;
             lock (target.EffectList)
             {
                 effects = target.EffectsOnTarget(spellType, spellName).ToList();
@@ -141,7 +141,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence GameSpellEffect matching Type in target's effect list or null</returns>
         public static GameSpellEffect FindEffectOnTarget(this GameLiving target, string spellType)
         {
-            GameSpellEffect effect = null;
+            GameSpellEffect effect;
             lock (target.EffectList)
             {
                 effect = target.EffectsOnTarget(spellType).FirstOrDefault();
@@ -158,7 +158,7 @@ namespace DOL.GS.Spells
         /// <returns>All GameSpellEffect matching Type in target's effect list or null</returns>
         public static List<GameSpellEffect> FindEffectsOnTarget(this GameLiving target, string spellType)
         {
-            List<GameSpellEffect> effects = null;
+            List<GameSpellEffect> effects;
             lock (target.EffectList)
             {
                 effects = target.EffectsOnTarget(spellType).ToList();
@@ -191,7 +191,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence of GameSpellEffect in target's effect list or null</returns>
         public static GameSpellEffect FindEffectOnTarget(this GameLiving target, ISpellHandler spellHandler)
         {
-            GameSpellEffect effect = null;
+            GameSpellEffect effect;
             lock (target.EffectList)
             {
                 effect = target.EffectsOnTarget(spellHandler).FirstOrDefault();
@@ -208,7 +208,7 @@ namespace DOL.GS.Spells
         /// <returns>All GameSpellEffect matching spellhandler in target's effect list or null</returns>
         public static List<GameSpellEffect> FindEffectsOnTarget(this GameLiving target, ISpellHandler spellHandler)
         {
-            List<GameSpellEffect> effects = null;
+            List<GameSpellEffect> effects;
             lock (target.EffectList)
             {
                 effects = target.EffectsOnTarget(spellHandler).ToList();
@@ -240,7 +240,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence of GameSpellEffect in target's effect list or null</returns>
         public static GameSpellEffect FindEffectOnTarget(this GameLiving target, Type spellHandler)
         {
-            GameSpellEffect effect = null;
+            GameSpellEffect effect;
             lock (target.EffectList)
             {
                 effect = target.EffectsOnTarget(spellHandler).FirstOrDefault();
@@ -257,7 +257,7 @@ namespace DOL.GS.Spells
         /// <returns>All GameSpellEffect mathing Type Hierarchy in target's effect list</returns>
         public static List<GameSpellEffect> FindEffectsOnTarget(this GameLiving target, Type spellHandler)
         {
-            List<GameSpellEffect> effects = null;
+            List<GameSpellEffect> effects;
             lock (target.EffectList)
             {
                 effects = target.EffectsOnTarget(spellHandler).ToList();
@@ -289,7 +289,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence PulsingSpellEffect build from spell in target's concentration list or null</returns>
         public static PulsingSpellEffect FindPulsingSpellOnTarget(this GameLiving target, Spell spell)
         {
-            PulsingSpellEffect pulsingSpell = null;
+            PulsingSpellEffect pulsingSpell;
             lock (target.ConcentrationEffects)
             {
                 pulsingSpell = target.PulsingSpellsOnTarget(spell).FirstOrDefault();
@@ -306,7 +306,7 @@ namespace DOL.GS.Spells
         /// <returns>All PulsingSpellEffect build from spell in target's concentration list or null</returns>
         public static List<PulsingSpellEffect> FindPulsingSpellsOnTarget(this GameLiving target, Spell spell)
         {
-            List<PulsingSpellEffect> effects = null;
+            List<PulsingSpellEffect> effects;
             lock (target.EffectList)
             {
                 effects = target.PulsingSpellsOnTarget(spell).ToList();
@@ -324,8 +324,7 @@ namespace DOL.GS.Spells
         /// <returns>All PulsingSpellEffect build from spell in target's concentration list or null</returns>
         private static IEnumerable<PulsingSpellEffect> PulsingSpellsOnTarget(this GameLiving target, Spell spell)
         {
-            return target.ConcentrationEffects.OfType<PulsingSpellEffect>().Where(pfx => pfx.SpellHandler != null && pfx.SpellHandler.Spell != null
-                                                                                  && pfx.SpellHandler.Spell.ID == spell.ID);
+            return target.ConcentrationEffects.OfType<PulsingSpellEffect>().Where(pfx => pfx.SpellHandler?.Spell != null && pfx.SpellHandler.Spell.ID == spell.ID);
         }
 
         #endregion
@@ -339,7 +338,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence of PulsingSpellEffect in targets' concentration list or null</returns>
         public static PulsingSpellEffect FindPulsingSpellOnTarget(this GameLiving target, ISpellHandler handler)
         {
-            PulsingSpellEffect effect = null;
+            PulsingSpellEffect effect;
             lock (target.ConcentrationEffects)
             {
                 effect = target.PulsingSpellsOnTarget(handler).FirstOrDefault();
@@ -356,7 +355,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence of PulsingSpellEffect in targets' concentration list or null</returns>
         public static List<PulsingSpellEffect> FindPulsingSpellsOnTarget(this GameLiving target, ISpellHandler handler)
         {
-            List<PulsingSpellEffect> effects = null;
+            List<PulsingSpellEffect> effects;
             lock (target.ConcentrationEffects)
             {
                 effects = target.PulsingSpellsOnTarget(handler).ToList();
@@ -387,7 +386,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence of IGameEffect in target's effect list or null</returns>
         public static IGameEffect FindStaticEffectOnTarget(this GameLiving target, Type effectType)
         {
-            IGameEffect effect = null;
+            IGameEffect effect;
             lock (target.EffectList)
             {
                 effect = target.StaticEffectsOnTarget(effectType).FirstOrDefault();
@@ -404,7 +403,7 @@ namespace DOL.GS.Spells
         /// <returns>All IGameEffect matching Effect Type in target's effect list</returns>
         public static List<IGameEffect> FindStaticEffectsOnTarget(this GameLiving target, Type effectType)
         {
-            List<IGameEffect> effects = null;
+            List<IGameEffect> effects;
             lock (target.EffectList)
             {
                 effects = target.StaticEffectsOnTarget(effectType).ToList();
@@ -435,7 +434,7 @@ namespace DOL.GS.Spells
         /// <returns>First occurence of Immunity State GameSpellEffect in target's effect list or null</returns>
         public static GameSpellEffect FindImmunityEffectOnTarget(this GameLiving target, Type spellHandler)
         {
-            GameSpellEffect effect = null;
+            GameSpellEffect effect;
             lock (target.EffectList)
             {
                 effect = target.ImmunityEffectsOnTarget(spellHandler).FirstOrDefault();
@@ -452,7 +451,7 @@ namespace DOL.GS.Spells
         /// <returns>All Immunity State GameSpellEffect matching SpellHandler Type in target's effect list</returns>
         public static List<GameSpellEffect> FindImmunityEffectsOnTarget(this GameLiving target, Type spellHandler)
         {
-            List<GameSpellEffect> effects = null;
+            List<GameSpellEffect> effects;
             lock (target.EffectList)
             {
                 effects = target.ImmunityEffectsOnTarget(spellHandler).ToList();

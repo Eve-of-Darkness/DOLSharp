@@ -35,8 +35,7 @@ namespace DOL.GS.Spells
         /// <param name="effect"></param>
         public override void OnEffectStart(GameSpellEffect effect)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 player.Effectiveness -= Spell.Value * 0.01;
                 player.Out.SendUpdateWeaponAndArmorStats();
@@ -53,8 +52,7 @@ namespace DOL.GS.Spells
         /// <returns>immunity duration in milliseconds</returns>
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 player.Effectiveness += Spell.Value * 0.01;
                 player.Out.SendUpdateWeaponAndArmorStats();
@@ -81,12 +79,16 @@ namespace DOL.GS.Spells
 
                 <End Info>
                 */
-                var list = new List<string>();
+                var list = new List<string>
+                {
+                    " ",
+                    Spell.Description,
+                    " ",
+                    $"- Effectiveness penality: {Spell.Value}%"
+                };
 
-                list.Add(" "); // empty line
-                list.Add(Spell.Description);
-                list.Add(" "); // empty line
-                list.Add("- Effectiveness penality: " + Spell.Value + "%");
+                // empty line
+                // empty line
                 return list;
             }
         }
@@ -103,11 +105,14 @@ namespace DOL.GS.Spells
 
         public override PlayerXEffect GetSavedEffect(GameSpellEffect e)
         {
-            PlayerXEffect eff = new PlayerXEffect();
-            eff.Var1 = Spell.ID;
-            eff.Duration = e.RemainingTime;
-            eff.IsHandler = true;
-            eff.SpellLine = SpellLine.KeyName;
+            PlayerXEffect eff = new PlayerXEffect
+            {
+                Var1 = Spell.ID,
+                Duration = e.RemainingTime,
+                IsHandler = true,
+                SpellLine = SpellLine.KeyName
+            };
+
             return eff;
         }
 
@@ -119,13 +124,7 @@ namespace DOL.GS.Spells
     /// </summary>
     public class AbstractIllnessSpellHandler : SpellHandler
     {
-        public override bool HasPositiveEffect
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool HasPositiveEffect => false;
 
         public override int CalculateSpellResistChance(GameLiving target)
         {
@@ -147,7 +146,7 @@ namespace DOL.GS.Spells
                 modifier -= (double)ab.Amount / 100;
             }
 
-            return (int)((double)Spell.Duration * modifier);
+            return (int)(Spell.Duration * modifier);
         }
 
         public AbstractIllnessSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }

@@ -36,24 +36,21 @@ namespace DOL.GS.Spells
         protected override int CalculateEffectDuration(GameLiving target, double effectiveness)
         {
             double duration = Spell.Duration;
-            duration *= 1.0 + m_caster.GetModified(eProperty.SpellDuration) * 0.01;
+            duration *= 1.0 + Caster.GetModified(eProperty.SpellDuration) * 0.01;
             return (int)duration;
         }
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
-
-            GamePlayer player = effect.Owner as GamePlayer;
-
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 player.CanBreathUnderWater = true;
                 player.BaseBuffBonusCategory[(int)eProperty.WaterSpeed] += (int)Spell.Value;
                 player.Out.SendUpdateMaxSpeed();
             }
 
-            eChatType toLiving = (Spell.Pulse == 0) ? eChatType.CT_Spell : eChatType.CT_SpellPulse;
-            eChatType toOther = (Spell.Pulse == 0) ? eChatType.CT_System : eChatType.CT_SpellPulse;
+            eChatType toLiving = Spell.Pulse == 0 ? eChatType.CT_Spell : eChatType.CT_SpellPulse;
+            eChatType toOther = Spell.Pulse == 0 ? eChatType.CT_System : eChatType.CT_SpellPulse;
             if (Spell.Message2 != string.Empty)
             {
                 Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, false)), toOther, effect.Owner);
@@ -65,9 +62,7 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 // Check for Mythirian of Ektaktos on effect expiration to prevent unneccessary removal of Water Breathing Effect
                 InventoryItem item = player.Inventory.GetItem((eInventorySlot)37);

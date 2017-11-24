@@ -28,21 +28,15 @@ namespace DOL.GS.Spells
         /// <summary>
         /// SpecBuffBonusCategory
         /// </summary>
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.SpecBuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.SpecBuff;
 
         /// <summary>
         /// BaseBuffBonusCategory
         /// </summary>
-        public override eBuffBonusCategory BonusCategory2 { get { return eBuffBonusCategory.BaseBuff; } }
+        public override eBuffBonusCategory BonusCategory2 => eBuffBonusCategory.BaseBuff;
 
-        public override eProperty Property1
-        {
-            get { return eProperty.SpellDamage; }
-        }
+        public override eProperty Property1 => eProperty.SpellDamage;
 
-        public override eProperty Property2
-        {
-            get { return eProperty.ResistPierce; }
-        }
+        public override eProperty Property2 => eProperty.ResistPierce;
     }
 }

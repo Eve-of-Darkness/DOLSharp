@@ -28,22 +28,16 @@ namespace DOL.GS.Spells
         /// <summary>
         /// SpecBuffBonusCategory
         /// </summary>
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.SpecBuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.SpecBuff;
 
         /// <summary>
         /// BaseBuffBonusCategory
         /// </summary>
-        public override eBuffBonusCategory BonusCategory2 { get { return eBuffBonusCategory.BaseBuff; } }
+        public override eBuffBonusCategory BonusCategory2 => eBuffBonusCategory.BaseBuff;
 
-        public override eProperty Property1
-        {
-            get { return eProperty.SpellRange; }
-        }
+        public override eProperty Property1 => eProperty.SpellRange;
 
-        public override eProperty Property2
-        {
-            get { return eProperty.ResistPierce; }
-        }
+        public override eProperty Property2 => eProperty.ResistPierce;
     }
 
     /// <summary>
@@ -57,9 +51,6 @@ namespace DOL.GS.Spells
         {
         }
 
-        public override bool HasPositiveEffect
-        {
-            get { return true; }
-        }
+        public override bool HasPositiveEffect => true;
     }
 }

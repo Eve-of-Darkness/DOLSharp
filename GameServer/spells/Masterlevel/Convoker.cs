@@ -48,40 +48,45 @@ namespace DOL.GS.Spells
             ApplyOnCombat = true;
 
             // Construct a new font.
-            font = new GameFont();
-            font.Model = 2584;
-            font.Name = spell.Name;
-            font.Realm = caster.Realm;
-            font.X = caster.X;
-            font.Y = caster.Y;
-            font.Z = caster.Z;
-            font.CurrentRegionID = caster.CurrentRegionID;
-            font.Heading = caster.Heading;
-            font.Owner = (GamePlayer)caster;
+            font = new GameFont
+            {
+                Model = 2584,
+                Name = spell.Name,
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster
+            };
 
             // Construct the font spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7312;
-            dbs.ClientEffect = 7312;
-            dbs.Damage = spell.Damage;
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "Prescience";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth;
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7312,
+                ClientEffect = 7312,
+                Damage = spell.Damage,
+                DamageType = (int) spell.DamageType,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "Prescience",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
             sRadius = 2000;
             s = new Spell(dbs, 50);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            heal = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            heal = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
 
@@ -93,20 +98,8 @@ namespace DOL.GS.Spells
             return false;
         }
 
-        public override bool HasPositiveEffect
-        {
-            get { return false; }
-        }
+        public override bool HasPositiveEffect => false;
 
-        public override void OnEffectStart(GameSpellEffect effect)
-        {
-            base.OnEffectStart(effect);
-        }
-
-        public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
-        {
-            return base.OnEffectExpires(effect, noMessages);
-        }
 
         public PrescienceSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
@@ -122,40 +115,45 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // Construct a new mine.
-            mine = new GameMine();
-            mine.Model = 2590;
-            mine.Name = spell.Name;
-            mine.Realm = caster.Realm;
-            mine.X = caster.X;
-            mine.Y = caster.Y;
-            mine.Z = caster.Z;
-            mine.CurrentRegionID = caster.CurrentRegionID;
-            mine.Heading = caster.Heading;
-            mine.Owner = (GamePlayer)caster;
+            mine = new GameMine
+            {
+                Model = 2590,
+                Name = spell.Name,
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster
+            };
 
             // Construct the mine spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7313;
-            dbs.ClientEffect = 7313;
-            dbs.Damage = spell.Damage;
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "PowerRend";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth;
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7313,
+                ClientEffect = 7313,
+                Damage = spell.Damage,
+                DamageType = (int) spell.DamageType,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "PowerRend",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            trap = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            trap = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
     #endregion
@@ -173,41 +171,46 @@ namespace DOL.GS.Spells
             Friendly = false;
 
             // Construct a new mine.
-            font = new GameFont();
-            font.Model = 2586;
-            font.Name = spell.Name;
-            font.Realm = caster.Realm;
-            font.X = caster.X;
-            font.Y = caster.Y;
-            font.Z = caster.Z;
-            font.CurrentRegionID = caster.CurrentRegionID;
-            font.Heading = caster.Heading;
-            font.Owner = (GamePlayer)caster;
+            font = new GameFont
+            {
+                Model = 2586,
+                Name = spell.Name,
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster
+            };
 
             // Construct the mine spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7237;
-            dbs.ClientEffect = 7237;
-            dbs.Damage = spell.Damage;
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "SpeedWrap";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth;
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7237,
+                ClientEffect = 7237,
+                Damage = spell.Damage,
+                DamageType = (int) spell.DamageType,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "SpeedWrap",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
             sRadius = 1000;
             dbs.SpellGroup = 9;
             s = new Spell(dbs, 50);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            heal = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            heal = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
 
@@ -222,17 +225,17 @@ namespace DOL.GS.Spells
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                ((GamePlayer)effect.Owner).Out.SendUpdateMaxSpeed();
+                player.Out.SendUpdateMaxSpeed();
             }
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                ((GamePlayer)effect.Owner).Out.SendUpdateMaxSpeed();
+                player.Out.SendUpdateMaxSpeed();
             }
 
             return base.OnEffectExpires(effect, noMessages);
@@ -283,7 +286,7 @@ namespace DOL.GS.Spells
     [SpellHandler("Battlewarder")]
     public class BattlewarderSpellHandler : SpellHandler
     {
-        private GameNPC warder;
+        private readonly GameNPC warder;
         private GameSpellEffect m_effect;
         /// <summary>
         /// Execute battle warder summon spell
@@ -291,7 +294,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -314,10 +317,10 @@ namespace DOL.GS.Spells
                 GamePlayer casterPlayer = effect.Owner as GamePlayer;
                 if (casterPlayer.GroundTarget != null && casterPlayer.GroundTargetInView)
                 {
-                    GameEventMgr.AddHandler(casterPlayer, GamePlayerEvent.Moving, new DOLEventHandler(PlayerMoves));
+                    GameEventMgr.AddHandler(casterPlayer, GameLivingEvent.Moving, new DOLEventHandler(PlayerMoves));
                     GameEventMgr.AddHandler(warder, GameLivingEvent.Dying, new DOLEventHandler(BattleWarderDie));
-                    GameEventMgr.AddHandler(casterPlayer, GamePlayerEvent.CastStarting, new DOLEventHandler(PlayerMoves));
-                    GameEventMgr.AddHandler(casterPlayer, GamePlayerEvent.AttackFinished, new DOLEventHandler(PlayerMoves));
+                    GameEventMgr.AddHandler(casterPlayer, GameLivingEvent.CastStarting, new DOLEventHandler(PlayerMoves));
+                    GameEventMgr.AddHandler(casterPlayer, GameLivingEvent.AttackFinished, new DOLEventHandler(PlayerMoves));
                     warder.X = casterPlayer.GroundTarget.X;
                     warder.Y = casterPlayer.GroundTarget.Y;
                     warder.Z = casterPlayer.GroundTarget.Z;
@@ -345,9 +348,9 @@ namespace DOL.GS.Spells
             if (effect.Owner is GamePlayer)
             {
                 GamePlayer casterPlayer = effect.Owner as GamePlayer;
-                GameEventMgr.RemoveHandler(casterPlayer, GamePlayerEvent.Moving, new DOLEventHandler(PlayerMoves));
-                GameEventMgr.RemoveHandler(casterPlayer, GamePlayerEvent.CastStarting, new DOLEventHandler(PlayerMoves));
-                GameEventMgr.RemoveHandler(casterPlayer, GamePlayerEvent.AttackFinished, new DOLEventHandler(PlayerMoves));
+                GameEventMgr.RemoveHandler(casterPlayer, GameLivingEvent.Moving, new DOLEventHandler(PlayerMoves));
+                GameEventMgr.RemoveHandler(casterPlayer, GameLivingEvent.CastStarting, new DOLEventHandler(PlayerMoves));
+                GameEventMgr.RemoveHandler(casterPlayer, GameLivingEvent.AttackFinished, new DOLEventHandler(PlayerMoves));
             }
 
             effect.Owner.EffectList.Remove(effect);
@@ -357,25 +360,22 @@ namespace DOL.GS.Spells
         // Event : player moves, lose focus
         public void PlayerMoves(DOLEvent e, object sender, EventArgs args)
         {
-            GameLiving player = sender as GameLiving;
-            if (player == null)
+            if (!(sender is GameLiving))
             {
                 return;
             }
 
-            if (e == GamePlayerEvent.Moving)
+            if (e == GameLivingEvent.Moving)
             {
                 MessageToCaster("Your concentration fades", eChatType.CT_SpellExpires);
                 OnEffectExpires(m_effect, true);
-                return;
             }
         }
 
         // Event : Battle warder has died
         private void BattleWarderDie(DOLEvent e, object sender, EventArgs args)
         {
-            GameNPC kWarder = sender as GameNPC;
-            if (kWarder == null)
+            if (!(sender is GameNPC))
             {
                 return;
             }
@@ -384,7 +384,6 @@ namespace DOL.GS.Spells
             {
                 MessageToCaster("Your Battle Warder has fallen!", eChatType.CT_SpellExpires);
                 OnEffectExpires(m_effect, true);
-                return;
             }
         }
 
@@ -395,7 +394,7 @@ namespace DOL.GS.Spells
                 return false;
             }
 
-            if (!(m_caster.GroundTarget != null && m_caster.GroundTargetInView))
+            if (!(Caster.GroundTarget != null && Caster.GroundTargetInView))
             {
                 MessageToCaster("Your area target is out of range.  Set a closer ground position.", eChatType.CT_SpellResisted);
                 return false;
@@ -407,19 +406,19 @@ namespace DOL.GS.Spells
         public BattlewarderSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            warder = new GameNPC();
-
-            // Fill the object variables
-            warder.CurrentRegion = caster.CurrentRegion;
-            warder.Heading = (ushort)((caster.Heading + 2048) % 4096);
-            warder.Level = 70;
-            warder.Realm = caster.Realm;
-            warder.Name = "Battle Warder";
-            warder.Model = 993;
-            warder.CurrentSpeed = 0;
-            warder.MaxSpeedBase = 0;
-            warder.GuildName = string.Empty;
-            warder.Size = 50;
+            warder = new GameNPC
+            {
+                CurrentRegion = caster.CurrentRegion,
+                Heading = (ushort) ((caster.Heading + 2048) % 4096),
+                Level = 70,
+                Realm = caster.Realm,
+                Name = "Battle Warder",
+                Model = 993,
+                CurrentSpeed = 0,
+                MaxSpeedBase = 0,
+                GuildName = string.Empty,
+                Size = 50
+            };
         }
     }
     #endregion
@@ -434,40 +433,45 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // Construct a new mine.
-            mine = new GameMine();
-            mine.Model = 2588;
-            mine.Name = spell.Name;
-            mine.Realm = caster.Realm;
-            mine.X = caster.X;
-            mine.Y = caster.Y;
-            mine.Z = caster.Z;
-            mine.CurrentRegionID = caster.CurrentRegionID;
-            mine.Heading = caster.Heading;
-            mine.Owner = (GamePlayer)caster;
+            mine = new GameMine
+            {
+                Model = 2588,
+                Name = spell.Name,
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster
+            };
 
             // Construct the mine spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7255;
-            dbs.ClientEffect = 7255;
-            dbs.Damage = spell.Damage;
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "DirectDamage";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth;
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7255,
+                ClientEffect = 7255,
+                Damage = spell.Damage,
+                DamageType = (int) spell.DamageType,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "DirectDamage",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            trap = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            trap = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
     #endregion
@@ -479,8 +483,8 @@ namespace DOL.GS.Spells
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        GameNPC summoned = null;
-        GameSpellEffect beffect = null;
+        private GameNPC summoned;
+        private GameSpellEffect beffect;
 
         public BrittleGuardSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
@@ -492,7 +496,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -503,8 +507,7 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness">factor from 0..1 (0%-100%)</param>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            GamePlayer player = Caster as GamePlayer;
-            if (player == null)
+            if (!(Caster is GamePlayer player))
             {
                 return;
             }
@@ -514,20 +517,18 @@ namespace DOL.GS.Spells
             {
                 if (log.IsWarnEnabled)
                 {
-                    log.WarnFormat("NPC template {0} not found! Spell: {1}", Spell.LifeDrainReturn, Spell.ToString());
+                    log.Warn($"NPC template {Spell.LifeDrainReturn} not found! Spell: {Spell}");
                 }
 
-                MessageToCaster("NPC template " + Spell.LifeDrainReturn + " not found!", eChatType.CT_System);
+                MessageToCaster($"NPC template {Spell.LifeDrainReturn} not found!", eChatType.CT_System);
                 return;
             }
 
-            Point2D summonloc;
             beffect = CreateSpellEffect(target, effectiveness);
             {
-                summonloc = target.GetPointFromHeading(target.Heading, 64);
+                var summonloc = target.GetPointFromHeading(target.Heading, 64);
 
-                BrittleBrain controlledBrain = new BrittleBrain(player);
-                controlledBrain.IsMainPet = false;
+                BrittleBrain controlledBrain = new BrittleBrain(player) {IsMainPet = false};
                 summoned = new GameNPC(template);
                 summoned.SetOwnBrain(controlledBrain);
                 summoned.X = summonloc.X;
@@ -584,7 +585,7 @@ namespace DOL.GS.Spells
         // public class Convoker9Handler : MasterlevelBuffHandling
     {
         private GameNPC m_living;
-        private GamePlayer m_player;
+        private readonly GamePlayer m_player;
 
         // public override eProperty Property1 { get { return eProperty.MeleeDamage; } }
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
@@ -602,8 +603,7 @@ namespace DOL.GS.Spells
             // Check if Necro try to use ML9 Convoker at own Pet
             if (m_player != null && m_player.CharacterClass.ID == (int)eCharacterClass.Necromancer)
             { // Caster is a Necro
-                NecromancerPet necroPet = target as NecromancerPet;
-                if (necroPet == null || necroPet.Owner == m_player)
+                if (!(target is NecromancerPet necroPet) || necroPet.Owner == m_player)
                 { // Caster is a Nekro and his Target is his Own Pet
                     MessageToCaster("You cant use this ability on your own Pet", eChatType.CT_SpellResisted);
                     return;
@@ -647,7 +647,7 @@ namespace DOL.GS.Spells
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private int x, y, z;
-        GameNPC summoned = null;
+        GameNPC summoned;
         RegionTimer m_growTimer;
         private const int C_GROWTIMER = 2000;
 
@@ -668,7 +668,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -679,8 +679,7 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness">factor from 0..1 (0%-100%)</param>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            GamePlayer player = Caster as GamePlayer;
-            if (player == null)
+            if (!(Caster is GamePlayer player))
             {
                 return;
             }
@@ -690,17 +689,20 @@ namespace DOL.GS.Spells
             {
                 if (log.IsWarnEnabled)
                 {
-                    log.WarnFormat("NPC template {0} not found! Spell: {1}", Spell.LifeDrainReturn, Spell.ToString());
+                    log.Warn($"NPC template {Spell.LifeDrainReturn} not found! Spell: {Spell}");
                 }
 
-                MessageToCaster("NPC template " + Spell.LifeDrainReturn + " not found!", eChatType.CT_System);
+                MessageToCaster($"NPC template {Spell.LifeDrainReturn} not found!", eChatType.CT_System);
                 return;
             }
 
             GameSpellEffect effect = CreateSpellEffect(target, effectiveness);
-            TitanBrain controlledBrain = new TitanBrain(player);
-            controlledBrain.IsMainPet = false;
-            controlledBrain.WalkState = eWalkState.Stay;
+            TitanBrain controlledBrain = new TitanBrain(player)
+            {
+                IsMainPet = false,
+                WalkState = eWalkState.Stay
+            };
+
             summoned = new GameNPC(template);
             summoned.SetOwnBrain(controlledBrain);
 
@@ -724,7 +726,7 @@ namespace DOL.GS.Spells
             summoned.AddToWorld();
             controlledBrain.AggressionState = eAggressionState.Aggressive;
             effect.Start(summoned);
-            m_growTimer = new RegionTimer((GameObject)m_caster, new RegionTimerCallback(TitanGrows), C_GROWTIMER);
+            m_growTimer = new RegionTimer(Caster, new RegionTimerCallback(TitanGrows), C_GROWTIMER);
         }
 
         // Make titan growing, and activate it on completition
@@ -735,12 +737,10 @@ namespace DOL.GS.Spells
                 summoned.Size += 10;
                 return C_GROWTIMER;
             }
-            else
-            {
-                summoned.Flags = 0;
-                m_growTimer.Stop();
-                m_growTimer = null;
-            }
+
+            summoned.Flags = 0;
+            m_growTimer.Stop();
+            m_growTimer = null;
 
             return 0;
         }
@@ -765,11 +765,9 @@ namespace DOL.GS.Spells
                         MessageToCaster("You must set a groundtarget!", eChatType.CT_SpellResisted);
                         return false;
                     }
-                    else
-                    {
-                        MessageToCaster("Your area target is not in view.", eChatType.CT_SpellResisted);
-                        return false;
-                    }
+
+                    MessageToCaster("Your area target is not in view.", eChatType.CT_SpellResisted);
+                    return false;
                 }
             }
 
@@ -805,7 +803,7 @@ namespace DOL.GS.Spells
 
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -816,7 +814,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -831,10 +829,10 @@ namespace DOL.GS.Spells
 
         public virtual void SendCasterMessage(GameLiving target, int mana)
         {
-            MessageToCaster(string.Format("You steal {0} for {1} power!", target.Name, mana), eChatType.CT_YouHit);
+            MessageToCaster($"You steal {target.Name} for {mana} power!", eChatType.CT_YouHit);
             if (mana > 0)
             {
-                MessageToCaster("You steal " + mana + " power points" + (mana == 1 ? "." : "s."), eChatType.CT_Spell);
+                MessageToCaster($"You steal {mana} power points{(mana == 1 ? "." : "s.")}", eChatType.CT_Spell);
             }
             else
             {
@@ -855,7 +853,7 @@ namespace DOL.AI.Brain
         {
             if (owner == null)
             {
-                throw new ArgumentNullException("owner");
+                throw new ArgumentNullException(nameof(owner));
             }
         }
 
@@ -872,25 +870,16 @@ namespace DOL.AI.Brain
 
 namespace DOL.AI.Brain
 {
-    public class TitanBrain : ControlledNpcBrain, IControlledBrain
+    public class TitanBrain : ControlledNpcBrain
     {
-        private GameLiving m_target;
-
         public TitanBrain(GameLiving owner)
             : base(owner)
         {
         }
 
-        public override int ThinkInterval
-        {
-            get { return 2000; }
-        }
+        public override int ThinkInterval => 2000;
 
-        public GameLiving Target
-        {
-            get { return m_target; }
-            set { m_target = value; }
-        }
+        public GameLiving Target { get; set; }
 
         #region AI
 
@@ -920,7 +909,7 @@ namespace DOL.AI.Brain
 
             foreach (GamePlayer o in Body.GetPlayersInRadius((ushort)Body.AttackRange))
             {
-                GamePlayer p = o as GamePlayer;
+                GamePlayer p = o;
 
                 if (GameServer.ServerRules.IsAllowedToAttack(Body, p, true))
                 {
@@ -968,7 +957,6 @@ namespace DOL.AI.Brain
             else if (enemies.Count < 1)
             {
                 WalkState = eWalkState.Stay;
-                enemies = FindTarget();
             }
 
             if (Target != null)
@@ -997,12 +985,7 @@ namespace DOL.AI.Brain
 #region MLBrain
 public class MLBrain : GuardBrain
 {
-    public MLBrain() : base() { }
-
-    public override int AggroRange
-    {
-        get { return 400; }
-    }
+    public override int AggroRange => 400;
 
     protected override void CheckNPCAggro()
     {

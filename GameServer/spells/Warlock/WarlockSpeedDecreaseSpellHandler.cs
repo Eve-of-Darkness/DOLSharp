@@ -54,13 +54,7 @@ namespace DOL.GS.Spells
                 }
 
                 SendEffectAnimation(effect.Owner, 12126, 0, false, 1);
-
-                // GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.Dying, new DOLEventHandler(OnAttacked));
-                // GameEventMgr.AddHandler(effect.Owner, GamePlayerEvent.Linkdeath, new DOLEventHandler(OnAttacked));
-                // GameEventMgr.AddHandler(effect.Owner, GamePlayerEvent.Quit, new DOLEventHandler(OnAttacked));
             }
-
-            // GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
         }
 
         /// <summary>
@@ -72,14 +66,9 @@ namespace DOL.GS.Spells
         /// <returns>immunity duration in milliseconds</returns>
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            // GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
             if (effect.Owner is GamePlayer)
             {
                 effect.Owner.Model = m_playerModel;
-
-                // GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.Dying, new DOLEventHandler(OnAttacked));
-                // GameEventMgr.RemoveHandler(effect.Owner, GamePlayerEvent.Linkdeath, new DOLEventHandler(OnAttacked));
-                // GameEventMgr.RemoveHandler(effect.Owner, GamePlayerEvent.Quit, new DOLEventHandler(OnAttacked));
             }
 
             return base.OnEffectExpires(effect, noMessages);

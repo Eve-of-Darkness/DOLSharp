@@ -31,7 +31,7 @@ namespace DOL.GS.Spells
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
-            int value = (int)m_spell.Value;
+            int value = (int)Spell.Value;
 
             SendEffectAnimation(effect.Owner, 0, false, 1);
             effect.Owner.AbilityBonus[(int)eProperty.Resist_Body] += value;
@@ -41,8 +41,7 @@ namespace DOL.GS.Spells
             effect.Owner.AbilityBonus[(int)eProperty.Resist_Matter] += value;
             effect.Owner.AbilityBonus[(int)eProperty.Resist_Spirit] += value;
 
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
                 player.UpdatePlayerStatus();
@@ -52,7 +51,7 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            int value = (int)m_spell.Value;
+            int value = (int)Spell.Value;
 
             effect.Owner.AbilityBonus[(int)eProperty.Resist_Body] -= value;
             effect.Owner.AbilityBonus[(int)eProperty.Resist_Cold] -= value;
@@ -61,8 +60,7 @@ namespace DOL.GS.Spells
             effect.Owner.AbilityBonus[(int)eProperty.Resist_Matter] -= value;
             effect.Owner.AbilityBonus[(int)eProperty.Resist_Spirit] -= value;
 
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
                 player.UpdatePlayerStatus();

@@ -38,7 +38,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -57,8 +57,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            var npcTarget = target as GameNPC;
-            if (npcTarget == null)
+            if (!(target is GameNPC npcTarget))
             {
                 return;
             }
@@ -100,8 +99,7 @@ namespace DOL.GS.Spells
         {
             var npcTarget = effect.Owner as GameNPC;
 
-            FearBrain fearBrain;
-            if (m_NPCFearBrains.TryRemove(npcTarget, out fearBrain))
+            if (m_NPCFearBrains.TryRemove(npcTarget, out var fearBrain))
             {
                 npcTarget.RemoveBrain(fearBrain);
             }

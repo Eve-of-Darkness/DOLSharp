@@ -50,7 +50,6 @@ namespace DOL.GS.Spells
             {
                 m_goldenTridentofFlame = GameServer.Database.FindObjectByKey<ItemTemplate>("Golden_Trident_of_Flame") ?? JavelinH;
                 items.Add(GameInventoryItem.Create(m_goldenTridentofFlame));
-                return;
             }
         }
 
@@ -66,41 +65,43 @@ namespace DOL.GS.Spells
                         log.Warn("Could not find Golden_Trident_of_Flame, loading it ...");
                     }
 
-                    m_goldenTridentofFlame = new ItemTemplate();
-                    m_goldenTridentofFlame.Id_nb = "Golden_Trident_of_Flame";
-                    m_goldenTridentofFlame.Name = "Golden Triden of Flame";
-                    m_goldenTridentofFlame.Level = 45;
-                    m_goldenTridentofFlame.Durability = 50000;
-                    m_goldenTridentofFlame.MaxDurability = 50000;
-                    m_goldenTridentofFlame.Condition = 50000;
-                    m_goldenTridentofFlame.MaxCondition = 50000;
-                    m_goldenTridentofFlame.Quality = 100;
-                    m_goldenTridentofFlame.DPS_AF = 150;
-                    m_goldenTridentofFlame.SPD_ABS = 36;
-                    m_goldenTridentofFlame.Type_Damage = 2;
-                    m_goldenTridentofFlame.Object_Type = 3;
-                    m_goldenTridentofFlame.Item_Type = 10;
-                    m_goldenTridentofFlame.Color = 48;
-                    m_goldenTridentofFlame.Effect = 77;
-                    m_goldenTridentofFlame.Model = 1004;
-                    m_goldenTridentofFlame.Bonus = 35;
-                    m_goldenTridentofFlame.Bonus1 = 60;
-                    m_goldenTridentofFlame.Bonus2 = 19;
-                    m_goldenTridentofFlame.Bonus3 = 20;
-                    m_goldenTridentofFlame.Bonus4 = 3;
-                    m_goldenTridentofFlame.Bonus5 = 3;
-                    m_goldenTridentofFlame.Bonus1Type = 10;
-                    m_goldenTridentofFlame.Bonus2Type = 1;
-                    m_goldenTridentofFlame.Bonus3Type = 148;
-                    m_goldenTridentofFlame.Bonus4Type = 155;
-                    m_goldenTridentofFlame.Bonus5Type = 200;
-                    m_goldenTridentofFlame.IsPickable = false;
-                    m_goldenTridentofFlame.IsDropable = false;
-                    m_goldenTridentofFlame.CanDropAsLoot = false;
-                    m_goldenTridentofFlame.IsTradable = false;
-                    m_goldenTridentofFlame.MaxCount = 1;
-                    m_goldenTridentofFlame.PackSize = 1;
-                    m_goldenTridentofFlame.ProcSpellID = 32116;
+                    m_goldenTridentofFlame = new ItemTemplate
+                    {
+                        Id_nb = "Golden_Trident_of_Flame",
+                        Name = "Golden Triden of Flame",
+                        Level = 45,
+                        Durability = 50000,
+                        MaxDurability = 50000,
+                        Condition = 50000,
+                        MaxCondition = 50000,
+                        Quality = 100,
+                        DPS_AF = 150,
+                        SPD_ABS = 36,
+                        Type_Damage = 2,
+                        Object_Type = 3,
+                        Item_Type = 10,
+                        Color = 48,
+                        Effect = 77,
+                        Model = 1004,
+                        Bonus = 35,
+                        Bonus1 = 60,
+                        Bonus2 = 19,
+                        Bonus3 = 20,
+                        Bonus4 = 3,
+                        Bonus5 = 3,
+                        Bonus1Type = 10,
+                        Bonus2Type = 1,
+                        Bonus3Type = 148,
+                        Bonus4Type = 155,
+                        Bonus5Type = 200,
+                        IsPickable = false,
+                        IsDropable = false,
+                        CanDropAsLoot = false,
+                        IsTradable = false,
+                        MaxCount = 1,
+                        PackSize = 1,
+                        ProcSpellID = 32116
+                    };
                 }
 
                 return m_goldenTridentofFlame;
@@ -111,7 +112,7 @@ namespace DOL.GS.Spells
         {
             get
             {
-                m_goldenTridentofFlame = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Golden_Trident_of_FlameM");
+                m_goldenTridentofFlame = GameServer.Database.FindObjectByKey<ItemTemplate>("Golden_Trident_of_FlameM");
                 if (m_goldenTridentofFlame == null)
                 {
                     if (log.IsWarnEnabled)
@@ -119,41 +120,43 @@ namespace DOL.GS.Spells
                         log.Warn("Could not find Golden_Trident_of_Flame, loading it ...");
                     }
 
-                    m_goldenTridentofFlame = new ItemTemplate();
-                    m_goldenTridentofFlame.Id_nb = "Golden_Trident_of_FlameM";
-                    m_goldenTridentofFlame.Name = "Golden Triden of Flame";
-                    m_goldenTridentofFlame.Level = 45;
-                    m_goldenTridentofFlame.Durability = 50000;
-                    m_goldenTridentofFlame.MaxDurability = 50000;
-                    m_goldenTridentofFlame.Condition = 50000;
-                    m_goldenTridentofFlame.MaxCondition = 50000;
-                    m_goldenTridentofFlame.Quality = 100;
-                    m_goldenTridentofFlame.DPS_AF = 150;
-                    m_goldenTridentofFlame.SPD_ABS = 36;
-                    m_goldenTridentofFlame.Type_Damage = 2;
-                    m_goldenTridentofFlame.Object_Type = 11;
-                    m_goldenTridentofFlame.Item_Type = 10;
-                    m_goldenTridentofFlame.Color = 48;
-                    m_goldenTridentofFlame.Effect = 77;
-                    m_goldenTridentofFlame.Model = 1004;
-                    m_goldenTridentofFlame.Bonus = 35;
-                    m_goldenTridentofFlame.Bonus1 = 60;
-                    m_goldenTridentofFlame.Bonus2 = 19;
-                    m_goldenTridentofFlame.Bonus3 = 20;
-                    m_goldenTridentofFlame.Bonus4 = 3;
-                    m_goldenTridentofFlame.Bonus5 = 3;
-                    m_goldenTridentofFlame.Bonus1Type = 10;
-                    m_goldenTridentofFlame.Bonus2Type = 1;
-                    m_goldenTridentofFlame.Bonus3Type = 148;
-                    m_goldenTridentofFlame.Bonus4Type = 155;
-                    m_goldenTridentofFlame.Bonus5Type = 200;
-                    m_goldenTridentofFlame.IsPickable = false;
-                    m_goldenTridentofFlame.IsDropable = false;
-                    m_goldenTridentofFlame.CanDropAsLoot = false;
-                    m_goldenTridentofFlame.IsTradable = false;
-                    m_goldenTridentofFlame.MaxCount = 1;
-                    m_goldenTridentofFlame.PackSize = 1;
-                    m_goldenTridentofFlame.ProcSpellID = 32116;
+                    m_goldenTridentofFlame = new ItemTemplate
+                    {
+                        Id_nb = "Golden_Trident_of_FlameM",
+                        Name = "Golden Triden of Flame",
+                        Level = 45,
+                        Durability = 50000,
+                        MaxDurability = 50000,
+                        Condition = 50000,
+                        MaxCondition = 50000,
+                        Quality = 100,
+                        DPS_AF = 150,
+                        SPD_ABS = 36,
+                        Type_Damage = 2,
+                        Object_Type = 11,
+                        Item_Type = 10,
+                        Color = 48,
+                        Effect = 77,
+                        Model = 1004,
+                        Bonus = 35,
+                        Bonus1 = 60,
+                        Bonus2 = 19,
+                        Bonus3 = 20,
+                        Bonus4 = 3,
+                        Bonus5 = 3,
+                        Bonus1Type = 10,
+                        Bonus2Type = 1,
+                        Bonus3Type = 148,
+                        Bonus4Type = 155,
+                        Bonus5Type = 200,
+                        IsPickable = false,
+                        IsDropable = false,
+                        CanDropAsLoot = false,
+                        IsTradable = false,
+                        MaxCount = 1,
+                        PackSize = 1,
+                        ProcSpellID = 32116
+                    };
                 }
 
                 return m_goldenTridentofFlame;
@@ -164,7 +167,7 @@ namespace DOL.GS.Spells
         {
             get
             {
-                m_goldenTridentofFlame = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Golden_Trident_of_FlameH");
+                m_goldenTridentofFlame = GameServer.Database.FindObjectByKey<ItemTemplate>("Golden_Trident_of_FlameH");
                 if (m_goldenTridentofFlame == null)
                 {
                     if (log.IsWarnEnabled)
@@ -172,41 +175,43 @@ namespace DOL.GS.Spells
                         log.Warn("Could not find Golden_Trident_of_Flame, loading it ...");
                     }
 
-                    m_goldenTridentofFlame = new ItemTemplate();
-                    m_goldenTridentofFlame.Id_nb = "Golden_Trident_of_FlameH";
-                    m_goldenTridentofFlame.Name = "Golden Triden of Flame";
-                    m_goldenTridentofFlame.Level = 45;
-                    m_goldenTridentofFlame.Durability = 50000;
-                    m_goldenTridentofFlame.MaxDurability = 50000;
-                    m_goldenTridentofFlame.Condition = 50000;
-                    m_goldenTridentofFlame.MaxCondition = 50000;
-                    m_goldenTridentofFlame.Quality = 100;
-                    m_goldenTridentofFlame.DPS_AF = 150;
-                    m_goldenTridentofFlame.SPD_ABS = 36;
-                    m_goldenTridentofFlame.Type_Damage = 2;
-                    m_goldenTridentofFlame.Object_Type = 19;
-                    m_goldenTridentofFlame.Item_Type = 10;
-                    m_goldenTridentofFlame.Color = 48;
-                    m_goldenTridentofFlame.Effect = 77;
-                    m_goldenTridentofFlame.Model = 1004;
-                    m_goldenTridentofFlame.Bonus = 35;
-                    m_goldenTridentofFlame.Bonus1 = 60;
-                    m_goldenTridentofFlame.Bonus2 = 19;
-                    m_goldenTridentofFlame.Bonus3 = 20;
-                    m_goldenTridentofFlame.Bonus4 = 3;
-                    m_goldenTridentofFlame.Bonus5 = 3;
-                    m_goldenTridentofFlame.Bonus1Type = 10;
-                    m_goldenTridentofFlame.Bonus2Type = 1;
-                    m_goldenTridentofFlame.Bonus3Type = 148;
-                    m_goldenTridentofFlame.Bonus4Type = 155;
-                    m_goldenTridentofFlame.Bonus5Type = 200;
-                    m_goldenTridentofFlame.IsPickable = false;
-                    m_goldenTridentofFlame.IsDropable = false;
-                    m_goldenTridentofFlame.CanDropAsLoot = false;
-                    m_goldenTridentofFlame.IsTradable = false;
-                    m_goldenTridentofFlame.MaxCount = 1;
-                    m_goldenTridentofFlame.PackSize = 1;
-                    m_goldenTridentofFlame.ProcSpellID = 32116;
+                    m_goldenTridentofFlame = new ItemTemplate
+                    {
+                        Id_nb = "Golden_Trident_of_FlameH",
+                        Name = "Golden Triden of Flame",
+                        Level = 45,
+                        Durability = 50000,
+                        MaxDurability = 50000,
+                        Condition = 50000,
+                        MaxCondition = 50000,
+                        Quality = 100,
+                        DPS_AF = 150,
+                        SPD_ABS = 36,
+                        Type_Damage = 2,
+                        Object_Type = 19,
+                        Item_Type = 10,
+                        Color = 48,
+                        Effect = 77,
+                        Model = 1004,
+                        Bonus = 35,
+                        Bonus1 = 60,
+                        Bonus2 = 19,
+                        Bonus3 = 20,
+                        Bonus4 = 3,
+                        Bonus5 = 3,
+                        Bonus1Type = 10,
+                        Bonus2Type = 1,
+                        Bonus3Type = 148,
+                        Bonus4Type = 155,
+                        Bonus5Type = 200,
+                        IsPickable = false,
+                        IsDropable = false,
+                        CanDropAsLoot = false,
+                        IsTradable = false,
+                        MaxCount = 1,
+                        PackSize = 1,
+                        ProcSpellID = 32116
+                    };
                 }
 
                 return m_goldenTridentofFlame;

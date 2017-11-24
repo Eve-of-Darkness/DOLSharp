@@ -47,8 +47,7 @@ namespace DOL.GS.Spells
                 return false;
             }
 
-            GamePlayer player = Caster as GamePlayer;
-            if (player == null)
+            if (!(Caster is GamePlayer player))
             {
                 return false;
             }
@@ -82,8 +81,7 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness"></param>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            GamePlayer player = Caster as GamePlayer;
-            if (player == null)
+            if (!(Caster is GamePlayer player))
             {
                 return;
             }
@@ -133,7 +131,7 @@ namespace DOL.GS.Spells
 
             if (artifact == null)
             {
-                log.Warn(string.Format("Missing artifact for item '{0}'", combinedScroll.Name));
+                log.Warn($"Missing artifact for item '{combinedScroll.Name}'");
             }
             else
             {

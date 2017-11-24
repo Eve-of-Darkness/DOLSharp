@@ -32,7 +32,7 @@ namespace DOL.GS.Spells
                 return false;
             }
 
-            if (!m_caster.IsWithinRadius(selectedTarget, Spell.Range))
+            if (!Caster.IsWithinRadius(selectedTarget, Spell.Range))
             {
                 MessageToCaster("Your target is too far away.", eChatType.CT_SpellResisted); return false;
             }
@@ -42,26 +42,28 @@ namespace DOL.GS.Spells
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
-            GamePlayer player = target as GamePlayer;
-            if (player == null)
+            if (!(target is GamePlayer player))
             {
                 return;
             }
 
-            var text = new List<string>();
-            text.Add("Class: " + player.CharacterClass.Name);
-            text.Add("Realmpoints: " + player.RealmPoints + " = " + string.Format("{0:#L#} {1}",player.RealmLevel + 10,player.RealmRankTitle(player.Client.Account.Language)));
-            text.Add("----------------------------------------------------");
-            text.Add("Str: " + player.Strength + " Dex: " + player.Dexterity + " Con: " + player.Constitution);
-            text.Add("Qui: " + player.Quickness + " Emp: " + player.Empathy + " Cha: " + player.Charisma);
-            text.Add("Pie: " + player.Piety + " Int: " + player.Intelligence + " HP: " + player.MaxHealth);
-            text.Add("----------------------------------------------------");
+            var text = new List<string>
+            {
+                $"Class: {player.CharacterClass.Name}",
+                $"Realmpoints: {player.RealmPoints} = {player.RealmLevel + 10:#L#} {player.RealmRankTitle(player.Client.Account.Language)}",
+                "----------------------------------------------------",
+                $"Str: {player.Strength} Dex: {player.Dexterity} Con: {player.Constitution}",
+                $"Qui: {player.Quickness} Emp: {player.Empathy} Cha: {player.Charisma}",
+                $"Pie: {player.Piety} Int: {player.Intelligence} HP: {player.MaxHealth}",
+                "----------------------------------------------------"
+            };
+
             IList<Specialization> specs = player.GetSpecList();
             foreach (object obj in specs)
             {
                 if (obj is Specialization)
                 {
-                    text.Add(((Specialization)obj).Name + ": " + ((Specialization)obj).Level.ToString());
+                    text.Add($"{((Specialization) obj).Name}: {((Specialization) obj).Level}");
                 }
             }
 
@@ -69,13 +71,14 @@ namespace DOL.GS.Spells
             IList abilities = player.GetAllAbilities();
             foreach (Ability ab in abilities)
             {
-                if (ab is RealmAbility && ab is RR5RealmAbility == false)
+                if (ab is RealmAbility ability && ability is RR5RealmAbility == false)
                 {
-                    text.Add(((RealmAbility)ab).Name);
+                    text.Add(ability.Name);
                 }
             } 
-(m_caster as GamePlayer).Out.SendCustomTextWindow("Realm Lore [ " + player.Name + " ]",text);
-            (m_caster as GamePlayer).Out.SendMessage("Realm Lore [ " + player.Name + " ]\n" + text,eChatType.CT_System,eChatLoc.CL_SystemWindow);
+
+            (Caster as GamePlayer)?.Out.SendCustomTextWindow($"Realm Lore [ {player.Name} ]",text);
+            (Caster as GamePlayer)?.Out.SendMessage($"Realm Lore [ {player.Name} ]\n{text}",eChatType.CT_System,eChatLoc.CL_SystemWindow);
         }
 
         public RealmLore(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }

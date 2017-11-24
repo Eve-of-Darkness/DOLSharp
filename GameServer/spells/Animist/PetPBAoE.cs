@@ -32,9 +32,7 @@ namespace DOL.GS.Spells
         {
         }
 
-        public override bool HasPositiveEffect {
-            get { return false; }
-        }
+        public override bool HasPositiveEffect => false;
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
@@ -49,15 +47,13 @@ namespace DOL.GS.Spells
              * -Select automatically Main controlled Turret if player don't have target or Turret target.
              * -Cast only on our turrets.
              */
-            if (Caster.ControlledBrain == null || Caster.ControlledBrain.Body == null)
+            if (Caster.ControlledBrain?.Body == null)
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "PetPBAOE.CheckBeginCast.NoPet"), eChatType.CT_System);
+                MessageToCaster(LanguageMgr.GetTranslation(((GamePlayer) Caster).Client, "PetPBAOE.CheckBeginCast.NoPet"), eChatType.CT_System);
                 return false;
             }
 
-            TurretPet target = selectedTarget as TurretPet;
-
-            if (target == null || !Caster.IsControlledNPC(target))
+            if (!(selectedTarget is TurretPet target) || !Caster.IsControlledNPC(target))
             {
                 target = Caster.ControlledBrain.Body as TurretPet;
             }
@@ -74,13 +70,12 @@ namespace DOL.GS.Spells
                     return;
                 }
 
-                IOldAggressiveBrain aggroBrain = ((GameNPC)ad.Target).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
+                if (((GameNPC)ad.Target).Brain is IOldAggressiveBrain aggroBrain)
                 {
                     TurretPet turret = null;
                     if (Caster.TargetObject == null || !Caster.IsControlledNPC(Caster.TargetObject as TurretPet))
                     {
-                        if (Caster.ControlledBrain != null && Caster.ControlledBrain.Body != null)
+                        if (Caster.ControlledBrain?.Body != null)
                         {
                             turret = Caster.ControlledBrain.Body as TurretPet;
                         }

@@ -11,16 +11,13 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Does this spell break stealth on start?
         /// </summary>
-        public override bool UnstealthCasterOnStart
-        {
-            get { return false; }
-        }
+        public override bool UnstealthCasterOnStart => false;
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
             if (Caster != null && Caster is GamePlayer && Caster.AttackWeapon != null && (Caster.AttackWeapon.Object_Type == 15 || Caster.AttackWeapon.Object_Type == 18 || Caster.AttackWeapon.Object_Type == 9))
             {
-                if (!(selectedTarget is GameKeepComponent || selectedTarget is Keeps.GameKeepDoor))
+                if (!(selectedTarget is GameKeepComponent || selectedTarget is GameKeepDoor))
                 {
                     MessageToCaster("You must have a Keep Component targeted for this spell!", eChatType.CT_Spell);
                     return false;
@@ -36,7 +33,7 @@ namespace DOL.GS.Spells
 
         public override void FinishSpellCast(GameLiving target)
         {
-            if (!(target is GameKeepComponent || target is Keeps.GameKeepDoor))
+            if (!(target is GameKeepComponent || target is GameKeepDoor))
             {
                 MessageToCaster("Your target must be a Keep Component!", eChatType.CT_SpellResisted);
                 return;
@@ -59,7 +56,7 @@ namespace DOL.GS.Spells
 
         public override int CalculateToHitChance(GameLiving target)
         {
-            if (target is GameKeepComponent || target is Keeps.GameKeepDoor)
+            if (target is GameKeepComponent || target is GameKeepDoor)
             {
                 return 100;
             }

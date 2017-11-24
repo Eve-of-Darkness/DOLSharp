@@ -67,8 +67,7 @@ namespace DOL.GS.Spells
                 !m_originalTarget.IsAlive ||
                 Caster.IsMezzed ||
                 Caster.IsStunned ||
-                Caster.IsSitting ||
-                (Caster.TargetObject is GameLiving ? m_originalTarget != Caster.TargetObject as GameLiving : true))
+                Caster.IsSitting || !(Caster.TargetObject is GameLiving) || m_originalTarget != (GameLiving) Caster.TargetObject)
             {
                 MessageToCaster("Your spell was cancelled.", eChatType.CT_SpellExpires);
                 effect.Cancel(false);

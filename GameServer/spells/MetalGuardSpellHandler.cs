@@ -27,11 +27,9 @@ namespace DOL.GS.Spells
         public override IList<GameLiving> SelectTargets(GameObject castTarget)
         {
             var list = new List<GameLiving>();
-            GameLiving target = castTarget as GameLiving;
 
-            if (Caster is GamePlayer)
+            if (Caster is GamePlayer casterPlayer)
             {
-                GamePlayer casterPlayer = (GamePlayer)Caster;
                 Group group = casterPlayer.Group;
                 if (group == null)
                 {
@@ -39,24 +37,21 @@ namespace DOL.GS.Spells
                 }
 
                 int spellRange = CalculateSpellRange();
-                if (group != null)
+                lock (group)
                 {
-                    lock (group)
+                    foreach (GamePlayer groupPlayer in casterPlayer.GetPlayersInRadius((ushort)Spell.Radius))
                     {
-                        foreach (GamePlayer groupPlayer in casterPlayer.GetPlayersInRadius((ushort)m_spell.Radius))
+                        if (casterPlayer.Group.IsInTheGroup(groupPlayer))
                         {
-                            if (casterPlayer.Group.IsInTheGroup(groupPlayer))
+                            if (groupPlayer != casterPlayer && groupPlayer.IsAlive)
                             {
-                                if (groupPlayer != casterPlayer && groupPlayer.IsAlive)
+                                list.Add(groupPlayer);
+                                IControlledBrain npc = groupPlayer.ControlledBrain;
+                                if (npc != null)
                                 {
-                                    list.Add(groupPlayer);
-                                    IControlledBrain npc = groupPlayer.ControlledBrain;
-                                    if (npc != null)
+                                    if (casterPlayer.IsWithinRadius(npc.Body, spellRange))
                                     {
-                                        if (casterPlayer.IsWithinRadius(npc.Body, spellRange))
-                                        {
-                                            list.Add(npc.Body);
-                                        }
+                                        list.Add(npc.Body);
                                     }
                                 }
                             }

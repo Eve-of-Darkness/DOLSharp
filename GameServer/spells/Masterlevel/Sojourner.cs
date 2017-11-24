@@ -27,7 +27,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -44,12 +44,9 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            foreach (GameNPC item in target.GetNPCsInRadius((ushort)m_spell.Radius))
+            foreach (GameNPC item in target.GetNPCsInRadius((ushort)Spell.Radius))
             {
-                if (item != null && item is GameMine)
-                {
-                    (item as GameMine).Delete();
-                }
+                (item as GameMine)?.Delete();
             }
         }
 
@@ -62,14 +59,14 @@ namespace DOL.GS.Spells
     [SpellHandler("AncientTransmuter")]
     public class AncientTransmuterSpellHandler : SpellHandler
     {
-        private GameMerchant merchant;
+        private readonly GameMerchant merchant;
         /// <summary>
         /// Execute Acient Transmuter summon spell
         /// </summary>
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -86,10 +83,7 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            if (merchant != null)
-            {
-                merchant.Delete();
-            }
+            merchant?.Delete();
 
             return base.OnEffectExpires(effect, noMessages);
         }
@@ -97,25 +91,25 @@ namespace DOL.GS.Spells
         public AncientTransmuterSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            if (caster is GamePlayer)
+            if (caster is GamePlayer casterPlayer)
             {
-                GamePlayer casterPlayer = caster as GamePlayer;
-                merchant = new GameMerchant();
+                merchant = new GameMerchant
+                {
+                    X = casterPlayer.X + Util.Random(20, 40) - Util.Random(20, 40),
+                    Y = casterPlayer.Y + Util.Random(20, 40) - Util.Random(20, 40),
+                    Z = casterPlayer.Z,
+                    CurrentRegion = casterPlayer.CurrentRegion,
+                    Heading = (ushort) ((casterPlayer.Heading + 2048) % 4096),
+                    Level = 1,
+                    Realm = casterPlayer.Realm,
+                    Name = "Ancient Transmuter",
+                    Model = 993,
+                    CurrentSpeed = 0,
+                    MaxSpeedBase = 0,
+                    GuildName = string.Empty,
+                    Size = 50
+                };
 
-                // Fill the object variables
-                merchant.X = casterPlayer.X + Util.Random(20, 40) - Util.Random(20, 40);
-                merchant.Y = casterPlayer.Y + Util.Random(20, 40) - Util.Random(20, 40);
-                merchant.Z = casterPlayer.Z;
-                merchant.CurrentRegion = casterPlayer.CurrentRegion;
-                merchant.Heading = (ushort)((casterPlayer.Heading + 2048) % 4096);
-                merchant.Level = 1;
-                merchant.Realm = casterPlayer.Realm;
-                merchant.Name = "Ancient Transmuter";
-                merchant.Model = 993;
-                merchant.CurrentSpeed = 0;
-                merchant.MaxSpeedBase = 0;
-                merchant.GuildName = string.Empty;
-                merchant.Size = 50;
                 merchant.Flags |= GameNPC.eFlags.PEACE;
                 merchant.TradeItems = new MerchantTradeItems("ML_transmuteritems");
             }
@@ -131,11 +125,6 @@ namespace DOL.GS.Spells
         // constructor
         public Port(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
-        public override void FinishSpellCast(GameLiving target)
-        {
-            base.FinishSpellCast(target);
-        }
-
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
             if (target == null)
@@ -143,14 +132,12 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
 
-            GamePlayer player = Caster as GamePlayer;
-
-            if (player != null)
+            if (Caster is GamePlayer player)
             {
                 if (!player.InCombat && !GameRelic.IsPlayerCarryingRelic(player))
                 {
@@ -167,9 +154,9 @@ namespace DOL.GS.Spells
     [SpellHandler("EssenceResist")]
     public class EssenceResistHandler : AbstractResistBuff
     {
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.BaseBuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.BaseBuff;
 
-        public override eProperty Property1 { get { return eProperty.Resist_Natural; } }
+        public override eProperty Property1 => eProperty.Resist_Natural;
 
         public EssenceResistHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
@@ -187,13 +174,7 @@ namespace DOL.GS.Spells
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
-            if (target == null)
-            {
-                return;
-            }
-
-            GamePlayer player = target as GamePlayer;
-            if (player != null && player.IsAlive)
+            if (target is GamePlayer player && player.IsAlive)
             {
                 Zephyr(player);
             }
@@ -207,7 +188,7 @@ namespace DOL.GS.Spells
                 return false;
             }
 
-            if (target is GameNPC == true)
+            if (target is GameNPC)
             {
                 return false;
             }
@@ -222,7 +203,7 @@ namespace DOL.GS.Spells
 
         private void Zephyr(GamePlayer target)
         {
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -267,7 +248,7 @@ namespace DOL.GS.Spells
             m_target.IsStunned = false;
             m_target.DismountSteed(true);
             m_target.DebuffCategory[(int)eProperty.SpellFumbleChance] -= 100;
-            GameEventMgr.RemoveHandler(m_target, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
+            GameEventMgr.RemoveHandler(m_target, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
             m_npc.StopMoving();
             m_npc.RemoveFromWorld();
 
@@ -288,8 +269,7 @@ namespace DOL.GS.Spells
 
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            if (!(sender is GameLiving))
             {
                 return;
             }
@@ -308,30 +288,25 @@ namespace DOL.GS.Spells
             ad.Damage -= damageAbsorbed;
             ad.Damage -= spellAbsorbed;
 
-            MessageToLiving(ad.Target, string.Format("You're in a Zephyr and can't be attacked!"), eChatType.CT_Spell);
-            MessageToLiving(ad.Attacker, string.Format("Your target is in a Zephyr and can't be attacked!"), eChatType.CT_Spell);
+            MessageToLiving(ad.Target, "You\'re in a Zephyr and can\'t be attacked!", eChatType.CT_Spell);
+            MessageToLiving(ad.Attacker, "Your target is in a Zephyr and can\'t be attacked!", eChatType.CT_Spell);
         }
 
         private void ArriveAtTarget(DOLEvent e, object obj, EventArgs args)
         {
-            GameNPC npc = obj as GameNPC;
-
-            if (npc == null)
+            if (!(obj is GameNPC npc))
             {
                 return;
             }
 
-            GamePlayer target = npc.TempProperties.getProperty<object>("target", null) as GamePlayer;
-
-            if (target == null || !target.IsAlive)
+            if (!(npc.TempProperties.getProperty<object>("target", null) is GamePlayer target) || !target.IsAlive)
             {
                 return;
             }
 
             GameEventMgr.RemoveHandler(npc, GameNPCEvent.ArriveAtTarget, new DOLEventHandler(ArriveAtTarget));
 
-            GamePlayer player = target as GamePlayer;
-            if (player == null)
+            if (!(target is GamePlayer player))
             {
                 return;
             }
@@ -348,7 +323,7 @@ namespace DOL.GS.Spells
             player.StopAttack();
             player.StopCurrentSpellcast();
             player.MountSteed(npc, true);
-            GameEventMgr.AddHandler(player, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
+            GameEventMgr.AddHandler(player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
 
             player.Out.SendMessage("You are picked up by a forceful zephyr!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             npc.StopFollowing();
@@ -357,7 +332,7 @@ namespace DOL.GS.Spells
             {
                 // Calculate random target
                 m_loc = GetTargetLoc();
-                (Caster as GamePlayer).Out.SendCheckLOS(Caster as GamePlayer, m_npc, new CheckLOSResponse(ZephyrCheckLOS));
+                (Caster as GamePlayer)?.Out.SendCheckLOS(Caster as GamePlayer, m_npc, new CheckLOSResponse(ZephyrCheckLOS));
             }
         }
 
@@ -409,14 +384,13 @@ namespace DOL.GS.Spells
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            GameEventMgr.AddHandler(Caster, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
+            GameEventMgr.AddHandler(Caster, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
             Caster.Endurance -= endurance;
         }
 
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            if (!(sender is GameLiving living))
             {
                 return;
             }
@@ -428,28 +402,21 @@ namespace DOL.GS.Spells
                 ad = attackedByEnemy.AttackData;
             }
 
-            if (ad.Attacker is GamePlayer)
+            if (ad.Attacker is GamePlayer player)
             {
                 ad.Damage = 0;
                 ad.CriticalDamage = 0;
-                GamePlayer player = ad.Attacker as GamePlayer;
-                player.Out.SendMessage(living.Name + " is Phaseshifted and can't be attacked!", eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"{living.Name} is Phaseshifted and can\'t be attacked!", eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
             }
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GameEventMgr.RemoveHandler(Caster, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
+            GameEventMgr.RemoveHandler(Caster, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
             return base.OnEffectExpires(effect, noMessages);
         }
 
-        public override bool HasPositiveEffect
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool HasPositiveEffect => false;
 
         public override int CalculateSpellResistChance(GameLiving target)
         {
@@ -470,26 +437,19 @@ namespace DOL.GS.Spells
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
-            if (Caster is GamePlayer && Caster.CurrentRegionID == 51 && ((GamePlayer)Caster).BindRegion == 51)
+            if (Caster is GamePlayer player && Caster.CurrentRegionID == 51 && player.BindRegion == 51)
             {
                 if (Caster.CurrentRegionID == 51)
                 {
                     MessageToCaster("You can't use this Ability here", eChatType.CT_SpellResisted);
                     return false;
                 }
-                else
-                {
-                    MessageToCaster("Bind in another Region to use this Ability", eChatType.CT_SpellResisted);
-                    return false;
-                }
+
+                MessageToCaster("Bind in another Region to use this Ability", eChatType.CT_SpellResisted);
+                return false;
             }
 
             return base.CheckBeginCast(selectedTarget);
-        }
-
-        public override void FinishSpellCast(GameLiving target)
-        {
-            base.FinishSpellCast(target);
         }
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
@@ -499,7 +459,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -512,15 +472,13 @@ namespace DOL.GS.Spells
                     player.Out.SendMessage("You can't teleport a group that is in combat!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;
                 }
-                else
+
+                foreach (GamePlayer pl in player.Group.GetPlayersInTheGroup())
                 {
-                    foreach (GamePlayer pl in player.Group.GetPlayersInTheGroup())
+                    if (pl != null)
                     {
-                        if (pl != null)
-                        {
-                            SendEffectAnimation(pl, 0, false, 1);
-                            pl.MoveTo((ushort)player.BindRegion, player.BindXpos, player.BindYpos, player.BindZpos, (ushort)player.BindHeading);
-                        }
+                        SendEffectAnimation(pl, 0, false, 1);
+                        pl.MoveTo((ushort)player.BindRegion, player.BindXpos, player.BindYpos, player.BindZpos, (ushort)player.BindHeading);
                     }
                 }
             }

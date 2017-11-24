@@ -39,8 +39,8 @@ namespace DOL.GS.Spells
 
             GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
 
-            eChatType toLiving = (Spell.Pulse == 0) ? eChatType.CT_Spell : eChatType.CT_SpellPulse;
-            eChatType toOther = (Spell.Pulse == 0) ? eChatType.CT_System : eChatType.CT_SpellPulse;
+            eChatType toLiving = Spell.Pulse == 0 ? eChatType.CT_Spell : eChatType.CT_SpellPulse;
+            eChatType toOther = Spell.Pulse == 0 ? eChatType.CT_System : eChatType.CT_SpellPulse;
             MessageToLiving(effect.Owner, Spell.Message1, toLiving);
             Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, false)), toOther, effect.Owner);
         }
@@ -67,14 +67,13 @@ namespace DOL.GS.Spells
 
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
         private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
         {
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            if (!(sender is GameLiving))
             {
                 return;
             }
@@ -87,7 +86,7 @@ namespace DOL.GS.Spells
             }
 
             // Log.DebugFormat("sender:{0} res:{1} IsMelee:{2} Type:{3}", living.Name, ad.AttackResult, ad.IsMeleeAttack, ad.AttackType);
-            if (ad == null || (ad.AttackResult != GameLiving.eAttackResult.HitStyle && ad.AttackResult != GameLiving.eAttackResult.HitUnstyled))
+            if (ad == null || ad.AttackResult != GameLiving.eAttackResult.HitStyle && ad.AttackResult != GameLiving.eAttackResult.HitUnstyled)
             {
                 return;
             }
@@ -119,8 +118,8 @@ namespace DOL.GS.Spells
             OnDamageAbsorbed(ad, damageAbsorbed);
 
             // TODO correct messages
-            MessageToLiving(ad.Target, string.Format("Your style absorbtion absorbs {0} damage!", damageAbsorbed), eChatType.CT_Spell);
-            MessageToLiving(ad.Attacker, string.Format("A barrier absorbs {0} damage of your attack!", damageAbsorbed), eChatType.CT_Spell);
+            MessageToLiving(ad.Target, $"Your style absorbtion absorbs {damageAbsorbed} damage!", eChatType.CT_Spell);
+            MessageToLiving(ad.Attacker, $"A barrier absorbs {damageAbsorbed} damage of your attack!", eChatType.CT_Spell);
         }
 
         protected virtual void OnDamageAbsorbed(AttackData ad, int DamageAmount)
@@ -137,12 +136,15 @@ namespace DOL.GS.Spells
                 return null;
             }
 
-            PlayerXEffect eff = new PlayerXEffect();
-            eff.Var1 = Spell.ID;
-            eff.Duration = e.RemainingTime;
-            eff.IsHandler = true;
-            eff.Var2 = (int)Spell.Value;
-            eff.SpellLine = SpellLine.KeyName;
+            PlayerXEffect eff = new PlayerXEffect
+            {
+                Var1 = Spell.ID,
+                Duration = e.RemainingTime,
+                IsHandler = true,
+                Var2 = (int) Spell.Value,
+                SpellLine = SpellLine.KeyName
+            };
+
             return eff;
         }
 
@@ -167,26 +169,19 @@ namespace DOL.GS.Spells
         {
             get
             {
-                var list = new List<string>();
+                var list = new List<string>
+                {
+                    $"Name: {Spell.Name}",
+                    string.Empty,
+                    $"Description: {Spell.Description}",
+                    string.Empty,
+                    $"Target: {Spell.Target}",
+                    "Type: Style Absorption"
+                };
 
-                // Name
-                list.Add("Name: " + Spell.Name);
-                list.Add(string.Empty);
-
-                // Description
-                list.Add("Description: " + Spell.Description);
-                list.Add(string.Empty);
-
-                // Target
-                list.Add("Target: " + Spell.Target);
-
-                // SpellType
-                list.Add("Type: Style Absorption");
-
-                // Damage
                 if (Spell.Damage != 0)
                 {
-                    list.Add("Absorption: " + Spell.Damage + "%");
+                    list.Add($"Absorption: {Spell.Damage}%");
                 }
 
                 if (Spell.Damage > 100)
@@ -202,7 +197,7 @@ namespace DOL.GS.Spells
                 // Value
                 if (Spell.Value != 0)
                 {
-                    list.Add("Value: " + Spell.Value);
+                    list.Add($"Value: {Spell.Value}");
                 }
 
                 // Cast
@@ -212,7 +207,7 @@ namespace DOL.GS.Spells
                 }
                 else if (Spell.CastTime > 0)
                 {
-                    list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                    list.Add($"Casting time: {(Spell.CastTime * 0.001):0.0## sec;-0.0## sec;'instant'}");
                 }
 
                 // Duration
@@ -222,7 +217,7 @@ namespace DOL.GS.Spells
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format("Duration: {0}:{1} min", Spell.Duration / 60000, (Spell.Duration % 60000 / 1000).ToString("00")));
+                    list.Add($"Duration: {Spell.Duration / 60000}:{(Spell.Duration % 60000 / 1000):00} min");
                 }
                 else if (Spell.Duration != 0)
                 {
@@ -230,29 +225,29 @@ namespace DOL.GS.Spells
                     // Range
                     if (Spell.Range != 0)
                     {
-                        list.Add("Range: " + Spell.Range);
+                        list.Add($"Range: {Spell.Range}");
                     }
                 }
 
                 // Radius
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
                 // Cost
-                list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                list.Add($"Power cost: {Spell.Power:0;0'%'}");
 
                 // Frequency
                 if (Spell.Frequency != 0)
                 {
-                    list.Add("Frequency: " + (Spell.Frequency * 0.001).ToString("0.0"));
+                    list.Add($"Frequency: {Spell.Frequency * 0.001:0.0}");
                 }
 
                 // DamageType
                 if (Spell.DamageType != 0)
                 {
-                    list.Add("Damage Type: " + Spell.DamageType);
+                    list.Add($"Damage Type: {Spell.DamageType}");
                 }
 
                 return list;

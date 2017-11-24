@@ -71,11 +71,11 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         public override int CalculateCastingTime()
         {
-            int ticks = m_spell.CastTime;
-            ticks = (int)(ticks * Math.Max(m_caster.CastingSpeedReductionCap, m_caster.DexterityCastTimeReduction));
-            if (ticks < m_caster.MinimumCastingSpeed)
+            int ticks = Spell.CastTime;
+            ticks = (int)(ticks * Math.Max(Caster.CastingSpeedReductionCap, Caster.DexterityCastTimeReduction));
+            if (ticks < Caster.MinimumCastingSpeed)
             {
-                ticks = m_caster.MinimumCastingSpeed;
+                ticks = Caster.MinimumCastingSpeed;
             }
 
             return ticks;
@@ -95,7 +95,7 @@ namespace DOL.GS.Spells
 
             if (Caster.ControlledBrain == null)
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "PetSpellHandler.CheckBeginCast.NoControlledBrainForCast"), eChatType.CT_SpellResisted);
+                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "PetSpellHandler.CheckBeginCast.NoControlledBrainForCast"), eChatType.CT_SpellResisted);
                 return false;
             }
 
@@ -108,9 +108,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            GamePlayer player = Caster as GamePlayer;
-
-            if (player == null || player.ControlledBrain == null)
+            if (!(Caster is GamePlayer player) || player.ControlledBrain == null)
             {
                 return;
             }
@@ -118,11 +116,10 @@ namespace DOL.GS.Spells
             // No power cost, we'll drain power on the caster when
             // the pet actually starts casting it.
             // If there is an ID, create a sub spell for the pet.
-            ControlledNpcBrain petBrain = player.ControlledBrain as ControlledNpcBrain;
-            if (petBrain != null && Spell.SubSpellID > 0)
+            if (player.ControlledBrain is ControlledNpcBrain petBrain && Spell.SubSpellId > 0)
             {
-                Spell spell = SkillBase.GetSpellByID(Spell.SubSpellID);
-                if (spell != null && spell.SubSpellID == 0)
+                Spell spell = SkillBase.GetSpellByID(Spell.SubSpellId);
+                if (spell != null && spell.SubSpellId == 0)
                 {
                     spell.Level = Spell.Level;
                     petBrain.Notify(GameNPCEvent.PetSpell, this,

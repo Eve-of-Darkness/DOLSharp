@@ -30,76 +30,15 @@ namespace DOL.GS.Spells
     [SpellHandler("Chamber")]
     public class ChamberSpellHandler : SpellHandler
     {
-        private Spell m_primaryspell = null;
-        private SpellLine m_primaryspellline = null;
-        private Spell m_secondaryspell = null;
-        private SpellLine m_secondaryspelline = null;
-        private int m_effectslot = 0;
+        public Spell PrimarySpell { get; set; }
 
-        public Spell PrimarySpell
-        {
-            get
-            {
-                return m_primaryspell;
-            }
+        public SpellLine PrimarySpellLine { get; set; }
 
-            set
-            {
-                m_primaryspell = value;
-            }
-        }
+        public Spell SecondarySpell { get; set; }
 
-        public SpellLine PrimarySpellLine
-        {
-            get
-            {
-                return m_primaryspellline;
-            }
+        public SpellLine SecondarySpellLine { get; set; }
 
-            set
-            {
-                m_primaryspellline = value;
-            }
-        }
-
-        public Spell SecondarySpell
-        {
-            get
-            {
-                return m_secondaryspell;
-            }
-
-            set
-            {
-                m_secondaryspell = value;
-            }
-        }
-
-        public SpellLine SecondarySpellLine
-        {
-            get
-            {
-                return m_secondaryspelline;
-            }
-
-            set
-            {
-                m_secondaryspelline = value;
-            }
-        }
-
-        public int EffectSlot
-        {
-            get
-            {
-                return m_effectslot;
-            }
-
-            set
-            {
-                m_effectslot = value;
-            }
-        }
+        public int EffectSlot { get; set; }
 
         public override void InterruptCasting()
         {
@@ -109,23 +48,21 @@ namespace DOL.GS.Spells
 
         public override bool CastSpell()
         {
-            GamePlayer caster = (GamePlayer)m_caster;
+            GamePlayer caster = (GamePlayer)Caster;
             m_spellTarget = caster.TargetObject as GameLiving;
-            GameSpellEffect effect = FindEffectOnTarget(caster, "Chamber", m_spell.Name);
-            if (effect != null && m_spell.Name == effect.Spell.Name)
+            GameSpellEffect effect = FindEffectOnTarget(caster, "Chamber", Spell.Name);
+            if (effect != null && Spell.Name == effect.Spell.Name)
             {
-                ISpellHandler spellhandler = null;
-                ISpellHandler spellhandler2 = null;
                 ChamberSpellHandler chamber = (ChamberSpellHandler)effect.SpellHandler;
                 GameSpellEffect PhaseShift = FindEffectOnTarget(m_spellTarget, "Phaseshift");
                 SelectiveBlindnessEffect SelectiveBlindness = Caster.EffectList.GetOfType<SelectiveBlindnessEffect>();
-                spellhandler = ScriptMgr.CreateSpellHandler(caster, chamber.PrimarySpell, chamber.PrimarySpellLine);
+                var spellhandler = ScriptMgr.CreateSpellHandler(caster, chamber.PrimarySpell, chamber.PrimarySpellLine);
 
                 #region Pre-checks
-                int duration = caster.GetSkillDisabledDuration(m_spell);
+                int duration = caster.GetSkillDisabledDuration(Spell);
                 if (duration > 0)
                 {
-                    MessageToCaster("You must wait " + (duration / 1000 + 1) + " seconds to use this spell!", eChatType.CT_System);
+                    MessageToCaster($"You must wait {duration / 1000 + 1} seconds to use this spell!", eChatType.CT_System);
                     return false;
                 }
 
@@ -208,10 +145,7 @@ namespace DOL.GS.Spells
                     GameLiving EffectOwner = SelectiveBlindness.EffectSource;
                     if (EffectOwner == m_spellTarget)
                     {
-                        if (m_caster is GamePlayer)
-                        {
-                            ((GamePlayer)m_caster).Out.SendMessage(string.Format("{0} is invisible to you!", m_spellTarget.GetName(0, true)), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
-                        }
+                        ((GamePlayer)Caster).Out.SendMessage($"{m_spellTarget.GetName(0, true)} is invisible to you!", eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
 
                         return false;
                     }
@@ -219,7 +153,7 @@ namespace DOL.GS.Spells
 
                 if (m_spellTarget.HasAbility(Abilities.DamageImmunity))
                 {
-                    MessageToCaster(m_spellTarget.Name + " is immune to this effect!", eChatType.CT_SpellResisted);
+                    MessageToCaster($"{m_spellTarget.Name} is immune to this effect!", eChatType.CT_SpellResisted);
                     return false;
                 }
 
@@ -240,38 +174,31 @@ namespace DOL.GS.Spells
 
                 if (chamber.SecondarySpell != null)
                 {
-                    spellhandler2 = ScriptMgr.CreateSpellHandler(caster, chamber.SecondarySpell, chamber.SecondarySpellLine);
+                    var spellhandler2 = ScriptMgr.CreateSpellHandler(caster, chamber.SecondarySpell, chamber.SecondarySpellLine);
                     spellhandler2.CastSpell();
                 }
 
                 effect.Cancel(false);
-
-                if (m_caster is GamePlayer)
+                
+                GamePlayer player_Caster = Caster as GamePlayer;
+                foreach (SpellLine spellline in player_Caster.GetSpellLines())
                 {
-                    GamePlayer player_Caster = Caster as GamePlayer;
-                    foreach (SpellLine spellline in player_Caster.GetSpellLines())
+                    foreach (Spell sp in SkillBase.GetSpellList(spellline.KeyName))
                     {
-                        foreach (Spell sp in SkillBase.GetSpellList(spellline.KeyName))
+                        if (sp.SpellType == Spell.SpellType)
                         {
-                            if (sp.SpellType == m_spell.SpellType)
-                            {
-                                m_caster.DisableSkill(sp, sp.RecastDelay);
-                            }
+                            Caster.DisableSkill(sp, sp.RecastDelay);
                         }
                     }
-                }
-                else if (m_caster is GameNPC)
-                {
-                    m_caster.DisableSkill(m_spell, m_spell.RecastDelay);
                 }
             }
             else
             {
                 base.CastSpell();
-                int duration = caster.GetSkillDisabledDuration(m_spell);
-                if (Caster is GamePlayer && duration == 0)
+                int duration = caster.GetSkillDisabledDuration(Spell);
+                if (Caster is GamePlayer player && duration == 0)
                 {
-                    ((GamePlayer)Caster).Out.SendMessage("Select the first spell for your " + Spell.Name + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"Select the first spell for your {Spell.Name}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
 
@@ -284,48 +211,47 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
 
             // endurance
-            m_caster.Endurance -= 5;
+            Caster.Endurance -= 5;
 
             // messages
-            GamePlayer caster = (GamePlayer)m_caster;
             if (Spell.InstrumentRequirement == 0)
             {
                 if (SecondarySpell == null && PrimarySpell == null)
                 {
-                    MessageToCaster("No spells were loaded into " + m_spell.Name + ".", eChatType.CT_Spell);
+                    MessageToCaster($"No spells were loaded into {Spell.Name}.", eChatType.CT_Spell);
                 }
                 else
                 {
-                    MessageToCaster("Your " + m_spell.Name + " is ready for use.", eChatType.CT_Spell);
+                    MessageToCaster($"Your {Spell.Name} is ready for use.", eChatType.CT_Spell);
 
                     // StartSpell(target); // and action
                     GameSpellEffect neweffect = CreateSpellEffect(target, 1);
-                    neweffect.Start(m_caster);
-                    SendEffectAnimation(m_caster, 0, false, 1);
-                    ((GamePlayer)m_caster).Out.SendWarlockChamberEffect((GamePlayer)m_caster);
+                    neweffect.Start(Caster);
+                    SendEffectAnimation(Caster, 0, false, 1);
+                    ((GamePlayer)Caster).Out.SendWarlockChamberEffect((GamePlayer)Caster);
                 }
 
-                foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
+                foreach (GamePlayer player in Caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
                 {
-                    if (player != m_caster)
+                    if (player != Caster)
                     {
-                        player.MessageFromArea(m_caster, m_caster.GetName(0, true) + " casts a spell!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                        player.MessageFromArea(Caster, $"{Caster.GetName(0, true)} casts a spell!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                     }
                 }
             }
 
             // the quick cast is unallowed whenever you miss the spell
             // set the time when casting to can not quickcast during a minimum time
-            if (m_caster is GamePlayer)
+            if (Caster is GamePlayer)
             {
-                QuickCastEffect quickcast = m_caster.EffectList.GetOfType<QuickCastEffect>();
+                QuickCastEffect quickcast = Caster.EffectList.GetOfType<QuickCastEffect>();
                 if (quickcast != null && Spell.CastTime > 0)
                 {
-                    m_caster.TempProperties.setProperty(GamePlayer.QUICK_CAST_CHANGE_TICK, m_caster.CurrentRegion.Time);
-                    m_caster.DisableSkill(SkillBase.GetAbility(Abilities.Quickcast), QuickCastAbilityHandler.DISABLE_DURATION);
+                    Caster.TempProperties.setProperty(GamePlayer.QUICK_CAST_CHANGE_TICK, Caster.CurrentRegion.Time);
+                    Caster.DisableSkill(SkillBase.GetAbility(Abilities.Quickcast), QuickCastAbilityHandler.DISABLE_DURATION);
                     quickcast.Cancel(false);
                 }
             }
@@ -334,7 +260,7 @@ namespace DOL.GS.Spells
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
 
-            ((GamePlayer)m_caster).Out.SendWarlockChamberEffect((GamePlayer)effect.Owner);
+            ((GamePlayer)Caster).Out.SendWarlockChamberEffect((GamePlayer)effect.Owner);
             return base.OnEffectExpires(effect, noMessages);
         }
 
@@ -367,17 +293,14 @@ namespace DOL.GS.Spells
         {
             get
             {
-                var list = new List<string>();
+                var list = new List<string>
+                {
+                    $"Name: {Spell.Name}",
+                    string.Empty,
+                    $"Description: {Spell.Description}",
+                    string.Empty
+                };
 
-                // Name
-                list.Add("Name: " + Spell.Name);
-                list.Add(string.Empty);
-
-                // Description
-                list.Add("Description: " + Spell.Description);
-                list.Add(string.Empty);
-
-                // SpellType
                 if (!Spell.AllowBolt)
                 {
                     list.Add("Type: Any but bolts");
@@ -389,16 +312,16 @@ namespace DOL.GS.Spells
                 }
 
                 // Cast
-                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.CastingTime", (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'")));
+                list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.CastingTime", (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'")));
 
                 // Recast
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.RecastTime") + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.RecastTime")}{Spell.RecastDelay / 60000}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "DelveInfo.RecastTime") + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"{LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.RecastTime")}{Spell.RecastDelay / 1000} sec");
                 }
 
                 return list;

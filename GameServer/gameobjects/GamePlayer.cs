@@ -10508,9 +10508,9 @@ break;
                     {
                         bool castOk = spellHandler.StartReuseTimer;
 
-                        if (spell.SubSpellID > 0)
+                        if (spell.SubSpellId > 0)
                         {
-                            Spell subspell = SkillBase.GetSpellByID(spell.SubSpellID);
+                            Spell subspell = SkillBase.GetSpellByID(spell.SubSpellId);
                             if (subspell != null)
                             {
                                 ISpellHandler subSpellHandler = ScriptMgr.CreateSpellHandler(this, subspell, chargeEffectLine);

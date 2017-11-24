@@ -22,6 +22,7 @@ using DOL.GS.PacketHandler;
 using DOL.GS.PropertyCalc;
 using DOL.AI.Brain;
 using System;
+using log4net;
 
 namespace DOL.GS.Spells
 {
@@ -32,7 +33,7 @@ namespace DOL.GS.Spells
 
     public abstract class PropertyChangingSpell : SpellHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Execute property changing spell
@@ -40,7 +41,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -55,7 +56,7 @@ namespace DOL.GS.Spells
             double duration = Spell.Duration;
             if (HasPositiveEffect)
             {
-                duration *= 1.0 + m_caster.GetModified(eProperty.SpellDuration) * 0.01;
+                duration *= 1.0 + Caster.GetModified(eProperty.SpellDuration) * 0.01;
                 if (Spell.InstrumentRequirement != 0)
                 {
                     InventoryItem instrument = Caster.AttackWeapon;
@@ -85,10 +86,9 @@ namespace DOL.GS.Spells
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             // vampiir, they cannot be buffed except with resists/armor factor/ haste / power regen
-            GamePlayer player = target as GamePlayer;
-            if (player != null)
+            if (target is GamePlayer player)
             {
-                if (HasPositiveEffect && player.CharacterClass.ID == (int)eCharacterClass.Vampiir && m_caster != player)
+                if (HasPositiveEffect && player.CharacterClass.ID == (int)eCharacterClass.Vampiir && Caster != player)
                 {
                     // restrictions
                     // if (this is PropertyChangingSpell
@@ -101,8 +101,7 @@ namespace DOL.GS.Spells
                     // {
                     if (this is StrengthBuff || this is DexterityBuff || this is ConstitutionBuff || this is QuicknessBuff || this is StrengthConBuff || this is DexterityQuiBuff || this is AcuityBuff)
                     {
-                        GamePlayer caster = m_caster as GamePlayer;
-                        if (caster != null)
+                        if (Caster is GamePlayer caster)
                         {
                             caster.Out.SendMessage("Your buff has no effect on the Vampiir!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }
@@ -113,7 +112,7 @@ namespace DOL.GS.Spells
 
                     if (this is ArmorFactorBuff)
                     {
-                        if (FindEffectOnTarget(target, "ArmorFactorBuff") != null && m_spellLine.IsBaseLine != true)
+                        if (FindEffectOnTarget(target, "ArmorFactorBuff") != null && SpellLine.IsBaseLine != true)
                         {
                             MessageToLiving(target, "You already have this effect!", eChatType.CT_SpellResisted);
                             return;
@@ -174,97 +173,96 @@ namespace DOL.GS.Spells
 
             // Xali: buffs/debuffs are now efficient on pets
             #region Petbuffs
-            if (effect.Owner is GameNPC)
-            {
-                if ((effect.Owner as GameNPC).Brain is ControlledNpcBrain)
-                {
-                    // Increase Pet's ArmorAbsorb/MagicAbsorb with Buffs
-                    if (this is StrengthBuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.MeleeDamage] += (int)(((Spell.Value / 100) * Spell.Level) / 2);
-                    }
-                    else if (this is ConstitutionBuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Body] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Energy] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Cold] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Heat] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Matter] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Spirit] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                    }
-                    else if (this is ArmorFactorBuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                    }
-                    else if (this is DexterityBuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                    }
-                    else if (this is QuicknessBuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.MeleeSpeed] += (int)(((Spell.Value / 100) * Spell.Level) / 6);
-                    }
-                    else if (this is StrengthConBuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.MeleeDamage] += (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Body] += (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Energy] += (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Cold] += (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Heat] += (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Matter] += (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Spirit] += (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                    }
-                    else if (this is DexterityQuiBuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.MeleeSpeed] += (int)(((Spell.Value / 100) * Spell.Level) / 6);
-                    }
 
-                    // Decrease Pet's ArmorAbsorb/MagicAbsorb with DeBuffs
-                    else if (this is StrengthDebuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.MeleeDamage] -= (int)(((Spell.Value / 100) * Spell.Level) / 2);
-                    }
-                    else if (this is ConstitutionDebuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Body] -= (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Energy] -= (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Cold] -= (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Heat] -= (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Matter] -= (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Spirit] -= (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                    }
-                    else if (this is ArmorFactorDebuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                    }
-                    else if (this is DexterityDebuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)(((Spell.Value / 100) * Spell.Level) / 4);
-                    }
-                    else if (this is QuicknessDebuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.MeleeSpeed] -= (int)(((Spell.Value / 100) * Spell.Level) / 6);
-                    }
-                    else if (this is StrengthConDebuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.MeleeDamage] -= (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Body] -= (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Energy] -= (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Cold] -= (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Heat] -= (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Matter] -= (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.Resist_Spirit] -= (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                    }
-                    else if (this is DexterityQuiDebuff)
-                    {
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)(((Spell.Value / 100) * Spell.Level) / 8);
-                        (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.MeleeSpeed] -= (int)(((Spell.Value / 100) * Spell.Level) / 6);
-                    }
+            if ((effect.Owner as GameNPC)?.Brain is ControlledNpcBrain)
+            {
+                // Increase Pet's ArmorAbsorb/MagicAbsorb with Buffs
+                if (this is StrengthBuff)
+                {
+                    (effect.Owner as GameNPC).AbilityBonus[(int)eProperty.MeleeDamage] += (int)(((Spell.Value / 100) * Spell.Level) / 2);
+                }
+                else if (this is ConstitutionBuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Body] += (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Energy] += (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Cold] += (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Heat] += (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Matter] += (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Spirit] += (int)(Spell.Value / 100 * Spell.Level / 4);
+                }
+                else if (this is ArmorFactorBuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
+                }
+                else if (this is DexterityBuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)(((Spell.Value / 100) * Spell.Level) / 4);
+                }
+                else if (this is QuicknessBuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.MeleeSpeed] += (int)(((Spell.Value / 100) * Spell.Level) / 6);
+                }
+                else if (this is StrengthConBuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.MeleeDamage] += (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Body] += (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Energy] += (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Cold] += (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Heat] += (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Matter] += (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Spirit] += (int)(Spell.Value / 100 * Spell.Level / 8);
+                }
+                else if (this is DexterityQuiBuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.MeleeSpeed] += (int)(Spell.Value / 100 * Spell.Level / 6);
+                }
+
+                // Decrease Pet's ArmorAbsorb/MagicAbsorb with DeBuffs
+                else if (this is StrengthDebuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.MeleeDamage] -= (int)(((Spell.Value / 100) * Spell.Level) / 2);
+                }
+                else if (this is ConstitutionDebuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Body] -= (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Energy] -= (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Cold] -= (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Heat] -= (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Matter] -= (int)(Spell.Value / 100 * Spell.Level / 4);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Spirit] -= (int)(Spell.Value / 100 * Spell.Level / 4);
+                }
+                else if (this is ArmorFactorDebuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)(Spell.Value / 100 * Spell.Level / 4);
+                }
+                else if (this is DexterityDebuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)(Spell.Value / 100 * Spell.Level / 4);
+                }
+                else if (this is QuicknessDebuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.MeleeSpeed] -= (int)(Spell.Value / 100 * Spell.Level / 6);
+                }
+                else if (this is StrengthConDebuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.MeleeDamage] -= (int)((Spell.Value / 100 * Spell.Level) / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Body] -= (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Energy] -= (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Cold] -= (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Heat] -= (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Matter] -= (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.Resist_Spirit] -= (int)(Spell.Value / 100 * Spell.Level / 8);
+                }
+                else if (this is DexterityQuiDebuff)
+                {
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)(Spell.Value / 100 * Spell.Level / 8);
+                    ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.MeleeSpeed] -= (int)(Spell.Value / 100 * Spell.Level / 6);
                 }
             }
+
             #endregion
 
             SendUpdates(effect.Owner);
@@ -280,30 +278,26 @@ namespace DOL.GS.Spells
 
             GameLiving player = null;
 
-            if (Caster is GameNPC && (Caster as GameNPC).Brain is IControlledBrain)
+            if ((Caster as GameNPC)?.Brain is IControlledBrain)
             {
-                player = ((Caster as GameNPC).Brain as IControlledBrain).Owner;
+                player = (((GameNPC) Caster).Brain as IControlledBrain)?.Owner;
             }
-            else if (effect.Owner is GameNPC && (effect.Owner as GameNPC).Brain is IControlledBrain)
+            else if ((effect.Owner as GameNPC)?.Brain is IControlledBrain)
             {
-                player = ((effect.Owner as GameNPC).Brain as IControlledBrain).Owner;
+                player = (((GameNPC) effect.Owner).Brain as IControlledBrain)?.Owner;
             }
 
             if (player != null)
             {
                 // Controlled NPC. Show message in blue writing to owner...
-                MessageToLiving(player, string.Format(
-                    Spell.Message2,
-                                                      effect.Owner.GetName(0, true)), toLiving);
+                MessageToLiving(player, string.Format(Spell.Message2, effect.Owner.GetName(0, true)), toLiving);
 
                 // ...and in white writing for everyone else.
                 foreach (GamePlayer gamePlayer in effect.Owner.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
                 {
                     if (gamePlayer != player)
                     {
-                        MessageToLiving(gamePlayer, string.Format(
-                            Spell.Message2,
-                                                                  effect.Owner.GetName(0, true)), toOther);
+                        MessageToLiving(gamePlayer, string.Format(Spell.Message2, effect.Owner.GetName(0, true)), toOther);
                     }
                 }
             }
@@ -320,7 +314,7 @@ namespace DOL.GS.Spells
             }
         }
 
-        BuffCheckAction m_buffCheckAction = null;
+        BuffCheckAction m_buffCheckAction;
 
         /// <summary>
         /// When an applied effect expires.
@@ -389,7 +383,7 @@ namespace DOL.GS.Spells
                 default:
                     if (log.IsErrorEnabled)
                     {
-                        log.Error("BonusCategory not found " + categoryid + "!");
+                        log.Error($"BonusCategory not found {categoryid}!");
                     }
 
                     break;
@@ -406,154 +400,97 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Property 2 which bonus value has to be changed
         /// </summary>
-        public virtual eProperty Property2
-        {
-            get { return eProperty.Undefined; }
-        }
+        public virtual eProperty Property2 => eProperty.Undefined;
 
         /// <summary>
         /// Property 3 which bonus value has to be changed
         /// </summary>
-        public virtual eProperty Property3
-        {
-            get { return eProperty.Undefined; }
-        }
+        public virtual eProperty Property3 => eProperty.Undefined;
 
         /// <summary>
         /// Property 4 which bonus value has to be changed
         /// </summary>
-        public virtual eProperty Property4
-        {
-            get { return eProperty.Undefined; }
-        }
+        public virtual eProperty Property4 => eProperty.Undefined;
 
         /// <summary>
         /// Property 5 which bonus value has to be changed
         /// </summary>
-        public virtual eProperty Property5
-        {
-            get { return eProperty.Undefined; }
-        }
+        public virtual eProperty Property5 => eProperty.Undefined;
 
         /// <summary>
         /// Property 6 which bonus value has to be changed
         /// </summary>
-        public virtual eProperty Property6
-        {
-            get { return eProperty.Undefined; }
-        }
+        public virtual eProperty Property6 => eProperty.Undefined;
 
         /// <summary>
         /// Property 7 which bonus value has to be changed
         /// </summary>
-        public virtual eProperty Property7
-        {
-            get { return eProperty.Undefined; }
-        }
+        public virtual eProperty Property7 => eProperty.Undefined;
 
         /// <summary>
         /// Property 8 which bonus value has to be changed
         /// </summary>
-        public virtual eProperty Property8
-        {
-            get { return eProperty.Undefined; }
-        }
+        public virtual eProperty Property8 => eProperty.Undefined;
 
         /// <summary>
         /// Property 9 which bonus value has to be changed
         /// </summary>
-        public virtual eProperty Property9
-        {
-            get { return eProperty.Undefined; }
-        }
+        public virtual eProperty Property9 => eProperty.Undefined;
 
         /// <summary>
         /// Property 10 which bonus value has to be changed
         /// </summary>
-        public virtual eProperty Property10
-        {
-            get { return eProperty.Undefined; }
-        }
+        public virtual eProperty Property10 => eProperty.Undefined;
 
         /// <summary>
         /// Bonus Category where to change the Property1
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory1
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.BaseBuff;
 
         /// <summary>
         /// Bonus Category where to change the Property2
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory2
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory2 => eBuffBonusCategory.BaseBuff;
 
         /// <summary>
         /// Bonus Category where to change the Property3
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory3
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory3 => eBuffBonusCategory.BaseBuff;
 
         /// <summary>
         /// Bonus Category where to change the Property4
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory4
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory4 => eBuffBonusCategory.BaseBuff;
 
         /// <summary>
         /// Bonus Category where to change the Property5
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory5
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory5 => eBuffBonusCategory.BaseBuff;
 
         /// <summary>
         /// Bonus Category where to change the Property6
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory6
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory6 => eBuffBonusCategory.BaseBuff;
 
         /// <summary>
         /// Bonus Category where to change the Property7
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory7
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory7 => eBuffBonusCategory.BaseBuff;
 
         /// <summary>
         /// Bonus Category where to change the Property8
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory8
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory8 => eBuffBonusCategory.BaseBuff;
 
         /// <summary>
         /// Bonus Category where to change the Property9
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory9
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory9 => eBuffBonusCategory.BaseBuff;
 
         /// <summary>
         /// Bonus Category where to change the Property10
         /// </summary>
-        public virtual eBuffBonusCategory BonusCategory10
-        {
-            get { return eBuffBonusCategory.BaseBuff; }
-        }
+        public virtual eBuffBonusCategory BonusCategory10 => eBuffBonusCategory.BaseBuff;
 
         public override void OnEffectRestored(GameSpellEffect effect, int[] vars)
         {
@@ -604,10 +541,9 @@ namespace DOL.GS.Spells
         /// <param name="IsSubstracted"></param>
         protected void ApplyBonus(GameLiving owner,  eBuffBonusCategory BonusCat, eProperty Property, int Value, bool IsSubstracted)
         {
-            IPropertyIndexer tblBonusCat;
             if (Property != eProperty.Undefined)
             {
-                tblBonusCat = GetBonusCategory(owner, BonusCat);
+                var tblBonusCat = GetBonusCategory(owner, BonusCat);
                 if (IsSubstracted)
                 {
                     tblBonusCat[(int)Property] -= Value;
@@ -640,9 +576,9 @@ namespace DOL.GS.Spells
     {
         public const int BUFFCHECKINTERVAL = 60000;// 60 seconds
 
-        private GameLiving m_caster = null;
-        private GameLiving m_owner = null;
-        private GameSpellEffect m_effect = null;
+        private readonly GameLiving m_caster;
+        private readonly GameLiving m_owner;
+        private readonly GameSpellEffect m_effect;
 
         public BuffCheckAction(GameLiving caster, GameLiving owner, GameSpellEffect effect)
             : base(caster)

@@ -44,8 +44,8 @@ namespace DOL.GS.Spells
             base.ApplyEffectOnTarget(target, effectiveness);
 
             m_pet.TempProperties.setProperty("target", target);
-            (m_pet.Brain as IOldAggressiveBrain).AddToAggroList(target, 1);
-            (m_pet.Brain as ProcPetBrain).Think();
+            (m_pet.Brain as IOldAggressiveBrain)?.AddToAggroList(target, 1);
+            (m_pet.Brain as ProcPetBrain)?.Think();
         }
 
         protected override GamePet GetGamePet(INpcTemplate template) { return new AstralPet(template); }
@@ -56,21 +56,17 @@ namespace DOL.GS.Spells
 
         protected override void OnNpcReleaseCommand(DOLEvent e, object sender, EventArgs arguments)
         {
-            if (!(sender is GameNPC) || !((sender as GameNPC).Brain is IControlledBrain))
+            if (!((sender as GameNPC)?.Brain is IControlledBrain))
             {
                 return;
             }
 
-            GameNPC pet = sender as GameNPC;
-            IControlledBrain brain = pet.Brain as IControlledBrain;
+            GameNPC pet = (GameNPC) sender;
 
             GameEventMgr.RemoveHandler(pet, GameLivingEvent.PetReleased, new DOLEventHandler(OnNpcReleaseCommand));
 
             Effects.GameSpellEffect effect = FindEffectOnTarget(pet, this);
-            if (effect != null)
-            {
-                effect.Cancel(false);
-            }
+            effect?.Cancel(false);
         }
 
         protected override void GetPetLocation(out int x, out int y, out int z, out ushort heading, out Region region)
@@ -88,10 +84,7 @@ namespace DOL.GS
 {
     public class AstralPet : GamePet
     {
-        public override int MaxHealth
-        {
-            get { return Level * 10; }
-        }
+        public override int MaxHealth => Level * 10;
 
         public override void OnAttackedByEnemy(AttackData ad) { }
 

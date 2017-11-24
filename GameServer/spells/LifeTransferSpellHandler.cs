@@ -46,10 +46,9 @@ namespace DOL.GS.Spells
             }
 
             bool healed = false;
-            int transferHeal;
-            double spellValue = m_spell.Value;
+            double spellValue = Spell.Value;
 
-            transferHeal = (int)(Caster.MaxHealth / 100 * Math.Abs(spellValue));
+            var transferHeal = (int)(Caster.MaxHealth / 100 * Math.Abs(spellValue));
 
             // Needed to prevent divide by zero error
             if (transferHeal <= 0)
@@ -72,7 +71,6 @@ namespace DOL.GS.Spells
                     MessageToCaster("Your target is diseased!", eChatType.CT_SpellResisted);
                     healed |= HealTarget(healTarget,  transferHeal >>= 1);
                 }
-
                 else
                 {
                     healed |= HealTarget(healTarget, transferHeal);
@@ -81,12 +79,12 @@ namespace DOL.GS.Spells
 
             if (!healed && Spell.Target == "Realm")
             {
-                m_caster.Mana -= PowerCost(target) >> 1;    // only 1/2 power if no heal
+                Caster.Mana -= PowerCost(target) >> 1;    // only 1/2 power if no heal
             }
             else
             {
-                m_caster.Mana -= PowerCost(target);
-                m_caster.Health -= transferHeal >> 1;
+                Caster.Mana -= PowerCost(target);
+                Caster.Health -= transferHeal >> 1;
             }
 
             // send animation for non pulsing spells only
@@ -131,11 +129,11 @@ namespace DOL.GS.Spells
 
             if (!target.IsAlive)
             {
-                MessageToCaster(target.GetName(0, true) + " is dead!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.GetName(0, true)} is dead!", eChatType.CT_SpellResisted);
                 return false;
             }
 
-            if (m_caster == target)
+            if (Caster == target)
             {
                 MessageToCaster("You cannot transfer life to yourself.", eChatType.CT_SpellResisted);
                 return false;
@@ -153,41 +151,37 @@ namespace DOL.GS.Spells
 
             long healedrp = 0;
 
-            if (m_caster is NecromancerPet &&
-                ((m_caster as NecromancerPet).Brain as IControlledBrain).GetPlayerOwner() != null
-                || m_caster is GamePlayer)
+            if (((Caster as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || Caster is GamePlayer)
             {
 
-                if (target is NecromancerPet && ((target as NecromancerPet).Brain as IControlledBrain).GetPlayerOwner() != null || target is GamePlayer)
+                if (((target as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || target is GamePlayer)
                 {
                     if (target.DamageRvRMemory > 0)
                     {
-                        healedrp = (long)Math.Max(heal, 0);
+                        healedrp = Math.Max(heal, 0);
                         target.DamageRvRMemory -= healedrp;
                     }
                 }
             }
 
-            if (healedrp > 0 && m_caster != target && m_spellLine.KeyName != GlobalSpellsLines.Item_Spells &&
-                m_caster.CurrentRegionID != 242 && m_spell.Pulse == 0) // On Exclu zone COOP
+            if (healedrp > 0 && Caster != target && SpellLine.KeyName != GlobalSpellsLines.Item_Spells &&
+                Caster.CurrentRegionID != 242 && Spell.Pulse == 0) // On Exclu zone COOP
             {
-                GamePlayer joueur_a_considerer = m_caster is NecromancerPet ? ((m_caster as NecromancerPet).Brain as IControlledBrain).GetPlayerOwner() : m_caster as GamePlayer;
+                GamePlayer joueur_a_considerer = Caster is NecromancerPet pet ? (pet.Brain as IControlledBrain)?.GetPlayerOwner() : Caster as GamePlayer;
 
                 int POURCENTAGE_SOIN_RP = ServerProperties.Properties.HEAL_PVP_DAMAGE_VALUE_RP; // ...% de bonus RP pour les soins effectués
                 long Bonus_RP_Soin = Convert.ToInt64((double)healedrp * POURCENTAGE_SOIN_RP / 100);
 
                 if (Bonus_RP_Soin >= 1)
                 {
-                    PlayerStatistics stats = joueur_a_considerer.Statistics as PlayerStatistics;
-
-                    if (stats != null)
+                    if (joueur_a_considerer.Statistics is PlayerStatistics stats)
                     {
                         stats.RPEarnedFromHitPointsHealed += (uint)Bonus_RP_Soin;
                         stats.HitPointsHealed += (uint)healedrp;
                     }
 
                     joueur_a_considerer.GainRealmPoints(Bonus_RP_Soin, false);
-                    joueur_a_considerer.Out.SendMessage("Vous gagnez " + Bonus_RP_Soin.ToString() + " points de royaume pour avoir soigné un membre de votre royaume.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    joueur_a_considerer.Out.SendMessage($"Vous gagnez {Bonus_RP_Soin} points de royaume pour avoir soigné un membre de votre royaume.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
             }
 
@@ -197,17 +191,17 @@ namespace DOL.GS.Spells
             {
                 if (Spell.Pulse == 0)
                 {
-                    MessageToCaster(target.GetName(0, true) + " is fully healed.", eChatType.CT_SpellResisted);
+                    MessageToCaster($"{target.GetName(0, true)} is fully healed.", eChatType.CT_SpellResisted);
                 }
 
                 return false;
             }
 
-            MessageToCaster("You heal " + target.GetName(0, false) + " for " + heal + " hit points!", eChatType.CT_Spell);
-            MessageToLiving(target, "You are healed by " + m_caster.GetName(0, false) + " for " + heal + " hit points.", eChatType.CT_Spell);
+            MessageToCaster($"You heal {target.GetName(0, false)} for {heal} hit points!", eChatType.CT_Spell);
+            MessageToLiving(target, $"You are healed by {Caster.GetName(0, false)} for {heal} hit points.", eChatType.CT_Spell);
             if (heal < amount)
             {
-                MessageToCaster(target.GetName(0, true) + " is fully healed.", eChatType.CT_Spell);
+                MessageToCaster($"{target.GetName(0, true)} is fully healed.", eChatType.CT_Spell);
             }
 
             return true;

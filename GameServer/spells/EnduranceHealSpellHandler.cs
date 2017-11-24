@@ -42,9 +42,7 @@ namespace DOL.GS.Spells
             }
 
             bool healed = false;
-            int minHeal;
-            int maxHeal;
-            CalculateHealVariance(out minHeal, out maxHeal);
+            CalculateHealVariance(out var minHeal, out var maxHeal);
 
             foreach (GameLiving healTarget in targets)
             {
@@ -90,7 +88,7 @@ namespace DOL.GS.Spells
 
         protected virtual void RemoveFromStat(int value)
         {
-            m_caster.Mana -= value;
+            Caster.Mana -= value;
         }
 
         /// <summary>
@@ -101,7 +99,7 @@ namespace DOL.GS.Spells
         /// <returns>true if heal was done</returns>
         public virtual bool HealTarget(GameLiving target, int amount)
         {
-            if (target == null || target.ObjectState != GameLiving.eObjectState.Active)
+            if (target == null || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return false;
             }
@@ -115,7 +113,7 @@ namespace DOL.GS.Spells
             if (!target.IsAlive)
             {
                 // "You cannot heal the dead!" sshot550.tga
-                MessageToCaster(target.GetName(0, true) + " is dead!", eChatType.CT_SpellResisted);
+                MessageToCaster($"{target.GetName(0, true)} is dead!", eChatType.CT_SpellResisted);
                 return false;
             }
 
@@ -125,22 +123,22 @@ namespace DOL.GS.Spells
             {
                 if (Spell.Pulse == 0)
                 {
-                    if (target == m_caster)
+                    if (target == Caster)
                     {
                         MessageToCaster("Your endurance is full.", eChatType.CT_SpellResisted);
                     }
                     else
                     {
-                        MessageToCaster(target.GetName(0, true) + " endurance is full.", eChatType.CT_SpellResisted);
+                        MessageToCaster($"{target.GetName(0, true)} endurance is full.", eChatType.CT_SpellResisted);
                     }
                 }
 
                 return false;
             }
 
-            if (m_caster == target)
+            if (Caster == target)
             {
-                MessageToCaster("You restore " + heal + " endurance points.", eChatType.CT_Spell);
+                MessageToCaster($"You restore {heal} endurance points.", eChatType.CT_Spell);
                 if (heal < amount)
                 {
                     MessageToCaster("Your endurance is full.", eChatType.CT_Spell);
@@ -149,7 +147,7 @@ namespace DOL.GS.Spells
             else
             {
                 MessageToCaster("You restore " + target.GetName(0, false) + " for " + heal + " ednurance points!", eChatType.CT_Spell);
-                MessageToLiving(target, "Your endurance was restored by " + m_caster.GetName(0, false) + " for " + heal + " points.", eChatType.CT_Spell);
+                MessageToLiving(target, "Your endurance was restored by " + Caster.GetName(0, false) + " for " + heal + " points.", eChatType.CT_Spell);
                 if (heal < amount)
                 {
                     MessageToCaster(target.GetName(0, true) + " endurance is full.", eChatType.CT_Spell);
@@ -166,17 +164,15 @@ namespace DOL.GS.Spells
         /// <param name="max">store max variance here</param>
         public virtual void CalculateHealVariance(out int min, out int max)
         {
-            double spellValue = m_spell.Value;
-            GamePlayer casterPlayer = m_caster as GamePlayer;
+            double spellValue = Spell.Value;
 
             // percents if less than zero
             if (spellValue < 0)
             {
-                spellValue = (spellValue * -0.01) * m_caster.MaxEndurance;
+                spellValue = spellValue * -0.01 * Caster.MaxEndurance;
             }
 
             min = max = (int)spellValue;
-            return;
         }
 
         public override bool CheckBeginCast(GameLiving selectedTarget)

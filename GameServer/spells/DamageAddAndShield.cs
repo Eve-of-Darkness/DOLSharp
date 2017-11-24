@@ -37,7 +37,7 @@ namespace DOL.GS.Spells
         /// <summary>
         /// The event type to hook on
         /// </summary>
-        protected override DOLEvent EventType { get { return GameLivingEvent.AttackFinished; } }
+        protected override DOLEvent EventType => GameLivingEvent.AttackFinished;
 
         public virtual double DPSCap(int Level)
         {
@@ -52,8 +52,7 @@ namespace DOL.GS.Spells
         /// <param name="arguments"></param>
         protected override void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackFinishedEventArgs atkArgs = arguments as AttackFinishedEventArgs;
-            if (atkArgs == null)
+            if (!(arguments is AttackFinishedEventArgs atkArgs))
             {
                 return;
             }
@@ -65,12 +64,8 @@ namespace DOL.GS.Spells
             }
 
             GameLiving target = atkArgs.AttackData.Target;
-            if (target == null)
-            {
-                return;
-            }
 
-            if (target.ObjectState != GameObject.eObjectState.Active)
+            if (target?.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -85,8 +80,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            GameLiving attacker = sender as GameLiving;
-            if (attacker == null)
+            if (!(sender is GameLiving attacker))
             {
                 return;
             }
@@ -115,20 +109,21 @@ namespace DOL.GS.Spells
                 damageResisted = damage * target.GetResist(Spell.DamageType) * -0.01;
             }
 
-            AttackData ad = new AttackData();
-            ad.Attacker = attacker;
-            ad.Target = target;
-            ad.Damage = (int)(damage + damageResisted);
-            ad.Modifier = (int)damageResisted;
-            ad.DamageType = Spell.DamageType;
-            ad.AttackType = AttackData.eAttackType.Spell;
-            ad.SpellHandler = this;
-            ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
+            AttackData ad = new AttackData
+            {
+                Attacker = attacker,
+                Target = target,
+                Damage = (int) (damage + damageResisted),
+                Modifier = (int) damageResisted,
+                DamageType = Spell.DamageType,
+                AttackType = AttackData.eAttackType.Spell,
+                SpellHandler = this,
+                AttackResult = GameLiving.eAttackResult.HitUnstyled
+            };
 
             if (ad.Attacker is GameNPC)
             {
-                IControlledBrain brain = ((GameNPC)ad.Attacker).Brain as IControlledBrain;
-                if (brain != null)
+                if (((GameNPC)ad.Attacker).Brain is IControlledBrain brain)
                 {
                     GamePlayer owner = brain.GetPlayerOwner();
                     if (owner != null)
@@ -140,9 +135,9 @@ namespace DOL.GS.Spells
             else
             {
                 GameClient attackerClient = null;
-                if (attacker is GamePlayer)
+                if (attacker is GamePlayer player)
                 {
-                    attackerClient = ((GamePlayer)attacker).Client;
+                    attackerClient = player.Client;
                 }
 
                 if (attackerClient != null)
@@ -152,9 +147,9 @@ namespace DOL.GS.Spells
             }
 
             GameClient targetClient = null;
-            if (target is GamePlayer)
+            if (target is GamePlayer gamePlayer)
             {
-                targetClient = ((GamePlayer)target).Client;
+                targetClient = gamePlayer.Client;
             }
 
             if (targetClient != null)
@@ -167,12 +162,7 @@ namespace DOL.GS.Spells
 
             foreach (GamePlayer player in ad.Attacker.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                if (player == null)
-                {
-                    continue;
-                }
-
-                player.Out.SendCombatAnimation(null, target, 0, 0, 0, 0, 0x0A, target.HealthPercent);
+                player?.Out.SendCombatAnimation(null, target, 0, 0, 0, 0, 0x0A, target.HealthPercent);
             }
         }
 
@@ -190,7 +180,7 @@ namespace DOL.GS.Spells
         /// <summary>
         /// The event type to hook on
         /// </summary>
-        protected override DOLEvent EventType { get { return GameLivingEvent.AttackedByEnemy; } }
+        protected override DOLEvent EventType => GameLivingEvent.AttackedByEnemy;
 
         /// <summary>
         /// Handler fired whenever effect target is attacked
@@ -200,8 +190,7 @@ namespace DOL.GS.Spells
         /// <param name="arguments"></param>
         protected override void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackedByEnemyEventArgs args = arguments as AttackedByEnemyEventArgs;
-            if (args == null)
+            if (!(arguments is AttackedByEnemyEventArgs args))
             {
                 return;
             }
@@ -217,8 +206,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            GameLiving attacker = sender as GameLiving; // sender is target of attack, becomes attacker for damage shield
-            if (attacker == null)
+            if (!(sender is GameLiving attacker))
             {
                 return;
             }
@@ -234,12 +222,8 @@ namespace DOL.GS.Spells
             }
 
             GameLiving target = args.AttackData.Attacker; // attacker becomes target for damage shield
-            if (target == null)
-            {
-                return;
-            }
 
-            if (target.ObjectState != GameObject.eObjectState.Active)
+            if (target?.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -270,8 +254,6 @@ namespace DOL.GS.Spells
             ad.AttackType = AttackData.eAttackType.Spell;
             ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
 
-            GamePlayer owner = null;
-
             GameClient attackerClient = null;
             if (attacker is GamePlayer)
             {
@@ -281,13 +263,10 @@ namespace DOL.GS.Spells
             if (ad.Attacker is GameNPC)
             {
                 IControlledBrain brain = ((GameNPC)ad.Attacker).Brain as IControlledBrain;
-                if (brain != null)
+                var owner = brain?.GetPlayerOwner();
+                if (owner?.ControlledBrain != null && ad.Attacker == owner.ControlledBrain.Body)
                 {
-                    owner = brain.GetPlayerOwner();
-                    if (owner != null && owner.ControlledBrain != null && ad.Attacker == owner.ControlledBrain.Body)
-                    {
-                        MessageToLiving(owner, string.Format(LanguageMgr.GetTranslation(owner.Client, "DamageAddAndShield.EventHandlerDS.YourHitFor"), ad.Attacker.Name, target.GetName(0, false), ad.Damage), eChatType.CT_Spell);
-                    }
+                    MessageToLiving(owner, string.Format(LanguageMgr.GetTranslation(owner.Client, "DamageAddAndShield.EventHandlerDS.YourHitFor"), ad.Attacker.Name, target.GetName(0, false), ad.Damage), eChatType.CT_Spell);
                 }
             }
             else if (attackerClient != null)
@@ -296,9 +275,9 @@ namespace DOL.GS.Spells
             }
 
             GameClient targetClient = null;
-            if (target is GamePlayer)
+            if (target is GamePlayer gamePlayer)
             {
-                targetClient = ((GamePlayer)target).Client;
+                targetClient = gamePlayer.Client;
             }
 
             if (targetClient != null)
@@ -310,12 +289,7 @@ namespace DOL.GS.Spells
             attacker.DealDamage(ad);
             foreach (GamePlayer player in attacker.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                if (player == null)
-                {
-                    continue;
-                }
-
-                player.Out.SendCombatAnimation(null, target, 0, 0, 0, 0, 0x14, target.HealthPercent);
+                player?.Out.SendCombatAnimation(null, target, 0, 0, 0, 0, 0x14, target.HealthPercent);
             }
 
             // Log.Debug(String.Format("spell damage: {0}; damage: {1}; resisted damage: {2}; damage type {3}; minSpread {4}.", Spell.Damage, ad.Damage, ad.Modifier, ad.DamageType, m_minDamageSpread));
@@ -353,7 +327,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -366,7 +340,7 @@ namespace DOL.GS.Spells
         protected override int CalculateEffectDuration(GameLiving target, double effectiveness)
         {
             double duration = Spell.Duration;
-            duration *= 1.0 + m_caster.GetModified(eProperty.SpellDuration) * 0.01;
+            duration *= 1.0 + Caster.GetModified(eProperty.SpellDuration) * 0.01;
             return (int)duration;
         }
 
@@ -378,7 +352,7 @@ namespace DOL.GS.Spells
             // set min spread based on spec
             if (Caster is GamePlayer)
             {
-                int lineSpec = Caster.GetModifiedSpecLevel(m_spellLine.Spec);
+                int lineSpec = Caster.GetModifiedSpecLevel(SpellLine.Spec);
                 m_minDamageSpread = 50;
                 if (Spell.Level > 0)
                 {

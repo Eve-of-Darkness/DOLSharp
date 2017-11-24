@@ -37,10 +37,10 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             if ((target is Keeps.GameKeepDoor || target is Keeps.GameKeepComponent) && Spell.SpellType != "SiegeArrow")
             {
-                MessageToCaster(string.Format("Your spell has no effect on the {0}!", target.Name), eChatType.CT_SpellResisted);
+                MessageToCaster($"Your spell has no effect on the {target.Name}!", eChatType.CT_SpellResisted);
                 return;
             }
 
@@ -96,11 +96,11 @@ namespace DOL.GS.Spells
 
         private void DealDamage(GameLiving target)
         {
-            int ticksToTarget = m_caster.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
+            int ticksToTarget = Caster.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
             int delay = 1 + ticksToTarget / 100;
             foreach (GamePlayer player in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                player.Out.SendSpellEffectAnimation(m_caster, target, m_spell.ClientEffect, (ushort)delay, false, 1);
+                player.Out.SendSpellEffectAnimation(Caster, target, Spell.ClientEffect, (ushort)delay, false, 1);
             }
 
             BoltOnTargetAction bolt = new BoltOnTargetAction(Caster, target, this);
@@ -131,18 +131,8 @@ namespace DOL.GS.Spells
             /// <param name="spellHandler"></param>
             public BoltOnTargetAction(GameLiving actionSource, GameLiving boltTarget, BoltSpellHandler spellHandler) : base(actionSource)
             {
-                if (boltTarget == null)
-                {
-                    throw new ArgumentNullException("boltTarget");
-                }
-
-                if (spellHandler == null)
-                {
-                    throw new ArgumentNullException("spellHandler");
-                }
-
-                m_boltTarget = boltTarget;
-                m_handler = spellHandler;
+                m_boltTarget = boltTarget ?? throw new ArgumentNullException(nameof(boltTarget));
+                m_handler = spellHandler ?? throw new ArgumentNullException(nameof(spellHandler));
             }
 
             /// <summary>
@@ -152,12 +142,8 @@ namespace DOL.GS.Spells
             {
                 GameLiving target = m_boltTarget;
                 GameLiving caster = (GameLiving)m_actionSource;
-                if (target == null)
-                {
-                    return;
-                }
 
-                if (target.CurrentRegionID != caster.CurrentRegionID)
+                if (target?.CurrentRegionID != caster.CurrentRegionID)
                 {
                     return;
                 }
@@ -208,7 +194,7 @@ namespace DOL.GS.Spells
                     missrate += targetAD.Style.BonusToDefense;
                 }
 
-                AttackData ad = m_handler.CalculateDamageToTarget(target, 0.5 - (caster.GetModified(eProperty.SpellDamage) * 0.01));
+                AttackData ad = m_handler.CalculateDamageToTarget(target, 0.5 - caster.GetModified(eProperty.SpellDamage) * 0.01);
 
                 if (Util.Chance(missrate))
                 {
@@ -219,8 +205,7 @@ namespace DOL.GS.Spells
                     target.StartInterruptTimer(target.SpellInterruptDuration, ad.AttackType, caster);
                     if (target is GameNPC)
                     {
-                        IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
-                        if (aggroBrain != null)
+                        if (((GameNPC)target).Brain is IOldAggressiveBrain aggroBrain)
                         {
                             aggroBrain.AddToAggroList(caster, 1);
                         }
@@ -229,13 +214,12 @@ namespace DOL.GS.Spells
                     return;
                 }
 
-                ad.Damage = (int)((double)ad.Damage * (1.0 + caster.GetModified(eProperty.SpellDamage) * 0.01));
+                ad.Damage = (int)(ad.Damage * (1.0 + caster.GetModified(eProperty.SpellDamage) * 0.01));
 
                 // Block
                 bool blocked = false;
-                if (target is GamePlayer)
+                if (target is GamePlayer player)
                 { // mobs left out yet
-                    GamePlayer player = (GamePlayer)target;
                     InventoryItem lefthand = player.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
                     if (lefthand != null && (player.AttackWeapon == null || player.AttackWeapon.Item_Type == Slot.RIGHTHAND || player.AttackWeapon.Item_Type == Slot.LEFTHAND))
                     {
@@ -265,10 +249,7 @@ namespace DOL.GS.Spells
                                     // You cannot engage a mob that was attacked within the last X seconds...
                                     if (engage.EngageTarget.LastAttackedByEnemyTick > engage.EngageTarget.CurrentRegion.Time - EngageAbilityHandler.ENGAGE_ATTACK_DELAY_TICK)
                                     {
-                                        if (engage.Owner is GamePlayer)
-                                        {
-                                            (engage.Owner as GamePlayer).Out.SendMessage(engage.EngageTarget.GetName(0, true) + " has been attacked recently and you are unable to engage.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                        }
+                                        (engage.Owner as GamePlayer)?.Out.SendMessage(engage.EngageTarget.GetName(0, true) + " has been attacked recently and you are unable to engage.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                     } // Check if player has enough endurance left to engage
                                     else if (engage.Owner.Endurance < EngageAbilityHandler.ENGAGE_DURATION_LOST)
                                     {
@@ -277,10 +258,7 @@ namespace DOL.GS.Spells
                                     else
                                     {
                                         engage.Owner.Endurance -= EngageAbilityHandler.ENGAGE_DURATION_LOST;
-                                        if (engage.Owner is GamePlayer)
-                                        {
-                                            (engage.Owner as GamePlayer).Out.SendMessage("You concentrate on blocking the blow!", eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
-                                        }
+                                        (engage.Owner as GamePlayer)?.Out.SendMessage("You concentrate on blocking the blow!", eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
 
                                         if (blockchance < 85)
                                         {
@@ -292,8 +270,8 @@ namespace DOL.GS.Spells
 
                             if (blockchance >= Util.Random(1, 100))
                             {
-                                m_handler.MessageToLiving(player, "You partially block " + caster.GetName(0, false) + "'s spell!", eChatType.CT_Missed);
-                                m_handler.MessageToCaster(player.GetName(0, true) + " blocks!", eChatType.CT_YouHit);
+                                m_handler.MessageToLiving(player, $"You partially block {caster.GetName(0, false)}\'s spell!", eChatType.CT_Missed);
+                                m_handler.MessageToCaster($"{player.GetName(0, true)} blocks!", eChatType.CT_YouHit);
                                 blocked = true;
                             }
                         }
@@ -307,9 +285,9 @@ namespace DOL.GS.Spells
                 {
                     // TODO: armor resists to damage type
                     double damage = m_handler.Spell.Damage / 2; // another half is physical damage
-                    if (target is GamePlayer)
+                    if (target is GamePlayer gamePlayer)
                     {
-                        ad.ArmorHitLocation = ((GamePlayer)target).CalculateArmorHitLocation(ad);
+                        ad.ArmorHitLocation = gamePlayer.CalculateArmorHitLocation(ad);
                     }
 
                     InventoryItem armor = null;
@@ -346,7 +324,7 @@ namespace DOL.GS.Spells
 
                 if (blocked == false && ad.CriticalDamage > 0)
                 {
-                    int critMax = (target is GamePlayer) ? ad.Damage / 2 : ad.Damage;
+                    int critMax = target is GamePlayer ? ad.Damage / 2 : ad.Damage;
                     ad.CriticalDamage = Util.Random(critMax / 10, critMax);
                 }
 

@@ -34,7 +34,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -62,13 +62,9 @@ namespace DOL.GS.Spells
             MessageToLiving(effect.Owner, Spell.Message1, eChatType.CT_Spell);
             Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, false)), eChatType.CT_Spell, effect.Owner);
             effect.Owner.StartInterruptTimer(effect.Owner.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
-            if (effect.Owner is GameNPC)
+            if (effect.Owner is GameNPC npc && npc.Brain is IOldAggressiveBrain aggroBrain)
             {
-                IOldAggressiveBrain aggroBrain = ((GameNPC)effect.Owner).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
-                {
-                    aggroBrain.AddToAggroList(Caster, 1);
-                }
+                aggroBrain.AddToAggroList(Caster, 1);
             }
         }
 
@@ -82,7 +78,8 @@ namespace DOL.GS.Spells
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
             // effect.Owner.IsDisarmed = false;
-            if (!noMessages) {
+            if (!noMessages)
+            {
                 MessageToLiving(effect.Owner, Spell.Message3, eChatType.CT_SpellExpires);
                 Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message4, effect.Owner.GetName(0, false)), eChatType.CT_SpellExpires, effect.Owner);
             }
@@ -97,36 +94,38 @@ namespace DOL.GS.Spells
         {
             get
             {
-                var list = new List<string>();
+                var list = new List<string>
+                {
+                    $"Function: {(Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType)}",
+                    " ",
+                    Spell.Description,
+                    " "
+                };
 
-                list.Add("Function: " + (Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType));
-                list.Add(" "); // empty line
-                list.Add(Spell.Description);
-                list.Add(" "); // empty line
                 if (Spell.Duration != 0)
                 {
-                    list.Add(string.Format("Duration: {0}sec", (int)Spell.Duration / 1000));
+                    list.Add($"Duration: {Spell.Duration / 1000}sec");
                 }
 
-                list.Add("Target: " + Spell.Target);
+                list.Add($"Target: {Spell.Target}");
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
                 if (Spell.Power != 0)
                 {
-                    list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                    list.Add($"Power cost: {Spell.Power:0;0'%'}");
                 }
 
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                list.Add($"Casting time: {(Spell.CastTime * 0.001):0.0## sec;-0.0## sec;'instant'}");
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"Recast time: {Spell.RecastDelay / 60000}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"Recast time: {Spell.RecastDelay / 1000} sec");
                 }
 
                 return list;

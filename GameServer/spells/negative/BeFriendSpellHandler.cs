@@ -39,7 +39,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -58,8 +58,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            var npcTarget = target as GameNPC;
-            if (npcTarget == null)
+            if (!(target is GameNPC npcTarget))
             {
                 return;
             }
@@ -98,10 +97,7 @@ namespace DOL.GS.Spells
             friendBrain.Think();
 
             // Prevent Aggro on Effect Expires.
-            if (currentBrain != null)
-            {
-                currentBrain.ClearAggroList();
-            }
+            currentBrain?.ClearAggroList();
 
             base.OnEffectStart(effect);
         }
@@ -116,8 +112,7 @@ namespace DOL.GS.Spells
         {
             var npcTarget = effect.Owner as GameNPC;
 
-            FriendBrain fearBrain;
-            if (m_NPCFriendBrain.TryRemove(npcTarget, out fearBrain))
+            if (m_NPCFriendBrain.TryRemove(npcTarget, out var fearBrain))
             {
                 npcTarget.RemoveBrain(fearBrain);
             }

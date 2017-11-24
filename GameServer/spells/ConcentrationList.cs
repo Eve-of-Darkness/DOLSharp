@@ -47,14 +47,7 @@ namespace DOL.GS.Spells
         /// Holds the list owner
         /// </summary>
         private readonly GameLiving m_owner;
-        /// <summary>
-        /// Stores the used concentration points
-        /// </summary>
-        private short m_usedConcPoints;
-        /// <summary>
-        /// Stores the amount of concentration spells in the list
-        /// </summary>
-        private byte m_concSpellsCount;
+
         /// <summary>
         /// Stores the count of BeginChanges
         /// </summary>
@@ -70,12 +63,7 @@ namespace DOL.GS.Spells
         /// <param name="owner">The list owner</param>
         public ConcentrationList(GameLiving owner)
         {
-            if (owner == null)
-            {
-                throw new ArgumentNullException("owner");
-            }
-
-            m_owner = owner;
+            m_owner = owner ?? throw new ArgumentNullException(nameof(owner));
         }
 
         /// <summary>
@@ -97,7 +85,7 @@ namespace DOL.GS.Spells
                 {
                     if (log.IsWarnEnabled)
                     {
-                        log.WarnFormat("({0}) concentration effect already added: {1}", m_owner.Name, effect.Name);
+                        log.Warn($"({m_owner.Name}) concentration effect already added: {effect.Name}");
                     }
                 }
                 else
@@ -105,7 +93,7 @@ namespace DOL.GS.Spells
                     // no conc spells are always last in the list
                     if (m_concSpells.Count > 0)
                     {
-                        IConcentrationEffect lastEffect = (IConcentrationEffect)m_concSpells[m_concSpells.Count - 1];
+                        IConcentrationEffect lastEffect = m_concSpells[m_concSpells.Count - 1];
                         if (lastEffect.Concentration > 0)
                         {
                             m_concSpells.Add(effect);
@@ -122,8 +110,8 @@ namespace DOL.GS.Spells
 
                     if (effect.Concentration > 0)
                     {
-                        m_usedConcPoints += effect.Concentration;
-                        m_concSpellsCount++;
+                        UsedConcentration += effect.Concentration;
+                        ConcSpellsCount++;
                     }
                 }
             }
@@ -150,8 +138,8 @@ namespace DOL.GS.Spells
                     m_concSpells.Remove(effect);
                     if (effect.Concentration > 0)
                     {
-                        m_usedConcPoints -= effect.Concentration;
-                        m_concSpellsCount--;
+                        UsedConcentration -= effect.Concentration;
+                        ConcSpellsCount--;
                     }
 
                     CommitChanges();
@@ -174,7 +162,7 @@ namespace DOL.GS.Spells
         {
             if (m_concSpells != null)
             {
-                IConcentrationEffect[] concEffect = null;
+                IConcentrationEffect[] concEffect;
                 lock (m_lockObject)
                 {
                     concEffect = m_concSpells.ToArray();
@@ -214,8 +202,7 @@ namespace DOL.GS.Spells
                 m_changeCounter = 0;
             }
 
-            GamePlayer player = m_owner as GamePlayer;
-            if (player != null && m_changeCounter <= 0)
+            if (m_owner is GamePlayer player && m_changeCounter <= 0)
             {
                 player.Out.SendConcentrationList();
             }
@@ -235,7 +222,7 @@ namespace DOL.GS.Spells
 
             lock (m_lockObject) // Mannen 10:56 PM 10/30/2006 - Fixing every lock(this)
             {
-                return m_concSpells.FirstOrDefault(eff => eff.GetType().Equals(effectType));
+                return m_concSpells.FirstOrDefault(eff => eff.GetType() == effectType);
             }
         }
 
@@ -253,7 +240,7 @@ namespace DOL.GS.Spells
 
             lock (m_lockObject) // Mannen 10:56 PM 10/30/2006 - Fixing every lock(this)
             {
-                return m_concSpells.Where(eff => eff.GetType().Equals(effectType)).ToArray();
+                return m_concSpells.Where(eff => eff.GetType() == effectType).ToArray();
             }
         }
 
@@ -279,18 +266,12 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Gets the amount of used concentration
         /// </summary>
-        public short UsedConcentration
-        {
-            get { return m_usedConcPoints; }
-        }
+        public short UsedConcentration { get; private set; }
 
         /// <summary>
         /// Gets the count of conc spells in the list
         /// </summary>
-        public byte ConcSpellsCount
-        {
-            get { return m_concSpellsCount; }
-        }
+        public byte ConcSpellsCount { get; private set; }
 
         /// <summary>
         /// Gets the list effects count

@@ -32,15 +32,15 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            eChatType toLiving = (Spell.Pulse == 0) ? eChatType.CT_Spell : eChatType.CT_SpellPulse;
-            eChatType toOther = (Spell.Pulse == 0) ? eChatType.CT_System : eChatType.CT_SpellPulse;
+            eChatType toLiving = Spell.Pulse == 0 ? eChatType.CT_Spell : eChatType.CT_SpellPulse;
+            eChatType toOther = Spell.Pulse == 0 ? eChatType.CT_System : eChatType.CT_SpellPulse;
             MessageToLiving(effect.Owner, Spell.Message1, toLiving);
             Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, false)), toOther, effect.Owner);
         }

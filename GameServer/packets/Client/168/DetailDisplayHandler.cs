@@ -1210,9 +1210,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                 output.AddRange(spellHandler.DelveInfo);
 
                 // Subspells
-                if (spell.SubSpellID > 0)
+                if (spell.SubSpellId > 0)
                 {
-                    Spell s = SkillBase.GetSpellByID(spell.SubSpellID);
+                    Spell s = SkillBase.GetSpellByID(spell.SubSpellId);
                     output.Add(" ");
 
                     ISpellHandler sh = ScriptMgr.CreateSpellHandler(client.Player, s, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
@@ -2177,12 +2177,12 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                 list.Add(" ");
                 list.Add(" ");
-                if (spl.SubSpellID > 0)
+                if (spl.SubSpellId > 0)
                 {
                     List<Spell> spells = SkillBase.GetSpellList(line.KeyName);
                     foreach (Spell subSpell in spells)
                     {
-                        if (subSpell.ID == spl.SubSpellID)
+                        if (subSpell.ID == spl.SubSpellId)
                         {
                             WritePotionSpellsInfos(list, client, subSpell, line);
                             break;

@@ -33,22 +33,18 @@ namespace DOL.GS.Spells
     [SpellHandler("DexStrConQuiTap")]
     public class DexStrConQuiTap : SpellHandler
     {
-        private IList<eProperty> m_stats;
-
-        public IList<eProperty> Stats
-        {
-            get { return m_stats; }
-            set { m_stats = value; }
-        }
+        public IList<eProperty> Stats { get; set; }
 
         public DexStrConQuiTap(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            Stats = new List<eProperty>();
-            Stats.Add(eProperty.Dexterity);
-            Stats.Add(eProperty.Strength);
-            Stats.Add(eProperty.Constitution);
-            Stats.Add(eProperty.Quickness);
+            Stats = new List<eProperty>
+            {
+                eProperty.Dexterity,
+                eProperty.Strength,
+                eProperty.Constitution,
+                eProperty.Quickness
+            };
         }
 
         public override void OnEffectStart(GameSpellEffect effect)
@@ -56,8 +52,8 @@ namespace DOL.GS.Spells
             base.OnEffectStart(effect);
             foreach (eProperty property in Stats)
             {
-                m_caster.BaseBuffBonusCategory[(int)property] += (int)m_spell.Value;
-                m_spellTarget.DebuffCategory[(int)property] -= (int)m_spell.Value;
+                Caster.BaseBuffBonusCategory[(int)property] += (int)Spell.Value;
+                m_spellTarget.DebuffCategory[(int)property] -= (int)Spell.Value;
             }
         }
 
@@ -65,8 +61,8 @@ namespace DOL.GS.Spells
         {
             foreach (eProperty property in Stats)
             {
-                m_spellTarget.DebuffCategory[(int)property] += (int)m_spell.Value;
-                m_caster.BaseBuffBonusCategory[(int)property] -= (int)m_spell.Value;
+                m_spellTarget.DebuffCategory[(int)property] += (int)Spell.Value;
+                Caster.BaseBuffBonusCategory[(int)property] -= (int)Spell.Value;
             }
 
             return base.OnEffectExpires(effect, noMessages);
@@ -79,9 +75,9 @@ namespace DOL.GS.Spells
     [SpellHandler("ArmorReducingEffectiveness")]
     public class ArmorReducingEffectiveness : DualStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.ArmorFactor; } }
+        public override eProperty Property1 => eProperty.ArmorFactor;
 
-        public override eProperty Property2 { get { return eProperty.ArmorAbsorption; } }
+        public override eProperty Property2 => eProperty.ArmorAbsorption;
 
         public ArmorReducingEffectiveness(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
@@ -94,8 +90,8 @@ namespace DOL.GS.Spells
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        GameNPC summoned = null;
-        GameSpellEffect beffect = null;
+        GameNPC summoned;
+        GameSpellEffect beffect;
 
         public SummonHealingElemental(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line) { }
@@ -107,8 +103,7 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness">factor from 0..1 (0%-100%)</param>
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            GamePlayer player = Caster as GamePlayer;
-            if (player == null)
+            if (!(Caster is GamePlayer player))
             {
                 return;
             }
@@ -118,17 +113,16 @@ namespace DOL.GS.Spells
             {
                 if (log.IsWarnEnabled)
                 {
-                    log.WarnFormat("NPC template {0} not found! Spell: {1}", Spell.LifeDrainReturn, Spell.ToString());
+                    log.Warn($"NPC template {Spell.LifeDrainReturn} not found! Spell: {Spell}");
                 }
 
-                MessageToCaster("NPC template " + Spell.LifeDrainReturn + " not found!", eChatType.CT_System);
+                MessageToCaster($"NPC template {Spell.LifeDrainReturn} not found!", eChatType.CT_System);
                 return;
             }
 
-            Point2D summonloc;
             beffect = CreateSpellEffect(target, effectiveness);
             {
-                summonloc = target.GetPointFromHeading(target.Heading, 64);
+                var summonloc = target.GetPointFromHeading(target.Heading, 64);
 
                 BrittleBrain controlledBrain = new BrittleBrain(player);
                 controlledBrain.IsMainPet = false;
@@ -197,8 +191,7 @@ namespace DOL.GS.Spells
 
         protected void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-            if (args == null || args.AttackData == null)
+            if (!(arguments is AttackFinishedEventArgs args) || args.AttackData == null)
             {
                 return;
             }
@@ -217,23 +210,26 @@ namespace DOL.GS.Spells
         // Creates the trap(spell)
         private ISpellHandler MakeTrap()
         {
-            DBSpell dbs = new DBSpell();
-            dbs.Name = "irritatin wisp";
-            dbs.Icon = 4107;
-            dbs.ClientEffect = 5435;
-            dbs.DamageType = 15;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "DirectDamage";
-            dbs.Damage = 80;
-            dbs.Value = 0;
-            dbs.Duration = 0;
-            dbs.Frequency = 0;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = 1500;
+            DBSpell dbs = new DBSpell
+            {
+                Name = "irritatin wisp",
+                Icon = 4107,
+                ClientEffect = 5435,
+                DamageType = 15,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "DirectDamage",
+                Damage = 80,
+                Value = 0,
+                Duration = 0,
+                Frequency = 0,
+                Pulse = 0,
+                PulsePower = 0,
+                Power = 0,
+                CastTime = 0,
+                Range = 1500
+            };
+
             Spell s = new Spell(dbs, 50);
             SpellLine sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             return ScriptMgr.CreateSpellHandler(m_pet, s, sl);
@@ -248,10 +244,7 @@ namespace DOL.GS
 {
     public class SummonHealingElementalPet : GamePet
     {
-        public override int MaxHealth
-        {
-            get { return Level * 10; }
-        }
+        public override int MaxHealth => Level * 10;
 
         public override void OnAttackedByEnemy(AttackData ad) { }
 
@@ -260,10 +253,7 @@ namespace DOL.GS
 
     public class SummonElementalPet : GamePet
     {
-        public override int MaxHealth
-        {
-            get { return Level * 10; }
-        }
+        public override int MaxHealth => Level * 10;
 
         public override void OnAttackedByEnemy(AttackData ad) { }
 

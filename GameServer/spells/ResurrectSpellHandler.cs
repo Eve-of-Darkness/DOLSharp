@@ -32,14 +32,14 @@ namespace DOL.GS.Spells
     public class ResurrectSpellHandler : SpellHandler
     {
         private const string RESURRECT_CASTER_PROPERTY = "RESURRECT_CASTER";
-        protected readonly ListDictionary m_resTimersByLiving = new ListDictionary();
+        private readonly ListDictionary m_resTimersByLiving = new ListDictionary();
 
         // constructor
         public ResurrectSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -57,15 +57,14 @@ namespace DOL.GS.Spells
             }
 
             SendEffectAnimation(target, 0, false, 1);
-            GamePlayer targetPlayer = target as GamePlayer;
-            if (targetPlayer == null)
+            if (!(target is GamePlayer targetPlayer))
             {
                 // not a player
                 ResurrectLiving(target);
             }
             else
             {
-                targetPlayer.TempProperties.setProperty(RESURRECT_CASTER_PROPERTY, m_caster);
+                targetPlayer.TempProperties.setProperty(RESURRECT_CASTER_PROPERTY, Caster);
                 RegionTimer resurrectExpiredTimer = new RegionTimer(targetPlayer);
                 resurrectExpiredTimer.Callback = new RegionTimerCallback(ResurrectExpiredCallback);
                 resurrectExpiredTimer.Properties.setProperty("targetPlayer", targetPlayer);
@@ -76,7 +75,7 @@ namespace DOL.GS.Spells
                 }
 
                 // send resurrect dialog
-                targetPlayer.Out.SendCustomDialog("Do you allow " + m_caster.GetName(0, true) + " to resurrected you\nwith " + m_spell.ResurrectHealth + " percent hits?", new CustomDialogResponse(ResurrectResponceHandler));
+                targetPlayer.Out.SendCustomDialog("Do you allow " + Caster.GetName(0, true) + " to resurrected you\nwith " + Spell.ResurrectHealth + " percent hits?", new CustomDialogResponse(ResurrectResponceHandler));
             }
         }
 
@@ -87,10 +86,10 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         public override int PowerCost(GameLiving target)
         {
-            float factor = Math.Max(0.1f, 0.5f + (target.Level - m_caster.Level) / (float)m_caster.Level);
+            float factor = Math.Max(0.1f, 0.5f + (target.Level - Caster.Level) / (float)Caster.Level);
 
             // DOLConsole.WriteLine("res power needed: " + (int) (m_caster.MaxMana * factor) + "; factor="+factor);
-            return (int)(m_caster.MaxMana * factor);
+            return (int)(Caster.MaxMana * factor);
         }
 
         /// <summary>
@@ -101,17 +100,14 @@ namespace DOL.GS.Spells
         protected virtual void ResurrectResponceHandler(GamePlayer player, byte response)
         {
             // DOLConsole.WriteLine("resurrect responce: " + response);
-            GameTimer resurrectExpiredTimer = null;
+            GameTimer resurrectExpiredTimer;
             lock (m_resTimersByLiving.SyncRoot)
             {
                 resurrectExpiredTimer = (GameTimer)m_resTimersByLiving[player];
                 m_resTimersByLiving.Remove(player);
             }
 
-            if (resurrectExpiredTimer != null)
-            {
-                resurrectExpiredTimer.Stop();
-            }
+            resurrectExpiredTimer?.Stop();
 
             GameLiving rezzer = (GameLiving)player.TempProperties.getProperty<object>(RESURRECT_CASTER_PROPERTY, null);
             if (!player.IsAlive)
@@ -135,16 +131,10 @@ namespace DOL.GS.Spells
                         if (Spell.ResurrectHealth == 100)
                         {
                             GameSpellEffect effect = FindEffectOnTarget(player, GlobalSpells.PvEResurrectionIllnessSpellType);
-                            if (effect != null)
-                            {
-                                effect.Overwrite(new GameSpellEffect(effect.SpellHandler, effect.Duration / 2, effect.PulseFreq));
-                            }
+                            effect?.Overwrite(new GameSpellEffect(effect.SpellHandler, effect.Duration / 2, effect.PulseFreq));
 
                             GameSpellEffect effecttwo = FindEffectOnTarget(player, GlobalSpells.RvRResurrectionIllnessSpellType);
-                            if (effecttwo != null)
-                            {
-                                effecttwo.Overwrite(new GameSpellEffect(effecttwo.SpellHandler, effecttwo.Duration / 2, effecttwo.PulseFreq));
-                            }
+                            effecttwo?.Overwrite(new GameSpellEffect(effecttwo.SpellHandler, effecttwo.Duration / 2, effecttwo.PulseFreq));
                         }
 
                         // VaNaTiC<-
@@ -154,7 +144,7 @@ namespace DOL.GS.Spells
                         player.Out.SendMessage("You decline to be resurrected.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                         // refund mana
-                        m_caster.Mana += PowerCost(player);
+                        Caster.Mana += PowerCost(player);
                     }
                 }
             }
@@ -168,18 +158,18 @@ namespace DOL.GS.Spells
         /// <param name="living"></param>
         protected virtual void ResurrectLiving(GameLiving living)
         {
-            if (m_caster.ObjectState != GameObject.eObjectState.Active)
+            if (Caster.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
 
-            if (m_caster.CurrentRegionID != living.CurrentRegionID)
+            if (Caster.CurrentRegionID != living.CurrentRegionID)
             {
                 return;
             }
 
-            living.Health = living.MaxHealth * m_spell.ResurrectHealth / 100;
-            int tempManaEnd = m_spell.ResurrectMana / 100;
+            living.Health = living.MaxHealth * Spell.ResurrectHealth / 100;
+            int tempManaEnd = Spell.ResurrectMana / 100;
             living.Mana = living.MaxMana * tempManaEnd;
 
             // The spec rez spells are the only ones that have endurance
@@ -192,7 +182,7 @@ namespace DOL.GS.Spells
                 living.Endurance = 0;
             }
 
-            living.MoveTo(m_caster.CurrentRegionID, m_caster.X, m_caster.Y, m_caster.Z, m_caster.Heading);
+            living.MoveTo(Caster.CurrentRegionID, Caster.X, Caster.Y, Caster.Z, Caster.Heading);
 
             GameTimer resurrectExpiredTimer = null;
             lock (m_resTimersByLiving.SyncRoot)
@@ -201,18 +191,14 @@ namespace DOL.GS.Spells
                 m_resTimersByLiving.Remove(living);
             }
 
-            if (resurrectExpiredTimer != null)
-            {
-                resurrectExpiredTimer.Stop();
-            }
+            resurrectExpiredTimer?.Stop();
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 player.StopReleaseTimer();
                 player.Out.SendPlayerRevive(player);
                 player.UpdatePlayerStatus();
-                player.Out.SendMessage("You have been resurrected by " + m_caster.GetName(0, false) + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage("You have been resurrected by " + Caster.GetName(0, false) + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 player.Notify(GamePlayerEvent.Revive, player, new RevivedEventArgs(Caster, Spell));
 
                 // Lifeflight add this should make it so players who have been ressurected don't take damage for 5 seconds
@@ -229,12 +215,11 @@ namespace DOL.GS.Spells
                         attacker.Notify(
                             GameLivingEvent.EnemyHealed,
                             attacker,
-                            new EnemyHealedEventArgs(living, m_caster, GameLiving.eHealthChangeType.Spell, living.Health));
+                            new EnemyHealedEventArgs(living, Caster, GameLiving.eHealthChangeType.Spell, living.Health));
                     }
                 }
 
-                GamePlayer casterPlayer = Caster as GamePlayer;
-                if (casterPlayer != null)
+                if (Caster is GamePlayer casterPlayer)
                 {
                     long rezRps = player.LastDeathRealmPoints * (Spell.ResurrectHealth + 50) / 1000;
                     if (rezRps > 0)
@@ -282,14 +267,13 @@ namespace DOL.GS.Spells
 
             // Lifeflight, the base call to Checkbegincast uses its own power check, which is bad for rez spells
             // so I added another check here.
-            if (m_caster.Mana < PowerCost(target))
+            if (Caster.Mana < PowerCost(target))
             {
                 MessageToCaster("You don't have enough power to cast that!", eChatType.CT_SpellResisted);
                 return false;
             }
 
-            GameLiving resurrectionCaster = target.TempProperties.getProperty<object>(RESURRECT_CASTER_PROPERTY, null) as GameLiving;
-            if (resurrectionCaster != null)
+            if (target.TempProperties.getProperty<object>(RESURRECT_CASTER_PROPERTY, null) is GameLiving resurrectionCaster)
             {
                 // already considering resurrection - do nothing
                 MessageToCaster("Your target is already considering a resurrection!", eChatType.CT_SpellResisted);
@@ -306,8 +290,7 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         public override bool CheckEndCast(GameLiving target)
         {
-            GameLiving resurrectionCaster = target.TempProperties.getProperty<object>(RESURRECT_CASTER_PROPERTY, null) as GameLiving;
-            if (resurrectionCaster != null)
+            if (target.TempProperties.getProperty<object>(RESURRECT_CASTER_PROPERTY, null) is GameLiving resurrectionCaster)
             {
                 // already considering resurrection - do nothing
                 MessageToCaster("Your target is already considering a resurrection!", eChatType.CT_SpellResisted);
@@ -342,23 +325,23 @@ namespace DOL.GS.Spells
 
                 var list = new List<string>();
 
-                list.Add("Function: " + (Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType));
+                list.Add($"Function: {(Spell.SpellType == string.Empty ? "(not implemented)" : Spell.SpellType)}");
                 list.Add(" "); // empty line
                 list.Add(Spell.Description);
                 list.Add(" "); // empty line
-                list.Add("Health restored: " + Spell.ResurrectHealth);
+                list.Add($"Health restored: {Spell.ResurrectHealth}");
                 if (Spell.ResurrectMana != 0)
                 {
-                    list.Add("Mana restored: " + Spell.ResurrectMana);
+                    list.Add($"Mana restored: {Spell.ResurrectMana}");
                 }
 
-                list.Add("Target: " + Spell.Target);
+                list.Add($"Target: {Spell.Target}");
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                list.Add($"Casting time: {(Spell.CastTime * 0.001):0.0## sec;-0.0## sec;'instant'}");
 
                 return list;
             }

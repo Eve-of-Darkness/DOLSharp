@@ -31,7 +31,7 @@ namespace DOL.GS.Spells
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private bool m_castFailed = false;
+        private bool m_castFailed;
 
         /// <summary>
         /// Execute direct damage spell
@@ -41,7 +41,7 @@ namespace DOL.GS.Spells
         {
             if (!m_castFailed)
             {
-                m_caster.Mana -= PowerCost(target);
+                Caster.Mana -= PowerCost(target);
             }
 
             base.FinishSpellCast(target);
@@ -65,7 +65,7 @@ namespace DOL.GS.Spells
                 if (player != null)
                 {
                     // This equation is used to simulate live values - Tolakram
-                    spellDamage = (target.MaxHealth * -Spell.Damage * .01) / 2.5;
+                    spellDamage = target.MaxHealth * -Spell.Damage * .01 / 2.5;
                 }
 
                 if (spellDamage < 0)
@@ -83,7 +83,7 @@ namespace DOL.GS.Spells
         {
             if (Spell.Damage < 0)
             {
-                return (m_spellTarget.MaxHealth * -Spell.Damage * .01) * 3.0 * effectiveness;
+                return m_spellTarget.MaxHealth * -Spell.Damage * .01 * 3.0 * effectiveness;
             }
 
             return base.DamageCap(effectiveness);
@@ -101,12 +101,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            bool spellOK = true;
-
-            if (Spell.Target.ToLower() == "cone" || (Spell.Target == "Enemy" && Spell.Radius > 0 && Spell.Range == 0))
-            {
-                spellOK = false;
-            }
+            bool spellOK = !(Spell.Target.ToLower() == "cone" || Spell.Target == "Enemy" && Spell.Radius > 0 && Spell.Range == 0);
 
             if (spellOK == false || MustCheckLOS(Caster))
             {
@@ -121,9 +116,9 @@ namespace DOL.GS.Spells
                     {
                         checkPlayer = Caster as GamePlayer;
                     }
-                    else if (Caster is GameNPC && (Caster as GameNPC).Brain is IControlledBrain)
+                    else if ((Caster as GameNPC)?.Brain is IControlledBrain)
                     {
-                        IControlledBrain brain = (Caster as GameNPC).Brain as IControlledBrain;
+                        IControlledBrain brain = ((GameNPC) Caster).Brain as IControlledBrain;
                         checkPlayer = brain.GetPlayerOwner();
                     }
                 }
@@ -155,15 +150,14 @@ namespace DOL.GS.Spells
             {
                 try
                 {
-                    GameLiving target = Caster.CurrentRegion.GetObject(targetOID) as GameLiving;
-                    if (target != null)
+                    if (Caster.CurrentRegion.GetObject(targetOID) is GameLiving target)
                     {
                         double effectiveness = player.TempProperties.getProperty<double>(LOSEFFECTIVENESS + target.ObjectID, 1.0);
                         DealDamage(target, effectiveness);
                         player.TempProperties.removeProperty(LOSEFFECTIVENESS + target.ObjectID);
 
                         // Due to LOS check delay the actual cast happens after FinishSpellCast does a notify, so we notify again
-                        GameEventMgr.Notify(GameLivingEvent.CastFinished, m_caster, new CastingEventArgs(this, target, m_lastAttackData));
+                        GameEventMgr.Notify(GameLivingEvent.CastFinished, Caster, new CastingEventArgs(this, target, m_lastAttackData));
                     }
                 }
                 catch (Exception e)
@@ -172,7 +166,7 @@ namespace DOL.GS.Spells
 
                     if (log.IsErrorEnabled)
                     {
-                        log.Error(string.Format("targetOID:{0} caster:{1} exception:{2}", targetOID, Caster, e));
+                        log.Error($"targetOID:{targetOID} caster:{Caster} exception:{e}");
                     }
                 }
             }
@@ -188,7 +182,7 @@ namespace DOL.GS.Spells
 
         protected virtual void DealDamage(GameLiving target, double effectiveness)
         {
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -206,9 +200,8 @@ namespace DOL.GS.Spells
          */
         protected override void OnSpellResisted(GameLiving target)
         {
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                GamePlayer player = target as GamePlayer;
                 player.Out.SendCheckLOS(Caster, player, new CheckLOSResponse(ResistSpellCheckLOS));
             }
             else
@@ -223,8 +216,7 @@ namespace DOL.GS.Spells
             {
                 try
                 {
-                    GameLiving target = Caster.CurrentRegion.GetObject(targetOID) as GameLiving;
-                    if (target != null)
+                    if (Caster.CurrentRegion.GetObject(targetOID) is GameLiving target)
                     {
                         SpellResisted(target);
                     }
@@ -233,7 +225,7 @@ namespace DOL.GS.Spells
                 {
                     if (log.IsErrorEnabled)
                     {
-                        log.Error(string.Format("targetOID:{0} caster:{1} exception:{2}", targetOID, Caster, e));
+                        log.Error($"targetOID:{targetOID} caster:{Caster} exception:{e}");
                     }
                 }
             }

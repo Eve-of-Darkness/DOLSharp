@@ -27,85 +27,84 @@ using DOL.Events;
 namespace DOL.GS.Spells
 {
     [SpellHandler("DmgReductionAndPowerReturn")]
-   public class DamageReductionAndPowerReturnSpellHandler : SpellHandler
-   {
-        public const string Damage_Reduction = "damage reduction";
+    public class DamageReductionAndPowerReturnSpellHandler : SpellHandler
+    {
+        private const string Damage_Reduction = "damage reduction";
 
-      public override void OnEffectStart(GameSpellEffect effect)
-      {
+        public override void OnEffectStart(GameSpellEffect effect)
+        {
             effect.Owner.TempProperties.setProperty(Damage_Reduction, 100000);
-         GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
+            GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
 
-         eChatType toLiving = (Spell.Pulse == 0) ? eChatType.CT_Spell : eChatType.CT_SpellPulse;
-            eChatType toOther = (Spell.Pulse == 0) ? eChatType.CT_System : eChatType.CT_Spell;///Pulse;
-         MessageToLiving(effect.Owner, Spell.Message1, toLiving);
-         Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, false)), toOther, effect.Owner);
-      }
+            eChatType toLiving = Spell.Pulse == 0 ? eChatType.CT_Spell : eChatType.CT_SpellPulse;
+            eChatType toOther = Spell.Pulse == 0 ? eChatType.CT_System : eChatType.CT_Spell; //Pulse;
+            MessageToLiving(effect.Owner, Spell.Message1, toLiving);
+            Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, false)), toOther, effect.Owner);
+        }
 
-      /// <summary>
-      /// When an applied effect expires.
-      /// Duration spells only.
-      /// </summary>
-      /// <param name="effect">The expired effect</param>
-      /// <param name="noMessages">true, when no messages should be sent to player and surrounding</param>
-      /// <returns>immunity duration in milliseconds</returns>
-      public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
-      {
-         GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
+        /// <summary>
+        /// When an applied effect expires.
+        /// Duration spells only.
+        /// </summary>
+        /// <param name="effect">The expired effect</param>
+        /// <param name="noMessages">true, when no messages should be sent to player and surrounding</param>
+        /// <returns>immunity duration in milliseconds</returns>
+        public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
+        {
+            GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
             effect.Owner.TempProperties.removeProperty(Damage_Reduction);
-         if (!noMessages && Spell.Pulse == 0)
-         {
-            MessageToLiving(effect.Owner, Spell.Message3, eChatType.CT_SpellExpires);
-            Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message4, effect.Owner.GetName(0, false)), eChatType.CT_SpellExpires, effect.Owner);
-         }
+            if (!noMessages && Spell.Pulse == 0)
+            {
+                MessageToLiving(effect.Owner, Spell.Message3, eChatType.CT_SpellExpires);
+                Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message4, effect.Owner.GetName(0, false)), eChatType.CT_SpellExpires, effect.Owner);
+            }
 
-         return 0;
-      }
+            return 0;
+        }
 
-      public override void FinishSpellCast(GameLiving target)
-      {
-         m_caster.Mana -= PowerCost(target);
-         base.FinishSpellCast(target);
-      }
+        public override void FinishSpellCast(GameLiving target)
+        {
+            Caster.Mana -= PowerCost(target);
+            base.FinishSpellCast(target);
+        }
 
-      private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
-      {
-         GameLiving living = sender as GameLiving;
-         if (living == null)
+        private void OnAttack(DOLEvent e, object sender, EventArgs arguments)
+        {
+            if (!(sender is GameLiving living))
             {
                 return;
             }
 
             AttackedByEnemyEventArgs attackedByEnemy = arguments as AttackedByEnemyEventArgs;
-         AttackData ad = null;
-         if (attackedByEnemy != null)
+            AttackData ad = null;
+            if (attackedByEnemy != null)
             {
                 ad = attackedByEnemy.AttackData;
             }
 
             // Log.DebugFormat("sender:{0} res:{1} IsMelee:{2} Type:{3}", living.Name, ad.AttackResult, ad.IsMeleeAttack, ad.AttackType);
             int damagereduction = living.TempProperties.getProperty<int>(Damage_Reduction);
-         double absorbPercent = Spell.Damage;
-         int damageAbsorbed = (int)(0.01 * absorbPercent * (ad.Damage + ad.CriticalDamage));
+            double absorbPercent = Spell.Damage;
+            int damageAbsorbed = (int) (0.01 * absorbPercent * (ad.Damage + ad.CriticalDamage));
             if (damageAbsorbed > damagereduction)
             {
                 damageAbsorbed = damagereduction;
             }
 
             damagereduction -= damageAbsorbed;
-         ad.Damage -= damageAbsorbed;
-         OnDamageAbsorbed(ad, damageAbsorbed);
+            ad.Damage -= damageAbsorbed;
+            OnDamageAbsorbed(ad, damageAbsorbed);
 
-         // TODO correct messages
+            // TODO correct messages
             if (ad.Damage > 0)
             {
-                MessageToLiving(ad.Target, string.Format("The damage reduction absorbs {0} damage!", damageAbsorbed), eChatType.CT_Spell);
+                MessageToLiving(ad.Target, $"The damage reduction absorbs {damageAbsorbed} damage!", eChatType.CT_Spell);
             }
 
-            MessageToLiving(ad.Attacker, string.Format("A damage reduction absorbs {0} damage of your attack!", damageAbsorbed), eChatType.CT_Spell);
+            MessageToLiving(ad.Attacker, $"A damage reduction absorbs {damageAbsorbed} damage of your attack!", eChatType.CT_Spell);
             if (damageAbsorbed > 0)
             {
-                MessageToCaster("The barrier returns " + damageAbsorbed + " mana back to you.", eChatType.CT_Spell);
+                MessageToCaster($"The barrier returns {damageAbsorbed} mana back to you.", eChatType.CT_Spell);
             }
 
             Caster.Mana = Caster.Mana + damageAbsorbed;
@@ -115,60 +114,61 @@ namespace DOL.GS.Spells
             }
 
             if (damagereduction <= 0)
-         {
-            GameSpellEffect effect = FindEffectOnTarget(living, this);
-            if (effect != null)
-                {
-                    effect.Cancel(false);
-                }
+            {
+                GameSpellEffect effect = FindEffectOnTarget(living, this);
+                effect?.Cancel(false);
             }
-         else
-         {
+            else
+            {
                 living.TempProperties.setProperty(Damage_Reduction, damagereduction);
-         }
-      }
+            }
+        }
 
-      protected virtual void OnDamageAbsorbed(AttackData ad, int DamageAmount)
-      {
-      }
+        protected virtual void OnDamageAbsorbed(AttackData ad, int DamageAmount)
+        {
+        }
 
-      public override PlayerXEffect GetSavedEffect(GameSpellEffect e)
-      {
-         if ( // VaNaTiC-> this cannot work, cause PulsingSpellEffect is derived from object and only implements IConcEffect
-              // e is PulsingSpellEffect ||
-              // VaNaTiC<-
-             Spell.Pulse != 0 || Spell.Concentration != 0 || e.RemainingTime < 1)
+        public override PlayerXEffect GetSavedEffect(GameSpellEffect e)
+        {
+            if ( // VaNaTiC-> this cannot work, cause PulsingSpellEffect is derived from object and only implements IConcEffect
+                // e is PulsingSpellEffect ||
+                // VaNaTiC<-
+                Spell.Pulse != 0 || Spell.Concentration != 0 || e.RemainingTime < 1)
             {
                 return null;
             }
 
-            PlayerXEffect eff = new PlayerXEffect();
-         eff.Var1 = Spell.ID;
-         eff.Duration = e.RemainingTime;
-         eff.IsHandler = true;
-         eff.Var2 = (int)Spell.Value;
-         eff.SpellLine = SpellLine.KeyName;
-         return eff;
-      }
+            PlayerXEffect eff = new PlayerXEffect
+            {
+                Var1 = Spell.ID,
+                Duration = e.RemainingTime,
+                IsHandler = true,
+                Var2 = (int) Spell.Value,
+                SpellLine = SpellLine.KeyName
+            };
 
-      public override void OnEffectRestored(GameSpellEffect effect, int[] vars)
-      {
-            effect.Owner.TempProperties.setProperty(Damage_Reduction, (int)vars[1]);
-         GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
-      }
+            return eff;
+        }
 
-      public override int OnRestoredEffectExpires(GameSpellEffect effect, int[] vars, bool noMessages)
-      {
-         GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
+        public override void OnEffectRestored(GameSpellEffect effect, int[] vars)
+        {
+            effect.Owner.TempProperties.setProperty(Damage_Reduction, (int) vars[1]);
+            GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
+        }
+
+        public override int OnRestoredEffectExpires(GameSpellEffect effect, int[] vars, bool noMessages)
+        {
+            GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
             effect.Owner.TempProperties.removeProperty(Damage_Reduction);
-         if (!noMessages && Spell.Pulse == 0)
-         {
-            MessageToLiving(effect.Owner, Spell.Message3, eChatType.CT_SpellExpires);
-            Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message4, effect.Owner.GetName(0, false)), eChatType.CT_SpellExpires, effect.Owner);
-         }
+            if (!noMessages && Spell.Pulse == 0)
+            {
+                MessageToLiving(effect.Owner, Spell.Message3, eChatType.CT_SpellExpires);
+                Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message4, effect.Owner.GetName(0, false)),
+                    eChatType.CT_SpellExpires, effect.Owner);
+            }
 
-         return 0;
-      }
+            return 0;
+        }
 
         public override IList<string> DelveInfo
         {
@@ -176,17 +176,17 @@ namespace DOL.GS.Spells
             {
                 var list = new List<string>();
 
-                list.Add("Name: " + Spell.Name);
-                list.Add("Description: " + Spell.Description);
-                list.Add("Target: " + Spell.Target);
+                list.Add($"Name: {Spell.Name}");
+                list.Add($"Description: {Spell.Description}");
+                list.Add($"Target: {Spell.Target}");
                 if (Spell.Damage != 0)
                 {
-                    list.Add("Damage Absorb: " + Spell.Damage + "%");
+                    list.Add($"Damage Absorb: {Spell.Damage}%");
                 }
 
                 if (Spell.Value != 0)
                 {
-                    list.Add("Power Return: " + Spell.Damage + "%");
+                    list.Add($"Power Return: {Spell.Damage}%");
                 }
 
                 if (Spell.CastTime < 0.1)
@@ -195,7 +195,7 @@ namespace DOL.GS.Spells
                 }
                 else if (Spell.CastTime > 0)
                 {
-                    list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                    list.Add($"Casting time: {Spell.CastTime * 0.001:0.0## sec;-0.0## sec;'instant'}");
                 }
 
                 if (Spell.Duration >= ushort.MaxValue * 1000)
@@ -204,37 +204,40 @@ namespace DOL.GS.Spells
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format("Duration: {0}:{1} min", Spell.Duration / 60000, (Spell.Duration % 60000 / 1000).ToString("00")));
+                    list.Add($"Duration: {Spell.Duration / 60000}:{Spell.Duration % 60000 / 1000:00} min");
                 }
                 else if (Spell.Duration != 0)
                 {
                     if (Spell.Range != 0)
                     {
-                        list.Add("Range: " + Spell.Range);
+                        list.Add($"Range: {Spell.Range}");
                     }
                 }
 
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
-                list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                list.Add($"Power cost: {Spell.Power:0;0'%'}");
 
                 if (Spell.Frequency != 0)
                 {
-                    list.Add("Frequency: " + (Spell.Frequency * 0.001).ToString("0.0"));
+                    list.Add($"Frequency: {Spell.Frequency * 0.001:0.0}");
                 }
 
                 if (Spell.DamageType != 0)
                 {
-                    list.Add("Damage Type: " + Spell.DamageType);
+                    list.Add($"Damage Type: {Spell.DamageType}");
                 }
 
                 return list;
             }
         }
 
-        public DamageReductionAndPowerReturnSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
-   }
+        public DamageReductionAndPowerReturnSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster,
+            spell, line)
+        {
+        }
+    }
 }

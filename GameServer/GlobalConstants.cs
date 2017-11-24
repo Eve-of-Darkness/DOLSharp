@@ -1638,7 +1638,7 @@ namespace DOL.GS
                     case eDamageType.Slash: return "Slash";
                     case eDamageType.Spirit: return "Spirit";
                     case eDamageType.Thrust: return "Thrust";
-                    default: return "unknown damagetype " + damage.ToString();
+                    default: return "unknown damagetype " + damage;
             }
         }
 

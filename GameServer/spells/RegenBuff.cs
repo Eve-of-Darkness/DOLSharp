@@ -30,9 +30,9 @@ namespace DOL.GS.Spells
     [SpellHandler("HealthRegenBuff")]
     public class HealthRegenSpellHandler : PropertyChangingSpell
     {
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.BaseBuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.BaseBuff;
 
-        public override eProperty Property1 { get { return eProperty.HealthRegenerationRate; } }
+        public override eProperty Property1 => eProperty.HealthRegenerationRate;
 
         public HealthRegenSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
@@ -45,16 +45,20 @@ namespace DOL.GS.Spells
     {
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            if (target is GamePlayer && (((GamePlayer)target).CharacterClass.ID == (int)eCharacterClass.Vampiir
-                || ((GamePlayer)target).CharacterClass.ID == (int)eCharacterClass.MaulerAlb
-                || ((GamePlayer)target).CharacterClass.ID == (int)eCharacterClass.MaulerMid
-                || ((GamePlayer)target).CharacterClass.ID == (int)eCharacterClass.MaulerHib)) { MessageToCaster("This spell has no effect on this class!", eChatType.CT_Spell); return; }
+            if (target is GamePlayer player && (player.CharacterClass.ID == (int) eCharacterClass.Vampiir
+                                         || player.CharacterClass.ID == (int) eCharacterClass.MaulerAlb
+                                         || player.CharacterClass.ID == (int) eCharacterClass.MaulerMid
+                                         || player.CharacterClass.ID == (int) eCharacterClass.MaulerHib))
+            {
+                MessageToCaster("This spell has no effect on this class!", eChatType.CT_Spell); return;
+            }
+
             base.ApplyEffectOnTarget(target, effectiveness);
         }
 
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.BaseBuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.BaseBuff;
 
-        public override eProperty Property1 { get { return eProperty.PowerRegenerationRate; } }
+        public override eProperty Property1 => eProperty.PowerRegenerationRate;
 
         public PowerRegenSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
     }
@@ -65,9 +69,9 @@ namespace DOL.GS.Spells
     [SpellHandler("EnduranceRegenBuff")]
     public class EnduranceRegenSpellHandler : PropertyChangingSpell
     {
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.BaseBuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.BaseBuff;
 
-        public override eProperty Property1 { get { return eProperty.EnduranceRegenerationRate; } }
+        public override eProperty Property1 => eProperty.EnduranceRegenerationRate;
 
         /// <summary>
         /// The max range from caster to owner for all conc buffs
@@ -93,8 +97,11 @@ namespace DOL.GS.Spells
             if (Spell.Concentration > 0)
             {
                 m_concEffects = new ListDictionary();
-                RangeCheckAction rangeCheck = new RangeCheckAction(Caster, this);
-                rangeCheck.Interval = RANGE_CHECK_INTERVAL;
+                RangeCheckAction rangeCheck = new RangeCheckAction(Caster, this)
+                {
+                    Interval = RANGE_CHECK_INTERVAL
+                };
+
                 rangeCheck.Start(RANGE_CHECK_INTERVAL);
             }
 

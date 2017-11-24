@@ -27,14 +27,14 @@ namespace DOL.GS.Spells
     [SpellHandler("AllStatsPercentDebuff")]
     public class AllStatsPercentDebuff : SpellHandler
     {
-        protected int StrDebuff = 0;
-        protected int DexDebuff = 0;
-        protected int ConDebuff = 0;
-        protected int EmpDebuff = 0;
-        protected int QuiDebuff = 0;
-        protected int IntDebuff = 0;
-        protected int ChaDebuff = 0;
-        protected int PieDebuff = 0;
+        protected int StrDebuff;
+        protected int DexDebuff;
+        protected int ConDebuff;
+        protected int EmpDebuff;
+        protected int QuiDebuff;
+        protected int IntDebuff;
+        protected int ChaDebuff;
+        protected int PieDebuff;
 
         public override int CalculateSpellResistChance(GameLiving target)
         {
@@ -46,15 +46,15 @@ namespace DOL.GS.Spells
             base.OnEffectStart(effect);
 
             // effect.Owner.DebuffCategory[(int)eProperty.Dexterity] += (int)m_spell.Value;
-            double percentValue = m_spell.Value / 100;
-            StrDebuff = (int)((double)effect.Owner.GetModified(eProperty.Strength) * percentValue);
-            DexDebuff = (int)((double)effect.Owner.GetModified(eProperty.Dexterity) * percentValue);
-            ConDebuff = (int)((double)effect.Owner.GetModified(eProperty.Constitution) * percentValue);
-            EmpDebuff = (int)((double)effect.Owner.GetModified(eProperty.Empathy) * percentValue);
-            QuiDebuff = (int)((double)effect.Owner.GetModified(eProperty.Quickness) * percentValue);
-            IntDebuff = (int)((double)effect.Owner.GetModified(eProperty.Intelligence) * percentValue);
-            ChaDebuff = (int)((double)effect.Owner.GetModified(eProperty.Charisma) * percentValue);
-            PieDebuff = (int)((double)effect.Owner.GetModified(eProperty.Piety) * percentValue);
+            double percentValue = Spell.Value / 100;
+            StrDebuff = (int)(effect.Owner.GetModified(eProperty.Strength) * percentValue);
+            DexDebuff = (int)(effect.Owner.GetModified(eProperty.Dexterity) * percentValue);
+            ConDebuff = (int)(effect.Owner.GetModified(eProperty.Constitution) * percentValue);
+            EmpDebuff = (int)(effect.Owner.GetModified(eProperty.Empathy) * percentValue);
+            QuiDebuff = (int)(effect.Owner.GetModified(eProperty.Quickness) * percentValue);
+            IntDebuff = (int)(effect.Owner.GetModified(eProperty.Intelligence) * percentValue);
+            ChaDebuff = (int)(effect.Owner.GetModified(eProperty.Charisma) * percentValue);
+            PieDebuff = (int)(effect.Owner.GetModified(eProperty.Piety) * percentValue);
 
             effect.Owner.DebuffCategory[(int)eProperty.Dexterity] += DexDebuff;
             effect.Owner.DebuffCategory[(int)eProperty.Strength] += StrDebuff;
@@ -77,8 +77,6 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            double percentValue = m_spell.Value / 100;
-
             effect.Owner.DebuffCategory[(int)eProperty.Dexterity] -= DexDebuff;
             effect.Owner.DebuffCategory[(int)eProperty.Strength] -= StrDebuff;
             effect.Owner.DebuffCategory[(int)eProperty.Constitution] -= ConDebuff;
@@ -88,9 +86,8 @@ namespace DOL.GS.Spells
             effect.Owner.DebuffCategory[(int)eProperty.Intelligence] -= IntDebuff;
             effect.Owner.DebuffCategory[(int)eProperty.Charisma] -= ChaDebuff;
 
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                GamePlayer player = effect.Owner as GamePlayer;
                 player.Out.SendCharStatsUpdate();
                 player.UpdateEncumberance();
                 player.UpdatePlayerStatus();
@@ -119,10 +116,9 @@ namespace DOL.GS.Spells
                 Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
             }
 
-            if (target is GameNPC)
+            if (target is GameNPC npc)
             {
-                IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
+                if (npc.Brain is IOldAggressiveBrain aggroBrain)
                 {
                     aggroBrain.AddToAggroList(Caster, (int)Spell.Value);
                 }

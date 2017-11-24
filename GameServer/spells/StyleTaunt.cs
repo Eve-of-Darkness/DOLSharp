@@ -47,18 +47,14 @@ namespace DOL.GS.Spells
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
-            if (target is GameNPC)
+            if (target is GameNPC npc)
             {
-                AttackData ad = Caster.TempProperties.getProperty<object>(GameLiving.LAST_ATTACK_DATA, null) as AttackData;
-                if (ad != null)
+                if (Caster.TempProperties.getProperty<object>(GameLiving.LAST_ATTACK_DATA, null) is AttackData ad)
                 {
-                    IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
-                    if (aggroBrain != null)
+                    if (npc.Brain is IOldAggressiveBrain aggroBrain)
                     {
                         int aggro = Convert.ToInt32(ad.Damage * Spell.Value);
                         aggroBrain.AddToAggroList(Caster, aggro);
-
-                        // log.DebugFormat("Damage: {0}, Taunt Value: {1}, (de)Taunt Amount {2}", ad.Damage, Spell.Value, aggro.ToString());
                     }
                 }
             }

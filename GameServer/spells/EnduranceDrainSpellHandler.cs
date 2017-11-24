@@ -10,7 +10,7 @@ namespace DOL.GS.Spells
 
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -21,7 +21,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -29,9 +29,9 @@ namespace DOL.GS.Spells
             int end = (int)Spell.Damage;
             target.ChangeEndurance(target,GameLiving.eEnduranceChangeType.Spell, -end);
 
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                ((GamePlayer)target).Out.SendMessage(m_caster.Name + " steal you for " + end + " endurance!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"{Caster.Name} steal you for {end} endurance!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
             }
 
             StealEndurance(target,end);
@@ -40,21 +40,21 @@ namespace DOL.GS.Spells
 
         public virtual void StealEndurance(GameLiving target,int end)
         {
-            if (!m_caster.IsAlive)
+            if (!Caster.IsAlive)
             {
                 return;
             }
 
-            m_caster.ChangeEndurance(target, GameLiving.eEnduranceChangeType.Spell, end);
+            Caster.ChangeEndurance(target, GameLiving.eEnduranceChangeType.Spell, end);
             SendCasterMessage(target,end);
         }
 
         public virtual void SendCasterMessage(GameLiving target,int end)
         {
-            MessageToCaster(string.Format("You steal {0} for {1} endurance!", target.Name, end), eChatType.CT_YouHit);
+            MessageToCaster($"You steal {target.Name} for {end} endurance!", eChatType.CT_YouHit);
             if (end > 0)
             {
-                MessageToCaster("You steal " + end + " endurance point" + (end == 1 ? "." : "s."), eChatType.CT_Spell);
+                MessageToCaster($"You steal {end} endurance point{(end == 1 ? "." : "s.")}", eChatType.CT_Spell);
             }
             else
             {
@@ -66,68 +66,61 @@ namespace DOL.GS.Spells
         {
             get
             {
-                var list = new List<string>();
+                var list = new List<string>
+                {
+                    $"Name: {Spell.Name}",
+                    $"Description: {Spell.Description}",
+                    $"Target: {Spell.Target}",
+                    $"Casting time: {Spell.CastTime * 0.001:0.0## sec;-0.0## sec;'instant'}"
+                };
 
-                // Name
-                list.Add("Name: " + Spell.Name);
-
-                // Description
-                list.Add("Description: " + Spell.Description);
-
-                // Target
-                list.Add("Target: " + Spell.Target);
-
-                // Cast
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
-
-                // Duration
                 if (Spell.Duration >= ushort.MaxValue * 1000)
                 {
                     list.Add("Duration: Permanent.");
                 }
                 else if (Spell.Duration > 60000)
                 {
-                    list.Add(string.Format("Duration: {0}:{1} min", Spell.Duration / 60000, (Spell.Duration % 60000 / 1000).ToString("00")));
+                    list.Add($"Duration: {Spell.Duration / 60000}:{Spell.Duration % 60000 / 1000:00} min");
                 }
                 else if (Spell.Duration != 0)
                 {
-                    list.Add("Duration: " + (Spell.Duration / 1000).ToString("0' sec';'Permanent.';'Permanent.'"));
+                    list.Add($"Duration: {Spell.Duration / 1000:0' sec';'Permanent.';'Permanent.'}");
                 }
 
                 // Recast
                 if (Spell.RecastDelay > 60000)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 60000).ToString() + ":" + (Spell.RecastDelay % 60000 / 1000).ToString("00") + " min");
+                    list.Add($"Recast time: {(Spell.RecastDelay / 60000)}:{Spell.RecastDelay % 60000 / 1000:00} min");
                 }
                 else if (Spell.RecastDelay > 0)
                 {
-                    list.Add("Recast time: " + (Spell.RecastDelay / 1000).ToString() + " sec");
+                    list.Add($"Recast time: {Spell.RecastDelay / 1000} sec");
                 }
 
                 // Range
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
                 // Radius
                 if (Spell.Radius != 0)
                 {
-                    list.Add("Radius: " + Spell.Radius);
+                    list.Add($"Radius: {Spell.Radius}");
                 }
 
                 // Cost
                 if (Spell.Power != 0)
                 {
-                    list.Add("Power cost: " + Spell.Power.ToString("0;0'%'"));
+                    list.Add($"Power cost: {Spell.Power:0;0'%'}");
                 }
 
                 // Effect
-                list.Add("Drain Endurance By: " + Spell.Damage + "%");
+                list.Add($"Drain Endurance By: {Spell.Damage}%");
 
                 if (Spell.Frequency != 0)
                 {
-                    list.Add("Frequency: " + (Spell.Frequency * 0.001).ToString("0.0"));
+                    list.Add($"Frequency: {Spell.Frequency * 0.001:0.0}");
                 }
 
                 return list;

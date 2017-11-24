@@ -34,9 +34,7 @@ namespace DOL.GS.Spells
                 var list = new List<string>();
                 list.Add(Spell.Description);
 
-                GamePlayer player = Caster as GamePlayer;
-
-                if (player != null)
+                if (Caster is GamePlayer player)
                 {
                     list.Add(" ");
 

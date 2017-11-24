@@ -27,7 +27,7 @@ namespace DOL.GS.Spells
     {
         public override void DrainPower(AttackData ad)
         {
-            if (!(m_caster is NecromancerPet))
+            if (!(Caster is NecromancerPet))
             {
                 return;
             }
@@ -38,7 +38,7 @@ namespace DOL.GS.Spells
         /// The power channelled through this spell goes to the owner, not the pet
         protected override GameLiving Owner()
         {
-            return ((Caster as NecromancerPet).Brain as IControlledBrain).Owner;
+            return ((Caster as NecromancerPet)?.Brain as IControlledBrain).Owner;
         }
 
         /// <summary>
@@ -48,17 +48,11 @@ namespace DOL.GS.Spells
         /// <param name="chatType"></param>
         protected override void MessageToOwner(string message, eChatType chatType)
         {
-            GameNPC npc = Caster as GameNPC;
-            if (npc != null)
+            if (Caster is GameNPC npc)
             {
-                ControlledNpcBrain brain = npc.Brain as ControlledNpcBrain;
-                if (brain != null)
+                if (npc.Brain is ControlledNpcBrain brain && brain.Owner is GamePlayer owner)
                 {
-                    GamePlayer owner = brain.Owner as GamePlayer;
-                    if (owner != null)
-                    {
-                        owner.Out.SendMessage(message, chatType, eChatLoc.CL_SystemWindow);
-                    }
+                    owner.Out.SendMessage(message, chatType, eChatLoc.CL_SystemWindow);
                 }
             }
         }

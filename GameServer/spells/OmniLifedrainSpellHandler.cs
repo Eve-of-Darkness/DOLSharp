@@ -41,7 +41,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -66,31 +66,31 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!m_caster.IsAlive)
+            if (!Caster.IsAlive)
             {
                 return;
             }
 
             int heal = (ad.Damage + ad.CriticalDamage) * Spell.LifeDrainReturn / 100; // % factor on all drains
-            if (m_caster.IsDiseased)
+            if (Caster.IsDiseased)
             {
                 MessageToCaster("You are diseased!", eChatType.CT_SpellResisted);
                 heal >>= 1;
             }
 
-            heal = m_caster.ChangeHealth(m_caster, GameLiving.eHealthChangeType.Spell, heal);
+            heal = Caster.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, heal);
 
             if (heal > 0)
             {
-                MessageToCaster("You steal " + heal + " hit point" + (heal == 1 ? "." : "s."), eChatType.CT_Spell);
+                MessageToCaster($"You steal {heal} hit point{(heal == 1 ? "." : "s.")}", eChatType.CT_Spell);
 
                 #region PVP DAMAGE
 
-                if (m_caster is NecromancerPet && ((m_caster as NecromancerPet).Brain as IControlledBrain).GetPlayerOwner() != null || m_caster is GamePlayer)
+                if (((Caster as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || Caster is GamePlayer)
                 {
-                    if (m_caster.DamageRvRMemory > 0)
+                    if (Caster.DamageRvRMemory > 0)
                     {
-                        m_caster.DamageRvRMemory -= (long)Math.Max(heal, 0);
+                        Caster.DamageRvRMemory -= Math.Max(heal, 0);
                     }
                 }
 
@@ -103,11 +103,11 @@ namespace DOL.GS.Spells
 
                 #region PVP DAMAGE
 
-                if (m_caster is NecromancerPet && ((m_caster as NecromancerPet).Brain as IControlledBrain).GetPlayerOwner() != null || m_caster is GamePlayer)
+                if (((Caster as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || Caster is GamePlayer)
                 {
-                    if (m_caster.DamageRvRMemory > 0)
+                    if (Caster.DamageRvRMemory > 0)
                     {
-                        m_caster.DamageRvRMemory = 0; // Remise a zéro compteur dommages/heal rps
+                        Caster.DamageRvRMemory = 0; // Remise a zéro compteur dommages/heal rps
                     }
                 }
                 #endregion PVP DAMAGE
@@ -124,16 +124,16 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!m_caster.IsAlive)
+            if (!Caster.IsAlive)
             {
                 return;
             }
 
-            int renew = ((ad.Damage + ad.CriticalDamage) * Spell.ResurrectHealth / 100) * Spell.LifeDrainReturn / 100; // %endo returned
-            renew = m_caster.ChangeEndurance(m_caster, GameLiving.eEnduranceChangeType.Spell, renew);
+            int renew = (ad.Damage + ad.CriticalDamage) * Spell.ResurrectHealth / 100 * Spell.LifeDrainReturn / 100; // %endo returned
+            renew = Caster.ChangeEndurance(Caster, GameLiving.eEnduranceChangeType.Spell, renew);
             if (renew > 0)
             {
-                MessageToCaster("You steal " + renew + " endurance.", eChatType.CT_Spell);
+                MessageToCaster($"You steal {renew} endurance.", eChatType.CT_Spell);
             }
             else
             {
@@ -151,16 +151,16 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!m_caster.IsAlive)
+            if (!Caster.IsAlive)
             {
                 return;
             }
 
-            int replenish = ((ad.Damage + ad.CriticalDamage) * Spell.ResurrectMana / 100) * Spell.LifeDrainReturn / 100; // %mana returned
-            replenish = m_caster.ChangeMana(m_caster, GameLiving.eManaChangeType.Spell, replenish);
+            int replenish = (ad.Damage + ad.CriticalDamage) * Spell.ResurrectMana / 100 * Spell.LifeDrainReturn / 100; // %mana returned
+            replenish = Caster.ChangeMana(Caster, GameLiving.eManaChangeType.Spell, replenish);
             if (replenish > 0)
             {
-                MessageToCaster("You steal " + replenish + " power.", eChatType.CT_Spell);
+                MessageToCaster($"You steal {replenish} power.", eChatType.CT_Spell);
             }
             else
             {
@@ -192,18 +192,18 @@ namespace DOL.GS.Spells
 
                 // Description
                 list.Add("Damages the target. A portion of damage is returned to the caster as health, power, and endurance.\n");
-                list.Add("Damage: " + Spell.Damage);
-                list.Add("Health returned: " + Spell.LifeDrainReturn + "% of damage dealt \n Power returned: " + Spell.ResurrectMana + "% of damage dealt \n Endurance returned: " + Spell.ResurrectHealth + "% of damage dealt");
-                list.Add("Target: " + Spell.Target);
+                list.Add($"Damage: {Spell.Damage}");
+                list.Add($"Health returned: {Spell.LifeDrainReturn}% of damage dealt \n Power returned: {Spell.ResurrectMana}% of damage dealt \n Endurance returned: {Spell.ResurrectHealth}% of damage dealt");
+                list.Add($"Target: {Spell.Target}");
                 if (Spell.Range != 0)
                 {
-                    list.Add("Range: " + Spell.Range);
+                    list.Add($"Range: {Spell.Range}");
                 }
 
-                list.Add("Casting time: " + (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'"));
+                list.Add($"Casting time: {Spell.CastTime * 0.001:0.0## sec;-0.0## sec;'instant'}");
                 if (Spell.DamageType != eDamageType.Natural)
                 {
-                    list.Add("Damage: " + GlobalConstants.DamageTypeToName(Spell.DamageType));
+                    list.Add($"Damage: {GlobalConstants.DamageTypeToName(Spell.DamageType)}");
                 }
 
                 return list;

@@ -43,12 +43,7 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         protected override GamePlayer Owner()
         {
-            if (!(Caster is NecromancerPet))
-            {
-                return null;
-            }
-
-            return ((Caster as NecromancerPet).Brain as IControlledBrain).Owner as GamePlayer;
+            return ((Caster as NecromancerPet)?.Brain as IControlledBrain)?.Owner as GamePlayer;
         }
 
         /// <summary>

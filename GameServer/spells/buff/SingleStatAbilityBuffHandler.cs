@@ -29,7 +29,7 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Bonus Category Enforced to Ability Buff Bonus Category
         /// </summary>
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.AbilityBuff; } }
+        public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.AbilityBuff;
 
         /// <summary>
         /// Send updates about the changes
@@ -66,7 +66,7 @@ namespace DOL.GS.Spells
     [SpellHandler("StrengthAbilityBuff")]
     public class StrengthAbilityBuffHandler : SingleStatAbilityBuffHandler
     {
-        public override eProperty Property1 { get { return eProperty.Strength; } }
+        public override eProperty Property1 => eProperty.Strength;
 
         public StrengthAbilityBuffHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
@@ -77,7 +77,7 @@ namespace DOL.GS.Spells
     [SpellHandler("DexterityAbilityBuff")]
     public class DexterityAbilityBuffHandler : SingleStatAbilityBuffHandler
     {
-        public override eProperty Property1 { get { return eProperty.Dexterity; } }
+        public override eProperty Property1 => eProperty.Dexterity;
 
         public DexterityAbilityBuffHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
@@ -88,7 +88,7 @@ namespace DOL.GS.Spells
     [SpellHandler("ConstitutionAbilityBuff")]
     public class ConstitutionAbilityBuffHandler : SingleStatAbilityBuffHandler
     {
-        public override eProperty Property1 { get { return eProperty.Constitution; } }
+        public override eProperty Property1 => eProperty.Constitution;
 
         public ConstitutionAbilityBuffHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
@@ -99,7 +99,7 @@ namespace DOL.GS.Spells
     [SpellHandler("QuicknessAbilityBuff")]
     public class QuicknessAbilityBuffHandler : SingleStatAbilityBuffHandler
     {
-        public override eProperty Property1 { get { return eProperty.Quickness; } }
+        public override eProperty Property1 => eProperty.Quickness;
 
         public QuicknessAbilityBuffHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
@@ -110,7 +110,7 @@ namespace DOL.GS.Spells
     [SpellHandler("AcuityAbilityBuff")]
     public class AcuityAbilityBuffHandler : SingleStatAbilityBuffHandler
     {
-        public override eProperty Property1 { get { return eProperty.Acuity; } }
+        public override eProperty Property1 => eProperty.Acuity;
 
         public AcuityAbilityBuffHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
@@ -121,7 +121,7 @@ namespace DOL.GS.Spells
     [SpellHandler("MaxHealthAbilityBuff")]
     public class MaxHealthAbilityBuffHandler : SingleStatAbilityBuffHandler
     {
-        public override eProperty Property1 { get { return eProperty.MaxHealth; } }
+        public override eProperty Property1 => eProperty.MaxHealth;
 
         public MaxHealthAbilityBuffHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)

@@ -9,8 +9,8 @@ namespace DOL.GS.Spells
     [SpellHandler("HereticDamageSpeedDecrease")]
     public class HereticDamageSpeedDecrease : HereticSpeedDecreaseSpellHandler
     {
-        protected int m_lastdamage = 0;
-        protected int m_pulsedamage = 0;
+        protected int m_lastdamage;
+        protected int m_pulsedamage;
 
         // protected int m_pulsecount = -1;
         public override void FinishSpellCast(GameLiving target)
@@ -50,9 +50,9 @@ namespace DOL.GS.Spells
         public override void CalculateDamageVariance(GameLiving target, out double min, out double max)
         {
             int speclevel = 1;
-            if (m_caster is GamePlayer)
+            if (Caster is GamePlayer)
             {
-                speclevel = ((GamePlayer)m_caster).GetModifiedSpecLevel(m_spellLine.Spec);
+                speclevel = ((GamePlayer)Caster).GetModifiedSpecLevel(SpellLine.Spec);
             }
 
             min = 1;
@@ -86,27 +86,8 @@ namespace DOL.GS.Spells
             base.CreateSpellEffect(target, effectiveness);
 
             // damage is not reduced with distance
-            return new GameSpellEffect(this, m_spell.Duration, m_spellLine.IsBaseLine ? 3000 : 2000, 1);
+            return new GameSpellEffect(this, Spell.Duration, SpellLine.IsBaseLine ? 3000 : 2000, 1);
         }
-
-        /*    public override void OnSpellPulse(PulsingSpellEffect effect)
-            {
-                if (m_pulsecount == -1)
-                    m_pulsecount = m_spell.Pulse;
-
-                if (m_pulsecount > 0)
-                {
-                    if (m_pulsecount == m_spell.Pulse)
-                        m_pulsecount -= 1;
-
-                    m_pulsecount -= 1;
-                    base.OnSpellPulse(effect);
-                }
-                else
-                {
-                    RemoveEffect();
-                }
-            }*/
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
@@ -118,18 +99,18 @@ namespace DOL.GS.Spells
         {
             GameLiving t = effect.Owner;
 
-            if (m_caster.Mana < Spell.PulsePower)
+            if (Caster.Mana < Spell.PulsePower)
             {
                 RemoveEffect();
             }
 
-            if (!m_caster.TargetInView)
+            if (!Caster.TargetInView)
             {
                 RemoveEffect();
                 return;
             }
 
-            if (!m_caster.IsAlive || !effect.Owner.IsAlive || m_caster.Mana < Spell.PulsePower || !m_caster.IsWithinRadius(effect.Owner, Spell.Range) || m_caster.IsMezzed || m_caster.IsStunned || (m_caster.TargetObject is GameLiving ? effect.Owner != m_caster.TargetObject as GameLiving : true))
+            if (!Caster.IsAlive || !effect.Owner.IsAlive || Caster.Mana < Spell.PulsePower || !Caster.IsWithinRadius(effect.Owner, Spell.Range) || Caster.IsMezzed || Caster.IsStunned || (Caster.TargetObject is GameLiving ? effect.Owner != Caster.TargetObject as GameLiving : true))
             {
                 RemoveEffect();
             }
@@ -147,22 +128,22 @@ namespace DOL.GS.Spells
             // A really lame way to charge the correct amount of power per pulse since this spell is cast and maintained without pulsing. - Tolakram
             if (m_focusTargets.Count > 1)
             {
-                double powerPerTarget = (double)(effect.Spell.PulsePower / m_focusTargets.Count);
+                double powerPerTarget = effect.Spell.PulsePower / m_focusTargets.Count;
 
                 int powerUsed = (int)powerPerTarget;
-                if (Util.ChanceDouble((double)powerPerTarget - (double)powerUsed))
+                if (Util.ChanceDouble(powerPerTarget - powerUsed))
                 {
                     powerUsed += 1;
                 }
 
                 if (powerUsed > 0)
                 {
-                    m_caster.Mana -= powerUsed;
+                    Caster.Mana -= powerUsed;
                 }
             }
             else
             {
-                m_caster.Mana -= effect.Spell.PulsePower;
+                Caster.Mana -= effect.Spell.PulsePower;
             }
         }
 
@@ -186,7 +167,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -223,15 +204,14 @@ namespace DOL.GS.Spells
         {
             m_lastdamage -= Convert.ToInt32(m_lastdamage * 0.25);
             SendEffectAnimation(target, 0, false, 0);
-            if (target is GameNPC)
+            if (target is GameNPC npc)
             {
-                IControlledBrain brain = ((GameNPC)target).Brain as IControlledBrain;
-                if (brain != null)
+                if (npc.Brain is IControlledBrain brain)
                 {
                     GamePlayer owner = brain.GetPlayerOwner();
                     if (owner != null)
                     {
-                        MessageToLiving(owner, "Your " + target.Name + " resists the effect!", eChatType.CT_SpellResisted);
+                        MessageToLiving(owner, $"Your {target.Name} resists the effect!", eChatType.CT_SpellResisted);
                     }
                 }
             }
@@ -240,17 +220,20 @@ namespace DOL.GS.Spells
                 MessageToLiving(target, "You resist the effect!", eChatType.CT_SpellResisted);
             }
 
-            MessageToCaster(target.GetName(0, true) + " resists the effect!", eChatType.CT_SpellResisted);
+            MessageToCaster($"{target.GetName(0, true)} resists the effect!", eChatType.CT_SpellResisted);
 
             if (Spell.Damage != 0)
             {
                 // notify target about missed attack for spells with damage
-                AttackData ad = new AttackData();
-                ad.Attacker = Caster;
-                ad.Target = target;
-                ad.AttackType = AttackData.eAttackType.Spell;
-                ad.AttackResult = GameLiving.eAttackResult.Missed;
-                ad.SpellHandler = this;
+                AttackData ad = new AttackData
+                {
+                    Attacker = Caster,
+                    Target = target,
+                    AttackType = AttackData.eAttackType.Spell,
+                    AttackResult = GameLiving.eAttackResult.Missed,
+                    SpellHandler = this
+                };
+
                 target.OnAttackedByEnemy(ad);
                 target.StartInterruptTimer(target.SpellInterruptDuration, ad.AttackType, Caster);
             }
@@ -259,10 +242,9 @@ namespace DOL.GS.Spells
                 target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
             }
 
-            if (target is GameNPC)
+            if (target is GameNPC gameNpc)
             {
-                IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
+                if (gameNpc.Brain is IOldAggressiveBrain aggroBrain)
                 {
                     aggroBrain.AddToAggroList(Caster, 1);
                 }

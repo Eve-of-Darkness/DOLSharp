@@ -29,18 +29,18 @@ namespace DOL.GS.Spells
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            GameLiving living = effect.Owner as GameLiving;
-            living.AbilityBonus[(int)eProperty.Dexterity] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Strength] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Constitution] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Acuity] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Piety] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Empathy] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Quickness] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Intelligence] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Charisma] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.MagicAbsorption] += (int)m_spell.Value;
+            GameLiving living = effect.Owner;
+            living.AbilityBonus[(int)eProperty.Dexterity] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Strength] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Constitution] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Acuity] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Piety] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Empathy] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Quickness] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Intelligence] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Charisma] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.ArmorAbsorption] += (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.MagicAbsorption] += (int)Spell.Value;
 
             if (effect.Owner is GamePlayer)
             {
@@ -54,22 +54,21 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GameLiving living = effect.Owner as GameLiving;
-            living.AbilityBonus[(int)eProperty.Dexterity] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Strength] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Constitution] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Acuity] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Piety] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Empathy] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Quickness] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Intelligence] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.Charisma] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)m_spell.Value;
-            living.AbilityBonus[(int)eProperty.MagicAbsorption] -= (int)m_spell.Value;
+            GameLiving living = effect.Owner;
+            living.AbilityBonus[(int)eProperty.Dexterity] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Strength] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Constitution] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Acuity] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Piety] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Empathy] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Quickness] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Intelligence] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.Charisma] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.ArmorAbsorption] -= (int)Spell.Value;
+            living.AbilityBonus[(int)eProperty.MagicAbsorption] -= (int)Spell.Value;
 
-            if (effect.Owner is GamePlayer)
+            if (effect.Owner is GamePlayer player)
             {
-                GamePlayer player = effect.Owner as GamePlayer;
                 player.Out.SendCharStatsUpdate();
                 player.UpdateEncumberance();
                 player.UpdatePlayerStatus();
@@ -96,10 +95,7 @@ namespace DOL.GS.Spells
             if (target is GameNPC)
             {
                 IOldAggressiveBrain aggroBrain = ((GameNPC)target).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
-                {
-                    aggroBrain.AddToAggroList(Caster, (int)Spell.Value);
-                }
+                aggroBrain?.AddToAggroList(Caster, (int)Spell.Value);
             }
         }
 

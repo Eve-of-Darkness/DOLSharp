@@ -12,12 +12,14 @@ namespace DOL.GS.Spells
         public CureAllSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
-            m_spellTypesToRemove = new List<string>();
-            m_spellTypesToRemove.Add("DamageOverTime");
-            m_spellTypesToRemove.Add("Nearsight");
-            m_spellTypesToRemove.Add("Silence");
-            m_spellTypesToRemove.Add("Disease");
-            m_spellTypesToRemove.Add("StyleBleeding");
+            SpellTypesToRemove = new List<string>
+            {
+                "DamageOverTime",
+                "Nearsight",
+                "Silence",
+                "Disease",
+                "StyleBleeding"
+            };
         }
     }
 }

@@ -38,10 +38,10 @@ namespace DOL.GS.Spells
             {
                 if (log.IsWarnEnabled)
                 {
-                    log.WarnFormat("NPC template {0} not found! Spell: {1}", Spell.LifeDrainReturn, Spell.ToString());
+                    log.Warn($"NPC template {Spell.LifeDrainReturn} not found! Spell: {Spell}");
                 }
 
-                MessageToCaster("NPC template " + (ushort)Spell.LifeDrainReturn + " not found!", eChatType.CT_System);
+                MessageToCaster($"NPC template {(ushort) Spell.LifeDrainReturn} not found!", eChatType.CT_System);
                 return;
             }
 
@@ -68,10 +68,7 @@ namespace DOL.GS.Spells
             m_pet.AddToWorld();
 
             // Check for buffs
-            if (brain is ControlledNpcBrain)
-            {
-                (brain as ControlledNpcBrain).CheckSpells(StandardMobBrain.eCheckSpellType.Defensive);
-            }
+            (brain as ControlledNpcBrain)?.CheckSpells(StandardMobBrain.eCheckSpellType.Defensive);
 
             AddHandlers();
             SetBrainToOwner(brain);
@@ -91,8 +88,7 @@ namespace DOL.GS.Spells
 
         protected void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-            if (args == null || args.AttackData == null)
+            if (!(arguments is AttackFinishedEventArgs args) || args.AttackData == null)
             {
                 return;
             }
@@ -107,10 +103,7 @@ namespace DOL.GS
 {
     public class IllusionBladePet : GamePet
     {
-        public override int MaxHealth
-        {
-            get { return Level * 10; }
-        }
+        public override int MaxHealth => Level * 10;
 
         public override void OnAttackedByEnemy(AttackData ad) { }
 

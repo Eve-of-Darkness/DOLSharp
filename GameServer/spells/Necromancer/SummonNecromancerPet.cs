@@ -68,13 +68,13 @@ namespace DOL.GS.Spells
         {
             if (FindStaticEffectOnTarget(Caster, typeof(ShadeEffect)) != null)
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonNecromancerPet.CheckBeginCast.ShadeEffectIsNotNull"), eChatType.CT_System);
+                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonNecromancerPet.CheckBeginCast.ShadeEffectIsNotNull"), eChatType.CT_System);
                 return false;
             }
 
-            if (Caster is GamePlayer && Caster.ControlledBrain != null)
+            if (Caster is GamePlayer player && Caster.ControlledBrain != null)
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "Summon.CheckBeginCast.AlreadyHaveaPet"), eChatType.CT_SpellResisted);
+                MessageToCaster(LanguageMgr.GetTranslation(player.Client, "Summon.CheckBeginCast.AlreadyHaveaPet"), eChatType.CT_SpellResisted);
                 return false;
             }
 
@@ -106,17 +106,11 @@ namespace DOL.GS.Spells
         {
             base.ApplyEffectOnTarget(target, effectiveness);
 
-            if (Caster is GamePlayer)
-            {
-                (Caster as GamePlayer).Shade(true);
-            }
+            (Caster as GamePlayer)?.Shade(true);
 
             // Cancel RR5 Call of Darkness if on caster.
             IGameEffect callOfDarkness = FindStaticEffectOnTarget(Caster, typeof(CallOfDarknessEffect));
-            if (callOfDarkness != null)
-            {
-                callOfDarkness.Cancel(false);
-            }
+            callOfDarkness?.Cancel(false);
         }
 
         /// <summary>
@@ -127,13 +121,13 @@ namespace DOL.GS.Spells
             get
             {
                 var delve = new List<string>();
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonNecromancerPet.DelveInfo.Function"));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonNecromancerPet.DelveInfo.Function"));
                 delve.Add(string.Empty);
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonNecromancerPet.DelveInfo.Description"));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonNecromancerPet.DelveInfo.Description"));
                 delve.Add(string.Empty);
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonNecromancerPet.DelveInfo.Target", Spell.Target));
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonNecromancerPet.DelveInfo.Power", Math.Abs(Spell.Power)));
-                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SummonNecromancerPet.DelveInfo.CastingTime", (Spell.CastTime / 1000).ToString("0.0## " + LanguageMgr.GetTranslation((Caster as GamePlayer).Client, "SpellHandler.DelveInfo.Sec"))));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonNecromancerPet.DelveInfo.Target", Spell.Target));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonNecromancerPet.DelveInfo.Power", Math.Abs(Spell.Power)));
+                delve.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SummonNecromancerPet.DelveInfo.CastingTime", (Spell.CastTime / 1000).ToString("0.0## " + LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.DelveInfo.Sec"))));
                 return delve;
             }
         }

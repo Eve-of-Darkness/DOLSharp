@@ -36,7 +36,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -83,7 +83,7 @@ namespace DOL.GS.Spells
                 RealmAbilities.L3RAPropertyEnhancer ra = Caster.GetAbility<RealmAbilities.ViperAbility>();
                 if (ra != null)
                 {
-                    int additional = (int)((float)ad.Damage * ((float)ra.Amount / 100));
+                    int additional = (int)(ad.Damage * ((float)ra.Amount / 100));
                     ad.Damage += additional;
                 }
             }
@@ -106,15 +106,15 @@ namespace DOL.GS.Spells
         /// <param name="max">returns max variance</param>
         public override void CalculateDamageVariance(GameLiving target, out double min, out double max)
         {
-            int speclevel = 1;
             min = 1.13;
             max = 1.13;
 
-            if (m_caster is GamePlayer)
+            if (Caster is GamePlayer player)
             {
-                if (m_spellLine.KeyName == GlobalSpellsLines.Mundane_Poisons)
+                int speclevel;
+                if (SpellLine.KeyName == GlobalSpellsLines.Mundane_Poisons)
                 {
-                    speclevel = ((GamePlayer)m_caster).GetModifiedSpecLevel(Specs.Envenom);
+                    speclevel = player.GetModifiedSpecLevel(Specs.Envenom);
                     min = 1.25;
                     max = 1.25;
 
@@ -125,7 +125,7 @@ namespace DOL.GS.Spells
                 }
                 else
                 {
-                    speclevel = ((GamePlayer)m_caster).GetModifiedSpecLevel(m_spellLine.Spec);
+                    speclevel = player.GetModifiedSpecLevel(SpellLine.Spec);
 
                     if (target.Level > 0)
                     {
@@ -154,17 +154,14 @@ namespace DOL.GS.Spells
         {
             // Graveen: only GamePlayer should receive messages :p
             GamePlayer PlayerReceivingMessages = null;
-            if (m_caster is GamePlayer)
+            if (Caster is GamePlayer)
             {
-                PlayerReceivingMessages = m_caster as GamePlayer;
+                PlayerReceivingMessages = Caster as GamePlayer;
             }
 
-            if (m_caster is GamePet)
+            if ((Caster as GamePet)?.Brain is IControlledBrain)
             {
-                if ((m_caster as GamePet).Brain is IControlledBrain)
-                {
-                    PlayerReceivingMessages = ((m_caster as GamePet).Brain as IControlledBrain).GetPlayerOwner();
-                }
+                PlayerReceivingMessages = (((GamePet) Caster).Brain as IControlledBrain)?.GetPlayerOwner();
             }
 
             if (PlayerReceivingMessages == null)
@@ -191,20 +188,6 @@ namespace DOL.GS.Spells
                     string.Format(LanguageMgr.GetTranslation(PlayerReceivingMessages.Client, "DoTSpellHandler.SendDamageMessages.YourCriticallyHits",
                     Spell.Name, ad.Target.GetName(0, false), ad.CriticalDamage)), eChatType.CT_YouHit);
             }
-
-            // if (ad.Damage > 0)
-            //          {
-            //              string modmessage = "";
-            //              if (ad.Modifier > 0) modmessage = " (+"+ad.Modifier+")";
-            //              if (ad.Modifier < 0) modmessage = " ("+ad.Modifier+")";
-            //              MessageToCaster("You hit "+ad.Target.GetName(0, false)+" for " + ad.Damage + " damage!", eChatType.CT_Spell);
-            //          }
-            //          else
-            //          {
-            //              MessageToCaster("You hit "+ad.Target.GetName(0, false)+" for " + ad.Damage + " damage!", eChatType.CT_Spell);
-            //              MessageToCaster(ad.Target.GetName(0, true) + " resists the effect!", eChatType.CT_SpellResisted);
-            //              MessageToLiving(ad.Target, "You resist the effect!", eChatType.CT_SpellResisted);
-            //          }
         }
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
@@ -216,7 +199,7 @@ namespace DOL.GS.Spells
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
             // damage is not reduced with distance
-            return new GameSpellEffect(this, m_spell.Duration, m_spell.Frequency, effectiveness);
+            return new GameSpellEffect(this, Spell.Duration, Spell.Frequency, effectiveness);
         }
 
         public override void OnEffectStart(GameSpellEffect effect)
@@ -268,7 +251,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -284,9 +267,9 @@ namespace DOL.GS.Spells
         {
             double spellDamage = Spell.Damage;
             GamePlayer player = null;
-            if (m_caster is GamePlayer)
+            if (Caster is GamePlayer gamePlayer)
             {
-                player = m_caster as GamePlayer;
+                player = gamePlayer;
             }
 
             if (player != null && player.CharacterClass.ManaStat != eStat.UNDEFINED)
@@ -298,9 +281,9 @@ namespace DOL.GS.Spells
                     spellDamage = 0;
                 }
             }
-            else if (m_caster is GameNPC)
+            else if (Caster is GameNPC)
             {
-                int manaStatValue = m_caster.GetModified(eProperty.Intelligence);
+                int manaStatValue = Caster.GetModified(eProperty.Intelligence);
                 spellDamage *= (manaStatValue + 200) / 275.0;
                 if (spellDamage < 0)
                 {

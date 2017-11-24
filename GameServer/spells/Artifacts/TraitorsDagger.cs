@@ -42,7 +42,7 @@ namespace DOL.GS.Spells
                         Effect.SpellHandler.Spell.SpellType.Equals("AtlantisTabletMorph") ||
                         Effect.SpellHandler.Spell.SpellType.Equals("AlvarusMorph"))
                     {
-                        player.Out.SendMessage("You already have an active morph!", DOL.GS.PacketHandler.eChatType.CT_SpellResisted, DOL.GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        player.Out.SendMessage("You already have an active morph!", PacketHandler.eChatType.CT_SpellResisted, PacketHandler.eChatLoc.CL_ChatWindow);
                         return;
                     }
                 }
@@ -103,8 +103,7 @@ namespace DOL.GS.Spells
 
         protected void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-            if (args == null || args.AttackData == null)
+            if (!(arguments is AttackFinishedEventArgs args) || args.AttackData == null)
             {
                 return;
             }
@@ -123,24 +122,27 @@ namespace DOL.GS.Spells
 
         private ISpellHandler MakeTrap()
         {
-            DBSpell dbs = new DBSpell();
-            dbs.Name = "Increased Essence Consumption";
-            dbs.Icon = 11020;
-            dbs.ClientEffect = 11020;
-            dbs.DamageType = 10;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "PetLifedrain";
-            dbs.Damage = 70;
-            dbs.LifeDrainReturn = 100;
-            dbs.Value = -100;
-            dbs.Duration = 0;
-            dbs.Frequency = 0;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = 350;
+            DBSpell dbs = new DBSpell
+            {
+                Name = "Increased Essence Consumption",
+                Icon = 11020,
+                ClientEffect = 11020,
+                DamageType = 10,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "PetLifedrain",
+                Damage = 70,
+                LifeDrainReturn = 100,
+                Value = -100,
+                Duration = 0,
+                Frequency = 0,
+                Pulse = 0,
+                PulsePower = 0,
+                Power = 0,
+                CastTime = 0,
+                Range = 350
+            };
+
             Spell s = new Spell(dbs, 50);
             SpellLine sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             return ScriptMgr.CreateSpellHandler(m_pet, s, sl);
@@ -155,10 +157,7 @@ namespace DOL.GS
 {
     public class TraitorDaggerPet : GamePet
     {
-        public override int MaxHealth
-        {
-            get { return Level * 15; }
-        }
+        public override int MaxHealth => Level * 15;
 
         public override void OnAttackedByEnemy(AttackData ad) { }
 

@@ -1101,12 +1101,12 @@ namespace DOL.GS
 
                 list.Add(" ");
                 list.Add(" ");
-                if (spl.SubSpellID > 0)
+                if (spl.SubSpellId > 0)
                 {
                     List<Spell> spells = SkillBase.GetSpellList(line.KeyName);
                     foreach (Spell subSpell in spells)
                     {
-                        if (subSpell.ID == spl.SubSpellID)
+                        if (subSpell.ID == spl.SubSpellId)
                         {
                             WritePotionSpellsInfos(list, client, subSpell, line);
                             break;

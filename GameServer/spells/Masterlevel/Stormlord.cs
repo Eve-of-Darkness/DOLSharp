@@ -37,46 +37,52 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // Construct a new storm.
-            storm = new GameStorm();
-            storm.Realm = caster.Realm;
-            storm.X = caster.X;
-            storm.Y = caster.Y;
-            storm.Z = caster.Z;
-            storm.CurrentRegionID = caster.CurrentRegionID;
-            storm.Heading = caster.Heading;
-            storm.Owner = (GamePlayer)caster;
-            storm.Movable = true;
+            storm = new GameStorm
+            {
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster,
+                Movable = true
+            };
 
             // Construct the storm spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7210;
-            dbs.ClientEffect = 7210;
-            dbs.Damage = spell.Damage;
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Realm";
-            dbs.Radius = 0;
-            dbs.Type = "StormMissHit";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth; // should be 4
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7210,
+                ClientEffect = 7210,
+                Damage = spell.Damage,
+                DamageType = (int) spell.DamageType,
+                Target = "Realm",
+                Radius = 0,
+                Type = "StormMissHit",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
+            // should be 4
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            tempest = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
 
     [SpellHandler("StormMissHit")]
     public class StormMissHit : MasterlevelBuffHandling
     {
-        public override eProperty Property1 { get { return eProperty.MissHit; } }
+        public override eProperty Property1 => eProperty.MissHit;
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
@@ -86,16 +92,16 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
 
             neweffect.Start(target);
 
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                ((GamePlayer)target).Out.SendMessage("You're harder to hit!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage("You're harder to hit!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -127,7 +133,7 @@ namespace DOL.GS.Spells
         /// <param name="target"></param>
         public override void FinishSpellCast(GameLiving target)
         {
-            m_caster.Mana -= PowerCost(target);
+            Caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
 
@@ -170,7 +176,7 @@ namespace DOL.GS.Spells
             {
                 if (targetStorm.Movable)
                 {
-                    GameNPC targetNPC = targetStorm as GameNPC;
+                    GameNPC targetNPC = targetStorm;
                     int range = Util.Random(0, 750);
                     double angle = Util.RandomDouble() * 2 * Math.PI;
                     targetNPC.WalkTo(targetNPC.X + (int)(range * Math.Cos(angle)), targetNPC.Y + (int)(range * Math.Sin(angle)), targetNPC.Z, targetNPC.MaxSpeed);
@@ -192,39 +198,45 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // Construct a new storm.
-            storm = new GameStorm();
-            storm.Realm = caster.Realm;
-            storm.X = caster.X;
-            storm.Y = caster.Y;
-            storm.Z = caster.Z;
-            storm.CurrentRegionID = caster.CurrentRegionID;
-            storm.Heading = caster.Heading;
-            storm.Owner = (GamePlayer)caster;
-            storm.Movable = true;
+            storm = new GameStorm
+            {
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster,
+                Movable = true
+            };
 
             // Construct the storm spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7273;
-            dbs.ClientEffect = 7273;
-            dbs.Damage = Math.Abs(spell.Damage);
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "StormEnduDrain";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth; // should be 2
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7273,
+                ClientEffect = 7273,
+                Damage = Math.Abs(spell.Damage),
+                DamageType = (int) spell.DamageType,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "StormEnduDrain",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
+            // should be 2
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            tempest = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
 
@@ -245,7 +257,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -256,9 +268,10 @@ namespace DOL.GS.Spells
 
             if (target is GamePlayer)
             {
-                ((GamePlayer)target).Out.SendMessage(" You lose " + end + " endurance!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                ((GamePlayer)target).Out.SendMessage($" You lose {end} endurance!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
             } 
-(m_caster as GamePlayer).Out.SendMessage(string.Empty + target.Name + " loses " + end + " endurance!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+
+            (Caster as GamePlayer)?.Out.SendMessage($"{target.Name} loses {end} endurance!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
@@ -285,39 +298,45 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // Construct a new storm.
-            storm = new GameStorm();
-            storm.Realm = caster.Realm;
-            storm.X = caster.X;
-            storm.Y = caster.Y;
-            storm.Z = caster.Z;
-            storm.CurrentRegionID = caster.CurrentRegionID;
-            storm.Heading = caster.Heading;
-            storm.Owner = (GamePlayer)caster;
-            storm.Movable = true;
+            storm = new GameStorm
+            {
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster,
+                Movable = true
+            };
 
             // Construct the storm spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7258;
-            dbs.ClientEffect = 7258;
-            dbs.Damage = spell.Damage;
-            dbs.DamageType = (int)spell.Damage;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "StormDexQuickDebuff";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth; // should be 2
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7258,
+                ClientEffect = 7258,
+                Damage = spell.Damage,
+                DamageType = (int) spell.Damage,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "StormDexQuickDebuff",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
+            // should be 2
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            tempest = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
 
@@ -327,9 +346,9 @@ namespace DOL.GS.Spells
     [SpellHandler("StormDexQuickDebuff")]
     public class StormDexQuickDebuff : DualStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.Dexterity; } }
+        public override eProperty Property1 => eProperty.Dexterity;
 
-        public override eProperty Property2 { get { return eProperty.Quickness; } }
+        public override eProperty Property2 => eProperty.Quickness;
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
@@ -339,16 +358,16 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
 
             neweffect.Start(target);
 
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                ((GamePlayer)target).Out.SendMessage("Your dexterity and quickness decreased!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage("Your dexterity and quickness decreased!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -379,39 +398,45 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // Construct a new storm.
-            storm = new GameStorm();
-            storm.Realm = caster.Realm;
-            storm.X = caster.X;
-            storm.Y = caster.Y;
-            storm.Z = caster.Z;
-            storm.CurrentRegionID = caster.CurrentRegionID;
-            storm.Heading = caster.Heading;
-            storm.Owner = (GamePlayer)caster;
-            storm.Movable = true;
+            storm = new GameStorm
+            {
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster,
+                Movable = true
+            };
 
             // Construct the storm spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7303;
-            dbs.ClientEffect = 7303;
-            dbs.Damage = Math.Abs(spell.Damage);
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "PowerDrainStorm";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth; // should be 2
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7303,
+                ClientEffect = 7303,
+                Damage = Math.Abs(spell.Damage),
+                DamageType = (int) spell.DamageType,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "PowerDrainStorm",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
+            // should be 2
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            tempest = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
 
@@ -433,7 +458,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -444,7 +469,7 @@ namespace DOL.GS.Spells
 
             if (target is GamePlayer)
             {
-                ((GamePlayer)target).Out.SendMessage(m_caster.Name + " steals you " + mana + " points of power!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                ((GamePlayer)target).Out.SendMessage($"{Caster.Name} steals you {mana} points of power!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
             }
 
             StealMana(target, mana);
@@ -454,21 +479,21 @@ namespace DOL.GS.Spells
 
         public virtual void StealMana(GameLiving target, int mana)
         {
-            if (!m_caster.IsAlive)
+            if (!Caster.IsAlive)
             {
                 return;
             }
 
-            m_caster.ChangeMana(target, GameLiving.eManaChangeType.Spell, mana);
+            Caster.ChangeMana(target, GameLiving.eManaChangeType.Spell, mana);
             SendCasterMessage(target, mana);
         }
 
         public virtual void SendCasterMessage(GameLiving target, int mana)
         {
-            MessageToCaster(string.Format("You steal {0} for {1} power!", target.Name, mana), eChatType.CT_YouHit);
+            MessageToCaster($"You steal {target.Name} for {mana} power!", eChatType.CT_YouHit);
             if (mana > 0)
             {
-                MessageToCaster("You steal " + mana + " power points" + (mana == 1 ? "." : "s."), eChatType.CT_Spell);
+                MessageToCaster($"You steal {mana} power points{(mana == 1 ? "." : "s.")}", eChatType.CT_Spell);
             }
 
             // else
@@ -502,22 +527,20 @@ namespace DOL.GS.Spells
         {
             base.OnEffectStart(effect);
             m_effect = effect;
-            if (effect.Owner is GameStorm)
+            if (effect.Owner is GameStorm targetStorm)
             {
-                GameStorm targetStorm = effect.Owner as GameStorm;
                 targetStorm.Movable = false;
                 MessageToCaster("Now the vortex of this storm is locked!", eChatType.CT_YouWereHit);
-                GameEventMgr.AddHandler(m_caster, GameLivingEvent.Moving, new DOLEventHandler(LivingMoves));
+                GameEventMgr.AddHandler(Caster, GameLivingEvent.Moving, new DOLEventHandler(LivingMoves));
             }
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            if (effect.Owner is GameStorm)
+            if (effect.Owner is GameStorm targetStorm)
             {
-                GameStorm targetStorm = effect.Owner as GameStorm;
                 targetStorm.Movable = true;
-                GameEventMgr.RemoveHandler(m_caster, GameLivingEvent.Moving, new DOLEventHandler(LivingMoves));
+                GameEventMgr.RemoveHandler(Caster, GameLivingEvent.Moving, new DOLEventHandler(LivingMoves));
             }
 
             return base.OnEffectExpires(effect, noMessages);
@@ -525,8 +548,7 @@ namespace DOL.GS.Spells
 
         public void LivingMoves(DOLEvent e, object sender, EventArgs args)
         {
-            GameLiving player = sender as GameLiving;
-            if (player == null)
+            if (!(sender is GameLiving))
             {
                 return;
             }
@@ -535,7 +557,6 @@ namespace DOL.GS.Spells
             {
                 MessageToCaster("You are moving. Your concentration fades", eChatType.CT_SpellExpires);
                 OnEffectExpires(m_effect, true);
-                return;
             }
         }
 
@@ -553,39 +574,45 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // Construct a new storm.
-            storm = new GameStorm();
-            storm.Realm = caster.Realm;
-            storm.X = caster.X;
-            storm.Y = caster.Y;
-            storm.Z = caster.Z;
-            storm.CurrentRegionID = caster.CurrentRegionID;
-            storm.Heading = caster.Heading;
-            storm.Owner = (GamePlayer)caster;
-            storm.Movable = true;
+            storm = new GameStorm
+            {
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster,
+                Movable = true
+            };
 
             // Construct the storm spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7223;
-            dbs.ClientEffect = 7223;
-            dbs.Damage = spell.Damage;
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "StormStrConstDebuff";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth; // should be 2
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7223,
+                ClientEffect = 7223,
+                Damage = spell.Damage,
+                DamageType = (int) spell.DamageType,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "StormStrConstDebuff",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
+            // should be 2
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            tempest = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
 
@@ -595,9 +622,9 @@ namespace DOL.GS.Spells
     [SpellHandler("StormStrConstDebuff")]
     public class StormStrConstDebuff : DualStatDebuff
     {
-        public override eProperty Property1 { get { return eProperty.Strength; } }
+        public override eProperty Property1 => eProperty.Strength;
 
-        public override eProperty Property2 { get { return eProperty.Constitution; } }
+        public override eProperty Property2 => eProperty.Constitution;
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
@@ -607,16 +634,16 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
 
             neweffect.Start(target);
 
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                ((GamePlayer)target).Out.SendMessage("Your strenght and constitution decreased!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage("Your strenght and constitution decreased!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -647,39 +674,45 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // Construct a new storm.
-            storm = new GameStorm();
-            storm.Realm = caster.Realm;
-            storm.X = caster.X;
-            storm.Y = caster.Y;
-            storm.Z = caster.Z;
-            storm.CurrentRegionID = caster.CurrentRegionID;
-            storm.Heading = caster.Heading;
-            storm.Owner = (GamePlayer)caster;
-            storm.Movable = true;
+            storm = new GameStorm
+            {
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster,
+                Movable = true
+            };
 
             // Construct the storm spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7305;
-            dbs.ClientEffect = 7305;
-            dbs.Damage = spell.Damage;
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "StormAcuityDebuff";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth; // should be 2
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7305,
+                ClientEffect = 7305,
+                Damage = spell.Damage,
+                DamageType = (int) spell.DamageType,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "StormAcuityDebuff",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
+            // should be 2
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            tempest = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
 
@@ -722,16 +755,16 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
 
             neweffect.Start(target);
 
-            if (target is GamePlayer)
+            if (target is GamePlayer player)
             {
-                ((GamePlayer)target).Out.SendMessage("Your acuity decreased!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage("Your acuity decreased!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -762,39 +795,44 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // Construct a new storm.
-            storm = new GameStorm();
-            storm.Realm = caster.Realm;
-            storm.X = caster.X;
-            storm.Y = caster.Y;
-            storm.Z = caster.Z;
-            storm.CurrentRegionID = caster.CurrentRegionID;
-            storm.Heading = caster.Heading;
-            storm.Owner = (GamePlayer)caster;
-            storm.Movable = true;
+            storm = new GameStorm
+            {
+                Realm = caster.Realm,
+                X = caster.X,
+                Y = caster.Y,
+                Z = caster.Z,
+                CurrentRegionID = caster.CurrentRegionID,
+                Heading = caster.Heading,
+                Owner = (GamePlayer) caster,
+                Movable = true
+            };
 
             // Construct the storm spell
-            dbs = new DBSpell();
-            dbs.Name = spell.Name;
-            dbs.Icon = 7216;
-            dbs.ClientEffect = 7216;
-            dbs.Damage = spell.Damage;
-            dbs.DamageType = (int)spell.DamageType;
-            dbs.Target = "Enemy";
-            dbs.Radius = 0;
-            dbs.Type = "StormEnergyTempest";
-            dbs.Value = spell.Value;
-            dbs.Duration = spell.ResurrectHealth;
-            dbs.Frequency = spell.ResurrectMana;
-            dbs.Pulse = 0;
-            dbs.PulsePower = 0;
-            dbs.LifeDrainReturn = spell.LifeDrainReturn;
-            dbs.Power = 0;
-            dbs.CastTime = 0;
-            dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
+            dbs = new DBSpell
+            {
+                Name = spell.Name,
+                Icon = 7216,
+                ClientEffect = 7216,
+                Damage = spell.Damage,
+                DamageType = (int) spell.DamageType,
+                Target = "Enemy",
+                Radius = 0,
+                Type = "StormEnergyTempest",
+                Value = spell.Value,
+                Duration = spell.ResurrectHealth,
+                Frequency = spell.ResurrectMana,
+                Pulse = 0,
+                PulsePower = 0,
+                LifeDrainReturn = spell.LifeDrainReturn,
+                Power = 0,
+                CastTime = 0,
+                Range = WorldMgr.VISIBILITY_DISTANCE
+            };
+
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
+            tempest = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
 
@@ -817,7 +855,7 @@ namespace DOL.GS.Spells
                 if (player != null)
                 {
                     // This equation is used to simulate live values - Tolakram
-                    spellDamage = (target.MaxHealth * -Spell.Damage * .01) / 2.5;
+                    spellDamage = target.MaxHealth * -Spell.Damage * .01 / 2.5;
                 }
 
                 if (spellDamage < 0)
@@ -835,7 +873,7 @@ namespace DOL.GS.Spells
         {
             if (Spell.Damage < 0)
             {
-                return (m_spellTarget.MaxHealth * -Spell.Damage * .01) * 3.0 * effectiveness;
+                return m_spellTarget.MaxHealth * -Spell.Damage * .01 * 3.0 * effectiveness;
             }
 
             return base.DamageCap(effectiveness);
@@ -849,7 +887,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+            if (!target.IsAlive || target.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }

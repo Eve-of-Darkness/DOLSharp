@@ -54,11 +54,11 @@ namespace DOL.GS.Spells
         {
             if (Caster.CurrentRegion.IsRvR || Caster.CurrentRegion.IsHousing || Caster.CurrentRegion.IsCapitalCity)
             {
-                MessageToCaster("You cannot cast this spell here!", DOL.GS.PacketHandler.eChatType.CT_SpellResisted);
+                MessageToCaster("You cannot cast this spell here!", PacketHandler.eChatType.CT_SpellResisted);
                 return false;
             }
 
-            if (Caster.TempProperties.getProperty<bool>(NoveltyPetBrain.HAS_PET, false))
+            if (Caster.TempProperties.getProperty(NoveltyPetBrain.HAS_PET, false))
             {
                 // no message
                 return false;
@@ -85,7 +85,7 @@ namespace DOL.GS.Spells
             get
             {
                 var list = new List<string>();
-                list.Add(string.Format("  {0}", Spell.Description));
+                list.Add($"  {Spell.Description}");
 
                 return list;
             }

@@ -19,14 +19,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
 using DOL.Language;
 using DOL.Database;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.GS.Spells;
 using DOL.GS.Effects;
-
 using log4net;
 
 namespace DOL.GS.Styles
@@ -57,8 +55,7 @@ namespace DOL.GS.Styles
             // several different threads at the same time!
             lock (living)
             {
-                GameLiving target = living.TargetObject as GameLiving;
-                if (target == null)
+                if (!(living.TargetObject is GameLiving target))
                 {
                     return false;
                 }
@@ -96,7 +93,7 @@ namespace DOL.GS.Styles
                         }
 
                         // Last attack result
-                        GameLiving.eAttackResult lastRes = (lastAD != null) ? lastAD.AttackResult : GameLiving.eAttackResult.Any;
+                        GameLiving.eAttackResult lastRes = lastAD?.AttackResult ?? GameLiving.eAttackResult.Any;
 
                         if (requiredAttackResult != GameLiving.eAttackResult.Any && lastRes != requiredAttackResult)
                         {
@@ -219,20 +216,14 @@ namespace DOL.GS.Styles
                 // Dead players can't use styles
                 if (!living.IsAlive)
                 {
-                    if (player != null)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "StyleProcessor.TryToUseStyle.CantCombatMode"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
-                    }
+                    player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "StyleProcessor.TryToUseStyle.CantCombatMode"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
 
                     return;
                 }
 
                 if (living.IsDisarmed)
                 {
-                    if (living is GamePlayer)
-                    {
-                        (living as GamePlayer).Out.SendMessage("You are disarmed and cannot attack!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
-                    }
+                    (living as GamePlayer)?.Out.SendMessage("You are disarmed and cannot attack!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
 
                     return;
                 }
@@ -240,10 +231,7 @@ namespace DOL.GS.Styles
                 // Can't use styles with range weapon
                 if (living.ActiveWeaponSlot == GameLiving.eActiveWeaponSlot.Distance)
                 {
-                    if (player != null)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "StyleProcessor.TryToUseStyle.CantMeleeCombat"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
-                    }
+                    player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "StyleProcessor.TryToUseStyle.CantMeleeCombat"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
 
                     return;
                 }
@@ -257,10 +245,7 @@ namespace DOL.GS.Styles
 
                 if (living.TargetObject == null)
                 {
-                    if (player != null)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "StyleProcessor.TryToUseStyle.MustHaveTarget"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
+                    player?.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "StyleProcessor.TryToUseStyle.MustHaveTarget"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                     return;
                 }
@@ -310,11 +295,14 @@ namespace DOL.GS.Styles
                         {
                             AttackData lastAD = (AttackData)living.TempProperties.getProperty<object>(GameLiving.LAST_ATTACK_DATA, null);
                             if (lastAD == null
-                            || lastAD.AttackResult != GameLiving.eAttackResult.HitStyle
-                            || lastAD.Style == null
-                            || lastAD.Style.ID != style.OpeningRequirementValue)
+                                || lastAD.AttackResult != GameLiving.eAttackResult.HitStyle
+                                || lastAD.Style == null
+                                || lastAD.Style.ID != style.OpeningRequirementValue)
                             {
-                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "StyleProcessor.TryToUseStyle.PerformStyleBefore", preRequireStyle.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                player.Out.SendMessage(
+                                    LanguageMgr.GetTranslation(player.Client.Account.Language,
+                                        "StyleProcessor.TryToUseStyle.PerformStyleBefore", preRequireStyle.Name),
+                                    eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
                         }
@@ -327,10 +315,7 @@ namespace DOL.GS.Styles
                         {
                             // cancel engage effect if exist
                             EngageEffect effect = living.EffectList.GetOfType<EngageEffect>();
-                            if (effect != null)
-                            {
-                                effect.Cancel(false);
-                            }
+                            effect?.Cancel(false);
                         }
 
                         // unstealth only on primary style to not break
@@ -371,11 +356,14 @@ namespace DOL.GS.Styles
                                 {
                                     AttackData lastAD = (AttackData)living.TempProperties.getProperty<object>(GameLiving.LAST_ATTACK_DATA, null);
                                     if (lastAD == null
-                                    || lastAD.AttackResult != GameLiving.eAttackResult.HitStyle
-                                    || lastAD.Style == null
-                                    || lastAD.Style.ID != style.OpeningRequirementValue)
+                                        || lastAD.AttackResult != GameLiving.eAttackResult.HitStyle
+                                        || lastAD.Style == null
+                                        || lastAD.Style.ID != style.OpeningRequirementValue)
                                     {
-                                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "StyleProcessor.TryToUseStyle.PerformStyleBefore", preRequireStyle.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                        player.Out.SendMessage(
+                                            LanguageMgr.GetTranslation(player.Client.Account.Language,
+                                                "StyleProcessor.TryToUseStyle.PerformStyleBefore",
+                                                preRequireStyle.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                         return;
                                     }
                                 }
@@ -654,8 +642,7 @@ namespace DOL.GS.Styles
                 return true;
             }
 
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer player))
             {
                 return false;
             }
@@ -861,7 +848,7 @@ namespace DOL.GS.Styles
 
             if (style.OpeningRequirementValue != 0 && style.AttackResultRequirement == 0 && style.OpeningRequirementType == 0)
             {
-                delveInfo.Add(string.Format("- Error: Opening Requirement '{0}' but requirement type is Any!", style.OpeningRequirementValue));
+                delveInfo.Add($"- Error: Opening Requirement '{style.OpeningRequirementValue}' but requirement type is Any!");
             }
 
             temp = string.Empty;
@@ -1093,30 +1080,30 @@ namespace DOL.GS.Styles
                 delveInfo.Add(" ");
                 delveInfo.Add("--- Style Technical Information ---");
                 delveInfo.Add(" ");
-                delveInfo.Add(string.Format("ID: {0}", style.ID));
-                delveInfo.Add(string.Format("ClassID: {0}", style.ClassID));
-                delveInfo.Add(string.Format("Icon: {0}", style.Icon));
-                delveInfo.Add(string.Format("TwoHandAnimation: {0}", style.TwoHandAnimation));
-                delveInfo.Add(string.Format("Spec: {0}", style.Spec));
-                delveInfo.Add(string.Format("SpecLevelRequirement: {0}", style.SpecLevelRequirement));
-                delveInfo.Add(string.Format("Level: {0}", style.Level));
-                delveInfo.Add(string.Format("GrowthOffset: {0}", style.GrowthOffset));
-                delveInfo.Add(string.Format("GrowthRate: {0}", style.GrowthRate));
-                delveInfo.Add(string.Format("Endurance: {0}", style.EnduranceCost));
-                delveInfo.Add(string.Format("StealthRequirement: {0}", style.StealthRequirement));
-                delveInfo.Add(string.Format("WeaponTypeRequirement: {0}", style.WeaponTypeRequirement));
+                delveInfo.Add($"ID: {style.ID}");
+                delveInfo.Add($"ClassID: {style.ClassID}");
+                delveInfo.Add($"Icon: {style.Icon}");
+                delveInfo.Add($"TwoHandAnimation: {style.TwoHandAnimation}");
+                delveInfo.Add($"Spec: {style.Spec}");
+                delveInfo.Add($"SpecLevelRequirement: {style.SpecLevelRequirement}");
+                delveInfo.Add($"Level: {style.Level}");
+                delveInfo.Add($"GrowthOffset: {style.GrowthOffset}");
+                delveInfo.Add($"GrowthRate: {style.GrowthRate}");
+                delveInfo.Add($"Endurance: {style.EnduranceCost}");
+                delveInfo.Add($"StealthRequirement: {style.StealthRequirement}");
+                delveInfo.Add($"WeaponTypeRequirement: {style.WeaponTypeRequirement}");
                 string indicator = string.Empty;
                 if (style.OpeningRequirementValue != 0 && style.AttackResultRequirement == 0 && style.OpeningRequirementType == 0)
                 {
                     indicator = "!!";
                 }
 
-                delveInfo.Add(string.Format("AttackResultRequirement: {0}({1}) {2}", style.AttackResultRequirement, (int)style.AttackResultRequirement, indicator));
-                delveInfo.Add(string.Format("OpeningRequirementType: {0}({1}) {2}", style.OpeningRequirementType, (int)style.OpeningRequirementType, indicator));
-                delveInfo.Add(string.Format("OpeningRequirementValue: {0}", style.OpeningRequirementValue));
-                delveInfo.Add(string.Format("ArmorHitLocation: {0}({1})", style.ArmorHitLocation, (int)style.ArmorHitLocation));
-                delveInfo.Add(string.Format("BonusToDefense: {0}", style.BonusToDefense));
-                delveInfo.Add(string.Format("BonusToHit: {0}", style.BonusToHit));
+                delveInfo.Add($"AttackResultRequirement: {style.AttackResultRequirement}({(int) style.AttackResultRequirement}) {indicator}");
+                delveInfo.Add($"OpeningRequirementType: {style.OpeningRequirementType}({(int) style.OpeningRequirementType}) {indicator}");
+                delveInfo.Add($"OpeningRequirementValue: {style.OpeningRequirementValue}");
+                delveInfo.Add($"ArmorHitLocation: {style.ArmorHitLocation}({(int) style.ArmorHitLocation})");
+                delveInfo.Add($"BonusToDefense: {style.BonusToDefense}");
+                delveInfo.Add($"BonusToHit: {style.BonusToHit}");
 
                 if (style.Procs != null && style.Procs.Count > 0)
                 {
@@ -1133,8 +1120,8 @@ namespace DOL.GS.Styles
                         procs += spell.Item1.ID;
                     }
 
-                    delveInfo.Add(string.Format("Procs: {0}", procs));
-                    delveInfo.Add(string.Format("RandomProc: {0}", style.RandomProc));
+                    delveInfo.Add($"Procs: {procs}");
+                    delveInfo.Add($"RandomProc: {style.RandomProc}");
                 }
             }
         }

@@ -26,7 +26,7 @@ namespace DOL.GS.Spells
     {
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
-            if (Caster.InCombat == true)
+            if (Caster.InCombat)
             {
                 MessageToCaster("You cannot cast this spell in combat!", eChatType.CT_SpellResisted);
                 return false;
@@ -47,11 +47,11 @@ namespace DOL.GS.Spells
 
         private void DealDamage(GameLiving target)
         {
-            int ticksToTarget = m_caster.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
+            int ticksToTarget = Caster.GetDistanceTo(target) * 100 / 85; // 85 units per 1/10s
             int delay = 1 + ticksToTarget / 100;
             foreach (GamePlayer player in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                player.Out.SendSpellEffectAnimation(m_caster, target, m_spell.ClientEffect, (ushort)delay, false, 1);
+                player.Out.SendSpellEffectAnimation(Caster, target, Spell.ClientEffect, (ushort)delay, false, 1);
             }
 
             BoltOnTargetAction bolt = new BoltOnTargetAction(Caster, target, this);
@@ -77,18 +77,8 @@ namespace DOL.GS.Spells
             public BoltOnTargetAction(GameLiving actionSource, GameLiving boltTarget, VampiirBoltSpellHandler spellHandler)
                 : base(actionSource)
             {
-                if (boltTarget == null)
-                {
-                    throw new ArgumentNullException("boltTarget");
-                }
-
-                if (spellHandler == null)
-                {
-                    throw new ArgumentNullException("spellHandler");
-                }
-
-                m_boltTarget = boltTarget;
-                m_handler = spellHandler;
+                m_boltTarget = boltTarget ?? throw new ArgumentNullException(nameof(boltTarget));
+                m_handler = spellHandler ?? throw new ArgumentNullException(nameof(spellHandler));
             }
 
             protected override void OnTick()
@@ -100,17 +90,16 @@ namespace DOL.GS.Spells
                     return;
                 }
 
-                int power = 0;
-
                 if (target is GameNPC || target.Mana > 0)
                 {
+                    int power;
                     if (target is GameNPC)
                     {
-                        power = (int)Math.Round(((double)target.Level * (double)m_handler.Spell.Value * 2) / 100);
+                        power = (int)Math.Round((target.Level * m_handler.Spell.Value * 2) / 100);
                     }
                     else
                     {
-                        power = (int)Math.Round((double)target.MaxMana * (((double)m_handler.Spell.Value) / 250));
+                        power = (int)Math.Round(target.MaxMana * (m_handler.Spell.Value / 250));
                     }
 
                     if (target.Mana < power)
@@ -120,20 +109,20 @@ namespace DOL.GS.Spells
 
                     caster.Mana += power;
 
-                    if (target is GamePlayer)
+                    if (target is GamePlayer gamePlayer)
                     {
                         target.Mana -= power;
-                        ((GamePlayer)target).Out.SendMessage(caster.Name + " takes " + power + " power!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                        gamePlayer.Out.SendMessage($"{caster.Name} takes {power} power!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
                     }
 
-                    if (caster is GamePlayer)
+                    if (caster is GamePlayer player)
                     {
-                        ((GamePlayer)caster).Out.SendMessage("You receive " + power + " power from " + target.Name + "!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"You receive {power} power from {target.Name}!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                     }
                 }
                 else
                 {
-                    ((GamePlayer)caster).Out.SendMessage("You did not receive any power from " + target.Name + "!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    ((GamePlayer)caster).Out.SendMessage($"You did not receive any power from {target.Name}!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
 
                 // Place the caster in combat
@@ -147,13 +136,16 @@ namespace DOL.GS.Spells
                 }
 
                 // create the attack data for the bolt
-                AttackData ad = new AttackData();
-                ad.Attacker = caster;
-                ad.Target = target;
-                ad.DamageType = eDamageType.Heat;
-                ad.AttackType = AttackData.eAttackType.Spell;
-                ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
-                ad.SpellHandler = m_handler;
+                AttackData ad = new AttackData
+                {
+                    Attacker = caster,
+                    Target = target,
+                    DamageType = eDamageType.Heat,
+                    AttackType = AttackData.eAttackType.Spell,
+                    AttackResult = GameLiving.eAttackResult.HitUnstyled,
+                    SpellHandler = m_handler
+                };
+
                 target.OnAttackedByEnemy(ad);
 
                 target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, caster);

@@ -27,11 +27,9 @@ namespace DOL.GS.Spells
         public override IList<GameLiving> SelectTargets(GameObject castTarget)
         {
             var list = new List<GameLiving>();
-            GameLiving target = castTarget as GameLiving;
 
-            if (Caster is GamePlayer)
+            if (Caster is GamePlayer casterPlayer)
             {
-                GamePlayer casterPlayer = (GamePlayer)Caster;
                 Group group = casterPlayer.Group;
                 if (group == null)
                 {
@@ -39,25 +37,23 @@ namespace DOL.GS.Spells
                 }
 
                 int spellRange = CalculateSpellRange();
-                if (group != null)
-                {
-                    lock (group)
-                    {
 
-                        foreach (GamePlayer groupPlayer in casterPlayer.GetPlayersInRadius((ushort)m_spell.Radius))
+                lock (group)
+                {
+
+                    foreach (GamePlayer groupPlayer in casterPlayer.GetPlayersInRadius((ushort)Spell.Radius))
+                    {
+                        if (casterPlayer.Group.IsInTheGroup(groupPlayer))
                         {
-                            if (casterPlayer.Group.IsInTheGroup(groupPlayer))
+                            if (groupPlayer != casterPlayer && groupPlayer.IsAlive)
                             {
-                                if (groupPlayer != casterPlayer && groupPlayer.IsAlive)
+                                list.Add(groupPlayer);
+                                IControlledBrain npc = groupPlayer.ControlledBrain;
+                                if (npc != null)
                                 {
-                                    list.Add(groupPlayer);
-                                    IControlledBrain npc = groupPlayer.ControlledBrain;
-                                    if (npc != null)
+                                    if (casterPlayer.IsWithinRadius(npc.Body, spellRange))
                                     {
-                                        if (casterPlayer.IsWithinRadius(npc.Body, spellRange))
-                                        {
-                                            list.Add(npc.Body);
-                                        }
+                                        list.Add(npc.Body);
                                     }
                                 }
                             }
@@ -74,16 +70,18 @@ namespace DOL.GS.Spells
             : base(caster, spell, line)
         {
             // RR4: now it's a list
-            m_spellTypesToRemove = new List<string>();
-            m_spellTypesToRemove.Add("Mesmerize");
-            m_spellTypesToRemove.Add("SpeedDecrease");
-            m_spellTypesToRemove.Add("StyleSpeedDecrease");
-            m_spellTypesToRemove.Add("DamageSpeedDecrease");
-            m_spellTypesToRemove.Add("HereticSpeedDecrease");
-            m_spellTypesToRemove.Add("HereticDamageSpeedDecreaseLOP");
-            m_spellTypesToRemove.Add("VampiirSpeedDecrease");
-            m_spellTypesToRemove.Add("ValkyrieSpeedDecrease");
-            m_spellTypesToRemove.Add("WarlockSpeedDecrease");
+            SpellTypesToRemove = new List<string>
+            {
+                "Mesmerize",
+                "SpeedDecrease",
+                "StyleSpeedDecrease",
+                "DamageSpeedDecrease",
+                "HereticSpeedDecrease",
+                "HereticDamageSpeedDecreaseLOP",
+                "VampiirSpeedDecrease",
+                "ValkyrieSpeedDecrease",
+                "WarlockSpeedDecrease"
+            };
         }
     }
 }
