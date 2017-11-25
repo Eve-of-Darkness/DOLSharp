@@ -26,15 +26,14 @@ namespace DOL.GS.PlayerClass
     public class ClassCleric : ClassAcolyte
     {
         public ClassCleric()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.ChurchofAlbion";
-            m_specializationMultiplier = 10;
-            m_primaryStat = eStat.PIE;
-            m_secondaryStat = eStat.CON;
-            m_tertiaryStat = eStat.STR;
-            m_manaStat = eStat.PIE;
-            m_baseHP = 720;
+            Profession = "PlayerClass.Profession.ChurchofAlbion";
+            SpecPointsMultiplier = 10;
+            PrimaryStat = eStat.PIE;
+            SecondaryStat = eStat.CON;
+            TertiaryStat = eStat.STR;
+            ManaStat = eStat.PIE;
+            BaseHP = 720;
         }
 
         public override bool HasAdvancedFromBaseClass()

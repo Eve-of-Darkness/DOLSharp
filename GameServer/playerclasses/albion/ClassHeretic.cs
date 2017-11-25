@@ -26,16 +26,15 @@ namespace DOL.GS.PlayerClass
     public class ClassHeretic : ClassAcolyte
     {
         public ClassHeretic()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.TempleofArawn";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.PIE;
-            m_secondaryStat = eStat.DEX;
-            m_tertiaryStat = eStat.CON;
-            m_manaStat = eStat.PIE;
-            m_wsbase = 360;
-            m_baseHP = 720;
+            Profession = "PlayerClass.Profession.TempleofArawn";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.PIE;
+            SecondaryStat = eStat.DEX;
+            TertiaryStat = eStat.CON;
+            ManaStat = eStat.PIE;
+            WeaponSkillBase = 360;
+            BaseHP = 720;
         }
 
         public override bool HasAdvancedFromBaseClass()

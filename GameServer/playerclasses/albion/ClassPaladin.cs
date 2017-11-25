@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System.Collections.Generic;
 
 namespace DOL.GS.PlayerClass
@@ -26,25 +27,21 @@ namespace DOL.GS.PlayerClass
     [CharacterClass((int)eCharacterClass.Paladin, "Paladin", "Fighter")]
     public class ClassPaladin : ClassFighter
     {
-        private static readonly string[] AutotrainableSkills = new[] { Specs.Slash, Specs.Chants };
+        private static readonly string[] AutotrainableSkills = { Specs.Slash, Specs.Chants };
 
         public ClassPaladin()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.ChurchofAlbion";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.CON;
-            m_secondaryStat = eStat.PIE;
-            m_tertiaryStat = eStat.STR;
-            m_manaStat = eStat.PIE;
-            m_wsbase = 380;
-            m_baseHP = 760;
+            Profession = "PlayerClass.Profession.ChurchofAlbion";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.CON;
+            SecondaryStat = eStat.PIE;
+            TertiaryStat = eStat.STR;
+            ManaStat = eStat.PIE;
+            WeaponSkillBase = 380;
+            BaseHP = 760;
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         public override IList<string> GetAutotrainableSkills()
         {
@@ -56,9 +53,6 @@ namespace DOL.GS.PlayerClass
             return true;
         }
 
-        public override ushort MaxPulsingSpells
-        {
-            get { return 2; }
-        }
+        public override ushort MaxPulsingSpells => 2;
     }
 }

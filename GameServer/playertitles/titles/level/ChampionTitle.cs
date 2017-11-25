@@ -49,7 +49,7 @@ namespace DOL.GS.PlayerTitles
         {
             if (player.Champion && player.ChampionLevel > 0)
             {
-                return source.TryTranslateOrDefault(string.Format("!CL Title {0}!", player.ChampionLevel), string.Format("Titles.CL.Level{0}", player.ChampionLevel));
+                return source.TryTranslateOrDefault($"!CL Title {player.ChampionLevel}!", $"Titles.CL.Level{player.ChampionLevel}");
             }
 
             return string.Empty;
@@ -58,10 +58,7 @@ namespace DOL.GS.PlayerTitles
         /// <summary>
         /// The event to hook.
         /// </summary>
-        public override DOLEvent Event
-        {
-            get { return GamePlayerEvent.ChampionLevelUp; }
-        }
+        public override DOLEvent Event => GamePlayerEvent.ChampionLevelUp;
 
         /// <summary>
         /// Verify whether the player is suitable for this title.
@@ -81,8 +78,7 @@ namespace DOL.GS.PlayerTitles
         /// <param name="arguments">The event arguments.</param>
         protected override void EventCallback(DOLEvent e, object sender, EventArgs arguments)
         {
-            GamePlayer p = sender as GamePlayer;
-            if (p != null && p.Titles.Contains(this))
+            if (sender is GamePlayer p && p.Titles.Contains(this))
             {
                 p.UpdateCurrentTitle();
                 return;

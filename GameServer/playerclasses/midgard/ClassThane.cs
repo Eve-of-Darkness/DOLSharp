@@ -27,22 +27,18 @@ namespace DOL.GS.PlayerClass
     {
 
         public ClassThane()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.HouseofThor";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.STR;
-            m_secondaryStat = eStat.PIE;
-            m_tertiaryStat = eStat.CON;
-            m_manaStat = eStat.PIE;
-            m_wsbase = 360;
-            m_baseHP = 720;
+            Profession = "PlayerClass.Profession.HouseofThor";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.STR;
+            SecondaryStat = eStat.PIE;
+            TertiaryStat = eStat.CON;
+            ManaStat = eStat.PIE;
+            WeaponSkillBase = 360;
+            BaseHP = 720;
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         public override bool HasAdvancedFromBaseClass()
         {

@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System.Collections.Generic;
 
 namespace DOL.GS.PlayerClass
@@ -26,25 +27,21 @@ namespace DOL.GS.PlayerClass
     [CharacterClass((int)eCharacterClass.Minstrel, "Minstrel", "Rogue")]
     public class ClassMinstrel : ClassAlbionRogue
     {
-        private static readonly string[] AutotrainableSkills = new[] { Specs.Instruments };
+        private static readonly string[] AutotrainableSkills = { Specs.Instruments };
 
         public ClassMinstrel()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.Academy";
-            m_specializationMultiplier = 15;
-            m_primaryStat = eStat.CHR;
-            m_secondaryStat = eStat.DEX;
-            m_tertiaryStat = eStat.STR;
-            m_manaStat = eStat.CHR;
-            m_wsbase = 380;
-            m_baseHP = 720;
+            Profession = "PlayerClass.Profession.Academy";
+            SpecPointsMultiplier = 15;
+            PrimaryStat = eStat.CHR;
+            SecondaryStat = eStat.DEX;
+            TertiaryStat = eStat.STR;
+            ManaStat = eStat.CHR;
+            WeaponSkillBase = 380;
+            BaseHP = 720;
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         public override IList<string> GetAutotrainableSkills()
         {
@@ -56,9 +53,6 @@ namespace DOL.GS.PlayerClass
             return true;
         }
 
-        public override ushort MaxPulsingSpells
-        {
-            get { return 2; }
-        }
+        public override ushort MaxPulsingSpells => 2;
     }
 }

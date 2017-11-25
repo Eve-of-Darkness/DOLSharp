@@ -66,7 +66,7 @@ namespace DOL.GS.Effects
                 spell.Cancel(false);
             }
 
-            _living.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, PropertyCalc.MaxSpeedCalculator.SPEED3);
+            _living.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, PropertyCalc.MaxSpeedCalculator.Speed3);
             _living.TempProperties.setProperty("Charging", true);
             if (_living is GamePlayer gamePlayer)
             {

@@ -34,8 +34,6 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.Stat_First, eProperty.Stat_Last)]
     public class StatCalculator : PropertyCalculator
     {
-        public StatCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
             int propertyIndex = (int)property;
@@ -55,9 +53,8 @@ namespace DOL.GS.PropertyCalc
             //    whatever your casting stat happens to be. If you're a druid, you should get an increase to empathy,
             //    while a bard should get an increase to charisma.  http://support.darkageofcamelot.com/kb/article.php?id=540
             // 3) Constitution lost at death, only affects players.
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                GamePlayer player = living as GamePlayer;
                 if (property == (eProperty)player.CharacterClass.ManaStat)
                 {
                     if (player.CharacterClass.ID != (int)eCharacterClass.Scout && player.CharacterClass.ID != (int)eCharacterClass.Hunter && player.CharacterClass.ID != (int)eCharacterClass.Ranger)
@@ -111,9 +108,8 @@ namespace DOL.GS.PropertyCalc
             int baseBuffBonus = living.BaseBuffBonusCategory[propertyIndex];
             int specBuffBonus = living.SpecBuffBonusCategory[propertyIndex];
 
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                GamePlayer player = living as GamePlayer;
                 if (property == (eProperty)player.CharacterClass.ManaStat)
                 {
                     if (player.CharacterClass.ClassType == eClassType.ListCaster)
@@ -151,10 +147,8 @@ namespace DOL.GS.PropertyCalc
             int itemBonus = living.ItemBonus[(int)property];
             int itemBonusCap = GetItemBonusCap(living, property);
 
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                GamePlayer player = living as GamePlayer;
-
                 if (property == (eProperty)player.CharacterClass.ManaStat)
                 {
                     if (player.CharacterClass.ID != (int)eCharacterClass.Scout && player.CharacterClass.ID != (int)eCharacterClass.Hunter && player.CharacterClass.ID != (int)eCharacterClass.Ranger)
@@ -200,10 +194,8 @@ namespace DOL.GS.PropertyCalc
 
             int itemBonusCapIncreaseCap = GetItemBonusCapIncreaseCap(living);
             int itemBonusCapIncrease = living.ItemBonus[(int)(eProperty.StatCapBonus_First - eProperty.Stat_First + property)];
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                GamePlayer player = living as GamePlayer;
-
                 if (property == (eProperty)player.CharacterClass.ManaStat)
                 {
                     if (player.CharacterClass.ID != (int)eCharacterClass.Scout && player.CharacterClass.ID != (int)eCharacterClass.Hunter && player.CharacterClass.ID != (int)eCharacterClass.Ranger)
@@ -224,28 +216,26 @@ namespace DOL.GS.PropertyCalc
                 return 0;
             }
 
-            int MythicalitemBonusCapIncreaseCap = GetMythicalItemBonusCapIncreaseCap(living);
-            int MythicalitemBonusCapIncrease = living.ItemBonus[(int)(eProperty.MythicalStatCapBonus_First - eProperty.Stat_First + property)];
+            int mythicalitemBonusCapIncreaseCap = GetMythicalItemBonusCapIncreaseCap(living);
+            int mythicalitemBonusCapIncrease = living.ItemBonus[(int)(eProperty.MythicalStatCapBonus_First - eProperty.Stat_First + property)];
             int itemBonusCapIncrease = GetItemBonusCapIncrease(living, property);
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                GamePlayer player = living as GamePlayer;
-
                 if (property == (eProperty)player.CharacterClass.ManaStat)
                 {
                     if (player.CharacterClass.ID != (int)eCharacterClass.Scout && player.CharacterClass.ID != (int)eCharacterClass.Hunter && player.CharacterClass.ID != (int)eCharacterClass.Ranger)
                     {
-                        MythicalitemBonusCapIncrease += living.ItemBonus[(int)eProperty.MythicalAcuCapBonus];
+                        mythicalitemBonusCapIncrease += living.ItemBonus[(int)eProperty.MythicalAcuCapBonus];
                     }
                 }
             }
 
-            if (MythicalitemBonusCapIncrease + itemBonusCapIncrease > 52)
+            if (mythicalitemBonusCapIncrease + itemBonusCapIncrease > 52)
             {
-                MythicalitemBonusCapIncrease = 52 - itemBonusCapIncrease;
+                mythicalitemBonusCapIncrease = 52 - itemBonusCapIncrease;
             }
 
-            return Math.Min(MythicalitemBonusCapIncrease, MythicalitemBonusCapIncreaseCap);
+            return Math.Min(mythicalitemBonusCapIncrease, mythicalitemBonusCapIncreaseCap);
         }
 
         /// <summary>

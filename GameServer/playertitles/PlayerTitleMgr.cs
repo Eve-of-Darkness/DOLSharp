@@ -33,12 +33,12 @@ namespace DOL.GS.PlayerTitles
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Holds all player titles.
         /// </summary>
-        private static readonly HashSet<IPlayerTitle> m_titles = new HashSet<IPlayerTitle>();
+        private static readonly HashSet<IPlayerTitle> Titles = new HashSet<IPlayerTitle>();
 
         /// <summary>
         /// Holds special "empty" title instance.
@@ -51,7 +51,7 @@ namespace DOL.GS.PlayerTitles
         /// <returns>true if successful</returns>
         public static bool Init()
         {
-            m_titles.Clear();
+            Titles.Clear();
             foreach (Type t in ScriptMgr.GetDerivedClasses(typeof(IPlayerTitle)))
             {
                 if (t == ClearTitle.GetType())
@@ -66,15 +66,15 @@ namespace DOL.GS.PlayerTitles
                 }
                 catch (Exception e)
                 {
-                    log.ErrorFormat("Error loading player title '{0}': {1}", t.FullName, e);
+                    Log.Error($"Error loading player title '{t.FullName}': {e}");
                     continue;
                 }
 
-                m_titles.Add(title);
-                log.DebugFormat("Loaded player title: {0}", title.GetType().FullName);
+                Titles.Add(title);
+                Log.Debug($"Loaded player title: {title.GetType().FullName}");
             }
 
-            log.InfoFormat("Loaded {0} player titles", m_titles.Count);
+            Log.Info($"Loaded {Titles.Count} player titles");
 
             return true;
         }
@@ -86,11 +86,12 @@ namespace DOL.GS.PlayerTitles
         /// <returns>All title suitable for given player or an empty list if none.</returns>
         public static ICollection GetPlayerTitles(GamePlayer player)
         {
-            var titles = new HashSet<IPlayerTitle>();
+            var titles = new HashSet<IPlayerTitle>
+            {
+                ClearTitle
+            };
 
-            titles.Add(ClearTitle);
-
-            return titles.Concat(m_titles.Where(t => t.IsSuitable(player))).ToArray();
+            return titles.Concat(Titles.Where(t => t.IsSuitable(player))).ToArray();
         }
 
         /// <summary>
@@ -105,7 +106,7 @@ namespace DOL.GS.PlayerTitles
                 return null;
             }
 
-            return m_titles.FirstOrDefault(t => t.GetType().FullName == s);
+            return Titles.FirstOrDefault(t => t.GetType().FullName == s);
         }
 
         /// <summary>
@@ -122,12 +123,12 @@ namespace DOL.GS.PlayerTitles
 
             Type t = title.GetType();
 
-            if (m_titles.Any(ttl => ttl.GetType() == t))
+            if (Titles.Any(ttl => ttl.GetType() == t))
             {
                 return false;
             }
 
-            m_titles.Add(title);
+            Titles.Add(title);
             return true;
         }
     }

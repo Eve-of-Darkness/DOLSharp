@@ -26,14 +26,13 @@ namespace DOL.GS.PlayerClass
     public class ClassSpiritmaster : ClassMystic
     {
         public ClassSpiritmaster()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.HouseofHel";
-            m_specializationMultiplier = 10;
-            m_primaryStat = eStat.PIE;
-            m_secondaryStat = eStat.DEX;
-            m_tertiaryStat = eStat.QUI;
-            m_manaStat = eStat.PIE;
+            Profession = "PlayerClass.Profession.HouseofHel";
+            SpecPointsMultiplier = 10;
+            PrimaryStat = eStat.PIE;
+            SecondaryStat = eStat.DEX;
+            TertiaryStat = eStat.QUI;
+            ManaStat = eStat.PIE;
         }
 
         public override bool HasAdvancedFromBaseClass()

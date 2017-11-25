@@ -26,14 +26,13 @@ namespace DOL.GS.PlayerClass
     public class ClassShaman : ClassSeer
     {
         public ClassShaman()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.HouseofYmir";
-            m_specializationMultiplier = 10;
-            m_primaryStat = eStat.PIE;
-            m_secondaryStat = eStat.CON;
-            m_tertiaryStat = eStat.STR;
-            m_manaStat = eStat.PIE;
+            Profession = "PlayerClass.Profession.HouseofYmir";
+            SpecPointsMultiplier = 10;
+            PrimaryStat = eStat.PIE;
+            SecondaryStat = eStat.CON;
+            TertiaryStat = eStat.STR;
+            ManaStat = eStat.PIE;
         }
 
         public override bool HasAdvancedFromBaseClass()

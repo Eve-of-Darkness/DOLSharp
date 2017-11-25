@@ -26,15 +26,14 @@ namespace DOL.GS.PlayerClass
     public class ClassBard : ClassNaturalist
     {
         public ClassBard()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofEssence";
-            m_specializationMultiplier = 15;
-            m_primaryStat = eStat.CHR;
-            m_secondaryStat = eStat.EMP;
-            m_tertiaryStat = eStat.CON;
-            m_manaStat = eStat.CHR;
-            m_wsbase = 360;
+            Profession = "PlayerClass.Profession.PathofEssence";
+            SpecPointsMultiplier = 15;
+            PrimaryStat = eStat.CHR;
+            SecondaryStat = eStat.EMP;
+            TertiaryStat = eStat.CON;
+            ManaStat = eStat.CHR;
+            WeaponSkillBase = 360;
         }
 
         public override bool HasAdvancedFromBaseClass()
@@ -42,9 +41,6 @@ namespace DOL.GS.PlayerClass
             return true;
         }
 
-        public override ushort MaxPulsingSpells
-        {
-            get { return 2; }
-        }
+        public override ushort MaxPulsingSpells => 2;
     }
 }

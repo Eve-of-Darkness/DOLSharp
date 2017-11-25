@@ -26,11 +26,10 @@ namespace DOL.GS.PlayerClass
     public class ClassViking : CharacterClassBase
     {
         public ClassViking()
-            : base()
         {
-            m_specializationMultiplier = 10;
-            m_wsbase = 440;
-            m_baseHP = 880;
+            SpecPointsMultiplier = 10;
+            WeaponSkillBase = 440;
+            BaseHP = 880;
         }
 
         public override string GetTitle(GamePlayer player, int level)
@@ -38,10 +37,7 @@ namespace DOL.GS.PlayerClass
             return HasAdvancedFromBaseClass() ? base.GetTitle(player, level) : base.GetTitle(player, 0);
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.PureTank; }
-        }
+        public override eClassType ClassType => eClassType.PureTank;
 
         public override GameTrainer.eChampionTrainerType ChampionTrainerType()
         {

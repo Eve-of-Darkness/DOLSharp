@@ -86,8 +86,6 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.CriticalHealHitChance)]
     public class CriticalHealHitChanceCalculator : PropertyCalculator
     {
-        public CriticalHealHitChanceCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
             int percent = living.AbilityBonus[(int)property];

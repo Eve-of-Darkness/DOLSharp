@@ -26,22 +26,18 @@ namespace DOL.GS.PlayerClass
     public class ClassChampion : ClassGuardian
     {
         public ClassChampion()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofEssence";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.STR;
-            m_secondaryStat = eStat.INT;
-            m_tertiaryStat = eStat.DEX;
-            m_manaStat = eStat.INT; // TODO: not sure
-            m_wsbase = 380;
-            m_baseHP = 760;
+            Profession = "PlayerClass.Profession.PathofEssence";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.STR;
+            SecondaryStat = eStat.INT;
+            TertiaryStat = eStat.DEX;
+            ManaStat = eStat.INT; // TODO: not sure
+            WeaponSkillBase = 380;
+            BaseHP = 760;
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         public override bool HasAdvancedFromBaseClass()
         {

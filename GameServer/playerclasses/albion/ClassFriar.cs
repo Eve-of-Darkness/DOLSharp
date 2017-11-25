@@ -26,16 +26,15 @@ namespace DOL.GS.PlayerClass
     public class ClassFriar : ClassAcolyte
     {
         public ClassFriar()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.DefendersofAlbion";
-            m_specializationMultiplier = 18;
-            m_primaryStat = eStat.PIE;
-            m_secondaryStat = eStat.CON;
-            m_tertiaryStat = eStat.STR;
-            m_manaStat = eStat.PIE;
-            m_wsbase = 360;
-            m_baseHP = 720;
+            Profession = "PlayerClass.Profession.DefendersofAlbion";
+            SpecPointsMultiplier = 18;
+            PrimaryStat = eStat.PIE;
+            SecondaryStat = eStat.CON;
+            TertiaryStat = eStat.STR;
+            ManaStat = eStat.PIE;
+            WeaponSkillBase = 360;
+            BaseHP = 720;
         }
 
         public override bool HasAdvancedFromBaseClass()

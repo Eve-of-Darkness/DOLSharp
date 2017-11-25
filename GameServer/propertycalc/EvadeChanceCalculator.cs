@@ -33,8 +33,7 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 int evadechance = 0;
                 if (player.HasAbility(Abilities.Evade))
@@ -50,8 +49,7 @@ namespace DOL.GS.PropertyCalc
                 return evadechance;
             }
 
-            GameNPC npc = living as GameNPC;
-            if (npc != null)
+            if (living is GameNPC npc)
             {
                 return living.AbilityBonus[(int)property] * 10 + npc.EvadeChance * 10;
             }

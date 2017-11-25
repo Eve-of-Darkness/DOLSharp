@@ -41,32 +41,20 @@ namespace DOL.GS.PropertyCalc
         {
             get
             {
-                int val;
-                if (m_propDict.TryGetValue(index, out val))
+                if (m_propDict.TryGetValue(index, out var val))
                 {
                     return val;
                 }
 
                 return 0;
             }
-
-            set
-            {
-                m_propDict[index] = value;
-            }
+            set => m_propDict[index] = value;
         }
 
         public int this[eProperty index]
         {
-            get
-            {
-                return this[(int)index];
-            }
-
-            set
-            {
-                this[(int)index] = value;
-            }
+            get => this[(int)index];
+            set => this[(int)index] = value;
         }
     }
 }

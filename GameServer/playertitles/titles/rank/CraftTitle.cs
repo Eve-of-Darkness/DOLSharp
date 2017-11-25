@@ -50,9 +50,8 @@ namespace DOL.GS.PlayerTitles
             }
 
             var craftingSkill = CraftingMgr.getSkillbyEnum(player.CraftingPrimarySkill);
-            var profession = craftingSkill as AbstractProfession;
 
-            if (profession == null)
+            if (!(craftingSkill is AbstractProfession profession))
             {
                 return craftingSkill.Name;
             }

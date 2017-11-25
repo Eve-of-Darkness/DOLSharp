@@ -26,14 +26,13 @@ namespace DOL.GS.PlayerClass
     public class ClassEldritch : ClassMagician
     {
         public ClassEldritch()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofFocus";
-            m_specializationMultiplier = 10;
-            m_primaryStat = eStat.INT;
-            m_secondaryStat = eStat.DEX;
-            m_tertiaryStat = eStat.QUI;
-            m_manaStat = eStat.INT;
+            Profession = "PlayerClass.Profession.PathofFocus";
+            SpecPointsMultiplier = 10;
+            PrimaryStat = eStat.INT;
+            SecondaryStat = eStat.DEX;
+            TertiaryStat = eStat.QUI;
+            ManaStat = eStat.INT;
         }
 
         public override bool HasAdvancedFromBaseClass()

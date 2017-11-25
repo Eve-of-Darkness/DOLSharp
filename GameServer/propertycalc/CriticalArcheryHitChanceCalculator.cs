@@ -12,8 +12,6 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.CriticalArcheryHitChance)]
     public class CriticalArcheryHitChanceCalculator : PropertyCalculator
     {
-        public CriticalArcheryHitChanceCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
             // base 10% chance of critical for all with ranged weapons plus ra bonus

@@ -27,33 +27,33 @@ namespace DOL.GS.PropertyCalc
     /// </summary>
     public sealed class MultiplicativePropertiesHybrid : IMultiplicativeProperties
     {
-        private readonly object m_LockObject = new object();
+        private readonly object _lockObject = new object();
 
         private sealed class PropertyEntry
         {
-            public double cachedValue = 1.0;
-            public HybridDictionary values;
+            public double CachedValue { get; private set; } = 1.0;
+            public HybridDictionary Values { get; set; }
 
             public void CalculateCachedValue()
             {
-                if (values == null)
+                if (Values == null)
                 {
-                    cachedValue = 1.0;
+                    CachedValue = 1.0;
                     return;
                 }
 
-                IDictionaryEnumerator de = values.GetEnumerator();
+                IDictionaryEnumerator de = Values.GetEnumerator();
                 double res = 1.0;
                 while (de.MoveNext())
                 {
                     res *= (double)de.Value;
                 }
 
-                cachedValue = res;
+                CachedValue = res;
             }
         }
 
-        private HybridDictionary m_properties = new HybridDictionary();
+        private readonly HybridDictionary _properties = new HybridDictionary();
 
         /// <summary>
         /// Adds new value, if key exists value will be overwriten
@@ -63,21 +63,21 @@ namespace DOL.GS.PropertyCalc
         /// <param name="value">The value added</param>
         public void Set(int index, object key, double value)
         {
-            lock (m_LockObject)
+            lock (_lockObject)
             {
-                PropertyEntry entry = (PropertyEntry)m_properties[index];
+                PropertyEntry entry = (PropertyEntry)_properties[index];
                 if (entry == null)
                 {
                     entry = new PropertyEntry();
-                    m_properties[index] = entry;
+                    _properties[index] = entry;
                 }
 
-                if (entry.values == null)
+                if (entry.Values == null)
                 {
-                    entry.values = new HybridDictionary();
+                    entry.Values = new HybridDictionary();
                 }
 
-                entry.values[key] = value;
+                entry.Values[key] = value;
                 entry.CalculateCachedValue();
             }
         }
@@ -89,25 +89,21 @@ namespace DOL.GS.PropertyCalc
         /// <param name="key">The key use to add the value</param>
         public void Remove(int index, object key)
         {
-            lock (m_LockObject)
+            lock (_lockObject)
             {
-                PropertyEntry entry = (PropertyEntry)m_properties[index];
-                if (entry == null)
+                PropertyEntry entry = (PropertyEntry)_properties[index];
+
+                if (entry?.Values == null)
                 {
                     return;
                 }
 
-                if (entry.values == null)
-                {
-                    return;
-                }
-
-                entry.values.Remove(key);
+                entry.Values.Remove(key);
 
                 // remove entry if it's empty
-                if (entry.values.Count < 1)
+                if (entry.Values.Count < 1)
                 {
-                    m_properties.Remove(index);
+                    _properties.Remove(index);
                     return;
                 }
 
@@ -122,13 +118,13 @@ namespace DOL.GS.PropertyCalc
         /// <returns>The property value (1.0 = 100%)</returns>
         public double Get(int index)
         {
-            PropertyEntry entry = (PropertyEntry)m_properties[index];
+            PropertyEntry entry = (PropertyEntry)_properties[index];
             if (entry == null)
             {
                 return 1.0;
             }
 
-            return entry.cachedValue;
+            return entry.CachedValue;
         }
     }
 }

@@ -31,7 +31,10 @@ namespace DOL.GS.PlayerTitles
         /// </summary>
         protected EventPlayerTitle()
         {
-            GameEventMgr.AddHandler(Event, new DOLEventHandler(EventCallback));
+            if (Event != null)
+            {
+                GameEventMgr.AddHandler(Event, new DOLEventHandler(EventCallback));
+            }
         }
 
         /// <summary>
@@ -47,8 +50,7 @@ namespace DOL.GS.PlayerTitles
         /// <param name="arguments">The event arguments.</param>
         protected virtual void EventCallback(DOLEvent e, object sender, EventArgs arguments)
         {
-            GamePlayer p = sender as GamePlayer;
-            if (p != null)
+            if (sender is GamePlayer p)
             {
                 if (IsSuitable(p))
                 {

@@ -26,14 +26,13 @@ namespace DOL.GS.PlayerClass
     public class ClassMentalist : ClassMagician
     {
         public ClassMentalist()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofHarmony";
-            m_specializationMultiplier = 10;
-            m_primaryStat = eStat.INT;
-            m_secondaryStat = eStat.DEX;
-            m_tertiaryStat = eStat.QUI;
-            m_manaStat = eStat.INT;
+            Profession = "PlayerClass.Profession.PathofHarmony";
+            SpecPointsMultiplier = 10;
+            PrimaryStat = eStat.INT;
+            SecondaryStat = eStat.DEX;
+            TertiaryStat = eStat.QUI;
+            ManaStat = eStat.INT;
         }
 
         public override bool HasAdvancedFromBaseClass()

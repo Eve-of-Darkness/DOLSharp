@@ -26,12 +26,11 @@ namespace DOL.GS.PlayerClass
     public class ClassMystic : CharacterClassBase
     {
         public ClassMystic()
-            : base()
         {
-            m_specializationMultiplier = 10;
-            m_wsbase = 280;
-            m_baseHP = 560;
-            m_manaStat = eStat.INT;
+            SpecPointsMultiplier = 10;
+            WeaponSkillBase = 280;
+            BaseHP = 560;
+            ManaStat = eStat.INT;
         }
 
         public override string GetTitle(GamePlayer player, int level)
@@ -39,10 +38,7 @@ namespace DOL.GS.PlayerClass
             return HasAdvancedFromBaseClass() ? base.GetTitle(player, level) : base.GetTitle(player, 0);
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.ListCaster; }
-        }
+        public override eClassType ClassType => eClassType.ListCaster;
 
         public override GameTrainer.eChampionTrainerType ChampionTrainerType()
         {

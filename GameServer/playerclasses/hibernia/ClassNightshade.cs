@@ -26,28 +26,21 @@ namespace DOL.GS.PlayerClass
     [CharacterClass((int)eCharacterClass.Nightshade, "Nightshade", "Stalker")]
     public class ClassNightshade : ClassStalker
     {
-        private static readonly string[] AutotrainableSkills = new[] { Specs.Stealth };
+        private static readonly string[] AutotrainableSkills = { Specs.Stealth };
 
         public ClassNightshade()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofEssence";
-            m_specializationMultiplier = 22;
-            m_primaryStat = eStat.DEX;
-            m_secondaryStat = eStat.QUI;
-            m_tertiaryStat = eStat.STR;
-            m_manaStat = eStat.DEX;
+            Profession = "PlayerClass.Profession.PathofEssence";
+            SpecPointsMultiplier = 22;
+            PrimaryStat = eStat.DEX;
+            SecondaryStat = eStat.QUI;
+            TertiaryStat = eStat.STR;
+            ManaStat = eStat.DEX;
         }
 
-        public override bool CanUseLefthandedWeapon
-        {
-            get { return true; }
-        }
+        public override bool CanUseLefthandedWeapon => true;
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         public override IList<string> GetAutotrainableSkills()
         {

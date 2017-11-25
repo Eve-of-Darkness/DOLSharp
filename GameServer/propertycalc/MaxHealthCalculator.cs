@@ -18,9 +18,8 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                GamePlayer player = living as GamePlayer;
                 int hpBase = player.CalculateMaxHealth(player.Level, player.GetModified(eProperty.Constitution));
                 int buffBonus = living.BaseBuffBonusCategory[(int)property];
                 if (buffBonus < 0)
@@ -42,10 +41,9 @@ namespace DOL.GS.PropertyCalc
 
                 return Math.Max(hpBase + itemBonus + buffBonus + abilityBonus, 1); // at least 1
             }
-            else if (living is GameKeepComponent)
-            {
-                GameKeepComponent keepComp = living as GameKeepComponent;
 
+            if (living is GameKeepComponent keepComp)
+            {
                 if (keepComp.Keep != null)
                 {
                     return (keepComp.Keep.EffectiveLevel(keepComp.Keep.Level) + 1) * keepComp.AbstractKeep.BaseLevel * 200;
@@ -53,11 +51,10 @@ namespace DOL.GS.PropertyCalc
 
                 return 0;
             }
-            else if (living is GameKeepDoor)
-            {
-                GameKeepDoor keepdoor = living as GameKeepDoor;
 
-                if (keepdoor.Component != null && keepdoor.Component.Keep != null)
+            if (living is GameKeepDoor keepdoor)
+            {
+                if (keepdoor.Component?.Keep != null)
                 {
                     return (keepdoor.Component.Keep.EffectiveLevel(keepdoor.Component.Keep.Level) + 1) * keepdoor.Component.AbstractKeep.BaseLevel * 200;
                 }
@@ -66,9 +63,10 @@ namespace DOL.GS.PropertyCalc
 
                 // todo : use material too to calculate maxhealth
             }
-            else if (living is GameNPC)
+
+            int hp;
+            if (living is GameNPC npc)
             {
-                int hp = 0;
 
                 if (living.Level < 10)
                 {
@@ -84,7 +82,7 @@ namespace DOL.GS.PropertyCalc
                     }
                 }
 
-                int basecon = (living as GameNPC).Constitution;
+                int basecon = npc.Constitution;
                 int conmod = 20; // at level 50 +75 con ~= +300 hit points
 
                 // first adjust hitpoints based on base CON
@@ -111,24 +109,20 @@ namespace DOL.GS.PropertyCalc
 
                 return conhp;
             }
-            else
-            {
-                if (living.Level < 10)
-                {
-                    return living.Level * 20 + 20 + living.BaseBuffBonusCategory[(int)property];    // default
-                }
-                else
-                {
-                    // approx to original formula, thx to mathematica :)
-                    int hp = (int)(50 + 11 * living.Level + 0.548331 * living.Level * living.Level) + living.BaseBuffBonusCategory[(int)property];
-                    if (living.Level < 25)
-                    {
-                        hp += 20;
-                    }
 
-                    return hp;
-                }
+            if (living.Level < 10)
+            {
+                return living.Level * 20 + 20 + living.BaseBuffBonusCategory[(int)property];    // default
             }
+            
+            // approx to original formula, thx to mathematica :)
+            hp = (int)(50 + 11 * living.Level + 0.548331 * living.Level * living.Level) + living.BaseBuffBonusCategory[(int)property];
+            if (living.Level < 25)
+            {
+                hp += 20;
+            }
+
+            return hp;
         }
 
         /// <summary>

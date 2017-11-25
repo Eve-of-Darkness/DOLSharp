@@ -35,8 +35,7 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            GamePlayer player = living as GamePlayer;
-            if (player == null)
+            if (!(living is GamePlayer))
             {
                 return 0;
             }

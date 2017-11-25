@@ -26,15 +26,14 @@ namespace DOL.GS.PlayerClass
     public class ClassWarden : ClassNaturalist
     {
         public ClassWarden()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofFocus";
-            m_specializationMultiplier = 18;
-            m_primaryStat = eStat.EMP;
-            m_secondaryStat = eStat.STR;
-            m_tertiaryStat = eStat.CON;
-            m_manaStat = eStat.EMP;
-            m_wsbase = 360;
+            Profession = "PlayerClass.Profession.PathofFocus";
+            SpecPointsMultiplier = 18;
+            PrimaryStat = eStat.EMP;
+            SecondaryStat = eStat.STR;
+            TertiaryStat = eStat.CON;
+            ManaStat = eStat.EMP;
+            WeaponSkillBase = 360;
         }
 
         public override bool HasAdvancedFromBaseClass()
@@ -42,9 +41,6 @@ namespace DOL.GS.PlayerClass
             return true;
         }
 
-        public override ushort MaxPulsingSpells
-        {
-            get { return 2; }
-        }
+        public override ushort MaxPulsingSpells => 2;
     }
 }

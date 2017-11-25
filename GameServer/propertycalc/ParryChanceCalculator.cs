@@ -34,9 +34,7 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 int buff = player.BaseBuffBonusCategory[(int)property] * 10
                 + player.SpecBuffBonusCategory[(int)property] * 10
@@ -57,11 +55,9 @@ namespace DOL.GS.PropertyCalc
                 return parrySpec + buff;
             }
 
-            NecromancerPet pet = living as NecromancerPet;
-            if (pet != null)
+            if (living is NecromancerPet pet)
             {
-                IControlledBrain brain = pet.Brain as IControlledBrain;
-                if (brain != null)
+                if (pet.Brain is IControlledBrain)
                 {
                     int buff = pet.BaseBuffBonusCategory[(int)property] * 10
                     + pet.SpecBuffBonusCategory[(int)property] * 10
@@ -74,8 +70,7 @@ namespace DOL.GS.PropertyCalc
                 }
             }
 
-            GameNPC npc = living as GameNPC;
-            if (npc != null)
+            if (living is GameNPC npc)
             {
                 return npc.ParryChance * 10;
             }

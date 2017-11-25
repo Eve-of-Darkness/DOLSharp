@@ -31,8 +31,6 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.EnduranceRegenerationRate)]
     public class EnduranceRegenerationRateCalculator : PropertyCalculator
     {
-        public EnduranceRegenerationRateCalculator() { }
-
         /// <summary>
         /// calculates the final property value
         /// </summary>

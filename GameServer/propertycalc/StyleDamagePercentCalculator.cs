@@ -36,8 +36,6 @@ namespace DOL.GS.PropertyCalc
         {
             return Math.Max(0, 100
                 + Math.Min(10,living.ItemBonus[(int)property]));
-
-// -living.BuffBonusCategory3[(int)property]);
         }
     }
 }

@@ -15,17 +15,12 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.CriticalSpellHitChance)]
     public class CriticalSpellHitChanceCalculator : PropertyCalculator
     {
-        public CriticalSpellHitChanceCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
             int chance = 0;
-            if (living is GamePlayer)
+            if ((living as GamePlayer)?.CharacterClass.ClassType == eClassType.ListCaster)
             {
-                if ((living as GamePlayer).CharacterClass.ClassType == eClassType.ListCaster)
-                {
-                    chance += 10;
-                }
+                chance += 10;
             }
 
             chance += living.AbilityBonus[(int)property];
