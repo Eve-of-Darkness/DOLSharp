@@ -25,11 +25,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.BuyRequest, "Handles player buy", eClientStatus.PlayerInGame)]
     public class PlayerBuyRequestHandler : IPacketHandler
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             if (client.Player == null)
@@ -37,14 +32,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                 return;
             }
 
-            uint X = packet.ReadInt();
-            uint Y = packet.ReadInt();
-            ushort id = packet.ReadShort();
-            ushort item_slot = packet.ReadShort();
-            byte item_count = (byte)packet.ReadByte();
-            byte menu_id = (byte)packet.ReadByte();
+            packet.ReadInt(); // X
+            packet.ReadInt(); // Y
+            packet.ReadShort(); // id
+            ushort itemSlot = packet.ReadShort();
+            byte itemCount = (byte)packet.ReadByte();
+            byte menuId = (byte)packet.ReadByte();
 
-            switch ((eMerchantWindowType)menu_id)
+            switch ((eMerchantWindowType)menuId)
             {
                 case eMerchantWindowType.HousingInsideShop:
                 case eMerchantWindowType.HousingOutsideShop:
@@ -53,7 +48,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 case eMerchantWindowType.HousingNPCHookpoint:
                 case eMerchantWindowType.HousingVaultHookpoint:
                     {
-                        HouseMgr.BuyHousingItem(client.Player, item_slot, item_count, (eMerchantWindowType)menu_id);
+                        HouseMgr.BuyHousingItem(client.Player, itemSlot, itemCount, (eMerchantWindowType)menuId);
                         break;
                     }
 
@@ -65,14 +60,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
 
                         // Forward the buy process to the merchant
-                        if (client.Player.TargetObject is GameMerchant)
+                        if (client.Player.TargetObject is GameMerchant merchant)
                         {
                             // Let merchant choose what happens
-                            ((GameMerchant)client.Player.TargetObject).OnPlayerBuy(client.Player, item_slot, item_count);
+                            merchant.OnPlayerBuy(client.Player, itemSlot, itemCount);
                         }
-                        else if (client.Player.TargetObject is GameLotMarker)
+                        else
                         {
-                            ((GameLotMarker)client.Player.TargetObject).OnPlayerBuy(client.Player, item_slot, item_count);
+                            (client.Player.TargetObject as GameLotMarker)?.OnPlayerBuy(client.Player, itemSlot, itemCount);
                         }
 
                         break;

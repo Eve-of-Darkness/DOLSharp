@@ -27,26 +27,13 @@ namespace DOL.GS.PacketHandler.Client.v168
         {
             ushort id = packet.ReadShort();
 
-// GameNPC npc = (GameNPC)WorldMgr.GetObjectTypeByIDFromRegion(client.Player.CurrentRegionID, id, typeof(GameNPC));
-            if (client.Player == null)
-            {
-                return;
-            }
+            Region region = client.Player?.CurrentRegion;
 
-            Region region = client.Player.CurrentRegion;
-            if (region == null)
-            {
-                return;
-            }
-
-            GameNPC npc = region.GetObject(id) as GameNPC;
-
-            if (npc != null)
+            if (region?.GetObject(id) is GameNPC npc)
             {
                 Tuple<ushort, ushort> key = new Tuple<ushort, ushort>(npc.CurrentRegionID, (ushort)npc.ObjectID);
 
-                long updatetime;
-                if (!client.GameObjectUpdateArray.TryGetValue(key, out updatetime))
+                if (!client.GameObjectUpdateArray.TryGetValue(key, out var updatetime))
                 {
                     updatetime = 0;
                 }

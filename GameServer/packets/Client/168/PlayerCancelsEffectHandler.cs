@@ -30,14 +30,14 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            int effectID = packet.ReadShort();
+            int effectId = packet.ReadShort();
             if (client.Version <= GameClient.eClientVersion.Version1109)
             {
-                new CancelEffectHandler(client.Player, effectID).Start(1);
+                new CancelEffectHandler(client.Player, effectId).Start(1);
             }
             else
             {
-                new CancelEffectHandler1110(client.Player, effectID).Start(1);
+                new CancelEffectHandler1110(client.Player, effectId).Start(1);
             }
         }
 
@@ -48,12 +48,12 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles players cancel effect actions
         /// </summary>
-        protected class CancelEffectHandler : RegionAction
+        private class CancelEffectHandler : RegionAction
         {
             /// <summary>
             /// The effect Id
             /// </summary>
-            protected readonly int m_effectId;
+            private readonly int _effectId;
 
             /// <summary>
             /// Constructs a new CancelEffectHandler
@@ -62,7 +62,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="effectId">The effect Id</param>
             public CancelEffectHandler(GamePlayer actionSource, int effectId) : base(actionSource)
             {
-                m_effectId = effectId;
+                _effectId = effectId;
             }
 
             /// <summary>
@@ -77,7 +77,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     foreach (IGameEffect effect in player.EffectList)
                     {
-                        if (effect.InternalID == m_effectId)
+                        if (effect.InternalID == _effectId)
                         {
                             found = effect;
                             break;
@@ -85,22 +85,19 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
                 }
 
-                if (found != null)
-                {
-                    found.Cancel(true);
-                }
+                found?.Cancel(true);
             }
         }
 
         /// <summary>
         /// Handles players cancel effect actions
         /// </summary>
-        protected class CancelEffectHandler1110 : RegionAction
+        private class CancelEffectHandler1110 : RegionAction
         {
             /// <summary>
             /// The effect Id
             /// </summary>
-            protected readonly int m_effectId;
+            private readonly int _effectId;
 
             /// <summary>
             /// Constructs a new CancelEffectHandler
@@ -109,7 +106,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="effectId">The effect Id</param>
             public CancelEffectHandler1110(GamePlayer actionSource, int effectId) : base(actionSource)
             {
-                m_effectId = effectId;
+                _effectId = effectId;
             }
 
             /// <summary>
@@ -124,18 +121,15 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     foreach (IGameEffect effect in player.EffectList)
                     {
-                        if (effect is GameSpellEffect && ((GameSpellEffect)effect).Spell.InternalID == m_effectId)
+                        if (effect is GameSpellEffect spellEffect && spellEffect.Spell.InternalID == _effectId)
                         {
-                            found = effect;
+                            found = spellEffect;
                             break;
                         }
                     }
                 }
 
-                if (found != null)
-                {
-                    found.Cancel(true);
-                }
+                found?.Cancel(true);
             }
         }
 

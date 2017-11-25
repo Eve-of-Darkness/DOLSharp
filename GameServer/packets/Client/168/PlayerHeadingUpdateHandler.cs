@@ -16,27 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System.Reflection;
-using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PlayerHeadingUpdate, "Handles Player Heading Update (Short State)", eClientStatus.PlayerInGame)]
     public class PlayerHeadingUpdateHandler : IPacketHandler
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            if (client == null || client.Player == null)
-            {
-                return;
-            }
-
-            if (client.Player.ObjectState != GameObject.eObjectState.Active)
+            if (client?.Player?.ObjectState != GameObject.eObjectState.Active)
             {
                 return;
             }
@@ -44,7 +32,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             ushort sessionId = packet.ReadShort(); // session ID
             if (client.SessionID != sessionId)
             {
-// GameServer.BanAccount(client, 120, "Hack sessionId", string.Format("Wrong sessionId:0x{0} in 0xBA packet (SessionID:{1})", sessionId, client.SessionID));
                 return; // client hack
             }
 
@@ -52,8 +39,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             client.Player.Heading = (ushort)(head & 0xFFF);
             packet.Skip(1); // unknown
             int flags = packet.ReadByte();
-
-// client.Player.PetInView = ((flags & 0x04) != 0); // TODO
+            
             client.Player.GroundTargetInView = (flags & 0x08) != 0;
             client.Player.TargetInView = (flags & 0x10) != 0;
 
@@ -95,9 +81,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             outpak.WritePacketLength();
 
             GSUDPPacketOut outpak190 = null;
-
-// byte[] outp = outpak.GetBuffer();
-//          outpak = null;
+            
             foreach (GamePlayer player in client.Player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 if (player != null && player != client.Player)
@@ -114,9 +98,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                             outpak190.WriteByte(client.Player.ManaPercent);
                             outpak190.WriteByte(client.Player.EndurancePercent);
                             outpak190.WritePacketLength();
-
-// byte[] outp190 = outpak190.GetBuffer();
-//                          outpak190 = null;// ?
                         }
 
                         player.Out.SendUDPRaw(outpak190);

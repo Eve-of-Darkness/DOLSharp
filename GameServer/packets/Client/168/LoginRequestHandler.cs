@@ -32,36 +32,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     /// <summary>
     /// Handles the login request packet.
     /// </summary>
-    /// <remarks>
-    /// Included is a PHP snippet for generating passwords that will work with the system/hashing algorithm DOL uses:
-    ///
-    /// PHP version of CryptPass(string password):
-    ///
-    /// $pass = "abc";
-    /// cryptPassword($pass);
-    ///
-    /// function cryptPassword($pass)
-    /// {
-    ///     $len = strlen($pass);
-    ///     $res = "";
-    ///     for ($i = 0; $i < $len; $i++)
-    ///     {
-    ///         $res = $res . chr(ord(substr($pass, $i, 1)) >> 8);
-    ///         $res = $res . chr(ord(substr($pass, $i, 1)));
-    ///     }
-    ///
-    ///     $hash = strtoupper(md5($res));
-    ///     $len = strlen($hash);
-    ///     for ($i = ($len-1)&~1; $i >= 0; $i-=2)
-    ///     {
-    ///         if (substr($hash, $i, 1) == "0")
-    ///             $hash = substr($hash, 0, $i) . substr($hash, $i+1, $len);
-    ///     }
-    ///
-    ///     $crypted = "##" . $hash;
-    ///     return $crypted;
-    /// }
-    /// </remarks>
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.LoginRequest, "Handles the login.", eClientStatus.None)]
     public class LoginRequestHandler : IPacketHandler
     {
@@ -70,8 +40,8 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static DateTime m_lastAccountCreateTime;
-        private readonly Dictionary<string, LockCount> m_locks = new Dictionary<string, LockCount>();
+        private static DateTime _lastAccountCreateTime;
+        private readonly Dictionary<string, LockCount> _locks = new Dictionary<string, LockCount>();
 
         #region IPacketHandler Members
 
@@ -83,10 +53,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
 
             string ipAddress = client.TcpEndpointAddress;
-
-            byte major;
-            byte minor;
-            byte build;
+            
             string password;
             string userName;
 
@@ -98,9 +65,9 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 packet.Skip(2); // Skip the client_type byte
 
-                major = (byte)packet.ReadByte();
-                minor = (byte)packet.ReadByte();
-                build = (byte)packet.ReadByte();
+                 packet.ReadByte(); // major
+                 packet.ReadByte(); // minor
+                 packet.ReadByte(); // build
                 password = packet.ReadString(20);
 
                 bool v174;
@@ -122,27 +89,13 @@ namespace DOL.GS.PacketHandler.Client.v168
                         break;
                 }
 
-                if (v174)
-                {
-                    packet.Skip(11);
-                }
-                else
-                {
-                    packet.Skip(7);
-                }
+                packet.Skip(v174 ? 11 : 7);
 
-                uint c2 = packet.ReadInt();
-                uint c3 = packet.ReadInt();
-                uint c4 = packet.ReadInt();
+                packet.ReadInt(); // c2
+                packet.ReadInt(); // c3
+                packet.ReadInt(); // c4
 
-                if (v174)
-                {
-                    packet.Skip(27);
-                }
-                else
-                {
-                    packet.Skip(31);
-                }
+                packet.Skip(v174 ? 27 : 31);
 
                 userName = packet.ReadString(20);
             }
@@ -154,9 +107,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                 packet.Skip(1);
 
                 // version
-                major = (byte)packet.ReadByte();
-                minor = (byte)packet.ReadByte();
-                build = (byte)packet.ReadByte();
+                packet.ReadByte(); // major
+                packet.ReadByte(); // minor
+                packet.ReadByte(); // build
 
                 // revision
                 packet.Skip(1);
@@ -170,13 +123,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                 // Read Password
                 password = packet.ReadLowEndianShortPascalString();
             }
-
-            /*
-            if (c2 == 0 && c3 == 0x05000000 && c4 == 0xF4000000)
-            {
-                loggerUsing = true;
-                Log.Warn("logger detected (" + username + ")");
-            }*/
 
             // check server status
             if (GameServer.Instance.ServerStatus == eGameServerStatus.GSS_Closed)
@@ -196,7 +142,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     if (Log.IsInfoEnabled)
                     {
-                        Log.Info(ipAddress + " disconnected because IsAllowedToConnect returned false!");
+                        Log.Info($"{ipAddress} disconnected because IsAllowedToConnect returned false!");
                     }
 
                     GameServer.Instance.Disconnect(client);
@@ -217,22 +163,19 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             try
             {
-                Account playerAccount;
-
                 // Make sure that client won't quit
                 lock (client)
                 {
                     GameClient.eClientState state = client.ClientState;
                     if (state != GameClient.eClientState.NotConnected)
                     {
-                        Log.DebugFormat("wrong client state on connect {0} {1}", userName, state.ToString());
+                        Log.Debug($"wrong client state on connect {userName} {state}");
                         return;
                     }
 
                     if (Log.IsInfoEnabled)
                     {
-                        Log.Info(string.Format("({0})User {1} logging on! ({2} type:{3} add:{4})", ipAddress, userName, client.Version,
-                                               client.ClientType, client.ClientAddons.ToString("G")));
+                        Log.Info($"({ipAddress})User {userName} logging on! ({client.Version} type:{client.ClientType} add:{client.ClientAddons:G})");
                     }
 
                     // check client already connected
@@ -278,15 +221,16 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
 
                     Regex goodName = new Regex("^[a-zA-Z0-9]*$");
+                    Account playerAccount;
                     if (!goodName.IsMatch(userName) || string.IsNullOrWhiteSpace(userName))
                     {
                         if (Log.IsInfoEnabled)
                         {
-                            Log.Info("Invalid symbols in account name \"" + userName + "\" found!");
+                            Log.Info($"Invalid symbols in account name \"{userName}\" found!");
                         }
 
                         client.IsConnected = false;
-                        if (client != null && client.Out != null)
+                        if (client.Out != null)
                         {
                             client.Out.SendLoginDenied(eLoginError.AccountInvalid);
                         }
@@ -319,7 +263,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                                     if (Log.IsInfoEnabled)
                                     {
-                                        Log.Info("Account creation failed, no password set for Account: " + userName);
+                                        Log.Info($"Account creation failed, no password set for Account: {userName}");
                                     }
 
                                     return;
@@ -334,7 +278,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                     ts = DateTime.Now - ac.CreationDate;
                                     if (ts.TotalMinutes < Properties.TIME_BETWEEN_ACCOUNT_CREATION_SAMEIP && totalacc > 1)
                                     {
-                                        Log.Warn("Account creation: too many from same IP within set minutes - " + userName + " : " + ipAddress);
+                                        Log.Warn($"Account creation: too many from same IP within set minutes - {userName} : {ipAddress}");
 
                                         client.IsConnected = false;
                                         client.Out.SendLoginDenied(eLoginError.PersonalAccountIsOutOfTime);
@@ -348,7 +292,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                                 if (totalacc >= Properties.TOTAL_ACCOUNTS_ALLOWED_SAMEIP)
                                 {
-                                    Log.Warn("Account creation: too many accounts created from same ip - " + userName + " : " + ipAddress);
+                                    Log.Warn($"Account creation: too many accounts created from same ip - {userName} : {ipAddress}");
 
                                     client.IsConnected = false;
                                     client.Out.SendLoginDenied(eLoginError.AccountNoAccessThisGame);
@@ -360,10 +304,10 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 // per timeslice - for preventing account bombing via different ip
                                 if (Properties.TIME_BETWEEN_ACCOUNT_CREATION > 0)
                                 {
-                                    ts = DateTime.Now - m_lastAccountCreateTime;
+                                    ts = DateTime.Now - _lastAccountCreateTime;
                                     if (ts.TotalMinutes < Properties.TIME_BETWEEN_ACCOUNT_CREATION)
                                     {
-                                        Log.Warn("Account creation: time between account creation too small - " + userName + " : " + ipAddress);
+                                        Log.Warn($"Account creation: time between account creation too small - {userName} : {ipAddress}");
 
                                         client.IsConnected = false;
                                         client.Out.SendLoginDenied(eLoginError.PersonalAccountIsOutOfTime);
@@ -373,22 +317,24 @@ namespace DOL.GS.PacketHandler.Client.v168
                                     }
                                 }
 
-                                m_lastAccountCreateTime = DateTime.Now;
+                                _lastAccountCreateTime = DateTime.Now;
 
-                                playerAccount = new Account();
-                                playerAccount.Name = userName;
-                                playerAccount.Password = CryptPassword(password);
-                                playerAccount.Realm = 0;
-                                playerAccount.CreationDate = DateTime.Now;
-                                playerAccount.LastLogin = DateTime.Now;
-                                playerAccount.LastLoginIP = ipAddress;
-                                playerAccount.LastClientVersion = ((int)client.Version).ToString();
-                                playerAccount.Language = Properties.SERV_LANGUAGE;
-                                playerAccount.PrivLevel = 1;
+                                playerAccount = new Account
+                                {
+                                    Name = userName,
+                                    Password = CryptPassword(password),
+                                    Realm = 0,
+                                    CreationDate = DateTime.Now,
+                                    LastLogin = DateTime.Now,
+                                    LastLoginIP = ipAddress,
+                                    LastClientVersion = ((int) client.Version).ToString(),
+                                    Language = Properties.SERV_LANGUAGE,
+                                    PrivLevel = 1
+                                };
 
                                 if (Log.IsInfoEnabled)
                                 {
-                                    Log.Info("New account created: " + userName);
+                                    Log.Info($"New account created: {userName}");
                                 }
 
                                 GameServer.Database.AddObject(playerAccount);
@@ -422,7 +368,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             {
                                 if (Log.IsInfoEnabled)
                                 {
-                                    Log.Info("(" + client.TcpEndpoint + ") Wrong password!");
+                                    Log.Info($"({client.TcpEndpoint}) Wrong password!");
                                 }
 
                                 client.IsConnected = false;
@@ -457,7 +403,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     {
                         if (Log.IsInfoEnabled)
                         {
-                            Log.InfoFormat("Too many clients connected, denied login to " + playerAccount.Name);
+                            Log.InfoFormat("Too many clients connected, denied login to {0}", playerAccount.Name);
                         }
 
                         client.IsConnected = false;
@@ -541,24 +487,24 @@ namespace DOL.GS.PacketHandler.Client.v168
                 Log.Warn("(Enter) No account name");
             }
 
-            LockCount lockObj = null;
-            lock (m_locks)
+            LockCount lockObj;
+            lock (_locks)
             {
                 // Get/create lock object
-                if (!m_locks.TryGetValue(accountName, out lockObj))
+                if (!_locks.TryGetValue(accountName, out lockObj))
                 {
                     lockObj = new LockCount();
-                    m_locks.Add(accountName, lockObj);
+                    _locks.Add(accountName, lockObj);
                 }
 
                 if (lockObj == null)
                 {
-                    Log.Error("(Enter) No lock object for account: '" + accountName + "'");
+                    Log.Error($"(Enter) No lock object for account: \'{accountName}\'");
                 }
                 else
                 {
                     // Increase count of locks
-                    lockObj.count++;
+                    lockObj.Count++;
                 }
             }
 
@@ -581,21 +527,21 @@ namespace DOL.GS.PacketHandler.Client.v168
                 Log.Warn("(Exit) No account name");
             }
 
-            LockCount lockObj = null;
-            lock (m_locks)
+            LockCount lockObj;
+            lock (_locks)
             {
                 // Get lock object
-                if (!m_locks.TryGetValue(accountName, out lockObj))
+                if (!_locks.TryGetValue(accountName, out lockObj))
                 {
-                    Log.Error("(Exit) No lock object for account: '" + accountName + "'");
+                    Log.Error($"(Exit) No lock object for account: \'{accountName}\'");
                 }
 
                 // Remove lock object if no more locks on it
                 if (lockObj != null)
                 {
-                    if (--lockObj.count <= 0)
+                    if (--lockObj.Count <= 0)
                     {
-                        m_locks.Remove(accountName);
+                        _locks.Remove(accountName);
                     }
                 }
             }
@@ -613,7 +559,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <summary>
             /// Count of locks held.
             /// </summary>
-            public int count;
+            public int Count { get; set; }
         }
 
         #endregion

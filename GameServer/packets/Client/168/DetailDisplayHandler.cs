@@ -40,24 +40,24 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        protected static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        protected static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            if (client == null || client.Player == null)
+            if (client?.Player == null)
             {
                 return;
             }
 
             ushort objectType = packet.ReadShort();
 
-            uint extraID = 0;
+            uint extraId = 0;
             if (client.Version >= GameClient.eClientVersion.Version186)
             {
-                extraID = packet.ReadInt();
+                extraId = packet.ReadInt();
             }
 
-            ushort objectID = packet.ReadShort();
+            ushort objectId = packet.ReadShort();
 
             string caption = string.Empty;
             var objectInfo = new List<string>();
@@ -77,7 +77,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             19      Reward Quest
              */
 
-            ChatUtil.SendDebugMessage(client, string.Format("Delve objectType={0}, objectID={1}, extraID={2}", objectType, objectID, extraID));
+            ChatUtil.SendDebugMessage(client, $"Delve objectType={objectType}, objectID={objectId}, extraID={extraId}");
 
             ItemTemplate item = null;
             InventoryItem invItem = null;
@@ -86,7 +86,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             var snapLists = client.Player.GetAllUsableListSpells();
 
             // find the first non-specialization index.
-            int indexAtSpecOid = Math.Max(0, snapSkills.FindIndex(it => (it.Item1 is Specialization) == false)) + (objectID - 100);
+            int indexAtSpecOid = Math.Max(0, snapSkills.FindIndex(it => (it.Item1 is Specialization) == false)) + (objectId - 100);
 
             switch (objectType)
             {
@@ -96,26 +96,17 @@ namespace DOL.GS.PacketHandler.Client.v168
                     {
                         if (objectType == 1)
                         {
-                            IGameInventoryObject invObject = client.Player.TargetObject as IGameInventoryObject;
-
                             // first try any active inventory object
-                            if (invItem == null)
+                            var invObject = client.Player.ActiveInventoryObject;
+                            if (invObject?.GetClientInventory(client.Player) != null)
                             {
-                                if (client.Player.ActiveInventoryObject != null)
-                                {
-                                    invObject = client.Player.ActiveInventoryObject;
-
-                                    if (invObject != null && invObject.GetClientInventory(client.Player) != null)
-                                    {
-                                        invObject.GetClientInventory(client.Player).TryGetValue(objectID, out invItem);
-                                    }
-                                }
+                                invObject.GetClientInventory(client.Player).TryGetValue(objectId, out invItem);
                             }
 
                             // finally try direct inventory access
                             if (invItem == null)
                             {
-                                invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                                invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
                             }
 
                             // Failed to get any inventory
@@ -126,8 +117,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
                         else if (objectType == 10)
                         {
-                            List<InventoryItem> list = client.Player.TempProperties.getProperty<object>(MarketExplorer.EXPLORER_ITEM_LIST, null) as List<InventoryItem>;
-                            if (list == null)
+                            if (!(client.Player.TempProperties.getProperty<object>(MarketExplorer.EXPLORER_ITEM_LIST, null) is List<InventoryItem> list))
                             {
                                 list = client.Player.TempProperties.getProperty<object>("TempSearchKey", null) as List<InventoryItem>;
                                 if (list == null)
@@ -136,12 +126,12 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 }
                             }
 
-                            if (objectID >= list.Count)
+                            if (objectId >= list.Count)
                             {
                                 return;
                             }
 
-                            invItem = list[objectID];
+                            invItem = list[objectId];
 
                             if (invItem == null)
                             {
@@ -165,149 +155,149 @@ namespace DOL.GS.PacketHandler.Client.v168
                         // Delve() and you're done, spells, charges and everything else.
 
                         // Let the player class create the appropriate item to delve
-                        caption = invItem.Name;
-
-                        if (client.Player.DelveItem<InventoryItem>(invItem, objectInfo))
+                        if (invItem != null)
                         {
-                            break;
-                        }
+                            caption = invItem.Name;
 
-                        #region Old Delve
-
-                        if (invItem is InventoryArtifact)
-                        {
-                            List<string> delve = new List<string>();
-                            (invItem as InventoryArtifact).Delve(delve, client.Player);
-
-                            foreach (string line in delve)
+                            if (client.Player.DelveItem(invItem, objectInfo))
                             {
-                                objectInfo.Add(line);
+                                break;
                             }
 
-                            break;
-                        }
+                            #region Old Delve
 
-                        // **********************************
-                        // show crafter name
-                        // **********************************
-                        if (invItem.IsCrafted)
-                        {
-                            objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.CrafterName", invItem.Creator));
-                            objectInfo.Add(" ");
-                        }
-                        else if (invItem.Description != null && invItem.Description != string.Empty)
-                        {
-                            objectInfo.Add(invItem.Description);
-                            objectInfo.Add(" ");
-                        }
-
-                        if ((invItem.Object_Type >= (int)eObjectType.GenericWeapon) && (invItem.Object_Type <= (int)eObjectType._LastWeapon) ||
-                            invItem.Object_Type == (int)eObjectType.Instrument)
-                        {
-                            WriteUsableClasses(objectInfo, invItem, client);
-                            WriteMagicalBonuses(objectInfo, invItem, client, false);
-                            WriteClassicWeaponInfos(objectInfo, invItem, client);
-                        }
-
-                        if (invItem.Object_Type >= (int)eObjectType.Cloth && invItem.Object_Type <= (int)eObjectType.Scale)
-                        {
-                            WriteUsableClasses(objectInfo, invItem, client);
-                            WriteMagicalBonuses(objectInfo, invItem, client, false);
-                            WriteClassicArmorInfos(objectInfo, invItem, client);
-                        }
-
-                        if (invItem.Object_Type == (int)eObjectType.Shield)
-                        {
-                            WriteUsableClasses(objectInfo, invItem, client);
-                            WriteMagicalBonuses(objectInfo, invItem, client, false);
-                            WriteClassicShieldInfos(objectInfo, invItem, client);
-                        }
-
-                        if (invItem.Object_Type == (int)eObjectType.Magical || invItem.Object_Type == (int)eObjectType.AlchemyTincture || invItem.Object_Type == (int)eObjectType.SpellcraftGem)
-                        {
-                            WriteMagicalBonuses(objectInfo, invItem, client, false);
-                        }
-
-                        // ***********************************
-                        // shows info for Poison Potions
-                        // ***********************************
-                        if (invItem.Object_Type == (int)eObjectType.Poison)
-                        {
-                            WritePoisonInfo(objectInfo, invItem, client);
-                        }
-
-                        if (invItem.Object_Type == (int)eObjectType.Magical && invItem.Item_Type == (int)eInventorySlot.FirstBackpack) // potion
-                        {
-                            WritePotionInfo(objectInfo, invItem, client);
-                        }
-                        else if (invItem.CanUseEvery > 0)
-                        {
-                            // Items with a reuse timer (aka cooldown).
-                            objectInfo.Add(" ");
-
-                            int minutes = invItem.CanUseEvery / 60;
-                            int seconds = invItem.CanUseEvery % 60;
-
-                            if (minutes == 0)
+                            if (invItem is InventoryArtifact)
                             {
-                                objectInfo.Add(string.Format("Can use item every: {0} sec", seconds));
-                            }
-                            else
-                            {
-                                objectInfo.Add(string.Format("Can use item every: {0}:{1:00} min", minutes, seconds));
-                            }
+                                List<string> delve = new List<string>();
+                                (invItem as InventoryArtifact).Delve(delve, client.Player);
 
-                            // objectInfo.Add(String.Format("Can use item every: {0:00}:{1:00}", minutes, seconds));
-                            int cooldown = invItem.CanUseAgainIn;
-
-                            if (cooldown > 0)
-                            {
-                                minutes = cooldown / 60;
-                                seconds = cooldown % 60;
-
-                                if (minutes == 0)
+                                foreach (string line in delve)
                                 {
-                                    objectInfo.Add(string.Format("Can use again in: {0} sec", seconds));
-                                }
-                                else
-                                {
-                                    objectInfo.Add(string.Format("Can use again in: {0}:{1:00} min", minutes, seconds));
+                                    objectInfo.Add(line);
                                 }
 
-                                // objectInfo.Add(String.Format("Can use again in: {0:00}:{1:00}", minutes, seconds));
+                                break;
                             }
-                        }
 
-                        if (!invItem.IsDropable || !invItem.IsPickable || invItem.IsIndestructible)
-                        {
-                            objectInfo.Add(" ");
-                        }
+                            // **********************************
+                            // show crafter name
+                            // **********************************
+                            if (invItem.IsCrafted)
+                            {
+                                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language,
+                                    "DetailDisplayHandler.HandlePacket.CrafterName", invItem.Creator));
+                                objectInfo.Add(" ");
+                            }
+                            else if (!string.IsNullOrEmpty(invItem.Description))
+                            {
+                                objectInfo.Add(invItem.Description);
+                                objectInfo.Add(" ");
+                            }
 
-                        if (!invItem.IsPickable)
-                        {
-                            objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotTraded"));
-                        }
+                            if (invItem.Object_Type >= (int) eObjectType.GenericWeapon &&
+                                invItem.Object_Type <= (int) eObjectType._LastWeapon ||
+                                invItem.Object_Type == (int) eObjectType.Instrument)
+                            {
+                                WriteUsableClasses(objectInfo, invItem, client);
+                                WriteMagicalBonuses(objectInfo, invItem, client, false);
+                                WriteClassicWeaponInfos(objectInfo, invItem, client);
+                            }
 
-                        if (!invItem.IsDropable)
-                        {
-                            objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotSold"));
-                        }
+                            if (invItem.Object_Type >= (int) eObjectType.Cloth &&
+                                invItem.Object_Type <= (int) eObjectType.Scale)
+                            {
+                                WriteUsableClasses(objectInfo, invItem, client);
+                                WriteMagicalBonuses(objectInfo, invItem, client, false);
+                                WriteClassicArmorInfos(objectInfo, invItem, client);
+                            }
 
-                        if (invItem.IsIndestructible)
-                        {
-                            objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotDestroyed"));
-                        }
+                            if (invItem.Object_Type == (int) eObjectType.Shield)
+                            {
+                                WriteUsableClasses(objectInfo, invItem, client);
+                                WriteMagicalBonuses(objectInfo, invItem, client, false);
+                                WriteClassicShieldInfos(objectInfo, invItem, client);
+                            }
 
-                        if (invItem.BonusLevel > 0)
-                        {
-                            objectInfo.Add(" ");
-                            objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.BonusLevel", invItem.BonusLevel));
-                        }
+                            if (invItem.Object_Type == (int) eObjectType.Magical
+                                || invItem.Object_Type == (int) eObjectType.AlchemyTincture
+                                || invItem.Object_Type == (int) eObjectType.SpellcraftGem)
+                            {
+                                WriteMagicalBonuses(objectInfo, invItem, client, false);
+                            }
 
-                        // Add admin info
-                        if (client.Account.PrivLevel > 1)
-                        {
-                            WriteTechnicalInfo(objectInfo, client, invItem);
+                            // ***********************************
+                            // shows info for Poison Potions
+                            // ***********************************
+                            if (invItem.Object_Type == (int) eObjectType.Poison)
+                            {
+                                WritePoisonInfo(objectInfo, invItem, client);
+                            }
+
+                            if (invItem.Object_Type == (int) eObjectType.Magical &&
+                                invItem.Item_Type == (int) eInventorySlot.FirstBackpack) // potion
+                            {
+                                WritePotionInfo(objectInfo, invItem, client);
+                            }
+                            else if (invItem.CanUseEvery > 0)
+                            {
+                                // Items with a reuse timer (aka cooldown).
+                                objectInfo.Add(" ");
+
+                                int minutes = invItem.CanUseEvery / 60;
+                                int seconds = invItem.CanUseEvery % 60;
+
+                                objectInfo.Add(minutes == 0
+                                    ? $"Can use item every: {seconds} sec"
+                                    : $"Can use item every: {minutes}:{seconds:00} min");
+
+                                int cooldown = invItem.CanUseAgainIn;
+
+                                if (cooldown > 0)
+                                {
+                                    minutes = cooldown / 60;
+                                    seconds = cooldown % 60;
+
+                                    objectInfo.Add(minutes == 0
+                                        ? $"Can use again in: {seconds} sec"
+                                        : $"Can use again in: {minutes}:{seconds:00} min");
+                                }
+                            }
+
+                            if (!invItem.IsDropable || !invItem.IsPickable || invItem.IsIndestructible)
+                            {
+                                objectInfo.Add(" ");
+                            }
+
+                            if (!invItem.IsPickable)
+                            {
+                                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language,
+                                    "DetailDisplayHandler.HandlePacket.CannotTraded"));
+                            }
+
+                            if (!invItem.IsDropable)
+                            {
+                                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language,
+                                    "DetailDisplayHandler.HandlePacket.CannotSold"));
+                            }
+
+                            if (invItem.IsIndestructible)
+                            {
+                                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language,
+                                    "DetailDisplayHandler.HandlePacket.CannotDestroyed"));
+                            }
+
+                            if (invItem.BonusLevel > 0)
+                            {
+                                objectInfo.Add(" ");
+                                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language,
+                                    "DetailDisplayHandler.HandlePacket.BonusLevel", invItem.BonusLevel));
+                            }
+
+                            // Add admin info
+                            if (client.Account.PrivLevel > 1)
+                            {
+                                WriteTechnicalInfo(objectInfo, client, invItem);
+                            }
                         }
 
                         break;
@@ -318,34 +308,44 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #region Spell
                 case 2: // spell List
                     {
-                        int lineID = objectID / 100;
-                        int spellID = objectID % 100;
+                        int lineId = objectId / 100;
+                        int spellId = objectId % 100;
 
                         Skill sk = null;
                         SpellLine sl = null;
 
                         // is spelline in index ?
-                        if (lineID < snapLists.Count)
+                        if (lineId < snapLists.Count)
                         {
-                            int index = snapLists[lineID].Item2.FindIndex(s => s is Spell ?
-                                                                               s.Level == spellID
-                                                                               : (s is Styles.Style ? ((Styles.Style)s).SpecLevelRequirement == spellID
-                                                                                  : (s is Ability ? ((Ability)s).SpecLevelRequirement == spellID : false)));
+                            int index = snapLists[lineId].Item2.FindIndex(s =>
+                            {
+                                switch (s)
+                                {
+                                    case Spell sSpell:
+                                        return sSpell.Level == spellId;
+                                    case Style sStyle:
+                                        return sStyle.SpecLevelRequirement == spellId;
+                                    case Ability sAbility:
+                                        return sAbility.SpecLevelRequirement == spellId;
+                                }
+
+                                return false;
+                            });
 
                             if (index > -1)
                             {
-                                sk = snapLists[lineID].Item2[index];
+                                sk = snapLists[lineId].Item2[index];
                             }
 
-                            sl = snapLists[lineID].Item1;
+                            sl = snapLists[lineId].Item1;
                         }
 
-                        if (sk is Spell && sl != null)
+                        if (sk is Spell spell && sl != null)
                         {
                             caption = sk.Name;
-                            WriteSpellInfo(objectInfo, (Spell)sk, sl, client);
+                            WriteSpellInfo(objectInfo, spell, sl, client);
                         }
-                        else if (sk is Styles.Style)
+                        else if (sk is Style)
                         {
                             caption = sk.Name;
                             WriteStyleInfo(objectInfo, (Style)sk, client);
@@ -398,9 +398,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                         if (objectType == 4)
                         {
                             GameMerchant merchant = null;
-                            if (client.Player.TargetObject != null && client.Player.TargetObject is GameMerchant)
+                            if (client.Player.TargetObject is GameMerchant gameMerchant)
                             {
-                                merchant = (GameMerchant)client.Player.TargetObject;
+                                merchant = gameMerchant;
                             }
 
                             if (merchant == null)
@@ -408,32 +408,32 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 return;
                             }
 
-                            byte pagenumber = (byte)(objectID / MerchantTradeItems.MAX_ITEM_IN_TRADEWINDOWS);
-                            short slotnumber = (short)(objectID % MerchantTradeItems.MAX_ITEM_IN_TRADEWINDOWS);
+                            byte pagenumber = (byte)(objectId / MerchantTradeItems.MAX_ITEM_IN_TRADEWINDOWS);
+                            short slotnumber = (short)(objectId % MerchantTradeItems.MAX_ITEM_IN_TRADEWINDOWS);
 
                             item = merchant.TradeItems.GetItem(pagenumber, (eMerchantWindowSlot)slotnumber);
                         }
                         else if (objectType == 19)
                         {
-                            ushort questID = (ushort)((extraID << 12) | (ushort)(objectID >> 4));
-                            int index = objectID & 0x0F;
+                            ushort questId = (ushort)((extraId << 12) | (ushort)(objectId >> 4));
+                            int index = objectId & 0x0F;
 
                             GameLiving questGiver = null;
-                            if (client.Player.TargetObject != null && client.Player.TargetObject is GameLiving)
+                            if (client.Player.TargetObject is GameLiving living)
                             {
-                                questGiver = (GameLiving)client.Player.TargetObject;
+                                questGiver = living;
                             }
 
-                            ChatUtil.SendDebugMessage(client, "Quest ID: " + questID);
+                            ChatUtil.SendDebugMessage(client, "Quest ID: " + questId);
 
-                            if (questID == 0)
+                            if (questId == 0)
                             {
                                 return; // questID == 0, wrong ID ?
                             }
 
-                            if (questID <= DataQuest.DataquestClientoffset)
+                            if (questId <= DataQuest.DataquestClientoffset)
                             {
-                                AbstractQuest q = client.Player.IsDoingQuest(QuestMgr.GetQuestTypeForID(questID));
+                                AbstractQuest q = client.Player.IsDoingQuest(QuestMgr.GetQuestTypeForID(questId));
 
                                 if (q == null)
                                 {
@@ -442,7 +442,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                     {
                                         try
                                         {
-                                            q = (AbstractQuest)Activator.CreateInstance(QuestMgr.GetQuestTypeForID(questID), new object[] { client.Player, 1 });
+                                            q = (AbstractQuest)Activator.CreateInstance(QuestMgr.GetQuestTypeForID(questId), client.Player, 1);
                                         }
                                         catch
                                         {
@@ -462,7 +462,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                     return; // this is not new quest
                                 }
 
-                                List<ItemTemplate> rewards = null;
+                                List<ItemTemplate> rewards;
                                 if (index < 8)
                                 {
                                     rewards = (q as RewardQuest).Rewards.BasicItems;
@@ -484,7 +484,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                                 foreach (DBDataQuest d in GameObject.DataQuestCache)
                                 {
-                                    if (d.ID == questID - DataQuest.DataquestClientoffset)
+                                    if (d.ID == questId - DataQuest.DataquestClientoffset)
                                     {
                                         dq = new DataQuest(d);
                                         break;
@@ -493,7 +493,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                                 if (dq != null && dq.StartType == DataQuest.eStartType.RewardQuest)
                                 {
-                                    List<ItemTemplate> rewards = null;
+                                    List<ItemTemplate> rewards;
                                     if (index < 8)
                                     {
                                         rewards = dq.FinalRewards;
@@ -519,7 +519,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         caption = item.Name;
 
-                        if (client.Player.DelveItem<ItemTemplate>(item, objectInfo))
+                        if (client.Player.DelveItem(item, objectInfo))
                         {
                             break;
                         }
@@ -595,7 +595,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         {
                             foreach (IGameEffect effect in client.Player.EffectList)
                             {
-                                if (effect.InternalID == objectID)
+                                if (effect.InternalID == objectId)
                                 {
                                     foundEffect = effect;
                                     break;
@@ -619,17 +619,16 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 {
                                     objectInfo.Add(" ");
                                     objectInfo.Add("----------Technical informations----------");
-                                    objectInfo.Add("Line: " + ((foundEffect as GameSpellEffect).SpellHandler == null ? "unknown" : (foundEffect as GameSpellEffect).SpellHandler.SpellLine.Name));
-                                    objectInfo.Add("SpellID: " + (foundEffect as GameSpellEffect).Spell.ID);
-                                    objectInfo.Add("Type: " + (foundEffect as GameSpellEffect).Spell.SpellType);
-                                    objectInfo.Add("ClientEffect: " + (foundEffect as GameSpellEffect).Spell.ClientEffect);
-                                    objectInfo.Add("Icon: " + (foundEffect as GameSpellEffect).Spell.Icon);
+                                    objectInfo.Add($"Line: {((foundEffect as GameSpellEffect).SpellHandler == null ? "unknown" : (foundEffect as GameSpellEffect).SpellHandler.SpellLine.Name)}");
+                                    objectInfo.Add($"SpellID: {(foundEffect as GameSpellEffect).Spell.ID}");
+                                    objectInfo.Add($"Type: {(foundEffect as GameSpellEffect).Spell.SpellType}");
+                                    objectInfo.Add($"ClientEffect: {(foundEffect as GameSpellEffect).Spell.ClientEffect}");
+                                    objectInfo.Add($"Icon: {(foundEffect as GameSpellEffect).Spell.Icon}");
                                     if ((foundEffect as GameSpellEffect).SpellHandler != null)
                                     {
-                                        objectInfo.Add("HasPositiveEffect: " + (foundEffect as GameSpellEffect).SpellHandler.HasPositiveEffect);
+                                        objectInfo.Add($"HasPositiveEffect: {(foundEffect as GameSpellEffect).SpellHandler.HasPositiveEffect}");
+                                        objectInfo.Add($"Disabled: {(foundEffect as GameSpellEffect).IsDisabled}");
                                     }
-
-                                    objectInfo.Add("Disabled: " + (foundEffect as GameSpellEffect).IsDisabled);
                                 }
                             }
                         }
@@ -668,9 +667,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                             return;
                         }
 
-                        if (playerTradeWindow.PartnerTradeItems != null && objectID < playerTradeWindow.PartnerItemsCount)
+                        if (playerTradeWindow.PartnerTradeItems != null && objectId < playerTradeWindow.PartnerItemsCount)
                         {
-                            invItem = (InventoryItem)playerTradeWindow.PartnerTradeItems[objectID];
+                            invItem = (InventoryItem)playerTradeWindow.PartnerTradeItems[objectId];
                         }
 
                         if (invItem == null)
@@ -681,7 +680,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         // Let the player class create the appropriate item to delve
                         caption = invItem.Name;
 
-                        if (client.Player.DelveItem<InventoryItem>(invItem, objectInfo))
+                        if (client.Player.DelveItem(invItem, objectInfo))
                         {
                             break;
                         }
@@ -701,8 +700,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                             objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.ChampionLevel", invItem.Level));
                         }
 
-                        if ((invItem.Object_Type >= (int)eObjectType.GenericWeapon) && (invItem.Object_Type <= (int)eObjectType.MaulerStaff) ||
-                            invItem.Object_Type == (int)eObjectType.Instrument)
+                        if (invItem.Object_Type >= (int)eObjectType.GenericWeapon
+                            && invItem.Object_Type <= (int)eObjectType.MaulerStaff
+                            || invItem.Object_Type == (int)eObjectType.Instrument)
                         {
                             WriteUsableClasses(objectInfo, invItem, client);
                             WriteMagicalBonuses(objectInfo, invItem, client, false);
@@ -723,7 +723,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                             WriteClassicShieldInfos(objectInfo, invItem, client);
                         }
 
-                        if ((invItem.Item_Type != (int)eInventorySlot.Horse && invItem.Object_Type == (int)eObjectType.Magical) || invItem.Object_Type == (int)eObjectType.AlchemyTincture || invItem.Object_Type == (int)eObjectType.SpellcraftGem)
+                        if ((invItem.Item_Type != (int)eInventorySlot.Horse && invItem.Object_Type == (int)eObjectType.Magical)
+                            || invItem.Object_Type == (int)eObjectType.AlchemyTincture
+                            || invItem.Object_Type == (int)eObjectType.SpellcraftGem)
                         {
                             WriteMagicalBonuses(objectInfo, invItem, client, false);
                         }
@@ -782,42 +784,42 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #region Trainer
                 case 9: // trainer window "info" button
                     {
-                        Specialization spec = client.Player.GetSpecList().Where(e => e.Trainable).ElementAtOrDefault(objectID);
+                        Specialization spec = client.Player.GetSpecList().Where(e => e.Trainable).ElementAtOrDefault(objectId);
 
                         if (spec != null)
                         {
                             caption = spec.Name;
                         }
 
-                        if (client.TrainerSkillCache != null && objectID < client.TrainerSkillCache.Count)
+                        if (client.TrainerSkillCache != null && objectId < client.TrainerSkillCache.Count)
                         {
                             objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.LevName"));
-                            foreach (Skill sk in client.TrainerSkillCache[objectID].Item2.Select(e => e.Item3))
+                            foreach (Skill sk in client.TrainerSkillCache[objectId].Item2.Select(e => e.Item3))
                             {
-                                if (sk is Ability)
+                                if (sk is Ability ability)
                                 {
-                                    objectInfo.Add(string.Format("{0}: {1}", ((Ability)sk).SpecLevelRequirement, sk.Name));
+                                    objectInfo.Add($"{ability.SpecLevelRequirement}: {sk.Name}");
                                 }
-                                else if (sk is Style)
+                                else if (sk is Style style)
                                 {
-                                    objectInfo.Add(string.Format("{0}: {1}", ((Style)sk).SpecLevelRequirement, sk.Name));
+                                    objectInfo.Add($"{style.SpecLevelRequirement}: {sk.Name}");
                                 }
                                 else
                                 {
-                                    objectInfo.Add(string.Format("{0}: {1}", sk.Level, sk.Name));
+                                    objectInfo.Add($"{sk.Level}: {sk.Name}");
                                 }
                             }
                         }
                         else
                         {
                             // delve on realm abilities
-                            if (objectID >= 50)
+                            if (objectId >= 50)
                             {
-                                int clientclassID = client.Player.CharacterClass.ID;
+                                int clientclassId = client.Player.CharacterClass.ID;
                                 int sub = 50;
-                                var ra_list = SkillBase.GetClassRealmAbilities(clientclassID).Where(ra => !(ra is RR5RealmAbility));
+                                var raList = SkillBase.GetClassRealmAbilities(clientclassId).Where(ra => !(ra is RR5RealmAbility));
 
-                                RealmAbility ab = ra_list.ElementAtOrDefault((int)(objectID - sub));
+                                RealmAbility ab = raList.ElementAtOrDefault(objectId - sub);
 
                                 if (ab != null)
                                 {
@@ -828,8 +830,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             }
 
                             caption = "Specialization not found";
-                            objectInfo.Add("that specialization is not found, id=" + objectID);
-                            break;
+                            objectInfo.Add($"that specialization is not found, id={objectId}");
                         }
 
                         break;
@@ -838,7 +839,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #region Group
                 case 12: // Item info to Group Chat
                     {
-                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
                         if (invItem == null)
                         {
                             return;
@@ -858,7 +859,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #region Guild
                 case 13: // Item info to Guild Chat
                     {
-                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
                         if (invItem == null)
                         {
                             return;
@@ -893,7 +894,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #region ChatGroup
                 case 15: // Item info to Chat group
                     {
-                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
                         if (invItem == null)
                         {
                             return;
@@ -906,7 +907,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             return;
                         }
 
-                        if (mychatgroup.Listen == true && (((bool)mychatgroup.Members[client.Player]) == false))
+                        if (mychatgroup.Listen && (bool)mychatgroup.Members[client.Player] == false)
                         {
                             client.Player.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.OnlyModerator"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return;
@@ -927,14 +928,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                 case 20:
                     {
                         Style style = null;
-                        if (client.TrainerSkillCache != null)
+                        // Search Id
+                        Skill sk = client.TrainerSkillCache?
+                            .SelectMany(el => el.Item2)
+                            .FirstOrDefault(e => e.Item2 == objectId && e.Item3.SkillType == eSkillPage.Styles)?.Item3;
+
+                        if (sk is Style style1)
                         {
-                            // Search Id
-                            Skill sk = client.TrainerSkillCache.SelectMany(el => el.Item2).Where(e => e.Item2 == objectID && e.Item3.SkillType == eSkillPage.Styles).FirstOrDefault().Item3;
-                            if (sk is Style)
-                            {
-                                style = (Style)sk;
-                            }
+                            style = style1;
                         }
 
                         if (style == null)
@@ -958,7 +959,11 @@ namespace DOL.GS.PacketHandler.Client.v168
                         if (client.TrainerSkillCache != null)
                         {
                             // Search Id
-                            sk = client.TrainerSkillCache.SelectMany(el => el.Item2).Where(e => ((objectType == 23 && e.Item2 == objectID && e.Item1 == 5) || (e.Item2 == objectID && e.Item1 != 5))).OrderBy(e => e.Item1).FirstOrDefault().Item3;
+                            sk = client.TrainerSkillCache
+                                .SelectMany(el => el.Item2)
+                                .Where(e => ((objectType == 23 && e.Item2 == objectId && e.Item1 == 5) || (e.Item2 == objectId && e.Item1 != 5)))
+                                .OrderBy(e => e.Item1)
+                                .FirstOrDefault()?.Item3;
                         }
 
                         if (sk == null)
@@ -966,16 +971,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                             return;
                         }
 
-                        if (sk is Spell)
+                        if (sk is Spell spell)
                         {
-                            Spell spell = (Spell)sk;
                             caption = spell.Name;
 
                             WriteSpellInfo(objectInfo, spell, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells), client);
                         }
-                        else if (sk is Ability)
+                        else if (sk is Ability abil)
                         {
-                            Ability abil = (Ability)sk;
                             caption = abil.Name;
 
                             if (abil.DelveInfo.Count > 0)
@@ -994,7 +997,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #region Repair
                 case 100:// repair
                     {
-                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
                         if (invItem != null)
                         {
                             client.Player.RepairItem(invItem);
@@ -1010,7 +1013,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #region Self Craft
                 case 101:// selfcraft
                     {
-                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
                         if (invItem != null)
                         {
                             client.Player.OpenSelfCraft(invItem);
@@ -1026,7 +1029,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #region Salvage
                 case 102:// salvage
                     {
-                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
                         if (invItem != null)
                         {
                             client.Player.SalvageItem(invItem);
@@ -1042,7 +1045,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #region BattleGroup
                 case 103: // Item info to battle group
                     {
-                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                        invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
                         if (invItem == null)
                         {
                             return;
@@ -1055,7 +1058,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             return;
                         }
 
-                        if (mybattlegroup.Listen == true && (((bool)mybattlegroup.Members[client.Player]) == false))
+                        if (mybattlegroup.Listen && (bool)mybattlegroup.Members[client.Player] == false)
                         {
                             client.Player.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.OnlyModerator"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return;
@@ -1072,38 +1075,38 @@ namespace DOL.GS.PacketHandler.Client.v168
                     #endregion
                 #region v1.110+
                 case 24:// SpellsNew
-                    if (client.CanSendTooltip(24, objectID))
+                    if (client.CanSendTooltip(24, objectId))
                     {
-                        client.Out.SendDelveInfo(DelveSpell(client, objectID));
+                        client.Out.SendDelveInfo(DelveSpell(client, objectId));
                     }
 
                     break;
                 case 25:// StylesNew
-                    if (client.CanSendTooltip(25, objectID))
+                    if (client.CanSendTooltip(25, objectId))
                     {
-                        client.Out.SendDelveInfo(DelveStyle(client, objectID));
+                        client.Out.SendDelveInfo(DelveStyle(client, objectId));
                     }
 
                     break;
                 case 26:// SongsNew
-                    if (client.CanSendTooltip(26, objectID))
+                    if (client.CanSendTooltip(26, objectId))
                     {
-                        client.Out.SendDelveInfo(DelveSong(client, objectID));
+                        client.Out.SendDelveInfo(DelveSong(client, objectId));
                     }
 
-                    client.Out.SendDelveInfo(DelveSpell(client, objectID));
+                    client.Out.SendDelveInfo(DelveSpell(client, objectId));
                     break;
                 case 27:// RANew
-                    if (client.CanSendTooltip(27, objectID))
+                    if (client.CanSendTooltip(27, objectId))
                     {
-                        client.Out.SendDelveInfo(DelveRealmAbility(client, objectID));
+                        client.Out.SendDelveInfo(DelveRealmAbility(client, objectId));
                     }
 
                     break;
                 case 28:// AbilityNew
-                    if (client.CanSendTooltip(28, objectID))
+                    if (client.CanSendTooltip(28, objectId))
                     {
-                        client.Out.SendDelveInfo(DelveAbility(client, objectID));
+                        client.Out.SendDelveInfo(DelveAbility(client, objectId));
                     }
 
                     break;
@@ -1112,9 +1115,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                 default:
                     {
                         // Try retieving champion lines
-                        int clSpecID = objectType - 150;
-                        int clLineIndex = objectID >> 8;
-                        int clSkillIndex = objectID & 0x00FF;
+                        int clSpecId = objectType - 150;
+                        int clLineIndex = objectId >> 8;
+                        int clSkillIndex = objectId & 0x00FF;
 
                         // Get Player CL Spec
                         var clspec = client.Player.GetSpecList().Where(sp => sp is LiveChampionsSpecialization).Cast<LiveChampionsSpecialization>().FirstOrDefault();
@@ -1123,7 +1126,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         List<Tuple<MiniLineSpecialization, List<Tuple<Skill, byte>>>> tree = null;
                         if (clspec != null)
                         {
-                            tree = clspec.GetTrainerTreeDisplay(client.Player, clspec.RetrieveTypeForIndex(clSpecID));
+                            tree = clspec.GetTrainerTreeDisplay(client.Player, clspec.RetrieveTypeForIndex(clSpecId));
                         }
 
                         // Try and handle all Champion lines, including custom lines
@@ -1134,13 +1137,13 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 Skill skill = tree[clLineIndex].Item2[clSkillIndex].Item1;
                                 if (skill != null)
                                 {
-                                    if (skill is Spell)
+                                    if (skill is Spell spell)
                                     {
                                         SpellLine spellLine = clspec.GetSpellLinesForLiving(client.Player).FirstOrDefault();
                                         if (spellLine != null)
                                         {
                                             caption = skill.Name;
-                                            WriteSpellInfo(objectInfo, (Spell)skill, spellLine, client);
+                                            WriteSpellInfo(objectInfo, spell, spellLine, client);
                                         }
                                         else
                                         {
@@ -1170,7 +1173,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
             else if ((objectType < 24 || objectType > 28) && objectType < 150) // only warn for non v1.110+ objects
             {
-                log.WarnFormat("DetailDisplayHandler no info for objectID {0} of type {1}. Item: {2}, client: {3}", objectID, objectType, item == null ? (invItem == null ? "null" : invItem.Id_nb) : item.Id_nb, client);
+                Log.Warn($"DetailDisplayHandler no info for objectID {objectId} of type {objectType}. Item: {(item == null ? (invItem == null ? "null" : invItem.Id_nb) : item.Id_nb)}, client: {client}");
             }
         }
 
@@ -1188,7 +1191,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <param name="client"></param>
         public void WriteSpellInfo(IList<string> output, Spell spell, SpellLine spellLine, GameClient client)
         {
-            if (client == null || client.Player == null)
+            if (client?.Player == null)
             {
                 return;
             }
@@ -1203,7 +1206,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             if (spellHandler == null)
             {
                 output.Add(" ");
-                output.Add("Spell type (" + spell.SpellType + ") is not implemented.");
+                output.Add($"Spell type ({spell.SpellType}) is not implemented.");
             }
             else
             {
@@ -1225,27 +1228,27 @@ namespace DOL.GS.PacketHandler.Client.v168
                 output.Add(" ");
                 output.Add("--- Spell Technical Information ---");
                 output.Add(" ");
-                output.Add("Line: " + (spellHandler == null ? spellLine.KeyName : spellHandler.SpellLine.Name));
-                output.Add("Type: " + spell.SpellType);
+                output.Add($"Line: {(spellHandler == null ? spellLine.KeyName : spellHandler.SpellLine.Name)}");
+                output.Add($"Type: {spell.SpellType}");
                 output.Add(" ");
-                output.Add("SpellID: " + spell.ID);
-                output.Add("Icon: " + spell.Icon);
-                output.Add("Type: " + spell.SpellType);
-                output.Add("ClientEffect: " + spell.ClientEffect);
-                output.Add("Target: " + spell.Target);
-                output.Add("MoveCast: " + spell.MoveCast);
-                output.Add("Uninterruptible: " + spell.Uninterruptible);
-                output.Add("Value: " + spell.Value);
-                output.Add("LifeDrainReturn: " + spell.LifeDrainReturn);
+                output.Add($"SpellID: {spell.ID}");
+                output.Add($"Icon: {spell.Icon}");
+                output.Add($"Type: {spell.SpellType}");
+                output.Add($"ClientEffect: {spell.ClientEffect}");
+                output.Add($"Target: {spell.Target}");
+                output.Add($"MoveCast: {spell.MoveCast}");
+                output.Add($"Uninterruptible: {spell.Uninterruptible}");
+                output.Add($"Value: {spell.Value}");
+                output.Add($"LifeDrainReturn: {spell.LifeDrainReturn}");
                 if (spellHandler != null)
                 {
-                    output.Add("HasPositiveEffect: " + spellHandler.HasPositiveEffect);
+                    output.Add($"HasPositiveEffect: {spellHandler.HasPositiveEffect}");
                 }
 
-                output.Add("SharedTimerGroup: " + spell.SharedTimerGroup);
-                output.Add("EffectGroup: " + spell.EffectGroup);
-                output.Add("SpellGroup (for hybrid grouping): " + spell.Group);
-                output.Add("Spell AllowCoexisting: " + spell.AllowCoexisting);
+                output.Add($"SharedTimerGroup: {spell.SharedTimerGroup}");
+                output.Add($"EffectGroup: {spell.EffectGroup}");
+                output.Add($"SpellGroup (for hybrid grouping): {spell.Group}");
+                output.Add($"Spell AllowCoexisting: {spell.AllowCoexisting}");
             }
         }
 
@@ -1259,71 +1262,71 @@ namespace DOL.GS.PacketHandler.Client.v168
             output.Add(" ");
             output.Add("--- Item Technical Information ---");
             output.Add(" ");
-            output.Add("Item Template: " + item.Id_nb);
-            output.Add("         Name: " + item.Name);
-            output.Add("        Level: " + item.Level);
-            output.Add("       Object: " + GlobalConstants.ObjectTypeToName(item.Object_Type) + " (" + item.Object_Type + ")");
-            output.Add("         Type: " + GlobalConstants.SlotToName(item.Item_Type) + " (" + item.Item_Type + ")");
-            output.Add("    Extension: " + item.Extension);
-            output.Add("        Model: " + item.Model);
-            output.Add("        Color: " + item.Color);
-            output.Add("       Emblem: " + item.Emblem);
-            output.Add("       Effect: " + item.Effect);
-            output.Add("  Value/Price: " + Money.GetShortString(item.Price));
-            output.Add("       Weight: " + (item.Weight / 10.0f) + "lbs");
-            output.Add("      Quality: " + item.Quality + "%");
-            output.Add("   Durability: " + dur + "/" + item.MaxDurability);
-            output.Add("    Condition: " + con + "/" + item.MaxCondition);
-            output.Add("        Realm: " + item.Realm);
-            output.Add("  Is dropable: " + (item.IsDropable ? "yes" : "no"));
-            output.Add("  Is pickable: " + (item.IsPickable ? "yes" : "no"));
-            output.Add("  Is tradable: " + (item.IsTradable ? "yes" : "no"));
-            output.Add(" Is alwaysDUR: " + (item.IsNotLosingDur ? "yes" : "no"));
-            output.Add("Is Indestruct: " + (item.IsIndestructible ? "yes" : "no"));
-            output.Add(" Is stackable: " + (item.IsStackable ? "yes" : "no"));
-            output.Add("  ProcSpellID: " + item.ProcSpellID);
-            output.Add(" ProcSpellID1: " + item.ProcSpellID1);
-            output.Add("      SpellID: " + item.SpellID + " (" + item.Charges + "/" + item.MaxCharges + ")");
-            output.Add("     SpellID1: " + item.SpellID1 + " (" + item.Charges1 + "/" + item.MaxCharges1 + ")");
+            output.Add($"Item Template: {item.Id_nb}");
+            output.Add($"         Name: {item.Name}");
+            output.Add($"        Level: {item.Level}");
+            output.Add($"       Object: {GlobalConstants.ObjectTypeToName(item.Object_Type)} ({item.Object_Type})");
+            output.Add($"         Type: {GlobalConstants.SlotToName(item.Item_Type)} ({item.Item_Type})");
+            output.Add($"    Extension: {item.Extension}");
+            output.Add($"        Model: {item.Model}");
+            output.Add($"        Color: {item.Color}");
+            output.Add($"       Emblem: {item.Emblem}");
+            output.Add($"       Effect: {item.Effect}");
+            output.Add($"  Value/Price: {Money.GetShortString(item.Price)}");
+            output.Add($"       Weight: {(item.Weight / 10.0f)}lbs");
+            output.Add($"      Quality: {item.Quality}%");
+            output.Add($"   Durability: {dur}/{item.MaxDurability}");
+            output.Add($"    Condition: {con}/{item.MaxCondition}");
+            output.Add($"        Realm: {item.Realm}");
+            output.Add($"  Is dropable: {(item.IsDropable ? "yes" : "no")}");
+            output.Add($"  Is pickable: {(item.IsPickable ? "yes" : "no")}");
+            output.Add($"  Is tradable: {(item.IsTradable ? "yes" : "no")}");
+            output.Add($" Is alwaysDUR: {(item.IsNotLosingDur ? "yes" : "no")}");
+            output.Add($"Is Indestruct: {(item.IsIndestructible ? "yes" : "no")}");
+            output.Add($" Is stackable: {(item.IsStackable ? "yes" : "no")}");
+            output.Add($"  ProcSpellID: {item.ProcSpellID}");
+            output.Add($" ProcSpellID1: {item.ProcSpellID1}");
+            output.Add($"      SpellID: {item.SpellID} ({item.Charges}/{item.MaxCharges})");
+            output.Add($"     SpellID1: {item.SpellID1} ({item.Charges1}/{item.MaxCharges1})");
             output.Add("PoisonSpellID: " + item.PoisonSpellID + " (" + item.PoisonCharges + "/" + item.PoisonMaxCharges + ") ");
 
             if (GlobalConstants.IsWeapon(item.Object_Type))
             {
-                output.Add("         Hand: " + GlobalConstants.ItemHandToName(item.Hand) + " (" + item.Hand + ")");
-                output.Add("Damage/Second: " + (item.DPS_AF / 10.0f));
-                output.Add("        Speed: " + (item.SPD_ABS / 10.0f));
-                output.Add("  Damage type: " + GlobalConstants.WeaponDamageTypeToName(item.Type_Damage) + " (" + item.Type_Damage + ")");
-                output.Add("        Bonus: " + item.Bonus);
+                output.Add($"         Hand: {GlobalConstants.ItemHandToName(item.Hand)} ({item.Hand})");
+                output.Add($"Damage/Second: {(item.DPS_AF / 10.0f)}");
+                output.Add($"        Speed: {(item.SPD_ABS / 10.0f)}");
+                output.Add($"  Damage type: {GlobalConstants.WeaponDamageTypeToName(item.Type_Damage)} ({item.Type_Damage})");
+                output.Add($"        Bonus: {item.Bonus}");
             }
             else if (GlobalConstants.IsArmor(item.Object_Type))
             {
-                output.Add("  Armorfactor: " + item.DPS_AF);
-                output.Add("   Absorption: " + item.SPD_ABS);
-                output.Add("        Bonus: " + item.Bonus);
+                output.Add($"  Armorfactor: {item.DPS_AF}");
+                output.Add($"   Absorption: {item.SPD_ABS}");
+                output.Add($"        Bonus: {item.Bonus}");
             }
             else if (item.Object_Type == (int)eObjectType.Shield)
             {
-                output.Add("Damage/Second: " + (item.DPS_AF / 10.0f));
-                output.Add("        Speed: " + (item.SPD_ABS / 10.0f));
-                output.Add("  Shield type: " + GlobalConstants.ShieldTypeToName(item.Type_Damage) + " (" + item.Type_Damage + ")");
-                output.Add("        Bonus: " + item.Bonus);
+                output.Add($"Damage/Second: {(item.DPS_AF / 10.0f)}");
+                output.Add($"        Speed: {(item.SPD_ABS / 10.0f)}");
+                output.Add($"  Shield type: {GlobalConstants.ShieldTypeToName(item.Type_Damage)} ({item.Type_Damage})");
+                output.Add($"        Bonus: {item.Bonus}");
             }
             else if (item.Object_Type == (int)eObjectType.Arrow || item.Object_Type == (int)eObjectType.Bolt)
             {
-                output.Add(" Ammunition #: " + item.DPS_AF);
-                output.Add("       Damage: " + GlobalConstants.AmmunitionTypeToDamageName(item.SPD_ABS));
-                output.Add("        Range: " + GlobalConstants.AmmunitionTypeToRangeName(item.SPD_ABS));
-                output.Add("     Accuracy: " + GlobalConstants.AmmunitionTypeToAccuracyName(item.SPD_ABS));
-                output.Add("        Bonus: " + item.Bonus);
+                output.Add($" Ammunition #: {item.DPS_AF}");
+                output.Add($"       Damage: {GlobalConstants.AmmunitionTypeToDamageName(item.SPD_ABS)}");
+                output.Add($"        Range: {GlobalConstants.AmmunitionTypeToRangeName(item.SPD_ABS)}");
+                output.Add($"     Accuracy: {GlobalConstants.AmmunitionTypeToAccuracyName(item.SPD_ABS)}");
+                output.Add($"        Bonus: {item.Bonus}");
             }
             else if (item.Object_Type == (int)eObjectType.Instrument)
             {
-                output.Add("   Instrument: " + GlobalConstants.InstrumentTypeToName(item.DPS_AF));
+                output.Add($"   Instrument: {GlobalConstants.InstrumentTypeToName(item.DPS_AF)}");
             }
 
             output.Add(" ");
-            output.Add("            Flags: " + item.Flags);
-            output.Add("        PackageID: " + item.PackageID);
+            output.Add($"            Flags: {item.Flags}");
+            output.Add($"        PackageID: {item.PackageID}");
         }
 
         protected string GetShortItemInfo(InventoryItem item, GameClient client)
@@ -1342,10 +1345,10 @@ namespace DOL.GS.PacketHandler.Client.v168
                         ges) health regen Value: 8  Tradeable.".
              */
 
-            string str = "- [" + item.Name + "]: " + GlobalConstants.ObjectTypeToName(item.Object_Type);
+            string str = $"- [{item.Name}]: {GlobalConstants.ObjectTypeToName(item.Object_Type)}";
             var objectInfo = new List<string>();
 
-            if ((item.Object_Type >= (int)eObjectType.GenericWeapon) && (item.Object_Type <= (int)eObjectType.MaulerStaff))
+            if (item.Object_Type >= (int)eObjectType.GenericWeapon && item.Object_Type <= (int)eObjectType.MaulerStaff)
             {
                 WriteMagicalBonuses(objectInfo, item, client, true);
                 WriteClassicWeaponInfos(objectInfo, item, client);
@@ -1418,23 +1421,23 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// </summary>
         public void WriteClassicWeaponInfos(IList<string> output, InventoryItem item, GameClient client)
         {
-            double itemDPS = item.DPS_AF / 10.0;
-            double clampedDPS = Math.Min(itemDPS, 1.2 + 0.3 * client.Player.Level);
-            double itemSPD = item.SPD_ABS / 10.0;
-            double effectiveDPS = clampedDPS * item.Quality / 100.0 * item.Condition / item.Template.MaxCondition;
+            double itemDps = item.DPS_AF / 10.0;
+            double clampedDps = Math.Min(itemDps, 1.2 + 0.3 * client.Player.Level);
+            double itemSpd = item.SPD_ABS / 10.0;
+            double effectiveDps = clampedDps * item.Quality / 100.0 * item.Condition / item.Template.MaxCondition;
 
             output.Add(" ");
             output.Add(" ");
             output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicWeaponInfos.DamageMod"));
-            if (itemDPS != 0)
+            if (itemDps != 0)
             {
-                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicWeaponInfos.BaseDPS", itemDPS.ToString("0.0")));
-                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicWeaponInfos.ClampDPS", clampedDPS.ToString("0.0")));
+                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicWeaponInfos.BaseDPS", itemDps.ToString("0.0")));
+                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicWeaponInfos.ClampDPS", clampedDps.ToString("0.0")));
             }
 
             if (item.SPD_ABS >= 0)
             {
-                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicWeaponInfos.SPD", itemSPD.ToString("0.0")));
+                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicWeaponInfos.SPD", itemSpd.ToString("0.0")));
             }
 
             if (item.Quality != 0)
@@ -1452,9 +1455,9 @@ namespace DOL.GS.PacketHandler.Client.v168
             output.Add(" ");
 
             output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicWeaponInfos.EffDamage"));
-            if (itemDPS != 0)
+            if (itemDps != 0)
             {
-                output.Add("- " + effectiveDPS.ToString("0.0") + " DPS");
+                output.Add($"- {effectiveDps:0.0} DPS");
             }
         }
 
@@ -1474,14 +1477,13 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             foreach (string allowed in item.AllowedClasses.SplitCSV(true))
             {
-                int classID = -1;
-                if (int.TryParse(allowed, out classID))
+                if (int.TryParse(allowed, out var classId))
                 {
-                    output.Add("- " + ((eCharacterClass)classID).ToString());
+                    output.Add($"- {(eCharacterClass) classId}");
                 }
                 else
                 {
-                    log.Error(item.Id_nb + " has an invalid entry for allowed classes '" + allowed + "'");
+                    Log.Error($"{item.Id_nb} has an invalid entry for allowed classes \'{allowed}\'");
                 }
             }
         }
@@ -1499,31 +1501,37 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public void WriteClassicShieldInfos(IList<string> output, ItemTemplate item, GameClient client)
         {
-            double itemDPS = item.DPS_AF / 10.0;
-            double clampedDPS = Math.Min(itemDPS, 1.2 + 0.3 * client.Player.Level);
-            double itemSPD = item.SPD_ABS / 10.0;
+            double itemDps = item.DPS_AF / 10.0;
+            double clampedDps = Math.Min(itemDps, 1.2 + 0.3 * client.Player.Level);
+            double itemSpd = item.SPD_ABS / 10.0;
 
             output.Add(" ");
             output.Add(" ");
             output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.DamageMod"));
-            if (itemDPS != 0)
+            if (itemDps != 0)
             {
-                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.BaseDPS", itemDPS.ToString("0.0")));
-                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.ClampDPS", clampedDPS.ToString("0.0")));
+                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.BaseDPS", itemDps.ToString("0.0")));
+                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.ClampDPS", clampedDps.ToString("0.0")));
             }
 
             if (item.SPD_ABS >= 0)
             {
-                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.SPD", itemSPD.ToString("0.0")));
+                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.SPD", itemSpd.ToString("0.0")));
             }
 
             output.Add(" ");
 
             switch (item.Type_Damage)
             {
-                    case 1: output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.Small")); break;
-                    case 2: output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.Medium")); break;
-                    case 3: output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.Large")); break;
+                case 1:
+                    output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.Small"));
+                    break;
+                case 2:
+                    output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.Medium"));
+                    break;
+                case 3:
+                    output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicShieldInfos.Large"));
+                    break;
             }
         }
 
@@ -1549,7 +1557,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicArmorInfos.BaseFactor", item.DPS_AF));
             }
 
-            double AF = 0;
+            double af = 0;
             if (item.DPS_AF != 0)
             {
                 int afCap = client.Player.Level;
@@ -1558,9 +1566,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                     afCap *= 2;
                 }
 
-                AF = Math.Min(afCap, item.DPS_AF);
+                af = Math.Min(afCap, item.DPS_AF);
 
-                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicArmorInfos.ClampFact", (int)AF));
+                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicArmorInfos.ClampFact", (int)af));
             }
 
             if (item.SPD_ABS >= 0)
@@ -1581,11 +1589,10 @@ namespace DOL.GS.PacketHandler.Client.v168
             output.Add(" ");
 
             output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicArmorInfos.EffArmor"));
-            double EAF = 0;
             if (item.DPS_AF != 0)
             {
-                EAF = AF * item.Quality / 100.0 * item.Condition / item.MaxCondition * (1 + item.SPD_ABS / 100.0);
-                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicArmorInfos.Factor", (int)EAF));
+                var eaf = af * item.Quality / 100.0 * item.Condition / item.MaxCondition * (1 + item.SPD_ABS / 100.0);
+                output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteClassicArmorInfos.Factor", (int)eaf));
             }
         }
 
@@ -1682,14 +1689,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                             }
                             else
                             {
-                                output.Add("-" + procSpell.Name + " (Spell Handler Not Implemented)");
+                                output.Add($"-{procSpell.Name} (Spell Handler Not Implemented)");
                             }
 
                             output.Add(spellNote);
                         }
                         else
                         {
-                            output.Add("- Spell Not Found: " + item.ProcSpellID);
+                            output.Add($"- Spell Not Found: {item.ProcSpellID}");
                         }
                     }
                     else
@@ -1729,14 +1736,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                             }
                             else
                             {
-                                output.Add("-" + procSpell.Name + " (Spell Handler Not Implemented)");
+                                output.Add($"-{procSpell.Name} (Spell Handler Not Implemented)");
                             }
 
                             output.Add(spellNote);
                         }
                         else
                         {
-                            output.Add("- Spell Not Found: " + item.ProcSpellID1);
+                            output.Add($"- Spell Not Found: {item.ProcSpellID1}");
                         }
                     }
                     else
@@ -1779,7 +1786,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
                         else
                         {
-                            output.Add("- Spell Not Found: " + item.SpellID);
+                            output.Add($"- Spell Not Found: {item.SpellID}");
                         }
                     }
 
@@ -1818,7 +1825,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
                         else
                         {
-                            output.Add("- Spell Not Found: " + item.SpellID1);
+                            output.Add($"- Spell Not Found: {item.SpellID1}");
                         }
                     }
 
@@ -1855,7 +1862,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                     }
                                     else
                                     {
-                                        output.Add("-" + spl.Name + "(Not implemented yet)");
+                                        output.Add($"-{spl.Name}(Not implemented yet)");
                                     }
 
                                     output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteMagicalBonuses.StrikeEnemy"));
@@ -1898,7 +1905,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 }
                                 else
                                 {
-                                    output.Add("-" + spl.Name + "(Not implemented yet)");
+                                    output.Add($"-{spl.Name}(Not implemented yet)");
                                 }
 
                                 output.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteMagicalBonuses.UsedItem"));
@@ -1949,22 +1956,22 @@ namespace DOL.GS.PacketHandler.Client.v168
                     // Bonus to casting speed: 2%
                     // Bonus to armor factor (AF): 18
                     // Power: 6 % of power pool.
-                    list.Add(string.Format(
-                        "- {0}: {1}{2}",
-                        SkillBase.GetPropertyName((eProperty)bonusCat),
-                        bonusValue.ToString("+0 ;-0 ;0 "), // Eden
-                        ((bonusCat == (int)eProperty.PowerPool)
-                         || (bonusCat >= (int)eProperty.Resist_First && bonusCat <= (int)eProperty.Resist_Last)
-                         || (bonusCat >= (int)eProperty.ResCapBonus_First && bonusCat <= (int)eProperty.ResCapBonus_Last)
-                         || bonusCat == (int)eProperty.Conversion
-                         || bonusCat == (int)eProperty.ExtraHP
-                         || bonusCat == (int)eProperty.RealmPoints
-                         || bonusCat == (int)eProperty.StyleAbsorb
-                         || bonusCat == (int)eProperty.ArcaneSyphon
-                         || bonusCat == (int)eProperty.BountyPoints
-                         || bonusCat == (int)eProperty.XpPoints)
-                        ? ((bonusCat == (int)eProperty.PowerPool) ? LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteBonusLine.PowerPool") : "%")
-                        : LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteBonusLine.Points")));
+
+                    var bonus = bonusCat == (int) eProperty.PowerPool
+                                || bonusCat >= (int) eProperty.Resist_First && bonusCat <= (int) eProperty.Resist_Last
+                                || bonusCat >= (int) eProperty.ResCapBonus_First && bonusCat <= (int) eProperty.ResCapBonus_Last
+                                || bonusCat == (int) eProperty.Conversion
+                                || bonusCat == (int) eProperty.ExtraHP
+                                || bonusCat == (int) eProperty.RealmPoints
+                                || bonusCat == (int) eProperty.StyleAbsorb
+                                || bonusCat == (int) eProperty.ArcaneSyphon
+                                || bonusCat == (int) eProperty.BountyPoints
+                                || bonusCat == (int) eProperty.XpPoints
+                        ? (bonusCat == (int) eProperty.PowerPool ? LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteBonusLine.PowerPool")
+                        : "%")
+                        : LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteBonusLine.Points");
+
+                    list.Add($"- {SkillBase.GetPropertyName((eProperty) bonusCat)}: {bonusValue:+0;-0;0}{bonus}");
                 }
             }
         }
@@ -1996,7 +2003,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             if (SkillBase.CheckPropertyType((eProperty)focusCat, ePropertyType.Focus))
             {
                 // - Body Magic: 4 lvls
-                list.Add(string.Format("- {0}: {1} lvls", SkillBase.GetPropertyName((eProperty)focusCat), focusLevel));
+                list.Add($"- {SkillBase.GetPropertyName((eProperty) focusCat)}: {focusLevel} lvls");
             }
         }
 
@@ -2028,7 +2035,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 list.Add(" ");
                 list.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteHorseInfo.Summon"));
                 list.Add(" ");
-                list.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteHorseInfo.Name", (horseName == null || horseName == string.Empty) ? "None" : horseName));
+                list.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteHorseInfo.Name", string.IsNullOrEmpty(horseName) ? "None" : horseName));
                 list.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteHorseInfo.NameMount"));
             }
 
@@ -2127,11 +2134,11 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                                 if (minutes == 0)
                                 {
-                                    list.Add(string.Format("Can use item every: {0} sec", seconds));
+                                    list.Add($"Can use item every: {seconds} sec");
                                 }
                                 else
                                 {
-                                    list.Add(string.Format("Can use item every: {0}:{1:00} min", minutes, seconds));
+                                    list.Add($"Can use item every: {minutes}:{seconds:00} min");
                                 }
                             }
 
@@ -2286,10 +2293,10 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public static string DelveStyle(GameClient clt, int id)
         {
-            Tuple<Skill,Skill> sk = clt.Player.GetAllUsableSkills().Where(e => e.Item1.InternalID == id && e.Item1 is Style).FirstOrDefault();
+            Tuple<Skill,Skill> sk = clt.Player.GetAllUsableSkills().FirstOrDefault(e => e.Item1.InternalID == id && e.Item1 is Style);
 
             Style style = null;
-            if (sk == null || sk.Item1 == null)
+            if (sk?.Item1 == null)
             {
                 style = SkillBase.GetStyleByInternalID(id);
             }
@@ -2308,12 +2315,12 @@ namespace DOL.GS.PacketHandler.Client.v168
                 // (Style (Fingerprint "1746652963")(FollowupStyle "Thigh Cut")(Hidden "1")OpeningDamage "55")(Skill "118")(SpecialNumber "1511")(SpecialType "1")(Expires "1342381240"))
                 // Skill = GetSpecToInternalIndex
                 // find opening style, and follow up !!
-                IEnumerable<Style> styles = clt.Player.GetSpecList().SelectMany(e => e.PretendStylesForLiving(clt.Player, clt.Player.MaxLevel));
+                IEnumerable<Style> styles = clt.Player.GetSpecList().SelectMany(e => e.PretendStylesForLiving(clt.Player, clt.Player.MaxLevel)).ToList();
 
                 // Is a followup
                 if (style.OpeningRequirementType == Style.eOpening.Offensive && style.AttackResultRequirement == Style.eAttackResultRequirement.Style)
                 {
-                    Style st = styles.Where(s => s.ID == style.OpeningRequirementValue).FirstOrDefault();
+                    Style st = styles.FirstOrDefault(s => s.ID == style.OpeningRequirementValue);
                     if (st != null)
                     {
                         // opening style should be only one.
@@ -2452,19 +2459,17 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <returns></returns>
         public static string DelveRealmAbility(GameClient clt, int id)
         {
-            Skill ra = clt.Player.GetAllUsableSkills().Where(e => e.Item1.InternalID == id && e.Item1 is Ability).Select(e => e.Item1).FirstOrDefault();
-
-            if (ra == null)
-            {
-                ra = SkillBase.GetAbilityByInternalID(id);
-            }
+            Skill ra = clt.Player.GetAllUsableSkills()
+                .Where(e => e.Item1.InternalID == id && e.Item1 is Ability)
+                .Select(e => e.Item1)
+                .FirstOrDefault() ?? SkillBase.GetAbilityByInternalID(id);
 
             MiniDelveWriter dw = new MiniDelveWriter("RealmAbility");
             dw.AddKeyValuePair("Index",  unchecked((short)id));
 
-            if (ra is RealmAbility)
+            if (ra is RealmAbility ability)
             {
-                ((RealmAbility)ra).AddDelve(ref dw);
+                ability.AddDelve(ref dw);
             }
             else if (ra != null)
             {

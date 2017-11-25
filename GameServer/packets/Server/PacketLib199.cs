@@ -19,18 +19,13 @@
 #define NOENCRYPTION
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-
 using DOL.Database;
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(199, GameClient.eClientVersion.Version199)]
     public class PacketLib199 : PacketLib198
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Constructs a new PacketLib for Version 1.99 clients
         /// </summary>
@@ -57,14 +52,13 @@ namespace DOL.GS.PacketHandler
                     firstAccountSlot = 300;
                     break;
                 default:
-                    throw new Exception("CharacterOverview requested for unknown realm " + realm);
+                    throw new Exception($"CharacterOverview requested for unknown realm {realm}");
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CharacterOverview)))
             {
-                pak.FillString(m_gameClient.Account.Name, 24);
-                IList<InventoryItem> items;
-                DOLCharacters[] characters = m_gameClient.Account.Characters;
+                pak.FillString(GameClient.Account.Name, 24);
+                DOLCharacters[] characters = GameClient.Account.Characters;
                 if (characters == null)
                 {
                     pak.Fill(0x0, 1880);
@@ -79,46 +73,50 @@ namespace DOL.GS.PacketHandler
                             if (characters[j].AccountSlot == i)
                             {
                                 pak.FillString(characters[j].Name, 24);
-                                items = GameServer.Database.SelectObjects<InventoryItem>(
+                                var items = GameServer.Database.SelectObjects<InventoryItem>(
                                     "`OwnerID` = @OwnerID AND `SlotPosition` >= @SlotPositionMin AND `SlotPosition` <= @SlotPositionMax",
-                                                                                         new[] { new QueryParameter("@OwnerID", characters[j].ObjectId), new QueryParameter("@SlotPositionMin", 10), new QueryParameter("@SlotPositionMax", 37) });
-                                byte ExtensionTorso = 0;
-                                byte ExtensionGloves = 0;
-                                byte ExtensionBoots = 0;
+                                    new[]
+                                    {
+                                        new QueryParameter("@OwnerID", characters[j].ObjectId),
+                                        new QueryParameter("@SlotPositionMin", 10),
+                                        new QueryParameter("@SlotPositionMax", 37)
+                                    });
+
+                                byte extensionTorso = 0;
+                                byte extensionGloves = 0;
+                                byte extensionBoots = 0;
                                 foreach (InventoryItem item in items)
                                 {
                                     switch (item.SlotPosition)
                                     {
                                         case 22:
-                                            ExtensionGloves = item.Extension;
+                                            extensionGloves = item.Extension;
                                             break;
                                         case 23:
-                                            ExtensionBoots = item.Extension;
+                                            extensionBoots = item.Extension;
                                             break;
                                         case 25:
-                                            ExtensionTorso = item.Extension;
-                                            break;
-                                        default:
+                                            extensionTorso = item.Extension;
                                             break;
                                     }
                                 }
 
                                 pak.WriteByte(0x01);
-                                pak.WriteByte((byte)characters[j].EyeSize);
-                                pak.WriteByte((byte)characters[j].LipSize);
-                                pak.WriteByte((byte)characters[j].EyeColor);
-                                pak.WriteByte((byte)characters[j].HairColor);
-                                pak.WriteByte((byte)characters[j].FaceType);
-                                pak.WriteByte((byte)characters[j].HairStyle);
-                                pak.WriteByte((byte)((ExtensionBoots << 4) | ExtensionGloves));
-                                pak.WriteByte((byte)((ExtensionTorso << 4) | (characters[j].IsCloakHoodUp ? 0x1 : 0x0)));
-                                pak.WriteByte((byte)characters[j].CustomisationStep); // 1 = auto generate config, 2= config ended by player, 3= enable config to player
-                                pak.WriteByte((byte)characters[j].MoodType);
+                                pak.WriteByte(characters[j].EyeSize);
+                                pak.WriteByte(characters[j].LipSize);
+                                pak.WriteByte(characters[j].EyeColor);
+                                pak.WriteByte(characters[j].HairColor);
+                                pak.WriteByte(characters[j].FaceType);
+                                pak.WriteByte(characters[j].HairStyle);
+                                pak.WriteByte((byte)((extensionBoots << 4) | extensionGloves));
+                                pak.WriteByte((byte)((extensionTorso << 4) | (characters[j].IsCloakHoodUp ? 0x1 : 0x0)));
+                                pak.WriteByte(characters[j].CustomisationStep); // 1 = auto generate config, 2= config ended by player, 3= enable config to player
+                                pak.WriteByte(characters[j].MoodType);
                                 pak.Fill(0x0, 13); // 0 String
                                 Region reg = WorldMgr.GetRegion((ushort)characters[j].Region);
                                 if (reg != null)
                                 {
-                                    var description = m_gameClient.GetTranslatedSpotDescription(reg, characters[j].Xpos, characters[j].Ypos, characters[j].Zpos);
+                                    var description = GameClient.GetTranslatedSpotDescription(reg, characters[j].Xpos, characters[j].Ypos, characters[j].Zpos);
                                     pak.FillString(description, 24);
                                 }
                                 else
@@ -136,14 +134,14 @@ namespace DOL.GS.PacketHandler
                                 }
 
                                 // pak.FillString(GamePlayer.RACENAMES[characters[j].Race], 24);
-                                pak.FillString(m_gameClient.RaceToTranslatedName(characters[j].Race, characters[j].Gender), 24);
+                                pak.FillString(GameClient.RaceToTranslatedName(characters[j].Race, characters[j].Gender), 24);
                                 pak.WriteByte((byte)characters[j].Level);
                                 pak.WriteByte((byte)characters[j].Class);
                                 pak.WriteByte((byte)characters[j].Realm);
                                 pak.WriteByte((byte)((((characters[j].Race & 0x10) << 2) + (characters[j].Race & 0x0F)) | (characters[j].Gender << 4))); // race max value can be 0x1F
                                 pak.WriteShortLowEndian((ushort)characters[j].CurrentModel);
                                 pak.WriteByte((byte)characters[j].Region);
-                                if (reg == null || (int)m_gameClient.ClientType > reg.Expansion)
+                                if (reg == null || (int)GameClient.ClientType > reg.Expansion)
                                 {
                                     pak.WriteByte(0x00);
                                 }
@@ -162,8 +160,7 @@ namespace DOL.GS.PacketHandler
                                 pak.WriteByte((byte)characters[j].Empathy);
                                 pak.WriteByte((byte)characters[j].Charisma);
 
-                                int found = 0;
-
+                                int found;
                                 // 16 bytes: armor model
                                 for (int k = 0x15; k < 0x1D; k++)
                                 {

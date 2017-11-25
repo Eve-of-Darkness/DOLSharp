@@ -28,11 +28,11 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            if (client == null || client.Player == null)
+            if (client?.Player == null)
             {
                 return;
             }
@@ -45,7 +45,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles player world init requests
         /// </summary>
-        protected class WorldInitAction : RegionAction
+        private class WorldInitAction : RegionAction
         {
             /// <summary>
             /// Constructs a new WorldInitAction
@@ -136,7 +136,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 // sending Packet 0x88!!!
                 if (!player.AddToWorld())
                 {
-                    log.ErrorFormat("Failed to add player to the region! {0}", player.ToString());
+                    Log.Error($"Failed to add player to the region! {player}");
                     player.Client.Out.SendPlayerQuit(true);
                     player.Client.Player.SaveIntoDatabase();
                     player.Client.Player.Quit(true);
@@ -192,9 +192,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                 player.Out.SendSetControlledHorse(player);
 
                 // check item at world load
-                if (log.IsDebugEnabled)
+                if (Log.IsDebugEnabled)
                 {
-                    log.DebugFormat("Client {0}({1} PID:{2} OID:{3}) entering Region {4}(ID:{5})", player.Client.Account.Name, player.Name, player.Client.SessionID, player.ObjectID, player.CurrentRegion.Description, player.CurrentRegionID);
+                    Log.Debug($"Client {player.Client.Account.Name}({player.Name} PID:{player.Client.SessionID} OID:{player.ObjectID}) entering Region {player.CurrentRegion.Description}(ID:{player.CurrentRegionID})");
                 }
             }
         }

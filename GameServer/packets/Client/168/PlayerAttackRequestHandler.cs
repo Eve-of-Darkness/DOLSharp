@@ -40,17 +40,17 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles change attack mode requests
         /// </summary>
-        protected class AttackRequestHandler : RegionAction
+        private class AttackRequestHandler : RegionAction
         {
             /// <summary>
             /// True if attack should be started
             /// </summary>
-            protected readonly bool m_start;
+            private readonly bool _start;
 
             /// <summary>
             /// True if user initiated the action else was done by the client
             /// </summary>
-            protected readonly bool m_userAction;
+            private readonly bool _userAction;
 
             /// <summary>
             /// Constructs a new AttackRequestHandler
@@ -60,8 +60,8 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="userAction">True if user initiated the action else was done by the client</param>
             public AttackRequestHandler(GamePlayer actionSource, bool start, bool userAction) : base(actionSource)
             {
-                m_start = start;
-                m_userAction = userAction;
+                _start = start;
+                _userAction = userAction;
             }
 
             /// <summary>
@@ -73,7 +73,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                 if (player.ActiveWeaponSlot == GameLiving.eActiveWeaponSlot.Distance)
                 {
-                    if (m_userAction)
+                    if (_userAction)
                     {
                         player.Out.SendMessage("You can't enter melee combat mode with a fired weapon!", eChatType.CT_YouHit,
                                                eChatLoc.CL_SystemWindow);
@@ -82,7 +82,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     return;
                 }
 
-                if (m_start)
+                if (_start)
                 {
                     player.StartAttack(player.TargetObject);
 

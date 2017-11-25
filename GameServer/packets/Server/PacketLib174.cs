@@ -32,7 +32,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.74 clients
@@ -51,14 +51,13 @@ namespace DOL.GS.PacketHandler
                 case eRealm.Albion: firstAccountSlot = 100; break;
                 case eRealm.Midgard: firstAccountSlot = 200; break;
                 case eRealm.Hibernia: firstAccountSlot = 300; break;
-                default: throw new Exception("CharacterOverview requested for unknown realm " + realm);
+                default: throw new Exception($"CharacterOverview requested for unknown realm {realm}");
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CharacterOverview)))
             {
-                pak.FillString(m_gameClient.Account.Name, 24);
-                IList<InventoryItem> items;
-                DOLCharacters[] characters = m_gameClient.Account.Characters;
+                pak.FillString(GameClient.Account.Name, 24);
+                DOLCharacters[] characters = GameClient.Account.Characters;
                 if (characters == null)
                 {
                     pak.Fill(0x0, 1840);
@@ -73,47 +72,51 @@ namespace DOL.GS.PacketHandler
                             if (characters[j].AccountSlot == i)
                             {
                                 pak.FillString(characters[j].Name, 24);
-                                items = GameServer.Database.SelectObjects<InventoryItem>(
+                                var items = GameServer.Database.SelectObjects<InventoryItem>(
                                     "`OwnerID` = @OwnerID AND `SlotPosition` >= @SlotPositionMin AND `SlotPosition` <= @SlotPositionMax",
-                                                                                         new[] { new QueryParameter("@OwnerID", characters[j].ObjectId), new QueryParameter("@SlotPositionMin", 10), new QueryParameter("@SlotPositionMax", 37) });
-                                byte ExtensionTorso = 0;
-                                byte ExtensionGloves = 0;
-                                byte ExtensionBoots = 0;
+                                    new[]
+                                    {
+                                        new QueryParameter("@OwnerID", characters[j].ObjectId),
+                                        new QueryParameter("@SlotPositionMin", 10),
+                                        new QueryParameter("@SlotPositionMax", 37)
+                                    });
+
+                                byte extensionTorso = 0;
+                                byte extensionGloves = 0;
+                                byte extensionBoots = 0;
                                 foreach (InventoryItem item in items)
                                 {
                                     switch (item.SlotPosition)
                                     {
                                         case 22:
-                                            ExtensionGloves = item.Extension;
+                                            extensionGloves = item.Extension;
                                             break;
                                         case 23:
-                                            ExtensionBoots = item.Extension;
+                                            extensionBoots = item.Extension;
                                             break;
                                         case 25:
-                                            ExtensionTorso = item.Extension;
-                                            break;
-                                        default:
+                                            extensionTorso = item.Extension;
                                             break;
                                     }
                                 }
 
                                 pak.WriteByte(0x01);
-                                pak.WriteByte((byte)characters[j].EyeSize);
-                                pak.WriteByte((byte)characters[j].LipSize);
-                                pak.WriteByte((byte)characters[j].EyeColor);
-                                pak.WriteByte((byte)characters[j].HairColor);
-                                pak.WriteByte((byte)characters[j].FaceType);
-                                pak.WriteByte((byte)characters[j].HairStyle);
-                                pak.WriteByte((byte)((ExtensionBoots << 4) | ExtensionGloves));
-                                pak.WriteByte((byte)((ExtensionTorso << 4) | (characters[j].IsCloakHoodUp ? 0x1 : 0x0)));
-                                pak.WriteByte((byte)characters[j].CustomisationStep); // 1 = auto generate config, 2= config ended by player, 3= enable config to player
-                                pak.WriteByte((byte)characters[j].MoodType);
+                                pak.WriteByte(characters[j].EyeSize);
+                                pak.WriteByte(characters[j].LipSize);
+                                pak.WriteByte(characters[j].EyeColor);
+                                pak.WriteByte(characters[j].HairColor);
+                                pak.WriteByte(characters[j].FaceType);
+                                pak.WriteByte(characters[j].HairStyle);
+                                pak.WriteByte((byte)((extensionBoots << 4) | extensionGloves));
+                                pak.WriteByte((byte)((extensionTorso << 4) | (characters[j].IsCloakHoodUp ? 0x1 : 0x0)));
+                                pak.WriteByte(characters[j].CustomisationStep); // 1 = auto generate config, 2= config ended by player, 3= enable config to player
+                                pak.WriteByte(characters[j].MoodType);
                                 pak.Fill(0x0, 13); // 0 String
 
                                 Region reg = WorldMgr.GetRegion((ushort)characters[j].Region);
                                 if (reg != null)
                                 {
-                                    var description = m_gameClient.GetTranslatedSpotDescription(reg, characters[j].Xpos, characters[j].Ypos, characters[j].Zpos);
+                                    var description = GameClient.GetTranslatedSpotDescription(reg, characters[j].Xpos, characters[j].Ypos, characters[j].Zpos);
                                     pak.FillString(description, 24);
                                 }
                                 else
@@ -131,14 +134,14 @@ namespace DOL.GS.PacketHandler
                                 }
 
                                 // pak.FillString(GamePlayer.RACENAMES[characters[j].Race], 24);
-                                pak.FillString(m_gameClient.RaceToTranslatedName(characters[j].Race, characters[j].Gender), 24);
+                                pak.FillString(GameClient.RaceToTranslatedName(characters[j].Race, characters[j].Gender), 24);
                                 pak.WriteByte((byte)characters[j].Level);
                                 pak.WriteByte((byte)characters[j].Class);
                                 pak.WriteByte((byte)characters[j].Realm);
                                 pak.WriteByte((byte)((((characters[j].Race & 0x10) << 2) + (characters[j].Race & 0x0F)) | (characters[j].Gender << 4))); // race max value can be 0x1F
                                 pak.WriteShortLowEndian((ushort)characters[j].CurrentModel);
                                 pak.WriteByte((byte)characters[j].Region);
-                                if (reg == null || (int)m_gameClient.ClientType > reg.Expansion)
+                                if (reg == null || (int)GameClient.ClientType > reg.Expansion)
                                 {
                                     pak.WriteByte(0x00);
                                 }
@@ -157,7 +160,7 @@ namespace DOL.GS.PacketHandler
                                 pak.WriteByte((byte)characters[j].Empathy);
                                 pak.WriteByte((byte)characters[j].Charisma);
 
-                                int found = 0;
+                                int found;
 
                                 // 16 bytes: armor model
                                 for (int k = 0x15; k < 0x1D; k++)
@@ -314,9 +317,9 @@ namespace DOL.GS.PacketHandler
             Region playerRegion = playerToCreate.CurrentRegion;
             if (playerRegion == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("SendPlayerCreate: playerRegion == null");
+                    Log.Warn("SendPlayerCreate: playerRegion == null");
                 }
 
                 return;
@@ -325,15 +328,15 @@ namespace DOL.GS.PacketHandler
             Zone playerZone = playerToCreate.CurrentZone;
             if (playerZone == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("SendPlayerCreate: playerZone == null");
+                    Log.Warn("SendPlayerCreate: playerZone == null");
                 }
 
                 return;
             }
 
-            if (m_gameClient.Player == null || playerToCreate.IsVisibleTo(m_gameClient.Player) == false)
+            if (GameClient.Player == null || playerToCreate.IsVisibleTo(GameClient.Player) == false)
             {
                 return;
             }
@@ -355,12 +358,12 @@ namespace DOL.GS.PacketHandler
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.LipSize)); // 1-4 = Ear size / 5-8 = Kin size
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.MoodType)); // 1-4 = Ear size / 5-8 = Kin size
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.EyeColor)); // 1-4 = Skin Color / 5-8 = Eye Color
-                pak.WriteByte(playerToCreate.GetDisplayLevel(m_gameClient.Player));
+                pak.WriteByte(playerToCreate.GetDisplayLevel(GameClient.Player));
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.HairColor)); // Hair: 1-4 = Color / 5-8 = unknown
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.FaceType)); // 1-4 = Unknown / 5-8 = Face type
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.HairStyle)); // 1-4 = Unknown / 5-8 = Hair Style
 
-                int flags = (GameServer.ServerRules.GetLivingRealm(m_gameClient.Player, playerToCreate) & 0x03) << 2;
+                int flags = (GameServer.ServerRules.GetLivingRealm(GameClient.Player, playerToCreate) & 0x03) << 2;
                 if (playerToCreate.IsAlive == false)
                 {
                     flags |= 0x01;
@@ -383,52 +386,48 @@ namespace DOL.GS.PacketHandler
 
                 pak.WriteByte((byte)flags);
                 pak.WriteByte(0x00); // new in 1.74
-                if (playerToCreate.CharacterClass.ID == (int)eCharacterClass.Vampiir)
-                {
-                    flags |= 0x40; // Vamp fly
-                }
 
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerName(m_gameClient.Player, playerToCreate));
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerGuildName(m_gameClient.Player, playerToCreate));
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerLastName(m_gameClient.Player, playerToCreate));
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerName(GameClient.Player, playerToCreate));
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerGuildName(GameClient.Player, playerToCreate));
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerLastName(GameClient.Player, playerToCreate));
 
                 // RR 12 / 13
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerPrefixName(m_gameClient.Player, playerToCreate));
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerTitle(m_gameClient.Player, playerToCreate)); // new in 1.74, NewTitle
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerPrefixName(GameClient.Player, playerToCreate));
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerTitle(GameClient.Player, playerToCreate)); // new in 1.74, NewTitle
                 SendTCP(pak);
             }
 
             // Update Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(playerToCreate.CurrentRegionID, (ushort)playerToCreate.ObjectID)] = GameTimer.GetTickCount();
+            GameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(playerToCreate.CurrentRegionID, (ushort)playerToCreate.ObjectID)] = GameTimer.GetTickCount();
 
             SendObjectGuildID(playerToCreate, playerToCreate.Guild); // used for nearest friendly/enemy object buttons and name colors on PvP server
         }
 
         public override void SendPlayerPositionAndObjectID()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.PositionAndObjectID)))
             {
-                pak.WriteShort((ushort)m_gameClient.Player.ObjectID); // This is the player's objectid not Sessionid!!!
-                pak.WriteShort((ushort)m_gameClient.Player.Z);
-                pak.WriteInt((uint)m_gameClient.Player.X);
-                pak.WriteInt((uint)m_gameClient.Player.Y);
-                pak.WriteShort(m_gameClient.Player.Heading);
+                pak.WriteShort((ushort)GameClient.Player.ObjectID); // This is the player's objectid not Sessionid!!!
+                pak.WriteShort((ushort)GameClient.Player.Z);
+                pak.WriteInt((uint)GameClient.Player.X);
+                pak.WriteInt((uint)GameClient.Player.Y);
+                pak.WriteShort(GameClient.Player.Heading);
 
                 int flags = 0;
-                Zone zone = m_gameClient.Player.CurrentZone;
+                Zone zone = GameClient.Player.CurrentZone;
                 if (zone == null)
                 {
                     return;
                 }
 
-                if (m_gameClient.Player.CurrentZone.IsDivingEnabled)
+                if (GameClient.Player.CurrentZone.IsDivingEnabled)
                 {
-                    flags = 0x80 | (m_gameClient.Player.IsUnderwater ? 0x01 : 0x00);
+                    flags = 0x80 | (GameClient.Player.IsUnderwater ? 0x01 : 0x00);
                 }
 
                 pak.WriteByte((byte)flags);
@@ -447,7 +446,7 @@ namespace DOL.GS.PacketHandler
                 }
 
                 // Dinberg - Changing to allow instances...
-                pak.WriteShort(m_gameClient.Player.CurrentRegion.Skin);
+                pak.WriteShort(GameClient.Player.CurrentRegion.Skin);
                 pak.WritePascalString(GameServer.Instance.Configuration.ServerNameShort); // new in 1.74, same as in SendLoginGranted
                 pak.WriteByte(0x00); // TODO: unknown, new in 1.74
                 SendTCP(pak);
@@ -462,7 +461,7 @@ namespace DOL.GS.PacketHandler
 
         protected virtual void WriteGroupMemberMapUpdate(GSTCPPacketOut pak, GameLiving living)
         {
-            bool sameRegion = living.CurrentRegion == m_gameClient.Player.CurrentRegion;
+            bool sameRegion = living.CurrentRegion == GameClient.Player.CurrentRegion;
             if (sameRegion && living.CurrentSpeed != 0) // todo : find a better way to detect when player change coord
             {
                 Zone zone = living.CurrentZone;
@@ -482,7 +481,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendRegionChanged()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
@@ -491,11 +490,11 @@ namespace DOL.GS.PacketHandler
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.RegionChanged)))
             {
                 // Dinberg - Changing to allow instances...
-                pak.WriteShort(m_gameClient.Player.CurrentRegion.Skin);
+                pak.WriteShort(GameClient.Player.CurrentRegion.Skin);
 
                 // Dinberg:Instances - also need to continue the bluff here, with zoneSkinID, for
                 // clientside positions of objects.
-                pak.WriteShort(m_gameClient.Player.CurrentZone.ZoneSkinID); // Zone ID?
+                pak.WriteShort(GameClient.Player.CurrentZone.ZoneSkinID); // Zone ID?
                 pak.WriteShort(0x00); // ?
                 pak.WriteShort(0x01); // cause region change ?
                 pak.WriteByte(0x0C); // Server ID
@@ -511,7 +510,7 @@ namespace DOL.GS.PacketHandler
             {
                 pak.WriteShort((ushort)spellCaster.ObjectID);
                 pak.WriteShort(spellid);
-                pak.WriteShort((ushort)(spellTarget == null ? 0 : spellTarget.ObjectID));
+                pak.WriteShort((ushort)(spellTarget?.ObjectID ?? 0));
                 pak.WriteShort(boltTime);
                 pak.WriteByte((byte)(noSound ? 1 : 0));
                 pak.WriteByte(success);
@@ -541,112 +540,107 @@ namespace DOL.GS.PacketHandler
 
         public override void SendWarmapBonuses()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
-            int AlbTowers = 0;
-            int MidTowers = 0;
-            int HibTowers = 0;
-            int AlbKeeps = 0;
-            int MidKeeps = 0;
-            int HibKeeps = 0;
-            int OwnerDFTowers = 0;
-            eRealm OwnerDF = eRealm.None;
+            int albTowers = 0;
+            int midTowers = 0;
+            int hibTowers = 0;
+            int albKeeps = 0;
+            int midKeeps = 0;
+            int hibKeeps = 0;
+            int ownerDfTowers = 0;
+            eRealm ownerDf = eRealm.None;
             foreach (AbstractGameKeep keep in GameServer.KeepManager.GetFrontierKeeps())
             {
-
-                switch ((eRealm)keep.Realm)
+                switch (keep.Realm)
                 {
                     case eRealm.Albion:
                         if (keep is GameKeep)
                         {
-                            AlbKeeps++;
+                            albKeeps++;
                         }
                         else
                         {
-                            AlbTowers++;
+                            albTowers++;
                         }
 
                         break;
                     case eRealm.Midgard:
                         if (keep is GameKeep)
                         {
-                            MidKeeps++;
+                            midKeeps++;
                         }
                         else
                         {
-                            MidTowers++;
+                            midTowers++;
                         }
 
                         break;
                     case eRealm.Hibernia:
                         if (keep is GameKeep)
                         {
-                            HibKeeps++;
+                            hibKeeps++;
                         }
                         else
                         {
-                            HibTowers++;
+                            hibTowers++;
                         }
 
-                        break;
-                    default:
                         break;
                 }
             }
 
-            if (AlbTowers > MidTowers && AlbTowers > HibTowers)
+            if (albTowers > midTowers && albTowers > hibTowers)
             {
-                OwnerDF = eRealm.Albion;
-                OwnerDFTowers = AlbTowers;
+                ownerDf = eRealm.Albion;
+                ownerDfTowers = albTowers;
             }
-            else if (MidTowers > AlbTowers && MidTowers > HibTowers)
+            else if (midTowers > albTowers && midTowers > hibTowers)
             {
-                OwnerDF = eRealm.Midgard;
-                OwnerDFTowers = MidTowers;
+                ownerDf = eRealm.Midgard;
+                ownerDfTowers = midTowers;
             }
-            else if (HibTowers > AlbTowers && HibTowers > MidTowers)
+            else if (hibTowers > albTowers && hibTowers > midTowers)
             {
-                OwnerDF = eRealm.Hibernia;
-                OwnerDFTowers = HibTowers;
+                ownerDf = eRealm.Hibernia;
+                ownerDfTowers = hibTowers;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.WarmapBonuses)))
             {
-                int RealmKeeps = 0;
-                int RealmTowers = 0;
-                switch ((eRealm)m_gameClient.Player.Realm)
+                int realmKeeps = 0;
+                int realmTowers = 0;
+                switch (GameClient.Player.Realm)
                 {
                     case eRealm.Albion:
-                        RealmKeeps = AlbKeeps;
-                        RealmTowers = AlbTowers;
+                        realmKeeps = albKeeps;
+                        realmTowers = albTowers;
                         break;
                     case eRealm.Midgard:
-                        RealmKeeps = MidKeeps;
-                        RealmTowers = MidTowers;
+                        realmKeeps = midKeeps;
+                        realmTowers = midTowers;
                         break;
                     case eRealm.Hibernia:
-                        RealmKeeps = HibKeeps;
-                        RealmTowers = HibTowers;
-                        break;
-                    default:
+                        realmKeeps = hibKeeps;
+                        realmTowers = hibTowers;
                         break;
                 }
 
-                pak.WriteByte((byte)RealmKeeps);
-                pak.WriteByte((byte)(((byte)RelicMgr.GetRelicCount(m_gameClient.Player.Realm, eRelicType.Magic)) << 4 | (byte)RelicMgr.GetRelicCount(m_gameClient.Player.Realm, eRelicType.Strength)));
-                pak.WriteByte((byte)OwnerDF);
-                pak.WriteByte((byte)RealmTowers);
-                pak.WriteByte((byte)OwnerDFTowers);
+                pak.WriteByte((byte)realmKeeps);
+                pak.WriteByte((byte)(((byte)RelicMgr.GetRelicCount(GameClient.Player.Realm, eRelicType.Magic)) << 4 | (byte)RelicMgr.GetRelicCount(GameClient.Player.Realm, eRelicType.Strength)));
+                pak.WriteByte((byte)ownerDf);
+                pak.WriteByte((byte)realmTowers);
+                pak.WriteByte((byte)ownerDfTowers);
                 SendTCP(pak);
             }
         }
 
         public override void SendLivingEquipmentUpdate(GameLiving living)
         {
-            if (m_gameClient.Player == null || living.IsVisibleTo(m_gameClient.Player) == false)
+            if (GameClient.Player == null || living.IsVisibleTo(GameClient.Player) == false)
             {
                 return;
             }
@@ -663,7 +657,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort((ushort)living.ObjectID);
                 pak.WriteByte((byte)((living.IsCloakHoodUp ? 0x01 : 0x00) | (int)living.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
 
-                pak.WriteByte((byte)living.VisibleActiveWeaponSlots);
+                pak.WriteByte(living.VisibleActiveWeaponSlots);
                 if (items != null)
                 {
                     pak.WriteByte((byte)items.Count);
@@ -692,7 +686,7 @@ namespace DOL.GS.PacketHandler
 
                         if (item.SlotPosition > Slot.RANGED || item.SlotPosition < Slot.RIGHTHAND)
                         {
-                            pak.WriteByte((byte)item.Extension);
+                            pak.WriteByte(item.Extension);
                         }
 
                         if ((texture & ~0xFF) != 0)
@@ -721,7 +715,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendVampireEffect(GameLiving living, bool show)
         {
-            if (m_gameClient.Player == null || living == null)
+            if (GameClient.Player == null || living == null)
             {
                 return;
             }

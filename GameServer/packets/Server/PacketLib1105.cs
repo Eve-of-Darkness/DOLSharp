@@ -19,11 +19,9 @@
 #define NOENCRYPTION
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
 using DOL.GS.RealmAbilities;
 using DOL.GS.Styles;
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
@@ -31,8 +29,6 @@ namespace DOL.GS.PacketHandler
     [PacketLib(1105, GameClient.eClientVersion.Version1105)]
     public class PacketLib1105 : PacketLib1104
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Constructs a new PacketLib for Client Version 1.105
         /// </summary>
@@ -41,7 +37,7 @@ namespace DOL.GS.PacketHandler
             : base(client)
         {
             // SendUpdateIcons
-            icons = 1;
+            Icons = 1;
         }
 
         /// <summary>
@@ -49,14 +45,14 @@ namespace DOL.GS.PacketHandler
         /// </summary>
         public override void SendTrainerWindow()
         {
-            if (m_gameClient == null || m_gameClient.Player == null)
+            if (GameClient?.Player == null)
             {
                 return;
             }
 
-            GamePlayer player = m_gameClient.Player;
+            GamePlayer player = GameClient.Player;
 
-            List<Specialization> specs = m_gameClient.Player.GetSpecList().Where(it => it.Trainable).ToList();
+            List<Specialization> specs = GameClient.Player.GetSpecList().Where(it => it.Trainable).ToList();
             IList<string> autotrains = player.CharacterClass.GetAutotrainableSkills();
 
             // Send Trainer Window with Trainable Specs
@@ -80,10 +76,13 @@ namespace DOL.GS.PacketHandler
             }
 
             // send RA usable by this class
-            var raList = SkillBase.GetClassRealmAbilities(m_gameClient.Player.CharacterClass.ID).Where(ra => !(ra is RR5RealmAbility));
+            var raList = SkillBase.GetClassRealmAbilities(GameClient.Player.CharacterClass.ID)
+                .Where(ra => !(ra is RR5RealmAbility))
+                .ToList();
+
             using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.TrainerWindow)))
             {
-                pak.WriteByte((byte)raList.Count());
+                pak.WriteByte((byte)raList.Count);
                 pak.WriteByte((byte)player.RealmSpecialtyPoints);
                 pak.WriteByte(1); // RA Code
                 pak.WriteByte(0);
@@ -96,7 +95,7 @@ namespace DOL.GS.PacketHandler
                     pak.WriteByte((byte)level);
                     pak.WriteByte((byte)ra.CostForUpgrade(level));
                     bool canBeUsed = ra.CheckRequirement(player);
-                    pak.WritePascalString(canBeUsed ? ra.Name : string.Format("[{0}]", ra.Name));
+                    pak.WritePascalString(canBeUsed ? ra.Name : $"[{ra.Name}]");
                 }
 
                 SendTCP(pak);
@@ -104,10 +103,10 @@ namespace DOL.GS.PacketHandler
 
             // Send Name Index for each spec.
             // Get ALL skills for player, ordered by spec key.
-            List<Tuple<Specialization, List<Tuple<int, int, Skill>>>> skillDictCache = null;
+            List<Tuple<Specialization, List<Tuple<int, int, Skill>>>> skillDictCache;
 
             // get from cache
-            if (m_gameClient.TrainerSkillCache == null)
+            if (GameClient.TrainerSkillCache == null)
             {
                 skillDictCache = new List<Tuple<Specialization, List<Tuple<int, int, Skill>>>>();
 
@@ -133,14 +132,14 @@ namespace DOL.GS.PacketHandler
                         toAdd.Add(new Tuple<int, int, Skill>((int)st.SkillType, st.InternalID, st));
                     }
 
-                    skillDictCache.Add(new Tuple<Specialization, List<Tuple<int, int, Skill>>>(spec, toAdd.OrderBy(e => (e.Item3 is Ability) ? ((Ability)e.Item3).SpecLevelRequirement : ((e.Item3 is Style) ? ((Style)e.Item3).SpecLevelRequirement : e.Item3.Level)).ToList()));
+                    skillDictCache.Add(new Tuple<Specialization, List<Tuple<int, int, Skill>>>(spec, toAdd.OrderBy(e => (e.Item3 as Ability)?.SpecLevelRequirement ?? ((e.Item3 as Style)?.SpecLevelRequirement ?? e.Item3.Level)).ToList()));
                 }
 
                 // save to cache
-                m_gameClient.TrainerSkillCache = skillDictCache;
+                GameClient.TrainerSkillCache = skillDictCache;
             }
 
-            skillDictCache = m_gameClient.TrainerSkillCache;
+            skillDictCache = GameClient.TrainerSkillCache;
 
             // Send Names first
             int index = 0;
@@ -173,7 +172,7 @@ namespace DOL.GS.PacketHandler
                 pakskill.WriteByte((byte)player.SkillSpecialtyPoints);
                 pakskill.WriteByte(3); // Skill description code
                 pakskill.WriteByte(0);
-                pakskill.WriteByte((byte)0); // unk ?
+                pakskill.WriteByte(0); // unk ?
 
                 // Fill out an array that tells the client how many spec points are available at each of
                 // this characters levels.  This seems to only be used for the 'Minimum Level' display on
@@ -198,7 +197,7 @@ namespace DOL.GS.PacketHandler
                     //    specpoints += i * m_gameClient.Player.CharacterClass.AdjustedSpecPointsMultiplier / 20;
 
                     // paksub.WriteByte((byte)specpoints);
-                    pakskill.WriteByte((byte)255);
+                    pakskill.WriteByte(255);
                 }
 
                 for (int skindex = 0 ; skindex < skillDictCache.Count ; skindex++)
@@ -207,7 +206,7 @@ namespace DOL.GS.PacketHandler
                     byte autotrain = 0;
                     if (autotrains.Contains(specs[skindex].KeyName))
                     {
-                        autotrain = (byte)Math.Floor((double)m_gameClient.Player.BaseLevel / 4);
+                        autotrain = (byte)Math.Floor((double)GameClient.Player.BaseLevel / 4);
                     }
 
                     if (pakskill.Length >= 2045)
@@ -227,17 +226,15 @@ namespace DOL.GS.PacketHandler
                             break;
                         }
 
-                        if (sk.Item3 is Ability)
+                        if (sk.Item3 is Ability ab)
                         {
-                            Ability ab = (Ability)sk.Item3;
-
                             // skill description
                             pakskill.WriteByte((byte)ab.SpecLevelRequirement); // level
                             // tooltip
-                            pakskill.WriteShort((ushort)ab.Icon); // icon
+                            pakskill.WriteShort(ab.Icon); // icon
                             pakskill.WriteByte((byte)sk.Item1); // skill page
-                            pakskill.WriteByte((byte)0); //
-                            pakskill.WriteByte((byte)0xFD); // line
+                            pakskill.WriteByte(0); //
+                            pakskill.WriteByte(0xFD); // line
                             pakskill.WriteShort((ushort)sk.Item2); // ID
                         }
                         else if (sk.Item3 is Spell)
@@ -249,7 +246,7 @@ namespace DOL.GS.PacketHandler
                             // tooltip
                             pakskill.WriteShort(sp.InternalIconID > 0 ? sp.InternalIconID : sp.Icon); // icon
                             pakskill.WriteByte((byte)sk.Item1); // skill page
-                            pakskill.WriteByte((byte)0); //
+                            pakskill.WriteByte(0); //
                             pakskill.WriteByte((byte)(sp.SkillType == eSkillPage.Songs ? 0xFF : 0xFE)); // line
                             pakskill.WriteShort((ushort)sk.Item2); // ID
                         }
@@ -259,7 +256,7 @@ namespace DOL.GS.PacketHandler
                             pakskill.WriteByte((byte)Math.Min(player.MaxLevel, st.SpecLevelRequirement));
 
                             // tooltip
-                            pakskill.WriteShort((ushort)st.Icon);
+                            pakskill.WriteShort(st.Icon);
                             pakskill.WriteByte((byte)sk.Item1);
                             pakskill.WriteByte((byte)st.OpeningRequirementType);
                             pakskill.WriteByte((byte)st.OpeningRequirementValue);
@@ -271,10 +268,10 @@ namespace DOL.GS.PacketHandler
                             pakskill.WriteByte((byte)sk.Item3.Level);
 
                             // tooltip
-                            pakskill.WriteShort((ushort)sk.Item3.Icon);
+                            pakskill.WriteShort(sk.Item3.Icon);
                             pakskill.WriteByte((byte)sk.Item1);
-                            pakskill.WriteByte((byte)0);
-                            pakskill.WriteByte((byte)0);
+                            pakskill.WriteByte(0);
+                            pakskill.WriteByte(0);
                             pakskill.WriteShort((ushort)sk.Item2);
                         }
                     }
@@ -286,7 +283,7 @@ namespace DOL.GS.PacketHandler
             // type 5 (realm abilities)
             using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.TrainerWindow)))
             {
-                pak.WriteByte((byte)raList.Count());
+                pak.WriteByte((byte)raList.Count);
                 pak.WriteByte((byte)player.RealmSpecialtyPoints);
                 pak.WriteByte(5);
                 pak.WriteByte(0);
@@ -303,14 +300,7 @@ namespace DOL.GS.PacketHandler
                         pak.WriteByte((byte)ra.CostForUpgrade(i));
                     }
 
-                    if (ra.CheckRequirement(m_gameClient.Player))
-                    {
-                        pak.WritePascalString(ra.KeyName);
-                    }
-                    else
-                    {
-                        pak.WritePascalString(string.Format("[{0}]", ra.Name));
-                    }
+                    pak.WritePascalString(ra.CheckRequirement(GameClient.Player) ? ra.KeyName : $"[{ra.Name}]");
                 }
 
                 SendTCP(pak);

@@ -26,7 +26,7 @@ namespace DOL.GS.PacketHandler
     [PacketLib(1113, GameClient.eClientVersion.Version1113)]
     public class PacketLib1113 : PacketLib1112
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Client Version 1.112
@@ -39,7 +39,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendPlayerTitles()
         {
-            var titles = m_gameClient.Player.Titles;
+            var titles = GameClient.Player.Titles;
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.DetailWindow)))
             {
@@ -49,7 +49,7 @@ namespace DOL.GS.PacketHandler
                 pak.WritePascalString("Player Statistics"); // window caption
 
                 byte line = 1;
-                foreach (string str in m_gameClient.Player.FormatStatistics())
+                foreach (string str in GameClient.Player.FormatStatistics())
                 {
                     pak.WriteByte(line++);
                     pak.WritePascalString(str);
@@ -63,13 +63,13 @@ namespace DOL.GS.PacketHandler
                 foreach (IPlayerTitle title in titles)
                 {
                     pak.WriteByte(line++);
-                    pak.WritePascalString(title.GetDescription(m_gameClient.Player));
+                    pak.WritePascalString(title.GetDescription(GameClient.Player));
                 }
 
                 long titlesLen = pak.Position - titlesCountPos - 1; // include titles count
                 if (titlesLen > byte.MaxValue)
                 {
-                    log.WarnFormat("Titles block is too long! {0} (player: {1})", titlesLen, m_gameClient.Player);
+                    Log.Warn($"Titles block is too long! {titlesLen} (player: {GameClient.Player})");
                 }
 
                 // Trailing Zero!

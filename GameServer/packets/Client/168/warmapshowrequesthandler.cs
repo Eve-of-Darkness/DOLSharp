@@ -24,21 +24,19 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.ShowWarmapRequest, "Show Warmap", eClientStatus.PlayerInGame)]
     public class WarmapShowRequestHandler : IPacketHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int code = packet.ReadByte();
-            int RealmMap = packet.ReadByte();
+            int realmMap = packet.ReadByte();
             int keepId = packet.ReadByte();
 
-            if (client == null || client.Player == null)
+            if (client?.Player == null)
             {
                 return;
             }
 
             // hack fix new keep ids
-            else if ((int)client.Version >= (int)GameClient.eClientVersion.Version190 && (int)client.Version < (int)GameClient.eClientVersion.Version1115)
+            if ((int)client.Version >= (int)GameClient.eClientVersion.Version190 && (int)client.Version < (int)GameClient.eClientVersion.Version1115)
             {
                 if (keepId >= 82)
                 {
@@ -56,7 +54,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 // warmap update
                 case 0:
                 {
-                    client.Player.WarMapPage = (byte)RealmMap;
+                    client.Player.WarMapPage = (byte)realmMap;
                     break;
                 }
 
@@ -157,7 +155,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                             default:
                                 {
-                                    if (keep != null && keep is GameKeep)
+                                    if (keep is GameKeep)
                                     {
                                         FrontiersPortalStone stone = keep.TeleportStone;
                                         if (stone != null)

@@ -37,12 +37,12 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles player sit requests
         /// </summary>
-        protected class SitRequestHandler : RegionAction
+        private class SitRequestHandler : RegionAction
         {
             /// <summary>
             /// The new sit state
             /// </summary>
-            protected readonly bool m_sit;
+            private readonly bool _sit;
 
             /// <summary>
             /// Constructs a new SitRequestHandler
@@ -51,7 +51,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="sit">The new sit state</param>
             public SitRequestHandler(GamePlayer actionSource, bool sit) : base(actionSource)
             {
-                m_sit = sit;
+                _sit = sit;
             }
 
             /// <summary>
@@ -61,7 +61,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 var player = (GamePlayer)m_actionSource;
 
-                player.Sit(m_sit);
+                player.Sit(_sit);
             }
         }
 

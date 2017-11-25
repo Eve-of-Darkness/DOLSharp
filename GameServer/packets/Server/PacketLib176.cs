@@ -19,23 +19,15 @@
 #define NOENCRYPTION
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-
 using DOL.Database;
 using DOL.Language;
 using DOL.GS.Housing;
-
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(176, GameClient.eClientVersion.Version176)]
     public class PacketLib176 : PacketLib175
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.76 clients
@@ -47,7 +39,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendFindGroupWindowUpdate(GamePlayer[] list)
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
@@ -61,14 +53,7 @@ namespace DOL.GS.PacketHandler
                     byte nbsolo = 0x1E;
                     foreach (GamePlayer player in list)
                     {
-                        if (player.Group != null)
-                        {
-                            pak.WriteByte(nbleader++);
-                        }
-                        else
-                        {
-                            pak.WriteByte(nbsolo++);
-                        }
+                        pak.WriteByte(player.Group != null ? nbleader++ : nbsolo++);
 
                         pak.WriteByte(player.Level);
                         pak.WritePascalString(player.Name);
@@ -76,14 +61,7 @@ namespace DOL.GS.PacketHandler
 
                         // Dinberg:Instances - We use ZoneSkinID to bluff our way to victory and
                         // trick the client for positioning objects (as IDs are hard coded).
-                        if (player.CurrentZone != null)
-                        {
-                            pak.WriteShort(player.CurrentZone.ZoneSkinID);
-                        }
-                        else
-                        {
-                            pak.WriteShort(0); // ?
-                        }
+                        pak.WriteShort(player.CurrentZone?.ZoneSkinID ?? 0);
 
                         pak.WriteByte(0); // duration
                         pak.WriteByte(0); // objective
@@ -109,7 +87,7 @@ namespace DOL.GS.PacketHandler
                 return;
             }
 
-            if (obj.IsVisibleTo(m_gameClient.Player) == false)
+            if (obj.IsVisibleTo(GameClient.Player) == false)
             {
                 return;
             }
@@ -118,9 +96,9 @@ namespace DOL.GS.PacketHandler
             {
                 pak.WriteShort((ushort)obj.ObjectID);
 
-                if (obj is GameStaticItem)
+                if (obj is GameStaticItem item)
                 {
-                    pak.WriteShort((ushort)(obj as GameStaticItem).Emblem);
+                    pak.WriteShort((ushort)item.Emblem);
                 }
                 else
                 {
@@ -151,15 +129,15 @@ namespace DOL.GS.PacketHandler
                     flag |= 0x08;
                 }
 
-                if (obj is GameStaticItemTimed && m_gameClient.Player != null && ((GameStaticItemTimed)obj).IsOwner(m_gameClient.Player))
+                if (obj is GameStaticItemTimed timed && GameClient.Player != null && timed.IsOwner(GameClient.Player))
                 {
                     flag |= 0x04;
                 }
 
                 pak.WriteShort((ushort)flag);
-                if (obj is GameStaticItem)
+                if (obj is GameStaticItem staticItem)
                 {
-                    int newEmblemBitMask = ((obj as GameStaticItem).Emblem & 0x010000) << 9;
+                    int newEmblemBitMask = (staticItem.Emblem & 0x010000) << 9;
                     pak.WriteInt((uint)newEmblemBitMask);// TODO other bits
                 }
                 else
@@ -168,13 +146,12 @@ namespace DOL.GS.PacketHandler
                 }
 
                 string name = obj.Name;
-                LanguageDataObject translation = null;
-                if (obj is GameStaticItem)
+                if (obj is GameStaticItem gameStaticItem)
                 {
-                    translation = LanguageMgr.GetTranslation(m_gameClient, (GameStaticItem)obj);
+                    var translation = GameClient.GetTranslation(gameStaticItem);
                     if (translation != null)
                     {
-                        if (obj is WorldInventoryItem)
+                        if (gameStaticItem is WorldInventoryItem)
                         {
                             // if (!Util.IsEmpty(((DBLanguageItem)translation).Name))
                             //    name = ((DBLanguageItem)translation).Name;
@@ -205,16 +182,16 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update Object Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(obj.CurrentRegionID, (ushort)obj.ObjectID)] = GameTimer.GetTickCount();
+            GameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(obj.CurrentRegionID, (ushort)obj.ObjectID)] = GameTimer.GetTickCount();
         }
 
         protected override void SendInventorySlotsUpdateRange(ICollection<int> slots, eInventoryWindowType windowType)
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate)))
             {
-                pak.WriteByte((byte)(slots == null ? 0 : slots.Count));
-                pak.WriteByte((byte)((m_gameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)m_gameClient.Player.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
-                pak.WriteByte((byte)m_gameClient.Player.VisibleActiveWeaponSlots);
+                pak.WriteByte((byte)(slots?.Count ?? 0));
+                pak.WriteByte((byte)((GameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)GameClient.Player.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
+                pak.WriteByte(GameClient.Player.VisibleActiveWeaponSlots);
                 pak.WriteByte((byte)windowType); // preAction (0x00 - Do nothing)
                 if (slots != null)
                 {
@@ -229,9 +206,7 @@ namespace DOL.GS.PacketHandler
                             pak.WriteByte((byte)updatedSlot);
                         }
 
-                        InventoryItem item = null;
-                        item = m_gameClient.Player.Inventory.GetItem((eInventorySlot)updatedSlot);
-
+                        var item = GameClient.Player.Inventory.GetItem((eInventorySlot)updatedSlot);
                         if (item == null)
                         {
                             pak.Fill(0x00, 19);
@@ -312,7 +287,7 @@ namespace DOL.GS.PacketHandler
                         pak.WriteByte((byte)item.Quality); // % of qua
                         pak.WriteByte((byte)item.Bonus); // % bonus
                         pak.WriteShort((ushort)item.Model);
-                        pak.WriteByte((byte)item.Extension);
+                        pak.WriteByte(item.Extension);
                         int effect = item.Effect;
                         if (item.Emblem != 0)
                         {
@@ -335,11 +310,11 @@ namespace DOL.GS.PacketHandler
                         {
                             if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                             {
-                                name += "[" + item.SellPrice.ToString() + " BP]";
+                                name += $"[{item.SellPrice} BP]";
                             }
                             else
                             {
-                                name += "[" + Money.GetString(item.SellPrice) + "]";
+                                name += $"[{Money.GetString(item.SellPrice)}]";
                             }
                         }
 
@@ -353,7 +328,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendLivingEquipmentUpdate(GameLiving living)
         {
-            if (m_gameClient.Player == null || living.IsVisibleTo(m_gameClient.Player) == false)
+            if (GameClient.Player == null || living.IsVisibleTo(GameClient.Player) == false)
             {
                 return;
             }
@@ -369,7 +344,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort((ushort)living.ObjectID);
                 pak.WriteByte((byte)((living.IsCloakHoodUp ? 0x01 : 0x00) | (int)living.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
 
-                pak.WriteByte((byte)living.VisibleActiveWeaponSlots);
+                pak.WriteByte(living.VisibleActiveWeaponSlots);
                 if (items != null)
                 {
                     pak.WriteByte((byte)items.Count);
@@ -402,7 +377,7 @@ namespace DOL.GS.PacketHandler
 
                         if (item.SlotPosition > Slot.RANGED || item.SlotPosition < Slot.RIGHTHAND)
                         {
-                            pak.WriteByte((byte)item.Extension);
+                            pak.WriteByte(item.Extension);
                         }
 
                         if ((texture & ~0xFF) != 0)
@@ -429,28 +404,6 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        /*
-         * public override void SendPlayerBanner(GamePlayer player, int GuildEmblem)
-        {
-            if (player == null) return;
-            GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VisualEffect));
-            pak.WriteShort((ushort) player.ObjectID);
-            pak.WriteByte(12);
-            if (GuildEmblem == 0)
-            {
-                pak.WriteByte(1);
-            }
-            else
-            {
-                pak.WriteByte(0);
-            }
-            int newEmblemBitMask = ((GuildEmblem & 0x010000) << 8) | (GuildEmblem & 0xFFFF);
-            pak.WriteInt((uint)newEmblemBitMask);
-            SendTCP(pak);
-        }
-
-         */
-
         public override void SendHouse(House house)
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseCreate)))
@@ -459,7 +412,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort((ushort)house.Z);
                 pak.WriteInt((uint)house.X);
                 pak.WriteInt((uint)house.Y);
-                pak.WriteShort((ushort)house.Heading);
+                pak.WriteShort(house.Heading);
                 pak.WriteShort((ushort)house.PorchRoofColor);
                 pak.WriteShort((ushort)(house.GetPorchAndGuildEmblemFlags() | (house.Emblem & 0x010000) >> 13));// new Guild Emblem
                 pak.WriteShort((ushort)house.Emblem);
@@ -477,7 +430,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update cache
-            m_gameClient.HouseUpdateArray[new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber)] = GameTimer.GetTickCount();
+            GameClient.HouseUpdateArray[new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber)] = GameTimer.GetTickCount();
         }
 
         public override void SendEnterHouse(House house)
@@ -486,10 +439,10 @@ namespace DOL.GS.PacketHandler
             {
 
                 pak.WriteShort((ushort)house.HouseNumber);
-                pak.WriteShort((ushort)25000);         // constant!
+                pak.WriteShort(25000);         // constant!
                 pak.WriteInt((uint)house.X);
                 pak.WriteInt((uint)house.Y);
-                pak.WriteShort((ushort)house.Heading); // useless/ignored by client.
+                pak.WriteShort(house.Heading); // useless/ignored by client.
                 pak.WriteByte(0x00);
                 pak.WriteByte((byte)(house.GetGuildEmblemFlags() | (house.Emblem & 0x010000) >> 14));// new Guild Emblem
                 pak.WriteShort((ushort)house.Emblem);   // emblem

@@ -31,7 +31,7 @@ namespace DOL.GS.PacketHandler
     [PacketLib(1104, GameClient.eClientVersion.Version1104)]
     public class PacketLib1104 : PacketLib1103
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Client Version 1.104
@@ -46,23 +46,23 @@ namespace DOL.GS.PacketHandler
         {
             if (realm < eRealm._FirstPlayerRealm || realm > eRealm._LastPlayerRealm)
             {
-                throw new Exception("CharacterOverview requested for unknown realm " + realm);
+                throw new Exception($"CharacterOverview requested for unknown realm {realm}");
             }
 
             int firstSlot = (byte)realm * 100;
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CharacterOverview)))
             {
-                pak.FillString(m_gameClient.Account.Name, 24);
+                pak.FillString(GameClient.Account.Name, 24);
 
-                if (m_gameClient.Account.Characters == null)
+                if (GameClient.Account.Characters == null)
                 {
                     pak.Fill(0x0, 1880);
                 }
                 else
                 {
                     Dictionary<int, DOLCharacters> charsBySlot = new Dictionary<int, DOLCharacters>();
-                    foreach (DOLCharacters c in m_gameClient.Account.Characters)
+                    foreach (DOLCharacters c in GameClient.Account.Characters)
                     {
                         try
                         {
@@ -70,49 +70,52 @@ namespace DOL.GS.PacketHandler
                         }
                         catch (Exception ex)
                         {
-                            log.Error("SendCharacterOverview - Duplicate char in slot? Slot: " + c.AccountSlot + ", Account: " + c.AccountName, ex);
+                            Log.Error($"SendCharacterOverview - Duplicate char in slot? Slot: {c.AccountSlot}, Account: {c.AccountName}", ex);
                         }
                     }
 
-                    var itemsByOwnerID = new Dictionary<string, Dictionary<eInventorySlot, InventoryItem>>();
+                    var itemsByOwnerId = new Dictionary<string, Dictionary<eInventorySlot, InventoryItem>>();
 
                     if (charsBySlot.Any())
                     {
                         var allItems = GameServer.Database.SelectObjects<InventoryItem>(
-                            "`OwnerID` = @OwnerID AND `SlotPosition` >= @MinEquipable AND `SlotPosition` <= @MaxEquipable",
-                                                                                        charsBySlot.Select(kv => new [] { new QueryParameter("@OwnerID", kv.Value.ObjectId), new QueryParameter("@MinEquipable", (int)eInventorySlot.MinEquipable), new QueryParameter("@MaxEquipable", (int)eInventorySlot.MaxEquipable) }))
-                            .SelectMany(objs => objs);
+                                "`OwnerID` = @OwnerID AND `SlotPosition` >= @MinEquipable AND `SlotPosition` <= @MaxEquipable",
+                                charsBySlot.Select(kv => new[]
+                                {
+                                    new QueryParameter("@OwnerID", kv.Value.ObjectId),
+                                    new QueryParameter("@MinEquipable", (int) eInventorySlot.MinEquipable),
+                                    new QueryParameter("@MaxEquipable", (int) eInventorySlot.MaxEquipable)
+                                }))
+                            .SelectMany(objs => objs)
+                            .ToList();
 
                         foreach (InventoryItem item in allItems)
                         {
                             try
                             {
-                                if (!itemsByOwnerID.ContainsKey(item.OwnerID))
+                                if (!itemsByOwnerId.ContainsKey(item.OwnerID))
                                 {
-                                    itemsByOwnerID.Add(item.OwnerID, new Dictionary<eInventorySlot, InventoryItem>());
+                                    itemsByOwnerId.Add(item.OwnerID, new Dictionary<eInventorySlot, InventoryItem>());
                                 }
 
-                                itemsByOwnerID[item.OwnerID].Add((eInventorySlot)item.SlotPosition, item);
+                                itemsByOwnerId[item.OwnerID].Add((eInventorySlot)item.SlotPosition, item);
                             }
                             catch (Exception ex)
                             {
-                                log.Error("SendCharacterOverview - Duplicate item on character? OwnerID: " + item.OwnerID + ", SlotPosition: " + item.SlotPosition + ", Account: " + m_gameClient.Account.Name, ex);
+                                Log.Error($"SendCharacterOverview - Duplicate item on character? OwnerID: {item.OwnerID}, SlotPosition: {item.SlotPosition}, Account: {GameClient.Account.Name}", ex);
                             }
                         }
                     }
 
                     for (int i = firstSlot; i < (firstSlot + 10); i++)
                     {
-                        DOLCharacters c = null;
-                        if (!charsBySlot.TryGetValue(i, out c))
+                        if (!charsBySlot.TryGetValue(i, out var c))
                         {
                             pak.Fill(0x0, 188);
                         }
                         else
                         {
-                            Dictionary<eInventorySlot, InventoryItem> charItems = null;
-
-                            if (!itemsByOwnerID.TryGetValue(c.ObjectId, out charItems))
+                            if (!itemsByOwnerId.TryGetValue(c.ObjectId, out var charItems))
                             {
                                 charItems = new Dictionary<eInventorySlot, InventoryItem>();
                             }
@@ -121,9 +124,7 @@ namespace DOL.GS.PacketHandler
                             byte extensionGloves = 0;
                             byte extensionBoots = 0;
 
-                            InventoryItem item = null;
-
-                            if (charItems.TryGetValue(eInventorySlot.TorsoArmor, out item))
+                            if (charItems.TryGetValue(eInventorySlot.TorsoArmor, out var item))
                             {
                                 extensionTorso = item.Extension;
                             }
@@ -141,23 +142,23 @@ namespace DOL.GS.PacketHandler
                             pak.Fill(0x00, 4);// new heading bytes in from 1.99 relocated in 1.104
                             pak.FillString(c.Name, 24);
                             pak.WriteByte(0x01);
-                            pak.WriteByte((byte)c.EyeSize);
-                            pak.WriteByte((byte)c.LipSize);
-                            pak.WriteByte((byte)c.EyeColor);
-                            pak.WriteByte((byte)c.HairColor);
-                            pak.WriteByte((byte)c.FaceType);
-                            pak.WriteByte((byte)c.HairStyle);
+                            pak.WriteByte(c.EyeSize);
+                            pak.WriteByte(c.LipSize);
+                            pak.WriteByte(c.EyeColor);
+                            pak.WriteByte(c.HairColor);
+                            pak.WriteByte(c.FaceType);
+                            pak.WriteByte(c.HairStyle);
                             pak.WriteByte((byte)((extensionBoots << 4) | extensionGloves));
                             pak.WriteByte((byte)((extensionTorso << 4) | (c.IsCloakHoodUp ? 0x1 : 0x0)));
-                            pak.WriteByte((byte)c.CustomisationStep); // 1 = auto generate config, 2= config ended by player, 3= enable config to player
-                            pak.WriteByte((byte)c.MoodType);
+                            pak.WriteByte(c.CustomisationStep); // 1 = auto generate config, 2= config ended by player, 3= enable config to player
+                            pak.WriteByte(c.MoodType);
                             pak.Fill(0x0, 13); // 0 String
 
                             string locationDescription = string.Empty;
                             Region region = WorldMgr.GetRegion((ushort)c.Region);
                             if (region != null)
                             {
-                                locationDescription = m_gameClient.GetTranslatedSpotDescription(region, c.Xpos, c.Ypos, c.Zpos);
+                                locationDescription = GameClient.GetTranslatedSpotDescription(region, c.Xpos, c.Ypos, c.Zpos);
                             }
 
                             pak.FillString(locationDescription, 24);
@@ -170,7 +171,7 @@ namespace DOL.GS.PacketHandler
 
                             pak.FillString(classname, 24);
 
-                            string racename = m_gameClient.RaceToTranslatedName(c.Race, c.Gender);
+                            string racename = GameClient.RaceToTranslatedName(c.Race, c.Gender);
                             pak.FillString(racename, 24);
 
                             pak.WriteByte((byte)c.Level);
@@ -179,7 +180,7 @@ namespace DOL.GS.PacketHandler
                             pak.WriteByte((byte)((((c.Race & 0x10) << 2) + (c.Race & 0x0F)) | (c.Gender << 4))); // race max value can be 0x1F
                             pak.WriteShortLowEndian((ushort)c.CurrentModel);
                             pak.WriteByte((byte)c.Region);
-                            if (region == null || (int)m_gameClient.ClientType > region.Expansion)
+                            if (region == null || (int)GameClient.ClientType > region.Expansion)
                             {
                                 pak.WriteByte(0x00);
                             }
@@ -198,33 +199,22 @@ namespace DOL.GS.PacketHandler
                             pak.WriteByte((byte)c.Empathy);
                             pak.WriteByte((byte)c.Charisma);
 
-                            InventoryItem rightHandWeapon = null;
-                            charItems.TryGetValue(eInventorySlot.RightHandWeapon, out rightHandWeapon);
-                            InventoryItem leftHandWeapon = null;
-                            charItems.TryGetValue(eInventorySlot.LeftHandWeapon, out leftHandWeapon);
-                            InventoryItem twoHandWeapon = null;
-                            charItems.TryGetValue(eInventorySlot.TwoHandWeapon, out twoHandWeapon);
-                            InventoryItem distanceWeapon = null;
-                            charItems.TryGetValue(eInventorySlot.DistanceWeapon, out distanceWeapon);
+                            charItems.TryGetValue(eInventorySlot.RightHandWeapon, out var rightHandWeapon);
+                            charItems.TryGetValue(eInventorySlot.LeftHandWeapon, out var leftHandWeapon);
+                            charItems.TryGetValue(eInventorySlot.TwoHandWeapon, out var twoHandWeapon);
+                            charItems.TryGetValue(eInventorySlot.DistanceWeapon, out var distanceWeapon);
 
-                            InventoryItem helmet = null;
-                            charItems.TryGetValue(eInventorySlot.HeadArmor, out helmet);
-                            InventoryItem gloves = null;
-                            charItems.TryGetValue(eInventorySlot.HandsArmor, out gloves);
-                            InventoryItem boots = null;
-                            charItems.TryGetValue(eInventorySlot.FeetArmor, out boots);
-                            InventoryItem torso = null;
-                            charItems.TryGetValue(eInventorySlot.TorsoArmor, out torso);
-                            InventoryItem cloak = null;
-                            charItems.TryGetValue(eInventorySlot.Cloak, out cloak);
-                            InventoryItem legs = null;
-                            charItems.TryGetValue(eInventorySlot.LegsArmor, out legs);
-                            InventoryItem arms = null;
-                            charItems.TryGetValue(eInventorySlot.ArmsArmor, out arms);
+                            charItems.TryGetValue(eInventorySlot.HeadArmor, out var helmet);
+                            charItems.TryGetValue(eInventorySlot.HandsArmor, out var gloves);
+                            charItems.TryGetValue(eInventorySlot.FeetArmor, out var boots);
+                            charItems.TryGetValue(eInventorySlot.TorsoArmor, out var torso);
+                            charItems.TryGetValue(eInventorySlot.Cloak, out var cloak);
+                            charItems.TryGetValue(eInventorySlot.LegsArmor, out var legs);
+                            charItems.TryGetValue(eInventorySlot.ArmsArmor, out var arms);
 
-                            pak.WriteShortLowEndian((ushort)(helmet != null ? helmet.Model : 0));
-                            pak.WriteShortLowEndian((ushort)(gloves != null ? gloves.Model : 0));
-                            pak.WriteShortLowEndian((ushort)(boots != null ? boots.Model : 0));
+                            pak.WriteShortLowEndian((ushort)(helmet?.Model ?? 0));
+                            pak.WriteShortLowEndian((ushort)(gloves?.Model ?? 0));
+                            pak.WriteShortLowEndian((ushort)(boots?.Model ?? 0));
 
                             ushort rightHandColor = 0;
                             if (rightHandWeapon != null)
@@ -234,10 +224,10 @@ namespace DOL.GS.PacketHandler
 
                             pak.WriteShortLowEndian(rightHandColor);
 
-                            pak.WriteShortLowEndian((ushort)(torso != null ? torso.Model : 0));
-                            pak.WriteShortLowEndian((ushort)(cloak != null ? cloak.Model : 0));
-                            pak.WriteShortLowEndian((ushort)(legs != null ? legs.Model : 0));
-                            pak.WriteShortLowEndian((ushort)(arms != null ? arms.Model : 0));
+                            pak.WriteShortLowEndian((ushort)(torso?.Model ?? 0));
+                            pak.WriteShortLowEndian((ushort)(cloak?.Model ?? 0));
+                            pak.WriteShortLowEndian((ushort)(legs?.Model ?? 0));
+                            pak.WriteShortLowEndian((ushort)(arms?.Model ?? 0));
 
                             ushort helmetColor = 0;
                             if (helmet != null)
@@ -304,17 +294,17 @@ namespace DOL.GS.PacketHandler
                             pak.WriteShortLowEndian(armsColor);
 
                             // weapon models
-                            pak.WriteShortLowEndian((ushort)(rightHandWeapon != null ? rightHandWeapon.Model : 0));
-                            pak.WriteShortLowEndian((ushort)(leftHandWeapon != null ? leftHandWeapon.Model : 0));
-                            pak.WriteShortLowEndian((ushort)(twoHandWeapon != null ? twoHandWeapon.Model : 0));
-                            pak.WriteShortLowEndian((ushort)(distanceWeapon != null ? distanceWeapon.Model : 0));
+                            pak.WriteShortLowEndian((ushort)(rightHandWeapon?.Model ?? 0));
+                            pak.WriteShortLowEndian((ushort)(leftHandWeapon?.Model ?? 0));
+                            pak.WriteShortLowEndian((ushort)(twoHandWeapon?.Model ?? 0));
+                            pak.WriteShortLowEndian((ushort)(distanceWeapon?.Model ?? 0));
 
-                            if (c.ActiveWeaponSlot == (byte)DOL.GS.GameLiving.eActiveWeaponSlot.TwoHanded)
+                            if (c.ActiveWeaponSlot == (byte)GameLiving.eActiveWeaponSlot.TwoHanded)
                             {
                                 pak.WriteByte(0x02);
                                 pak.WriteByte(0x02);
                             }
-                            else if (c.ActiveWeaponSlot == (byte)DOL.GS.GameLiving.eActiveWeaponSlot.Distance)
+                            else if (c.ActiveWeaponSlot == (byte)GameLiving.eActiveWeaponSlot.Distance)
                             {
                                 pak.WriteByte(0x03);
                                 pak.WriteByte(0x03);
@@ -359,7 +349,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendDupNameCheckReply(string name, bool nameExists)
         {
-            if (m_gameClient == null || m_gameClient.Account == null)
+            if (GameClient?.Account == null)
             {
                 return;
             }
@@ -369,7 +359,7 @@ namespace DOL.GS.PacketHandler
             using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.DupNameCheckReply)))
             {
                 pak.FillString(name, 30);
-                pak.FillString(m_gameClient.Account.Name, 24);
+                pak.FillString(GameClient.Account.Name, 24);
                 pak.WriteByte((byte)(nameExists ? 0x1 : 0x0));
                 pak.Fill(0x0, 3);
                 SendTCP(pak);

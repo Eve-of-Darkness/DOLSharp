@@ -2871,7 +2871,7 @@ namespace DOL.GS
             }
             else
             {
-                long lastmove = TempProperties.getProperty<long>(PlayerPositionUpdateHandler.LASTMOVEMENTTICK);
+                long lastmove = TempProperties.getProperty<long>(PlayerPositionUpdateHandler.LastMovementTick);
                 if ((lastmove > 0 && lastmove + 5000 < CurrentRegion.Time) // cancel sprint after 5sec without moving?
                     || Endurance - 5 <= 0)
                 {
@@ -11559,7 +11559,7 @@ break;
             Heading = heading;
 
             // Remove the last update tick property, to prevent speedhack messages during zoning and teleporting!
-            TempProperties.removeProperty(PlayerPositionUpdateHandler.LASTMOVEMENTTICK);
+            TempProperties.removeProperty(PlayerPositionUpdateHandler.LastMovementTick);
 
             // If the destination is in another region
             if (regionID != CurrentRegionID)

@@ -37,7 +37,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <returns></returns>
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            ushort targetID = packet.ReadShort();
+            ushort targetId = packet.ReadShort();
             ushort flags = packet.ReadShort();
 
             /*
@@ -47,7 +47,7 @@ namespace DOL.GS.PacketHandler.Client.v168
              * 0x0001 = players attack mode bit (not targets!)
              */
 
-            new ChangeTargetAction(client.Player, targetID, (flags & (0x4000 | 0x2000)) != 0, (flags & 0x8000) != 0).Start(1);
+            new ChangeTargetAction(client.Player, targetId, (flags & (0x4000 | 0x2000)) != 0, (flags & 0x8000) != 0).Start(1);
         }
 
         #endregion
@@ -57,22 +57,22 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Changes players target
         /// </summary>
-        protected class ChangeTargetAction : RegionAction
+        private class ChangeTargetAction : RegionAction
         {
             /// <summary>
             /// The 'examine target' bit
             /// </summary>
-            protected readonly bool m_examineTarget;
+            private readonly bool _examineTarget;
 
             /// <summary>
             /// The new target OID
             /// </summary>
-            protected readonly int m_newTargetId;
+            private readonly int _newTargetId;
 
             /// <summary>
             /// The 'target in view' flag
             /// </summary>
-            protected readonly bool m_targetInView;
+            private readonly bool _targetInView;
 
             /// <summary>
             /// Constructs a new TargetChangeAction
@@ -84,9 +84,9 @@ namespace DOL.GS.PacketHandler.Client.v168
             public ChangeTargetAction(GamePlayer actionSource, int newTargetId, bool targetInView, bool examineTarget)
                 : base(actionSource)
             {
-                m_newTargetId = newTargetId;
-                m_targetInView = targetInView;
-                m_examineTarget = examineTarget;
+                _newTargetId = newTargetId;
+                _targetInView = targetInView;
+                _examineTarget = examineTarget;
             }
 
             /// <summary>
@@ -96,14 +96,14 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 var player = (GamePlayer)m_actionSource;
 
-                GameObject myTarget = player.CurrentRegion.GetObject((ushort)m_newTargetId);
+                GameObject myTarget = player.CurrentRegion.GetObject((ushort)_newTargetId);
                 player.TargetObject = myTarget;
-                player.TargetInView = m_targetInView;
+                player.TargetInView = _targetInView;
 
                 if (myTarget != null)
                 {
                     // Send target message text only if 'examine' bit is set.
-                    if (m_examineTarget)
+                    if (_examineTarget)
                     {
                         foreach (string message in myTarget.GetExamineMessages(player))
                         {
@@ -113,7 +113,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     // Then no LOS message; not sure which bit to use so use both :)
                     // should be sent if targeted is using group panel to change the target
-                    if (!m_targetInView)
+                    if (!_targetInView)
                     {
                         player.Out.SendMessage("Target is not in view.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
@@ -126,11 +126,9 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                 if (player.IsPraying)
                 {
-                    var gravestone = myTarget as GameGravestone;
-                    if (gravestone == null || !gravestone.InternalID.Equals(player.InternalID))
+                    if (!(myTarget is GameGravestone gravestone) || !gravestone.InternalID.Equals(player.InternalID))
                     {
-                        player.Out.SendMessage("You are no longer targetting your grave. Your prayers fail.", eChatType.CT_System,
-                                               eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage("You are no longer targetting your grave. Your prayers fail.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         player.PrayTimerStop();
                     }
                 }

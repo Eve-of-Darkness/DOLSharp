@@ -27,8 +27,8 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            int unk1 = packet.ReadByte();
-            int unk2 = packet.ReadByte();
+            packet.ReadByte(); // unk1
+            packet.ReadByte(); // unk2
             ushort houseNumber = packet.ReadShort();
 
             // house is null, return

@@ -25,10 +25,9 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            // packet.Skip(10);
-            uint playerX = packet.ReadInt();
-            uint playerY = packet.ReadInt();
-            int sessionId = packet.ReadShort();
+            packet.ReadInt(); //playerX
+            packet.ReadInt(); // playerY
+            packet.ReadShort(); // sessionId
             ushort targetOid = packet.ReadShort();
 
             // TODO: utilize these client-sent coordinates to possibly check for exploits which are spoofing position packets but not spoofing them everywhere
@@ -42,12 +41,12 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles player interact actions
         /// </summary>
-        protected class InteractActionHandler : RegionAction
+        private class InteractActionHandler : RegionAction
         {
             /// <summary>
             /// The interact target OID
             /// </summary>
-            protected readonly int m_targetOid;
+            private readonly int _targetOid;
 
             /// <summary>
             /// Constructs a new InterractActionHandler
@@ -56,7 +55,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="targetOid">The interact target OID</param>
             public InteractActionHandler(GamePlayer actionSource, int targetOid) : base(actionSource)
             {
-                m_targetOid = targetOid;
+                _targetOid = targetOid;
             }
 
             /// <summary>
@@ -66,18 +65,9 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 var player = (GamePlayer)m_actionSource;
                 Region region = player.CurrentRegion;
-                if (region == null)
-                {
-                    return;
-                }
 
-                GameObject obj = region.GetObject((ushort)m_targetOid);
-                if (obj == null)
-                {
-                    return;
-                }
-
-                obj.Interact(player);
+                GameObject obj = region?.GetObject((ushort)_targetOid);
+                obj?.Interact(player);
             }
         }
 

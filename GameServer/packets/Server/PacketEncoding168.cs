@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System.Reflection;
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
@@ -27,46 +25,30 @@ namespace DOL.GS.PacketHandler
     /// </summary>
     public class PacketEncoding168 : IPacketEncoding
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public enum eEncryptionState
         {
             NotEncrypted = 0,
-            RSAEncrypted = 1,
-            PseudoRC4Encrypted = 2
+            RsaEncrypted = 1,
+            PseudoRc4Encrypted = 2
         }
-
-        protected eEncryptionState m_encryptionState;
-        protected byte[] m_sbox = null;
 
         public PacketEncoding168()
         {
-            m_encryptionState = eEncryptionState.NotEncrypted;
-            m_sbox = new byte[256];
+            EncryptionState = eEncryptionState.NotEncrypted;
+            SBox = new byte[256];
         }
 
         /// <summary>
         /// Gets or sets the SBox for this encoding
         /// </summary>
-        public byte[] SBox
-      {
-        get { return m_sbox; }
-            set { m_sbox = value; }
-      }
+        public byte[] SBox { get; set; }
 
         /// <summary>
         /// Gets or sets the Encryption State of this encoding
         /// </summary>
-      public eEncryptionState EncryptionState
-      {
-        get { return m_encryptionState; }
-        set { m_encryptionState = value; }
-      }
+        public eEncryptionState EncryptionState { get; set; }
 
-      /// <summary>
+        /// <summary>
         /// Decrypts a 1.68 packet
         /// </summary>
         /// <param name="content">the content to be decrypted</param>

@@ -46,14 +46,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                 itemsChosen[i] = packet.ReadByte();
             }
 
-            ushort data2 = packet.ReadShort(); // unknown
-            ushort data3 = packet.ReadShort(); // unknown
-            ushort data4 = packet.ReadShort(); // unknown
+            packet.ReadShort(); // unknown
+            packet.ReadShort(); // unknown
+            packet.ReadShort(); // unknown
 
-            ushort questID = packet.ReadShort();
-            ushort questGiverID = packet.ReadShort();
+            ushort questId = packet.ReadShort();
+            ushort questGiverId = packet.ReadShort();
 
-            new QuestRewardChosenAction(client.Player, countChosen, itemsChosen, questGiverID, questID).Start(1);
+            new QuestRewardChosenAction(client.Player, countChosen, itemsChosen, questGiverId, questId).Start(1);
         }
 
         #endregion
@@ -63,12 +63,12 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Send dialog response via Notify().
         /// </summary>
-        protected class QuestRewardChosenAction : RegionAction
+        private class QuestRewardChosenAction : RegionAction
         {
-            private readonly int m_countChosen;
-            private readonly int[] m_itemsChosen;
-            private readonly int m_questGiverID;
-            private readonly int m_questID;
+            private readonly int _countChosen;
+            private readonly int[] _itemsChosen;
+            private readonly int _questGiverId;
+            private readonly int _questId;
 
             /// <summary>
             /// Constructs a new QuestRewardChosenAction.
@@ -76,16 +76,15 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="actionSource">The responding player,</param>
             /// <param name="countChosen">Number of items chosen from the dialog.</param>
             /// <param name="itemsChosen">List of items chosen from the dialog.</param>
-            /// <param name="questGiverID">ID of the quest NPC.</param>
-            /// <param name="questID">ID of the quest.</param>
-            public QuestRewardChosenAction(GamePlayer actionSource, int countChosen, int[] itemsChosen,
-                                           int questGiverID, int questID)
+            /// <param name="questGiverId">ID of the quest NPC.</param>
+            /// <param name="questId">ID of the quest.</param>
+            public QuestRewardChosenAction(GamePlayer actionSource, int countChosen, int[] itemsChosen, int questGiverId, int questId)
                 : base(actionSource)
             {
-                m_countChosen = countChosen;
-                m_itemsChosen = itemsChosen;
-                m_questGiverID = questGiverID;
-                m_questID = questID;
+                _countChosen = countChosen;
+                _itemsChosen = itemsChosen;
+                _questGiverId = questGiverId;
+                _questId = questId;
             }
 
             /// <summary>
@@ -96,9 +95,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 var player = (GamePlayer)m_actionSource;
 
                 player.Notify(GamePlayerEvent.QuestRewardChosen, player,
-                              new QuestRewardChosenEventArgs(m_questGiverID, m_questID, m_countChosen, m_itemsChosen));
-
-                return;
+                              new QuestRewardChosenEventArgs(_questGiverId, _questId, _countChosen, _itemsChosen));
             }
         }
 

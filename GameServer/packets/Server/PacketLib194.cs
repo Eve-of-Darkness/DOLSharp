@@ -17,11 +17,8 @@
  *
  */
 #define NOENCRYPTION
-using System;
-using System.Reflection;
 using DOL.GS.Quests;
 using DOL.Database;
-using log4net;
 using DOL.GS.Behaviour;
 
 namespace DOL.GS.PacketHandler
@@ -29,31 +26,26 @@ namespace DOL.GS.PacketHandler
     [PacketLib(194, GameClient.eClientVersion.Version194)]
     public class PacketLib194 : PacketLib193
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        public override void SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, DataQuest quest)
+        public override void SendQuestOfferWindow(GameNPC questNpc, GamePlayer player, DataQuest quest)
         {
-            SendQuestWindow(questNPC, player, quest, true);
+            SendQuestWindow(questNpc, player, quest, true);
         }
 
-        public override void SendQuestRewardWindow(GameNPC questNPC, GamePlayer player, DataQuest quest)
+        public override void SendQuestRewardWindow(GameNPC questNpc, GamePlayer player, DataQuest quest)
         {
-            SendQuestWindow(questNPC, player, quest, false);
+            SendQuestWindow(questNpc, player, quest, false);
         }
 
-        const ushort MAX_STORY_LENGTH = 1000;   // Via trial and error, 1.108 client.
+        private const ushort MaxStoryLength = 1000;   // Via trial and error, 1.108 client.
                                                 // Often will cut off text around 990 but longer strings do not result in any errors. -Tolakram
-        protected override void SendQuestWindow(GameNPC questNPC, GamePlayer player, DataQuest quest, bool offer)
+        protected override void SendQuestWindow(GameNPC questNpc, GamePlayer player, DataQuest quest, bool offer)
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.Dialog)))
             {
-                ushort QuestID = quest.ClientQuestId;
+                ushort questId = quest.ClientQuestId;
                 pak.WriteShort(offer ? (byte)0x22 : (byte)0x21); // Dialog
-                pak.WriteShort(QuestID);
-                pak.WriteShort((ushort)questNPC.ObjectID);
+                pak.WriteShort(questId);
+                pak.WriteShort((ushort)questNpc.ObjectID);
                 pak.WriteByte(0x00); // unknown
                 pak.WriteByte(0x00); // unknown
                 pak.WriteByte(0x00); // unknown
@@ -76,10 +68,10 @@ namespace DOL.GS.PacketHandler
                 {
                     string personalizedStory = BehaviourUtils.GetPersonalizedMessage(quest.Story, player);
 
-                    if (personalizedStory.Length > MAX_STORY_LENGTH)
+                    if (personalizedStory.Length > MaxStoryLength)
                     {
-                        pak.WriteShort(MAX_STORY_LENGTH);
-                        pak.WriteStringBytes(personalizedStory.Substring(0, MAX_STORY_LENGTH));
+                        pak.WriteShort(MaxStoryLength);
+                        pak.WriteStringBytes(personalizedStory.Substring(0, MaxStoryLength));
                     }
                     else
                     {
@@ -89,10 +81,10 @@ namespace DOL.GS.PacketHandler
                 }
                 else
                 {
-                    if (quest.FinishText.Length > MAX_STORY_LENGTH)
+                    if (quest.FinishText.Length > MaxStoryLength)
                     {
-                        pak.WriteShort(MAX_STORY_LENGTH);
-                        pak.WriteStringBytes(quest.FinishText.Substring(0, MAX_STORY_LENGTH));
+                        pak.WriteShort(MaxStoryLength);
+                        pak.WriteStringBytes(quest.FinishText.Substring(0, MaxStoryLength));
                     }
                     else
                     {
@@ -101,7 +93,7 @@ namespace DOL.GS.PacketHandler
                     }
                 }
 
-                pak.WriteShort(QuestID);
+                pak.WriteShort(questId);
                 pak.WriteByte((byte)quest.StepTexts.Count); // #goals count
                 foreach (string text in quest.StepTexts)
                 {
@@ -113,7 +105,7 @@ namespace DOL.GS.PacketHandler
                         t = text.Substring(0, 253);
                     }
 
-                    pak.WritePascalString(string.Format("{0}\r", t));
+                    pak.WritePascalString($"{t}\r");
                 }
 
                 pak.WriteInt((uint)quest.MoneyReward());
@@ -124,7 +116,7 @@ namespace DOL.GS.PacketHandler
                     WriteItemData(pak, GameInventoryItem.Create(reward));
                 }
 
-                pak.WriteByte((byte)quest.NumOptionalRewardsChoice);
+                pak.WriteByte(quest.NumOptionalRewardsChoice);
                 pak.WriteByte((byte)quest.OptionalRewards.Count);
                 foreach (ItemTemplate reward in quest.OptionalRewards)
                 {
@@ -135,14 +127,14 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        protected override void SendQuestWindow(GameNPC questNPC, GamePlayer player, RewardQuest quest, bool offer)
+        protected override void SendQuestWindow(GameNPC questNpc, GamePlayer player, RewardQuest quest, bool offer)
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.Dialog)))
             {
-                ushort QuestID = QuestMgr.GetIDForQuestType(quest.GetType());
+                ushort questId = QuestMgr.GetIDForQuestType(quest.GetType());
                 pak.WriteShort(offer ? (byte)0x22 : (byte)0x21); // Dialog
-                pak.WriteShort(QuestID);
-                pak.WriteShort((ushort)questNPC.ObjectID);
+                pak.WriteShort(questId);
+                pak.WriteShort((ushort)questNpc.ObjectID);
                 pak.WriteByte(0x00); // unknown
                 pak.WriteByte(0x00); // unknown
                 pak.WriteByte(0x00); // unknown
@@ -190,11 +182,11 @@ namespace DOL.GS.PacketHandler
                     }
                 }
 
-                pak.WriteShort(QuestID);
+                pak.WriteShort(questId);
                 pak.WriteByte((byte)quest.Goals.Count); // #goals count
                 foreach (RewardQuest.QuestGoal goal in quest.Goals)
                 {
-                    pak.WritePascalString(string.Format("{0}\r", goal.Description));
+                    pak.WritePascalString($"{goal.Description}\r");
                 }
 
                 pak.WriteInt((uint)quest.Rewards.Money); // unknown, new in 1.94

@@ -29,8 +29,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             var groundY = (int)packet.ReadInt();
             var groundZ = (int)packet.ReadInt();
             ushort flag = packet.ReadShort();
-
-// ushort unk2 = packet.ReadShort();
+            
             new ChangeGroundTargetHandler(client.Player, groundX, groundY, groundZ, flag).Start(1);
         }
 
@@ -41,24 +40,24 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles ground target changes
         /// </summary>
-        protected class ChangeGroundTargetHandler : RegionAction
+        private class ChangeGroundTargetHandler : RegionAction
         {
-            protected readonly ushort m_flag;
+            private readonly ushort _flag;
 
             /// <summary>
             /// The new ground X
             /// </summary>
-            protected readonly int m_x;
+            private readonly int _x;
 
             /// <summary>
             /// The new ground Y
             /// </summary>
-            protected readonly int m_y;
+            private readonly int _y;
 
             /// <summary>
             /// The new ground Z
             /// </summary>
-            protected readonly int m_z;
+            private readonly int _z;
 
             /// <summary>
             /// Constructs a new ChangeGroundTargetHandler
@@ -70,10 +69,10 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="flag"></param>
             public ChangeGroundTargetHandler(GamePlayer actionSource, int x, int y, int z, ushort flag) : base(actionSource)
             {
-                m_x = x;
-                m_y = y;
-                m_z = z;
-                m_flag = flag;
+                _x = x;
+                _y = y;
+                _z = z;
+                _flag = flag;
             }
 
             /// <summary>
@@ -82,8 +81,8 @@ namespace DOL.GS.PacketHandler.Client.v168
             protected override void OnTick()
             {
                 var player = (GamePlayer)m_actionSource;
-                player.GroundTargetInView = (m_flag & 0x100) != 0;
-                player.SetGroundTarget(m_x, m_y, (ushort)m_z);
+                player.GroundTargetInView = (_flag & 0x100) != 0;
+                player.SetGroundTarget(_x, _y, (ushort)_z);
 
                 if (!player.GroundTargetInView)
                 {
@@ -104,8 +103,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
 
                     if (player.Steed is GameBoat)
-
-                        // Ichi - && player.GroundTarget.Z > player.CurrentZone.ZoneRegion.WaterLevel) return;
                     {
                         if (player.Steed.OwnerID == player.InternalID)
                         {
@@ -117,14 +114,11 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     if (player.Steed.MAX_PASSENGERS > 8 && player.Steed.CurrentRiders.Length < player.Steed.REQUIRED_PASSENGERS)
                     {
-                        player.Out.SendMessage(
-                            "The " + player.Steed.Name + " does not yet have enough passengers to move!",
-                                               eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"The {player.Steed.Name} does not yet have enough passengers to move!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
 
                     player.Steed.WalkTo(player.GroundTarget, player.Steed.MaxSpeed);
-                    return;
                 }
             }
         }

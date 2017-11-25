@@ -33,7 +33,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.88 clients
@@ -56,7 +56,7 @@ namespace DOL.GS.PacketHandler
                 }
 
                 pak.WriteShort((ushort)living.ObjectID);
-                pak.WriteByte((byte)living.VisibleActiveWeaponSlots);
+                pak.WriteByte(living.VisibleActiveWeaponSlots);
                 pak.WriteByte((byte)living.CurrentSpeed); // new in 189b+, speed
                 pak.WriteByte((byte)((living.IsCloakInvisible ? 0x01 : 0x00) | (living.IsHelmInvisible ? 0x02 : 0x00))); // new in 189b+, cloack/helm visibility
                 pak.WriteByte((byte)((living.IsCloakHoodUp ? 0x01 : 0x00) | (int)living.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
@@ -95,7 +95,7 @@ namespace DOL.GS.PacketHandler
 
                         if (item.SlotPosition > Slot.RANGED || item.SlotPosition < Slot.RIGHTHAND)
                         {
-                            pak.WriteByte((byte)item.Extension);
+                            pak.WriteByte(item.Extension);
                         }
 
                         if ((texture & ~0xFF) != 0)
@@ -131,7 +131,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="windowType"></param>
         public override void SendInventoryItemsUpdate(IDictionary<int, InventoryItem> updateItems, eInventoryWindowType windowType)
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
@@ -177,21 +177,21 @@ namespace DOL.GS.PacketHandler
             // ChatUtil.SendDebugMessage(m_gameClient, string.Format("SendItemsPartialUpdate: windowType: {0}, {1}", windowType, items == null ? "nothing" : items[0].Name));
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate)))
             {
-                GameVault houseVault = m_gameClient.Player.ActiveInventoryObject as GameVault;
+                GameVault houseVault = GameClient.Player.ActiveInventoryObject as GameVault;
                 pak.WriteByte((byte)items.Count);
                 pak.WriteByte(0x00); // new in 189b+, show shield in left hand
-                pak.WriteByte((byte)((m_gameClient.Player.IsCloakInvisible ? 0x01 : 0x00) | (m_gameClient.Player.IsHelmInvisible ? 0x02 : 0x00))); // new in 189b+, cloack/helm visibility
+                pak.WriteByte((byte)((GameClient.Player.IsCloakInvisible ? 0x01 : 0x00) | (GameClient.Player.IsHelmInvisible ? 0x02 : 0x00))); // new in 189b+, cloack/helm visibility
                 if (windowType == eInventoryWindowType.HouseVault && houseVault != null)
                 {
                     pak.WriteByte((byte)(houseVault.Index + 1));    // Add the vault number to the window caption
                 }
                 else
                 {
-                    pak.WriteByte((byte)((m_gameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)m_gameClient.Player.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
+                    pak.WriteByte((byte)((GameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)GameClient.Player.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
                 }
 
                 // ^ in 1.89b+, 0 bit - showing hooded cloack, if not hooded not show cloack at all ?
-                pak.WriteByte(m_gameClient.Player.VisibleActiveWeaponSlots);
+                pak.WriteByte(GameClient.Player.VisibleActiveWeaponSlots);
                 pak.WriteByte((byte)windowType);
                 foreach (var entry in items)
                 {
@@ -213,11 +213,11 @@ namespace DOL.GS.PacketHandler
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate)))
             {
-                GameVault houseVault = m_gameClient.Player.ActiveInventoryObject as GameVault;
+                GameVault houseVault = GameClient.Player.ActiveInventoryObject as GameVault;
 
-                pak.WriteByte((byte)(slots == null ? 0 : slots.Count));
+                pak.WriteByte((byte)(slots?.Count ?? 0));
                 pak.WriteByte(0); // CurrentSpeed & 0xFF (not used for player, only for NPC)
-                pak.WriteByte((byte)((m_gameClient.Player.IsCloakInvisible ? 0x01 : 0x00) | (m_gameClient.Player.IsHelmInvisible ? 0x02 : 0x00))); // new in 189b+, cloack/helm visibility
+                pak.WriteByte((byte)((GameClient.Player.IsCloakInvisible ? 0x01 : 0x00) | (GameClient.Player.IsHelmInvisible ? 0x02 : 0x00))); // new in 189b+, cloack/helm visibility
 
                 if (windowType == eInventoryWindowType.HouseVault && houseVault != null)
                 {
@@ -225,10 +225,10 @@ namespace DOL.GS.PacketHandler
                 }
                 else
                 {
-                    pak.WriteByte((byte)((m_gameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)m_gameClient.Player.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
+                    pak.WriteByte((byte)((GameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)GameClient.Player.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
                 }
 
-                pak.WriteByte((byte)m_gameClient.Player.VisibleActiveWeaponSlots);
+                pak.WriteByte(GameClient.Player.VisibleActiveWeaponSlots);
                 pak.WriteByte((byte)windowType);
 
                 if (slots != null)
@@ -237,7 +237,7 @@ namespace DOL.GS.PacketHandler
                     {
                         if (updatedSlot >= (int)eInventorySlot.Consignment_First && updatedSlot <= (int)eInventorySlot.Consignment_Last)
                         {
-                            log.Error("PacketLib198:SendInventorySlotsUpdateBase - GameConsignmentMerchant inventory is no longer cached with player.  Use a Dictionary<int, InventoryItem> instead.");
+                            Log.Error("PacketLib198:SendInventorySlotsUpdateBase - GameConsignmentMerchant inventory is no longer cached with player.  Use a Dictionary<int, InventoryItem> instead.");
                             pak.WriteByte((byte)(updatedSlot - (int)eInventorySlot.Consignment_First + (int)eInventorySlot.HousingInventory_First));
                         }
                         else
@@ -245,7 +245,7 @@ namespace DOL.GS.PacketHandler
                             pak.WriteByte((byte)updatedSlot);
                         }
 
-                        WriteItemData(pak, m_gameClient.Player.Inventory.GetItem((eInventorySlot)updatedSlot));
+                        WriteItemData(pak, GameClient.Player.Inventory.GetItem((eInventorySlot)updatedSlot));
                     }
                 }
 
@@ -253,7 +253,7 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        protected static int MAX_NAME_LENGTH = 55;
+        protected static int MaxNameLength = 55;
 
         protected virtual void WriteItemData(GSTCPPacketOut pak, InventoryItem item)
         {
@@ -342,7 +342,7 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte((byte)item.Quality); // % of qua
             pak.WriteByte((byte)item.Bonus); // % bonus
             pak.WriteShort((ushort)item.Model);
-            pak.WriteByte((byte)item.Extension);
+            pak.WriteByte(item.Extension);
 
             int flag = 0;
             if (item.Emblem != 0)
@@ -357,16 +357,16 @@ namespace DOL.GS.PacketHandler
 
             flag |= 0x02; // enable salvage button
 
-            AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(m_gameClient.Player.CraftingPrimarySkill);
-            if (skill != null && skill is AdvancedCraftingSkill/* && ((AdvancedCraftingSkill)skill).IsAllowedToCombine(m_gameClient.Player, item)*/)
+            AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(GameClient.Player.CraftingPrimarySkill);
+            if (skill is AdvancedCraftingSkill/* && ((AdvancedCraftingSkill)skill).IsAllowedToCombine(m_gameClient.Player, item)*/)
             {
                 flag |= 0x04; // enable craft button
             }
 
             ushort icon1 = 0;
             ushort icon2 = 0;
-            string spell_name1 = string.Empty;
-            string spell_name2 = string.Empty;
+            string spellName1 = string.Empty;
+            string spellName2 = string.Empty;
 
             if (item.Object_Type != (int)eObjectType.AlchemyTincture)
             {
@@ -381,7 +381,7 @@ namespace DOL.GS.PacketHandler
                         {
                             flag |= 0x08;
                             icon1 = spell.Icon;
-                            spell_name1 = spell.Name; // or best spl.Name ?
+                            spellName1 = spell.Name; // or best spl.Name ?
                         }
                     }
 
@@ -392,7 +392,7 @@ namespace DOL.GS.PacketHandler
                         {
                             flag |= 0x10;
                             icon2 = spell.Icon;
-                            spell_name2 = spell.Name; // or best spl.Name ?
+                            spellName2 = spell.Name; // or best spl.Name ?
                         }
                     }
                 }
@@ -402,14 +402,14 @@ namespace DOL.GS.PacketHandler
 
             if ((flag & 0x08) == 0x08)
             {
-                pak.WriteShort((ushort)icon1);
-                pak.WritePascalString(spell_name1);
+                pak.WriteShort(icon1);
+                pak.WritePascalString(spellName1);
             }
 
             if ((flag & 0x10) == 0x10)
             {
-                pak.WriteShort((ushort)icon2);
-                pak.WritePascalString(spell_name2);
+                pak.WriteShort(icon2);
+                pak.WritePascalString(spellName2);
             }
 
             pak.WriteByte((byte)item.Effect);
@@ -425,17 +425,17 @@ namespace DOL.GS.PacketHandler
             {
                 if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                 {
-                    name += "[" + item.SellPrice.ToString() + " BP]";
+                    name += $"[{item.SellPrice} BP]";
                 }
                 else
                 {
-                    name += "[" + Money.GetShortString(item.SellPrice) + "]";
+                    name += $"[{Money.GetShortString(item.SellPrice)}]";
                 }
             }
 
-            if (name.Length > MAX_NAME_LENGTH)
+            if (name.Length > MaxNameLength)
             {
-                name = name.Substring(0, MAX_NAME_LENGTH);
+                name = name.Substring(0, MaxNameLength);
             }
 
             pak.WritePascalString(name);
@@ -449,7 +449,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort((ushort)house.Z);
                 pak.WriteInt((uint)house.X);
                 pak.WriteInt((uint)house.Y);
-                pak.WriteShort((ushort)house.Heading);
+                pak.WriteShort(house.Heading);
                 pak.WriteShort((ushort)house.PorchRoofColor);
                 int flagPorchAndGuildEmblem = (house.Emblem & 0x010000) >> 13;// new Guild Emblem
                 if (house.Porch)
@@ -485,7 +485,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update cache
-            m_gameClient.HouseUpdateArray[new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber)] = GameTimer.GetTickCount();
+            GameClient.HouseUpdateArray[new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber)] = GameTimer.GetTickCount();
         }
 
         public override void SendGarden(House house)
@@ -510,7 +510,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update cache
-            m_gameClient.HouseUpdateArray.UpdateIfExists(new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber), GameTimer.GetTickCount());
+            GameClient.HouseUpdateArray.UpdateIfExists(new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber), GameTimer.GetTickCount());
         }
 
         public override void SendGarden(House house, int i)
@@ -521,7 +521,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort(0); // sheduled for repossession (in hours) new in 1.89b+
                 pak.WriteByte(0x01);
                 pak.WriteByte(0x00); // update
-                OutdoorItem item = (OutdoorItem)house.OutdoorItems[i];
+                OutdoorItem item = house.OutdoorItems[i];
                 pak.WriteByte((byte)i);
                 pak.WriteShort((ushort)item.Model);
                 pak.WriteByte((byte)item.Position);
@@ -530,7 +530,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update cache
-            m_gameClient.HouseUpdateArray.UpdateIfExists(new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber), GameTimer.GetTickCount());
+            GameClient.HouseUpdateArray.UpdateIfExists(new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber), GameTimer.GetTickCount());
         }
 
         public override void SendHouseOccupied(House house, bool flagHouseOccuped)
@@ -546,7 +546,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update cache
-            m_gameClient.HouseUpdateArray.UpdateIfExists(new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber), GameTimer.GetTickCount());
+            GameClient.HouseUpdateArray.UpdateIfExists(new Tuple<ushort, ushort>(house.RegionID, (ushort)house.HouseNumber), GameTimer.GetTickCount());
         }
 
         public override void SendEnterHouse(House house)
@@ -554,10 +554,10 @@ namespace DOL.GS.PacketHandler
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseEnter)))
             {
                 pak.WriteShort((ushort)house.HouseNumber);
-                pak.WriteShort((ushort)25000);         // constant!
+                pak.WriteShort(25000);         // constant!
                 pak.WriteInt((uint)house.X);
                 pak.WriteInt((uint)house.Y);
-                pak.WriteShort((ushort)house.Heading); // useless/ignored by client.
+                pak.WriteShort(house.Heading); // useless/ignored by client.
                 pak.WriteByte(0x00);
                 pak.WriteByte((byte)(house.GetGuildEmblemFlags() | (house.Emblem & 0x010000) >> 14));// new Guild Emblem
                 pak.WriteShort((ushort)house.Emblem);   // emblem

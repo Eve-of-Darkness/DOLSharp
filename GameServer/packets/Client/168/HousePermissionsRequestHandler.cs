@@ -27,7 +27,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            int pid = packet.ReadShort();
+            packet.ReadShort(); // pid
             ushort housenumber = packet.ReadShort();
 
             // house is null, return

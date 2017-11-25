@@ -18,7 +18,6 @@
  */
 using System;
 using System.Collections.Generic;
-
 using log4net;
 
 namespace DOL.GS.PacketHandler
@@ -47,7 +46,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly Dictionary<int, int> _packetIdToPreprocessMap;
         private readonly Dictionary<int, Func<GameClient, GSPacketIn, bool>> _preprocessors;
@@ -75,7 +74,7 @@ namespace DOL.GS.PacketHandler
             }
             else
             {
-                log.InfoFormat("Replacing Packet Processor for packet ID {0} with preprocessorId {1}", packetId, preprocessorId);
+                Log.Info($"Replacing Packet Processor for packet ID {packetId} with preprocessorId {preprocessorId}");
                 _packetIdToPreprocessMap[packetId] = preprocessorId;
             }
     }
@@ -98,8 +97,7 @@ namespace DOL.GS.PacketHandler
         /// <returns>true if the packet passes all preprocessor checks; false otherwise</returns>
         public bool CanProcessPacket(GameClient client, GSPacketIn packet)
         {
-            int preprocessorId;
-            if (!_packetIdToPreprocessMap.TryGetValue(packet.ID, out preprocessorId))
+            if (!_packetIdToPreprocessMap.TryGetValue(packet.ID, out var preprocessorId))
             {
                 return false;
             }
@@ -110,8 +108,7 @@ namespace DOL.GS.PacketHandler
                 return true;
             }
 
-            Func<GameClient, GSPacketIn, bool> preprocessor;
-            if (!_preprocessors.TryGetValue(preprocessorId, out preprocessor))
+            if (!_preprocessors.TryGetValue(preprocessorId, out var preprocessor))
             {
                 return false;
             }

@@ -33,7 +33,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.81 clients
@@ -90,7 +90,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendPlayerTitles()
         {
-            var titles = m_gameClient.Player.Titles;
+            var titles = GameClient.Player.Titles;
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.DetailWindow)))
             {
                 pak.WriteByte(1); // new in 1.75
@@ -98,7 +98,7 @@ namespace DOL.GS.PacketHandler
                 pak.WritePascalString("Player Statistics"); // window caption
 
                 byte line = 1;
-                foreach (string str in m_gameClient.Player.FormatStatistics())
+                foreach (string str in GameClient.Player.FormatStatistics())
                 {
                     pak.WriteByte(line++);
                     pak.WritePascalString(str);
@@ -112,13 +112,13 @@ namespace DOL.GS.PacketHandler
                 foreach (IPlayerTitle title in titles)
                 {
                     pak.WriteByte(line++);
-                    pak.WritePascalString(title.GetDescription(m_gameClient.Player));
+                    pak.WritePascalString(title.GetDescription(GameClient.Player));
                 }
 
                 long titlesLen = pak.Position - titlesCountPos - 1; // include titles count
                 if (titlesLen > byte.MaxValue)
                 {
-                    log.WarnFormat("Titles block is too long! {0} (player: {1})", titlesLen, m_gameClient.Player);
+                    Log.Warn($"Titles block is too long! {titlesLen} (player: {GameClient.Player})");
                 }
 
                 // Trailing Zero!
@@ -135,7 +135,7 @@ namespace DOL.GS.PacketHandler
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.PetWindow)))
             {
-                pak.WriteShort((ushort)(pet == null ? 0 : pet.ObjectID));
+                pak.WriteShort((ushort)(pet?.ObjectID ?? 0));
                 pak.WriteByte(0x00); // unused
                 pak.WriteByte(0x00); // unused
                 switch (windowAction) // 0-released, 1-normal, 2-just charmed? | Roach: 0-close window, 1-update window, 2-create window
@@ -194,7 +194,7 @@ namespace DOL.GS.PacketHandler
                 }
                 else
                 {
-                    pak.WriteByte((byte)0); // effect count
+                    pak.WriteByte(0); // effect count
                 }
 
                 SendTCP(pak);

@@ -17,21 +17,13 @@
  *
  */
 #define NOENCRYPTION
-using log4net;
 using System.Collections.Generic;
-using System.Reflection;
-using DOL.Database;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(182, GameClient.eClientVersion.Version182)]
     public class PacketLib182 : PacketLib181
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Constructs a new PacketLib for Version 1.82 clients
         /// </summary>
@@ -45,9 +37,9 @@ namespace DOL.GS.PacketHandler
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate)))
             {
-                pak.WriteByte((byte)(slots == null ? 0 : slots.Count));
-                pak.WriteByte((byte)((m_gameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)m_gameClient.Player.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
-                pak.WriteByte((byte)m_gameClient.Player.VisibleActiveWeaponSlots);
+                pak.WriteByte((byte)(slots?.Count ?? 0));
+                pak.WriteByte((byte)((GameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)GameClient.Player.ActiveQuiverSlot)); // bit0 is hood up bit4 to 7 is active quiver
+                pak.WriteByte(GameClient.Player.VisibleActiveWeaponSlots);
                 pak.WriteByte((byte)windowType);
                 if (slots != null)
                 {
@@ -62,8 +54,7 @@ namespace DOL.GS.PacketHandler
                             pak.WriteByte((byte)updatedSlot);
                         }
 
-                        InventoryItem item = null;
-                        item = m_gameClient.Player.Inventory.GetItem((eInventorySlot)updatedSlot);
+                        var item = GameClient.Player.Inventory.GetItem((eInventorySlot)updatedSlot);
 
                         if (item == null)
                         {
@@ -142,7 +133,7 @@ namespace DOL.GS.PacketHandler
                         pak.WriteByte((byte)item.Quality); // % of qua
                         pak.WriteByte((byte)item.Bonus); // % bonus
                         pak.WriteShort((ushort)item.Model);
-                        pak.WriteByte((byte)item.Extension);
+                        pak.WriteByte(item.Extension);
                         int flag = 0;
                         if (item.Emblem != 0)
                         {
@@ -156,16 +147,16 @@ namespace DOL.GS.PacketHandler
 
                         // flag |= 0x01; // newGuildEmblem
                         flag |= 0x02; // enable salvage button
-                        AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(m_gameClient.Player.CraftingPrimarySkill);
-                        if (skill != null && skill is AdvancedCraftingSkill/* && ((AdvancedCraftingSkill)skill).IsAllowedToCombine(m_gameClient.Player, item)*/)
+                        AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(GameClient.Player.CraftingPrimarySkill);
+                        if (skill is AdvancedCraftingSkill)
                         {
                             flag |= 0x04; // enable craft button
                         }
 
                         ushort icon1 = 0;
                         ushort icon2 = 0;
-                        string spell_name1 = string.Empty;
-                        string spell_name2 = string.Empty;
+                        string spellName1 = string.Empty;
+                        string spellName2 = string.Empty;
                         if (item.Object_Type != (int)eObjectType.AlchemyTincture)
                         {
                             SpellLine chargeEffectsLine = SkillBase.GetSpellLine(GlobalSpellsLines.Item_Effects);
@@ -179,7 +170,7 @@ namespace DOL.GS.PacketHandler
                                     {
                                         flag |= 0x08;
                                         icon1 = spell.Icon;
-                                        spell_name1 = spell.Name; // or best spl.Name ?
+                                        spellName1 = spell.Name; // or best spl.Name ?
                                     }
                                 }
 
@@ -190,7 +181,7 @@ namespace DOL.GS.PacketHandler
                                     {
                                         flag |= 0x10;
                                         icon2 = spell.Icon;
-                                        spell_name2 = spell.Name; // or best spl.Name ?
+                                        spellName2 = spell.Name; // or best spl.Name ?
                                     }
                                 }
                             }
@@ -199,14 +190,14 @@ namespace DOL.GS.PacketHandler
                         pak.WriteByte((byte)flag);
                         if ((flag & 0x08) == 0x08)
                         {
-                            pak.WriteShort((ushort)icon1);
-                            pak.WritePascalString(spell_name1);
+                            pak.WriteShort(icon1);
+                            pak.WritePascalString(spellName1);
                         }
 
                         if ((flag & 0x10) == 0x10)
                         {
-                            pak.WriteShort((ushort)icon2);
-                            pak.WritePascalString(spell_name2);
+                            pak.WriteShort(icon2);
+                            pak.WritePascalString(spellName2);
                         }
 
                         pak.WriteByte((byte)item.Effect);
@@ -220,11 +211,11 @@ namespace DOL.GS.PacketHandler
                         {
                             if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                             {
-                                name += "[" + item.SellPrice.ToString() + " BP]";
+                                name += $"[{item.SellPrice} BP]";
                             }
                             else
                             {
-                                name += "[" + Money.GetString(item.SellPrice) + "]";
+                                name += $"[{Money.GetString(item.SellPrice)}]";
                             }
                         }
 

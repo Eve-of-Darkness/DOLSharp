@@ -42,12 +42,12 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles player cancel effect requests
         /// </summary>
-        protected class CancelEffectHandler : RegionAction
+        private class CancelEffectHandler : RegionAction
         {
             /// <summary>
             /// The effect index
             /// </summary>
-            protected readonly int m_index;
+            private readonly int _index;
 
             /// <summary>
             /// Constructs a new CancelEffectHandler
@@ -56,7 +56,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="index">The effect index</param>
             public CancelEffectHandler(GamePlayer actionSource, int index) : base(actionSource)
             {
-                m_index = index;
+                _index = index;
             }
 
             /// <summary>
@@ -69,17 +69,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                 IConcentrationEffect effect = null;
                 lock (player.ConcentrationEffects)
                 {
-                    if (m_index < player.ConcentrationEffects.Count)
+                    if (_index < player.ConcentrationEffects.Count)
                     {
-                        effect = player.ConcentrationEffects[m_index];
+                        effect = player.ConcentrationEffects[_index];
                         player.ConcentrationEffects.Remove(effect);
                     }
                 }
 
-                if (effect != null)
-                {
-                    effect.Cancel(true);
-                }
+                effect?.Cancel(true);
             }
         }
 

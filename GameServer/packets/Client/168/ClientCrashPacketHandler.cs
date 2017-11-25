@@ -28,7 +28,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
@@ -37,26 +37,25 @@ namespace DOL.GS.PacketHandler.Client.v168
                 string dllName = packet.ReadString(16);
                 packet.Position = 0x50;
                 uint upTime = packet.ReadInt();
-                string text = string.Format("Client crash ({0}) dll:{1} clientUptime:{2}sec", client.ToString(), dllName, upTime);
-                if (log.IsInfoEnabled)
+                string text = $"Client crash ({client}) dll:{dllName} clientUptime:{upTime}sec";
+                if (Log.IsInfoEnabled)
                 {
-                    log.Info(text);
+                    Log.Info(text);
                 }
 
-                if (log.IsDebugEnabled)
+                if (Log.IsDebugEnabled)
                 {
-                    log.Debug("Last client sent/received packets (from older to newer):");
+                    Log.Debug("Last client sent/received packets (from older to newer):");
 
                     foreach (IPacket prevPak in client.PacketProcessor.GetLastPackets())
                     {
-                        log.Info(prevPak.ToHumanReadable());
+                        Log.Info(prevPak.ToHumanReadable());
                     }
                 }
 
                 // Eden
                 if (client.Player != null)
                 {
-                    GamePlayer player = client.Player;
                     client.Out.SendPlayerQuit(true);
                     client.Player.SaveIntoDatabase();
                     client.Player.Quit(true);

@@ -20,13 +20,11 @@
 
 using System;
 using System.Reflection;
-
 using DOL.Database;
 using DOL.Language;
 using DOL.AI.Brain;
 using DOL.GS.Keeps;
 using DOL.GS.Quests;
-
 using log4net;
 
 namespace DOL.GS.PacketHandler
@@ -37,7 +35,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.71 clients
@@ -50,29 +48,29 @@ namespace DOL.GS.PacketHandler
 
         public override void SendPlayerPositionAndObjectID()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.PositionAndObjectID)))
             {
-                pak.WriteShort((ushort)m_gameClient.Player.ObjectID); // This is the player's objectid not Sessionid!!!
-                pak.WriteShort((ushort)m_gameClient.Player.Z);
-                pak.WriteInt((uint)m_gameClient.Player.X);
-                pak.WriteInt((uint)m_gameClient.Player.Y);
-                pak.WriteShort(m_gameClient.Player.Heading);
+                pak.WriteShort((ushort)GameClient.Player.ObjectID); // This is the player's objectid not Sessionid!!!
+                pak.WriteShort((ushort)GameClient.Player.Z);
+                pak.WriteInt((uint)GameClient.Player.X);
+                pak.WriteInt((uint)GameClient.Player.Y);
+                pak.WriteShort(GameClient.Player.Heading);
 
                 int flags = 0;
-                if (m_gameClient.Player.CurrentZone.IsDivingEnabled)
+                if (GameClient.Player.CurrentZone.IsDivingEnabled)
                 {
-                    flags = 0x80 | (m_gameClient.Player.IsUnderwater ? 0x01 : 0x00);
+                    flags = 0x80 | (GameClient.Player.IsUnderwater ? 0x01 : 0x00);
                 }
 
                 pak.WriteByte((byte)flags);
 
                 pak.WriteByte(0x00);    // TODO Unknown
-                Zone zone = m_gameClient.Player.CurrentZone;
+                Zone zone = GameClient.Player.CurrentZone;
                 if (zone == null)
                 {
                     return;
@@ -82,7 +80,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort((ushort)(zone.YOffset / 0x2000));
 
                 // Dinberg - Changing to allow instances...
-                pak.WriteShort(m_gameClient.Player.CurrentRegion.Skin);
+                pak.WriteShort(GameClient.Player.CurrentRegion.Skin);
                 pak.WriteShort(0x00); // TODO: unknown, new in 1.71
                 SendTCP(pak);
             }
@@ -90,12 +88,12 @@ namespace DOL.GS.PacketHandler
 
         public override void SendObjectCreate(GameObject obj)
         {
-            if (obj == null || m_gameClient.Player == null)
+            if (obj == null || GameClient.Player == null)
             {
                 return;
             }
 
-            if (obj.IsVisibleTo(m_gameClient.Player) == false)
+            if (obj.IsVisibleTo(GameClient.Player) == false)
             {
                 return;
             }
@@ -103,9 +101,9 @@ namespace DOL.GS.PacketHandler
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.ObjectCreate)))
             {
                 pak.WriteShort((ushort)obj.ObjectID);
-                if (obj is GameStaticItem)
+                if (obj is GameStaticItem item)
                 {
-                    pak.WriteShort((ushort)(obj as GameStaticItem).Emblem);
+                    pak.WriteShort((ushort)item.Emblem);
                 }
                 else
                 {
@@ -136,7 +134,7 @@ namespace DOL.GS.PacketHandler
                     flag |= 0x08;
                 }
 
-                if (obj is GameStaticItemTimed && m_gameClient.Player != null && ((GameStaticItemTimed)obj).IsOwner(m_gameClient.Player))
+                if (obj is GameStaticItemTimed timed && GameClient.Player != null && timed.IsOwner(GameClient.Player))
                 {
                     flag |= 0x04;
                 }
@@ -145,13 +143,12 @@ namespace DOL.GS.PacketHandler
                 pak.WriteInt(0x0); // TODO: unknown, new in 1.71
 
                 string name = obj.Name;
-                LanguageDataObject translation = null;
-                if (obj is GameStaticItem)
+                if (obj is GameStaticItem staticItem)
                 {
-                    translation = LanguageMgr.GetTranslation(m_gameClient, (GameStaticItem)obj);
+                    var translation = GameClient.GetTranslation(staticItem);
                     if (translation != null)
                     {
-                        if (obj is WorldInventoryItem)
+                        if (staticItem is WorldInventoryItem)
                         {
                             // if (!Util.IsEmpty(((DBLanguageItem)translation).Name))
                             //    name = ((DBLanguageItem)translation).Name;
@@ -182,29 +179,29 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update Object Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(obj.CurrentRegionID, (ushort)obj.ObjectID)] = GameTimer.GetTickCount();
+            GameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(obj.CurrentRegionID, (ushort)obj.ObjectID)] = GameTimer.GetTickCount();
         }
 
         public override void SendNPCCreate(GameNPC npc)
         {
 
-            if (m_gameClient.Player == null || npc.IsVisibleTo(m_gameClient.Player) == false)
+            if (GameClient.Player == null || npc.IsVisibleTo(GameClient.Player) == false)
             {
                 return;
             }
 
             // Added by Suncheck - Mines are not shown to enemy players
-            if (npc is GameMine)
+            if (npc is GameMine mine)
             {
-                if (GameServer.ServerRules.IsAllowedToAttack((npc as GameMine).Owner, m_gameClient.Player, true))
+                if (GameServer.ServerRules.IsAllowedToAttack(mine.Owner, GameClient.Player, true))
                 {
                     return;
                 }
             }
 
-            if (npc is GameMovingObject)
+            if (npc is GameMovingObject o)
             {
-                SendMovingObjectCreate(npc as GameMovingObject);
+                SendMovingObjectCreate(o);
                 return;
             }
 
@@ -212,10 +209,6 @@ namespace DOL.GS.PacketHandler
             {
                 int speed = 0;
                 ushort speedZ = 0;
-                if (npc == null)
-                {
-                    return;
-                }
 
                 if (!npc.IsAtTargetPosition)
                 {
@@ -232,7 +225,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort(speedZ);
                 pak.WriteShort(npc.Model);
                 pak.WriteByte(npc.Size);
-                byte level = npc.GetDisplayLevel(m_gameClient.Player);
+                byte level = npc.GetDisplayLevel(GameClient.Player);
                 if ((npc.Flags & GameNPC.eFlags.STATUE) != 0)
                 {
                     level |= 0x80;
@@ -240,7 +233,7 @@ namespace DOL.GS.PacketHandler
 
                 pak.WriteByte(level);
 
-                byte flags = (byte)(GameServer.ServerRules.GetLivingRealm(m_gameClient.Player, npc) << 6);
+                byte flags = (byte)(GameServer.ServerRules.GetLivingRealm(GameClient.Player, npc) << 6);
                 if ((npc.Flags & GameNPC.eFlags.GHOST) != 0)
                 {
                     flags |= 0x01;
@@ -272,7 +265,7 @@ namespace DOL.GS.PacketHandler
                 string add = string.Empty;
                 byte flags2 = 0x00;
                 IControlledBrain brain = npc.Brain as IControlledBrain;
-                if (m_gameClient.Version >= GameClient.eClientVersion.Version187)
+                if (GameClient.Version >= GameClient.eClientVersion.Version187)
                 {
                     if (brain != null)
                     {
@@ -282,7 +275,7 @@ namespace DOL.GS.PacketHandler
 
                 if ((npc.Flags & GameNPC.eFlags.CANTTARGET) != 0)
                 {
-                    if (m_gameClient.Account.PrivLevel > 1)
+                    if (GameClient.Account.PrivLevel > 1)
                     {
                         add += "-DOR"; // indicates DOR flag for GMs
                     }
@@ -294,7 +287,7 @@ namespace DOL.GS.PacketHandler
 
                 if ((npc.Flags & GameNPC.eFlags.DONTSHOWNAME) != 0)
                 {
-                    if (m_gameClient.Account.PrivLevel > 1)
+                    if (GameClient.Account.PrivLevel > 1)
                     {
                         add += "-NON"; // indicates NON flag for GMs
                     }
@@ -309,7 +302,7 @@ namespace DOL.GS.PacketHandler
                     flags2 |= 0x04;
                 }
 
-                eQuestIndicator questIndicator = npc.GetQuestIndicator(m_gameClient.Player);
+                eQuestIndicator questIndicator = npc.GetQuestIndicator(GameClient.Player);
 
                 if (questIndicator == eQuestIndicator.Available)
                 {
@@ -343,7 +336,7 @@ namespace DOL.GS.PacketHandler
                 string name = npc.Name;
                 string guildName = npc.GuildName;
 
-                LanguageDataObject translation = LanguageMgr.GetTranslation(m_gameClient, npc);
+                LanguageDataObject translation = GameClient.GetTranslation(npc);
                 if (translation != null)
                 {
                     if (!Util.IsEmpty(((DBLanguageNPC)translation).Name))
@@ -364,31 +357,22 @@ namespace DOL.GS.PacketHandler
 
                 if (add.Length > 0)
                 {
-                    name = string.Format("[{0}]{1}", name, add);
+                    name = $"[{name}]{add}";
                 }
 
                 pak.WritePascalString(name);
-
-                if (guildName.Length > 47)
-                {
-                    pak.WritePascalString(guildName.Substring(0, 47));
-                }
-                else
-                {
-                    pak.WritePascalString(guildName);
-                }
-
+                pak.WritePascalString(guildName.Length > 47 ? guildName.Substring(0, 47) : guildName);
                 pak.WriteByte(0x00);
                 SendTCP(pak);
             }
 
             // Update Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(npc.CurrentRegionID, (ushort)npc.ObjectID)] = 0;
+            GameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(npc.CurrentRegionID, (ushort)npc.ObjectID)] = 0;
         }
 
         public override void SendFindGroupWindowUpdate(GamePlayer[] list)
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
@@ -402,14 +386,7 @@ namespace DOL.GS.PacketHandler
                     byte nbsolo = 0x1E;
                     foreach (GamePlayer player in list)
                     {
-                        if (player.Group != null)
-                        {
-                            pak.WriteByte(nbleader++);
-                        }
-                        else
-                        {
-                            pak.WriteByte(nbsolo++);
-                        }
+                        pak.WriteByte(player.Group != null ? nbleader++ : nbsolo++);
 
                         pak.WriteByte(player.Level);
                         pak.WritePascalString(player.Name);
@@ -461,9 +438,9 @@ namespace DOL.GS.PacketHandler
                     string desc = quest.Description;
                     if (name.Length > byte.MaxValue)
                     {
-                        if (log.IsWarnEnabled)
+                        if (Log.IsWarnEnabled)
                         {
-                            log.Warn(quest.GetType().ToString() + ": name is too long for 1.71 clients (" + name.Length + ") '" + name + "'");
+                            Log.Warn($"{quest.GetType()}: name is too long for 1.71 clients ({name.Length}) \'{name}\'");
                         }
 
                         name = name.Substring(0, byte.MaxValue);
@@ -471,9 +448,9 @@ namespace DOL.GS.PacketHandler
 
                     if (desc.Length > ushort.MaxValue)
                     {
-                        if (log.IsWarnEnabled)
+                        if (Log.IsWarnEnabled)
                         {
-                            log.Warn(quest.GetType().ToString() + ": description is too long for 1.71 clients (" + desc.Length + ") '" + desc + "'");
+                            Log.Warn($"{quest.GetType()}: description is too long for 1.71 clients ({desc.Length}) \'{desc}\'");
                         }
 
                         desc = desc.Substring(0, ushort.MaxValue);
@@ -481,9 +458,9 @@ namespace DOL.GS.PacketHandler
 
                     if (name.Length + desc.Length > 2048 - 10)
                     {
-                        if (log.IsWarnEnabled)
+                        if (Log.IsWarnEnabled)
                         {
-                            log.Warn(quest.GetType().ToString() + ": name + description length is too long and would have crashed the client.\nName (" + name.Length + "): '" + name + "'\nDesc (" + desc.Length + "): '" + desc + "'");
+                            Log.Warn($"{quest.GetType()}: name + description length is too long and would have crashed the client.\nName ({name.Length}): \'{name}\'\nDesc ({desc.Length}): \'{desc}\'");
                         }
 
                         name = name.Substring(0, 32);
@@ -507,11 +484,10 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort((ushort)living.ObjectID);
                 pak.WriteByte(0);
                 pak.WriteByte(living.Level);
-                GamePlayer player = living as GamePlayer;
-                if (player != null)
+                if (living is GamePlayer player)
                 {
-                    pak.WritePascalString(GameServer.ServerRules.GetPlayerGuildName(m_gameClient.Player, player));
-                    pak.WritePascalString(GameServer.ServerRules.GetPlayerLastName(m_gameClient.Player, player));
+                    pak.WritePascalString(GameServer.ServerRules.GetPlayerGuildName(GameClient.Player, player));
+                    pak.WritePascalString(GameServer.ServerRules.GetPlayerLastName(GameClient.Player, player));
                 }
                 else if (!updateStrings)
                 {
@@ -529,7 +505,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendPlayerFreeLevelUpdate()
         {
-            GamePlayer player = m_gameClient.Player;
+            GamePlayer player = GameClient.Player;
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VisualEffect)))
             {
                 pak.WriteShort((ushort)player.ObjectID);
@@ -537,7 +513,7 @@ namespace DOL.GS.PacketHandler
 
                 byte flag = player.FreeLevelState;
 
-                TimeSpan t = new TimeSpan((long)(DateTime.Now.Ticks - player.LastFreeLeveled.Ticks));
+                TimeSpan t = new TimeSpan(DateTime.Now.Ticks - player.LastFreeLeveled.Ticks);
 
                 ushort time = 0;
 

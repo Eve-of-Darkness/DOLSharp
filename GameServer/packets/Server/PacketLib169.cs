@@ -17,7 +17,6 @@
  *
  */
 #define NOENCRYPTION
-
 using DOL.GS.Spells;
 using DOL.GS.Effects;
 
@@ -36,7 +35,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendGroupWindowUpdate()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
@@ -45,15 +44,8 @@ namespace DOL.GS.PacketHandler
             {
                 pak.WriteByte(0x06);
 
-                Group group = m_gameClient.Player.Group;
-                if (group == null)
-                {
-                    pak.WriteByte(0x00);
-                }
-                else
-                {
-                    pak.WriteByte((byte)group.MemberCount);
-                }
+                Group group = GameClient.Player.Group;
+                pak.WriteByte(group?.MemberCount ?? 0x00);
 
                 pak.WriteByte(0x01);
                 pak.WriteByte(0x00);
@@ -62,7 +54,7 @@ namespace DOL.GS.PacketHandler
                 {
                     foreach (GameLiving living in group.GetMembersInTheGroup())
                     {
-                        bool sameRegion = living.CurrentRegion == m_gameClient.Player.CurrentRegion;
+                        bool sameRegion = living.CurrentRegion == GameClient.Player.CurrentRegion;
 
                         pak.WriteByte(living.Level);
                         if (sameRegion)
@@ -87,17 +79,17 @@ namespace DOL.GS.PacketHandler
                                 playerStatus |= 0x04;
                             }
 
-                            if (SpellHelper.FindEffectOnTarget(living, "DamageOverTime") != null)
+                            if (living.FindEffectOnTarget("DamageOverTime") != null)
                             {
                                 playerStatus |= 0x08;
                             }
 
-                            if (living is GamePlayer && ((GamePlayer)living).Client.ClientState == GameClient.eClientState.Linkdead)
+                            if (living is GamePlayer player && player.Client.ClientState == GameClient.eClientState.Linkdead)
                             {
                                 playerStatus |= 0x10;
                             }
 
-                            if (living.CurrentRegion != m_gameClient.Player.CurrentRegion)
+                            if (living.CurrentRegion != GameClient.Player.CurrentRegion)
                             {
                                 playerStatus |= 0x20;
                             }
@@ -115,7 +107,7 @@ namespace DOL.GS.PacketHandler
                         }
 
                         pak.WritePascalString(living.Name);
-                        pak.WritePascalString(living is GamePlayer ? ((GamePlayer)living).CharacterClass.Name : "NPC");// classname
+                        pak.WritePascalString(living is GamePlayer gamePlayer ? gamePlayer.CharacterClass.Name : "NPC");// classname
                     }
                 }
 
@@ -126,13 +118,10 @@ namespace DOL.GS.PacketHandler
         protected override void WriteGroupMemberUpdate(GSTCPPacketOut pak, bool updateIcons, GameLiving living)
         {
             pak.WriteByte((byte)(living.GroupIndex + 1)); // From 1 to 8
-            bool sameRegion = living.CurrentRegion == m_gameClient.Player.CurrentRegion;
-            GamePlayer player = null;
+            bool sameRegion = living.CurrentRegion == GameClient.Player.CurrentRegion;
             if (sameRegion)
             {
-                player = living as GamePlayer;
-
-                if (player != null)
+                if (living is GamePlayer player)
                 {
                     pak.WriteByte(player.CharacterClass.HealthPercentGroupWindow);
                 }
@@ -160,19 +149,14 @@ namespace DOL.GS.PacketHandler
                     playerStatus |= 0x04;
                 }
 
-                if (SpellHelper.FindEffectOnTarget(living, "DamageOverTime") != null)
+                if (living.FindEffectOnTarget("DamageOverTime") != null)
                 {
                     playerStatus |= 0x08;
                 }
 
-                if (living is GamePlayer && ((GamePlayer)living).Client.ClientState == GameClient.eClientState.Linkdead)
+                if (living is GamePlayer gamePlayer && gamePlayer.Client.ClientState == GameClient.eClientState.Linkdead)
                 {
                     playerStatus |= 0x10;
-                }
-
-                if (!sameRegion)
-                {
-                    playerStatus |= 0x20;
                 }
 
                 pak.WriteByte(playerStatus);

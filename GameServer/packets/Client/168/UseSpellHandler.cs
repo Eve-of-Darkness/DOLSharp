@@ -45,15 +45,15 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 int xOffsetInZone = packet.ReadShort();
                 int yOffsetInZone = packet.ReadShort();
-                int currentZoneID = packet.ReadShort();
+                int currentZoneId = packet.ReadShort();
                 int realZ = packet.ReadShort();
 
-                Zone newZone = WorldMgr.GetZone((ushort)currentZoneID);
+                Zone newZone = WorldMgr.GetZone((ushort)currentZoneId);
                 if (newZone == null)
                 {
                     if (Log.IsWarnEnabled)
                     {
-                        Log.Warn("Unknown zone in UseSpellHandler: " + currentZoneID + " player: " + client.Player.Name);
+                        Log.Warn($"Unknown zone in UseSpellHandler: {currentZoneId} player: {client.Player.Name}");
                     }
                 }
                 else
@@ -80,27 +80,22 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles player use spell actions
         /// </summary>
-        protected class UseSpellAction : RegionAction
+        private class UseSpellAction : RegionAction
         {
-            /// <summary>
-            /// Defines a logger for this class.
-            /// </summary>
-            private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
             /// <summary>
             /// The speed and flags data
             /// </summary>
-            protected readonly int m_flagSpeedData;
+            private readonly int _flagSpeedData;
 
             /// <summary>
             /// The used spell level
             /// </summary>
-            protected readonly int m_spellLevel;
+            private readonly int _spellLevel;
 
             /// <summary>
             /// The used spell line index
             /// </summary>
-            protected readonly int m_spellLineIndex;
+            private readonly int _spellLineIndex;
 
             /// <summary>
             /// Constructs a new UseSpellAction
@@ -112,9 +107,9 @@ namespace DOL.GS.PacketHandler.Client.v168
             public UseSpellAction(GamePlayer actionSource, int flagSpeedData, int spellLevel, int spellLineIndex)
                 : base(actionSource)
             {
-                m_flagSpeedData = flagSpeedData;
-                m_spellLevel = spellLevel;
-                m_spellLineIndex = spellLineIndex;
+                _flagSpeedData = flagSpeedData;
+                _spellLevel = spellLevel;
+                _spellLineIndex = spellLineIndex;
             }
 
             /// <summary>
@@ -124,42 +119,51 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 GamePlayer player = (GamePlayer)m_actionSource;
 
-                if ((m_flagSpeedData & 0x200) != 0)
+                if ((_flagSpeedData & 0x200) != 0)
                 {
-                    player.CurrentSpeed = (short)(-(m_flagSpeedData & 0x1ff)); // backward movement
+                    player.CurrentSpeed = (short)(-(_flagSpeedData & 0x1ff)); // backward movement
                 }
                 else
                 {
-                    player.CurrentSpeed = (short)(m_flagSpeedData & 0x1ff); // forward movement
+                    player.CurrentSpeed = (short)(_flagSpeedData & 0x1ff); // forward movement
                 }
 
-                player.IsStrafing = (m_flagSpeedData & 0x4000) != 0;
-                player.TargetInView = (m_flagSpeedData & 0xa000) != 0; // why 2 bits? that has to be figured out
-                player.GroundTargetInView = (m_flagSpeedData & 0x1000) != 0;
+                player.IsStrafing = (_flagSpeedData & 0x4000) != 0;
+                player.TargetInView = (_flagSpeedData & 0xa000) != 0; // why 2 bits? that has to be figured out
+                player.GroundTargetInView = (_flagSpeedData & 0x1000) != 0;
 
                 List<Tuple<SpellLine, List<Skill>>> snap = player.GetAllUsableListSpells();
                 Skill sk = null;
                 SpellLine sl = null;
-
-                // is spelline in index ?
-                if (m_spellLineIndex < snap.Count)
+                
+                if (_spellLineIndex < snap.Count)
                 {
-                    int index = snap[m_spellLineIndex].Item2.FindIndex(s => s is Spell ?
-                                                                       s.Level == m_spellLevel
-                                                                       : (s is Styles.Style ? ((Styles.Style)s).SpecLevelRequirement == m_spellLevel
-                                                                          : (s is Ability ? ((Ability)s).SpecLevelRequirement == m_spellLevel : false)));
+                    int index = snap[_spellLineIndex].Item2.FindIndex(s =>
+                    {
+                        switch (s)
+                        {
+                            case Spell item:
+                                return item.Level == _spellLevel;
+                            case Styles.Style item:
+                                return item.SpecLevelRequirement == _spellLevel;
+                            case Ability item:
+                                return item.SpecLevelRequirement == _spellLevel;
+                            default:
+                                return false;
+                        }
+                    });
 
                     if (index > -1)
                     {
-                        sk = snap[m_spellLineIndex].Item2[index];
+                        sk = snap[_spellLineIndex].Item2[index];
                     }
 
-                    sl = snap[m_spellLineIndex].Item1;
+                    sl = snap[_spellLineIndex].Item1;
                 }
 
-                if (sk is Spell && sl != null)
+                if (sk is Spell spell && sl != null)
                 {
-                    player.CastSpell((Spell)sk, sl);
+                    player.CastSpell(spell, sl);
                 }
                 else if (sk is Styles.Style)
                 {
@@ -169,10 +173,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     Ability ab = (Ability)sk;
                     IAbilityActionHandler handler = SkillBase.GetAbilityActionHandler(ab.KeyName);
-                    if (handler != null)
-                    {
-                        handler.Execute(ab, player);
-                    }
+                    handler?.Execute(ab, player);
 
                     ab.Execute(player);
                 }
@@ -180,11 +181,11 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     if (Log.IsWarnEnabled)
                     {
-                        Log.Warn("Client <" + player.Client.Account.Name + "> requested incorrect spell at level " + m_spellLevel +
-                            " in spell-line " + ((sl == null || sl.Name == null) ? "unkown" : sl.Name));
+                        Log.Warn(
+                            $"Client <{player.Client.Account.Name}> requested incorrect spell at level {_spellLevel} in spell-line {sl?.Name ?? "unkown"}");
                     }
 
-                    player.Out.SendMessage(string.Format("Error : Spell (Line {0}, Level {1}) can't be resolved...", m_spellLineIndex, m_spellLevel), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"Error : Spell (Line {_spellLineIndex}, Level {_spellLevel}) can't be resolved...", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                 }
             }
         }

@@ -42,8 +42,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             if (client.Player.TargetObject != null && command == 2 && client.Player.ControlledBrain == null &&
                 client.Player.CharacterClass.ID == (int)eCharacterClass.Animist)
             {
-                var turret = client.Player.TargetObject as TurretPet;
-                if (turret != null && turret.Brain is TurretFNFBrain && client.Player.IsControlledNPC(turret))
+                if (client.Player.TargetObject is TurretPet turret && turret.Brain is TurretFNFBrain && client.Player.IsControlledNPC(turret))
                 {
                     // release
                     new HandlePetCommandAction(client.Player, 0, 0, 2).Start(1);
@@ -55,7 +54,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             if (client.Player.ControlledBrain != null)
             {
                 new HandlePetCommandAction(client.Player, aggroState, walkState, command).Start(1);
-                return;
             }
         }
 
@@ -66,22 +64,22 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles pet command actions
         /// </summary>
-        protected class HandlePetCommandAction : RegionAction
+        private class HandlePetCommandAction : RegionAction
         {
             /// <summary>
             /// The pet aggro state
             /// </summary>
-            protected readonly int m_aggroState;
+            private readonly int _aggroState;
 
             /// <summary>
             /// The pet command
             /// </summary>
-            protected readonly int m_command;
+            private readonly int _command;
 
             /// <summary>
             /// The pet walk state
             /// </summary>
-            protected readonly int m_walkState;
+            private readonly int _walkState;
 
             /// <summary>
             /// Constructs a new HandlePetCommandAction
@@ -93,9 +91,9 @@ namespace DOL.GS.PacketHandler.Client.v168
             public HandlePetCommandAction(GamePlayer actionSource, int aggroState, int walkState, int command)
                 : base(actionSource)
             {
-                m_aggroState = aggroState;
-                m_walkState = walkState;
-                m_command = command;
+                _aggroState = aggroState;
+                _walkState = walkState;
+                _command = command;
             }
 
             /// <summary>
@@ -105,7 +103,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 var player = (GamePlayer)m_actionSource;
 
-                switch (m_aggroState)
+                switch (_aggroState)
                 {
                     case 0:
                         break; // ignore
@@ -121,14 +119,13 @@ namespace DOL.GS.PacketHandler.Client.v168
                     default:
                         if (Log.IsWarnEnabled)
                         {
-                            Log.Warn("unknown aggro state " + m_aggroState + ", player=" + player.Name + "  version=" + player.Client.Version +
-                                     "  client type=" + player.Client.ClientType);
+                            Log.Warn($"unknown aggro state {_aggroState}, player={player.Name}  version={player.Client.Version}  client type={player.Client.ClientType}");
                         }
 
                         break;
                 }
 
-                switch (m_walkState)
+                switch (_walkState)
                 {
                     case 0:
                         break; // ignore
@@ -147,14 +144,13 @@ namespace DOL.GS.PacketHandler.Client.v168
                     default:
                         if (Log.IsWarnEnabled)
                         {
-                            Log.Warn("unknown walk state " + m_walkState + ", player=" + player.Name + "  version=" + player.Client.Version +
-                                     "  client type=" + player.Client.ClientType);
+                            Log.Warn($"unknown walk state {_walkState}, player={player.Name}  version={player.Client.Version}  client type={player.Client.ClientType}");
                         }
 
                         break;
                 }
 
-                switch (m_command)
+                switch (_command)
                 {
                     case 0:
                         break; // ignore
@@ -167,8 +163,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     default:
                         if (Log.IsWarnEnabled)
                         {
-                            Log.Warn("unknown command state " + m_command + ", player=" + player.Name + "  version=" + player.Client.Version +
-                                     "  client type=" + player.Client.ClientType);
+                            Log.Warn($"unknown command state {_command}, player={player.Name}  version={player.Client.Version}  client type={player.Client.ClientType}");
                         }
 
                         break;

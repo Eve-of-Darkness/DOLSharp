@@ -18,22 +18,16 @@
 */
 #define NOENCRYPTION
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-
 using DOL.Database;
 using DOL.GS.Styles;
-
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(1112, GameClient.eClientVersion.Version1112)]
     public class PacketLib1112 : PacketLib1111
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Constructs a new PacketLib for Client Version 1.112
         /// </summary>
@@ -45,18 +39,17 @@ namespace DOL.GS.PacketHandler
 
         public override void SendUpdatePlayerSkills()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             // Get Skills as "Usable Skills" which are in network order ! (with forced update)
-            List<Tuple<Skill, Skill>> usableSkills = m_gameClient.Player.GetAllUsableSkills(true);
+            List<Tuple<Skill, Skill>> usableSkills = GameClient.Player.GetAllUsableSkills(true);
 
             bool sent = false; // set to true once we can't send packet anymore !
             int index = 0; // index of our position in the list !
             int total = usableSkills.Count; // cache List count.
-            int packetCount = 0; // Number of packet sent for the entire list
             while (!sent)
             {
                 int packetEntry = 0; // needed to tell client how much skill we send
@@ -65,8 +58,8 @@ namespace DOL.GS.PacketHandler
                 {
                     // Write header
                     pak.WriteByte(0x01); // subcode for skill
-                    pak.WriteByte((byte)0); // packet entries, can't know it for now...
-                    pak.WriteByte((byte)0x03); // subtype for following pages
+                    pak.WriteByte(0); // packet entries, can't know it for now...
+                    pak.WriteByte(0x03); // subtype for following pages
                     pak.WriteByte((byte)index); // packet first entry
 
                     // getting pak filled
@@ -82,15 +75,14 @@ namespace DOL.GS.PacketHandler
                         Skill skill = usableSkills[index].Item1;
                         Skill skillrelated = usableSkills[index].Item2;
 
-                        if (skill is Specialization)
+                        if (skill is Specialization spec)
                         {
-                            Specialization spec = (Specialization)skill;
                             pak.WriteByte((byte)spec.Level);
                             pak.WriteShort((ushort)spec.InternalID); // new 1.112
                             pak.WriteByte((byte)spec.SkillType);
                             pak.WriteShort(0);
-                            pak.WriteByte((byte)(m_gameClient.Player.GetModifiedSpecLevel(spec.KeyName) - spec.Level)); // bonus
-                            pak.WriteShort((ushort)spec.Icon);
+                            pak.WriteByte((byte)(GameClient.Player.GetModifiedSpecLevel(spec.KeyName) - spec.Level)); // bonus
+                            pak.WriteShort(spec.Icon);
                             pak.WritePascalString(spec.Name);
                         }
                         else if (skill is Ability)
@@ -100,8 +92,8 @@ namespace DOL.GS.PacketHandler
                             pak.WriteShort((ushort)ab.InternalID); // new 1.112
                             pak.WriteByte((byte)ab.SkillType);
                             pak.WriteShort(0);
-                            pak.WriteByte((byte)0);
-                            pak.WriteShort((ushort)ab.Icon);
+                            pak.WriteByte(0);
+                            pak.WriteShort(ab.Icon);
                             pak.WritePascalString(ab.Name);
                         }
                         else if (skill is Spell)
@@ -112,7 +104,7 @@ namespace DOL.GS.PacketHandler
                             pak.WriteByte((byte)spell.SkillType);
 
                             // spec index for this Spell - Special for Song and Unknown Indexes...
-                            int spin = 0;
+                            int spin;
                             if (spell.SkillType == eSkillPage.Songs)
                             {
                                 spin = 0xFF;
@@ -120,9 +112,9 @@ namespace DOL.GS.PacketHandler
                             else
                             {
                                 // find this line Specialization index !
-                                if (skillrelated is SpellLine && !Util.IsEmpty(((SpellLine)skillrelated).Spec))
+                                if (skillrelated is SpellLine line && !Util.IsEmpty(line.Spec))
                                 {
-                                    spin = usableSkills.FindIndex(sk => (sk.Item1 is Specialization) && ((Specialization)sk.Item1).KeyName == ((SpellLine)skillrelated).Spec);
+                                    spin = usableSkills.FindIndex(sk => sk.Item1 is Specialization && ((Specialization)sk.Item1).KeyName == line.Spec);
 
                                     if (spin == -1)
                                     {
@@ -179,7 +171,7 @@ namespace DOL.GS.PacketHandler
 
                             pak.WriteShort((ushort)pre);
                             pak.WriteByte(GlobalConstants.GetSpecToInternalIndex(style.Spec)); // index specialization in bonus...
-                            pak.WriteShort((ushort)style.Icon);
+                            pak.WriteShort(style.Icon);
                             pak.WritePascalString(style.Name);
                         }
 
@@ -199,20 +191,18 @@ namespace DOL.GS.PacketHandler
 
                     if (!sent)
                     {
-                        pak.WriteByte((byte)99);
+                        pak.WriteByte(99);
                     }
 
                     SendTCP(pak);
                 }
-
-                packetCount++;
             }
 
             // Send List Cast Spells...
             SendNonHybridSpellLines();
 
             // clear trainer cache
-            m_gameClient.TrainerSkillCache = null;
+            GameClient.TrainerSkillCache = null;
 
             if (ForceTooltipUpdate)
             {
@@ -225,7 +215,7 @@ namespace DOL.GS.PacketHandler
         /// </summary>
         public override void SendNonHybridSpellLines()
         {
-            GamePlayer player = m_gameClient.Player;
+            GamePlayer player = GameClient.Player;
             if (player == null)
             {
                 return;
@@ -253,9 +243,8 @@ namespace DOL.GS.PacketHandler
                     // Add All Spells...
                     foreach (Skill sk in spXsl.Item2)
                     {
-                        if (sk is Spell)
+                        if (sk is Spell sp)
                         {
-                            Spell sp = (Spell)sk;
                             pak.WriteShortLowEndian((byte)sp.Level);
                             pak.WriteShort((ushort)sp.InternalID); // new 1.112
                             pak.WriteShort(sp.Icon);
@@ -264,9 +253,9 @@ namespace DOL.GS.PacketHandler
                         else
                         {
                             int reqLevel = 1;
-                            if (sk is Style)
+                            if (sk is Style style)
                             {
-                                reqLevel = ((Style)sk).SpecLevelRequirement;
+                                reqLevel = style.SpecLevelRequirement;
                             }
                             else if (sk is Ability)
                             {
@@ -385,7 +374,7 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte((byte)template.Bonus);
             pak.WriteByte((byte)template.BonusLevel); // 1.109
             pak.WriteShort((ushort)template.Model);
-            pak.WriteByte((byte)template.Extension);
+            pak.WriteByte(template.Extension);
             if (template.Emblem != 0)
             {
                 pak.WriteShort((ushort)template.Emblem);
@@ -396,14 +385,7 @@ namespace DOL.GS.PacketHandler
             }
 
             pak.WriteShort((ushort)template.Effect);
-            if (count > 1)
-            {
-                pak.WritePascalString(string.Format("{0} {1}", count, template.Name));
-            }
-            else
-            {
-                pak.WritePascalString(template.Name);
-            }
+            pak.WritePascalString(count > 1 ? $"{count} {template.Name}" : template.Name);
         }
 
         protected override void WriteItemData(GSTCPPacketOut pak, InventoryItem item)
@@ -490,7 +472,7 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte((byte)item.Bonus); // % bonus
             pak.WriteByte((byte)item.BonusLevel); // 1.109
             pak.WriteShort((ushort)item.Model);
-            pak.WriteByte((byte)item.Extension);
+            pak.WriteByte(item.Extension);
             int flag = 0;
             int emblem = item.Emblem;
             int color = item.Color;
@@ -506,16 +488,16 @@ namespace DOL.GS.PacketHandler
 
             // flag |= 0x01; // newGuildEmblem
             flag |= 0x02; // enable salvage button
-            AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(m_gameClient.Player.CraftingPrimarySkill);
-            if (skill != null && skill is AdvancedCraftingSkill/* && ((AdvancedCraftingSkill)skill).IsAllowedToCombine(m_gameClient.Player, item)*/)
+            AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(GameClient.Player.CraftingPrimarySkill);
+            if (skill is AdvancedCraftingSkill)
             {
                 flag |= 0x04; // enable craft button
             }
 
             ushort icon1 = 0;
             ushort icon2 = 0;
-            string spell_name1 = string.Empty;
-            string spell_name2 = string.Empty;
+            string spellName1 = string.Empty;
+            string spellName2 = string.Empty;
             if (item.Object_Type != (int)eObjectType.AlchemyTincture)
             {
                 if (item.SpellID > 0/* && item.Charges > 0*/)
@@ -530,7 +512,7 @@ namespace DOL.GS.PacketHandler
                             {
                                 flag |= 0x08;
                                 icon1 = spl.Icon;
-                                spell_name1 = spl.Name; // or best spl.Name ?
+                                spellName1 = spl.Name; // or best spl.Name ?
                                 break;
                             }
                         }
@@ -549,7 +531,7 @@ namespace DOL.GS.PacketHandler
                             {
                                 flag |= 0x10;
                                 icon2 = spl.Icon;
-                                spell_name2 = spl.Name; // or best spl.Name ?
+                                spellName2 = spl.Name; // or best spl.Name ?
                                 break;
                             }
                         }
@@ -560,32 +542,32 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte((byte)flag);
             if ((flag & 0x08) == 0x08)
             {
-                pak.WriteShort((ushort)icon1);
-                pak.WritePascalString(spell_name1);
+                pak.WriteShort(icon1);
+                pak.WritePascalString(spellName1);
             }
 
             if ((flag & 0x10) == 0x10)
             {
-                pak.WriteShort((ushort)icon2);
-                pak.WritePascalString(spell_name2);
+                pak.WriteShort(icon2);
+                pak.WritePascalString(spellName2);
             }
 
             pak.WriteByte((byte)item.Effect);
             string name = item.Name;
             if (item.Count > 1)
             {
-                name = item.Count + " " + name;
+                name = $"{item.Count} {name}";
             }
 
             if (item.SellPrice > 0)
             {
                 if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                 {
-                    name += "[" + item.SellPrice.ToString() + " BP]";
+                    name += $"[{item.SellPrice} BP]";
                 }
                 else
                 {
-                    name += "[" + Money.GetString(item.SellPrice) + "]";
+                    name += $"[{Money.GetString(item.SellPrice)}]";
                 }
             }
 
@@ -690,7 +672,7 @@ namespace DOL.GS.PacketHandler
                 else
                 {
                     // Set Player always on ground, this is an "anti lag" packet
-                    ushort contenthead = (ushort)(player.Heading + (true ? 0x1000 : 0));
+                    ushort contenthead = (ushort)(player.Heading + 0x1000);
                     pak.WriteShort(contenthead);
 
                     // No Fall Speed.
@@ -737,7 +719,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(player.CurrentRegionID, (ushort)player.ObjectID)] = GameTimer.GetTickCount();
+            GameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(player.CurrentRegionID, (ushort)player.ObjectID)] = GameTimer.GetTickCount();
         }
     }
 }

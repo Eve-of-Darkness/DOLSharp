@@ -20,25 +20,14 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Reflection;
 using DOL.GS.Effects;
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(190, GameClient.eClientVersion.Version190)]
     public class PacketLib190 : PacketLib189
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        protected byte icons;
-
-        public byte Icons {
-            get { return icons; }
-        }
+        public byte Icons { get; protected set; }
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.90 clients
@@ -48,26 +37,26 @@ namespace DOL.GS.PacketHandler
             : base(client)
         {
             // SendUpdateIcons
-            icons = 0;
+            Icons = 0;
         }
 
         public override void SendUpdatePoints()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CharacterPointsUpdate)))
             {
-                pak.WriteInt((uint)m_gameClient.Player.RealmPoints);
-                pak.WriteShort(m_gameClient.Player.LevelPermill);
-                pak.WriteShort((ushort)m_gameClient.Player.SkillSpecialtyPoints);
-                pak.WriteInt((uint)m_gameClient.Player.BountyPoints);
-                pak.WriteShort((ushort)m_gameClient.Player.RealmSpecialtyPoints);
-                pak.WriteShort(m_gameClient.Player.ChampionLevelPermill);
-                pak.WriteLongLowEndian((ulong)m_gameClient.Player.Experience);
-                pak.WriteLongLowEndian((ulong)m_gameClient.Player.ExperienceForNextLevel);
+                pak.WriteInt((uint)GameClient.Player.RealmPoints);
+                pak.WriteShort(GameClient.Player.LevelPermill);
+                pak.WriteShort((ushort)GameClient.Player.SkillSpecialtyPoints);
+                pak.WriteInt((uint)GameClient.Player.BountyPoints);
+                pak.WriteShort((ushort)GameClient.Player.RealmSpecialtyPoints);
+                pak.WriteShort(GameClient.Player.ChampionLevelPermill);
+                pak.WriteLongLowEndian((ulong)GameClient.Player.Experience);
+                pak.WriteLongLowEndian((ulong)GameClient.Player.ExperienceForNextLevel);
                 pak.WriteLongLowEndian(0);// champExp
                 pak.WriteLongLowEndian(0);// champExpNextLevel
                 SendTCP(pak);
@@ -76,29 +65,28 @@ namespace DOL.GS.PacketHandler
 
         public override void SendStatusUpdate(byte sittingFlag)
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CharacterStatusUpdate)))
             {
-                pak.WriteByte(m_gameClient.Player.HealthPercent);
-                pak.WriteByte(m_gameClient.Player.ManaPercent);
+                pak.WriteByte(GameClient.Player.HealthPercent);
+                pak.WriteByte(GameClient.Player.ManaPercent);
                 pak.WriteByte(sittingFlag);
-                pak.WriteByte(m_gameClient.Player.EndurancePercent);
-                pak.WriteByte(m_gameClient.Player.ConcentrationPercent);
-
-                // pak.WriteShort((byte) (m_gameClient.Player.IsAlive ? 0x00 : 0x0f)); // 0x0F if dead ??? where it now ?
+                pak.WriteByte(GameClient.Player.EndurancePercent);
+                pak.WriteByte(GameClient.Player.ConcentrationPercent);
+                
                 pak.WriteByte(0);// unk
-                pak.WriteShort((ushort)m_gameClient.Player.MaxMana);
-                pak.WriteShort((ushort)m_gameClient.Player.MaxEndurance);
-                pak.WriteShort((ushort)m_gameClient.Player.MaxConcentration);
-                pak.WriteShort((ushort)m_gameClient.Player.MaxHealth);
-                pak.WriteShort((ushort)m_gameClient.Player.Health);
-                pak.WriteShort((ushort)m_gameClient.Player.Endurance);
-                pak.WriteShort((ushort)m_gameClient.Player.Mana);
-                pak.WriteShort((ushort)m_gameClient.Player.Concentration);
+                pak.WriteShort((ushort)GameClient.Player.MaxMana);
+                pak.WriteShort((ushort)GameClient.Player.MaxEndurance);
+                pak.WriteShort((ushort)GameClient.Player.MaxConcentration);
+                pak.WriteShort((ushort)GameClient.Player.MaxHealth);
+                pak.WriteShort((ushort)GameClient.Player.Health);
+                pak.WriteShort((ushort)GameClient.Player.Endurance);
+                pak.WriteShort((ushort)GameClient.Player.Mana);
+                pak.WriteShort((ushort)GameClient.Player.Concentration);
                 SendTCP(pak);
             }
         }
@@ -106,7 +94,7 @@ namespace DOL.GS.PacketHandler
         // 190c+ SendUpdateIcons
         public override void SendUpdateIcons(IList changedEffects, ref int lastUpdateEffectsCount)
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
@@ -117,13 +105,13 @@ namespace DOL.GS.PacketHandler
 
                 int fxcount = 0;
                 int entriesCount = 0;
-                lock (m_gameClient.Player.EffectList)
+                lock (GameClient.Player.EffectList)
                 {
                     pak.WriteByte(0);   // effects count set in the end
                     pak.WriteByte(0);   // unknown
                     pak.WriteByte(Icons);   // unknown
                     pak.WriteByte(0);   // unknown
-                    foreach (IGameEffect effect in m_gameClient.Player.EffectList)
+                    foreach (IGameEffect effect in GameClient.Player.EffectList)
                     {
                         if (effect.Icon != 0)
                         {
@@ -137,14 +125,13 @@ namespace DOL.GS.PacketHandler
                             pak.WriteByte((byte)(fxcount - 1)); // icon index
                             pak.WriteByte((effect is GameSpellEffect) ? (byte)(fxcount - 1) : (byte)0xff);
 
-                            byte ImmunByte = 0;
-                            var gsp = effect as GameSpellEffect;
-                            if (gsp != null && gsp.IsDisabled)
+                            byte immunByte = 0;
+                            if (effect is GameSpellEffect gsp && gsp.IsDisabled)
                             {
-                                ImmunByte = 1;
+                                immunByte = 1;
                             }
 
-                            pak.WriteByte(ImmunByte); // new in 1.73; if non zero says "protected by" on right click
+                            pak.WriteByte(immunByte); // new in 1.73; if non zero says "protected by" on right click
 
                             // bit 0x08 adds "more..." to right click info
                             pak.WriteShort(effect.Icon);
@@ -153,9 +140,9 @@ namespace DOL.GS.PacketHandler
                             pak.WriteShort((ushort)(effect.RemainingTime / 1000));
                             pak.WriteShort(effect.InternalID);      // reference for shift+i or cancel spell
                             byte flagNegativeEffect = 0;
-                            if (effect is StaticEffect)
+                            if (effect is StaticEffect staticEffect)
                             {
-                                if (((StaticEffect)effect).HasNegativeEffect)
+                                if (staticEffect.HasNegativeEffect)
                                 {
                                     flagNegativeEffect = 1;
                                 }
@@ -185,10 +172,7 @@ namespace DOL.GS.PacketHandler
                         // Log.DebugFormat("adding [{0}] (empty)", fxcount-1);
                     }
 
-                    if (changedEffects != null)
-                    {
-                        changedEffects.Clear();
-                    }
+                    changedEffects?.Clear();
 
                     if (entriesCount == 0)
                     {
@@ -202,55 +186,53 @@ namespace DOL.GS.PacketHandler
                     SendTCP(pak);
                 }
             }
-
-            return;
         }
 
         public override void SendMasterLevelWindow(byte ml)
         {
-            if (m_gameClient == null || m_gameClient.Player == null)
+            if (GameClient?.Player == null)
             {
                 return;
             }
 
             // If required ML=0 then send current player ML data
-            byte mlToSend = (byte)(ml == 0 ? (m_gameClient.Player.MLLevel == 0 ? 1 : m_gameClient.Player.MLLevel) : ml);
+            byte mlToSend = (byte)(ml == 0 ? (GameClient.Player.MLLevel == 0 ? 1 : GameClient.Player.MLLevel) : ml);
 
             if (mlToSend > GamePlayer.ML_MAX_LEVEL)
             {
                 mlToSend = GamePlayer.ML_MAX_LEVEL;
             }
 
-            double mlXPPercent = 0;
+            double mlXpPercent;
             double mlStepPercent = 0;
 
-            if (m_gameClient.Player.MLLevel < 10)
+            if (GameClient.Player.MLLevel < 10)
             {
-                mlXPPercent = 100.0 * (double)m_gameClient.Player.MLExperience / (double)m_gameClient.Player.GetMLExperienceForLevel((int)(m_gameClient.Player.MLLevel + 1));
-                if (m_gameClient.Player.GetStepCountForML((byte)(m_gameClient.Player.MLLevel + 1)) > 0)
+                mlXpPercent = 100.0 * GameClient.Player.MLExperience / GameClient.Player.GetMLExperienceForLevel(GameClient.Player.MLLevel + 1);
+                if (GameClient.Player.GetStepCountForML((byte)(GameClient.Player.MLLevel + 1)) > 0)
                 {
-                    mlStepPercent = 100.0 * (double)m_gameClient.Player.GetCountMLStepsCompleted((byte)(m_gameClient.Player.MLLevel + 1)) / (double)m_gameClient.Player.GetStepCountForML((byte)(m_gameClient.Player.MLLevel + 1));
+                    mlStepPercent = 100.0 * GameClient.Player.GetCountMLStepsCompleted((byte)(GameClient.Player.MLLevel + 1)) / GameClient.Player.GetStepCountForML((byte)(GameClient.Player.MLLevel + 1));
                 }
             }
             else
             {
-                mlXPPercent = 100.0; // ML10 has no MLXP, so always 100%
+                mlXpPercent = 100.0; // ML10 has no MLXP, so always 100%
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut((byte)eServerPackets.MasterLevelWindow))
             {
-                pak.WriteByte((byte)mlXPPercent); // MLXP (blue bar)
+                pak.WriteByte((byte)mlXpPercent); // MLXP (blue bar)
                 pak.WriteByte((byte)Math.Min(mlStepPercent, 100)); // Step percent (red bar)
-                pak.WriteByte((byte)(m_gameClient.Player.MLLevel + 1)); // ML level + 1
+                pak.WriteByte((byte)(GameClient.Player.MLLevel + 1)); // ML level + 1
                 pak.WriteByte(0);
-                pak.WriteShort((ushort)0); // exp1 ? new in 1.90
-                pak.WriteShort((ushort)0); // exp2 ? new in 1.90
+                pak.WriteShort(0); // exp1 ? new in 1.90
+                pak.WriteShort(0); // exp2 ? new in 1.90
                 pak.WriteByte(ml);
 
                 // ML level completion is displayed client side for Step 11
                 for (int i = 1; i < 11; i++)
                 {
-                    string description = m_gameClient.Player.GetMLStepDescription(mlToSend, i);
+                    string description = GameClient.Player.GetMLStepDescription(mlToSend, i);
                     pak.WritePascalString(description);
                 }
 
@@ -347,7 +329,7 @@ namespace DOL.GS.PacketHandler
                 else
                 {
                     // Set Player always on ground, this is an "anti lag" packet
-                    ushort contenthead = (ushort)(player.Heading + (true ? 0x1000 : 0));
+                    ushort contenthead = (ushort)(player.Heading + 0x1000);
                     pak.WriteShort(contenthead);
 
                     // No Fall Speed.
@@ -395,7 +377,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(player.CurrentRegionID, (ushort)player.ObjectID)] = GameTimer.GetTickCount();
+            GameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(player.CurrentRegionID, (ushort)player.ObjectID)] = GameTimer.GetTickCount();
         }
     }
 }

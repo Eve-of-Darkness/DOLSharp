@@ -16,39 +16,31 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System.Reflection;
-using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.SetMarketPrice, "Set Market/Consignment Merchant Price.", eClientStatus.PlayerInGame)]
     public class PlayerSetMarketPriceHandler : IPacketHandler
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            if (client == null || client.Player == null)
+            if (client?.Player == null)
             {
                 return;
             }
 
             int slot = packet.ReadByte();
-            int unk1 = packet.ReadByte();
-            ushort unk2 = packet.ReadShort();
+            packet.ReadByte(); // unk
+            packet.ReadShort(); // unk
             uint price = packet.ReadInt();
 
-            // ChatUtil.SendDebugMessage(client.Player, "PlayerSetMarketPriceHandler");
-
             // only IGameInventoryObjects can handle set price commands
-            if (client.Player.TargetObject == null || (client.Player.TargetObject is IGameInventoryObject) == false)
+            if (client.Player.TargetObject == null || client.Player.TargetObject is IGameInventoryObject == false)
             {
                 return;
-            } 
-(client.Player.TargetObject as IGameInventoryObject).SetSellPrice(client.Player, (ushort)slot, price);
+            }
+
+            ((IGameInventoryObject) client.Player.TargetObject).SetSellPrice(client.Player, (ushort)slot, price);
         }
     }
 }
