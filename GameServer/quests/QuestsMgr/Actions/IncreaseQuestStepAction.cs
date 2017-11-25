@@ -27,13 +27,13 @@ namespace DOL.GS.Quests.Actions
     public class IncreaseQuestStepAction: AbstractAction<Type,Unused>
     {
 
-        public IncreaseQuestStepAction(GameNPC defaultNPC,  object p, object q)
-            : base(defaultNPC, eActionType.IncQuestStep, p, q)
+        public IncreaseQuestStepAction(GameNPC defaultNpc,  object p, object q)
+            : base(defaultNpc, eActionType.IncQuestStep, p, q)
         {
         }
 
-        public IncreaseQuestStepAction(GameNPC defaultNPC, Type questType)
-            : this(defaultNPC, (object)questType, (object)null)
+        public IncreaseQuestStepAction(GameNPC defaultNpc, Type questType)
+            : this(defaultNpc, questType, null)
         { }
 
         public override void Perform(DOLEvent e, object sender, EventArgs args)

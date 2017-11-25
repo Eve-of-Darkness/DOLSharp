@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Gem of Lost Memories Encounter"; }
-        }
+        public override string Name => "Gem of Lost Memories Encounter";
     }
 }

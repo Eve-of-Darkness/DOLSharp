@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Traitor's Dagger Encounter"; }
-        }
+        public override string Name => "Traitor's Dagger Encounter";
     }
 }

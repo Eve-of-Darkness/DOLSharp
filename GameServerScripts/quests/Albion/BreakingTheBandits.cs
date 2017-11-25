@@ -565,10 +565,10 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)((m_questPlayer.ExperienceForNextLevel - m_questPlayer.ExperienceForCurrentLevel) / 20), true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)((QuestPlayer.ExperienceForNextLevel - QuestPlayer.ExperienceForCurrentLevel) / 20), true);
             long money = Money.GetMoney(0, 0, 0, 1, 30 + Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} for your service.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} for your service.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

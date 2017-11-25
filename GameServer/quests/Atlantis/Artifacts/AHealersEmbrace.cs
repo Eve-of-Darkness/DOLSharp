@@ -31,7 +31,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
     class AHealersEmbrace : ArtifactQuest
     {
         public AHealersEmbrace()
-            : base() { }
+        {}
 
         public AHealersEmbrace(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -49,7 +49,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init("Healer's Embrace", typeof(AHealersEmbrace));
+            Init("Healer's Embrace", typeof(AHealersEmbrace));
         }
 
         /// <summary>
@@ -82,29 +82,19 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
-                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                    ArtifactID,
-                    (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
                 if (versions.Count > 0 && RemoveItem(player, item))
                 {
-                    GiveItem(scholar, player, ArtifactID, versions[";;"]);
-                    string reply = string.Format(
-                        "Here is the Healer's Embrace Cloak, {0} {1} {2} {3}, {4}!",
-                        "restored to its original power. It is a fine cloak and I wish I could keep",
-                        "it, but it is for you and you alone. Do not destroy it because you will never",
-                        "have access to its full power again. Take care of it and it shall aid you in",
-                        "the trials",
-                        player.CharacterClass.Name);
+                    GiveItem(scholar, player, ArtifactId, versions[";;"]);
+                    string reply = $"Here is the Healer\'s Embrace Cloak, restored to its original power. It is a fine cloak and I wish I could keep it, but it is for you and you alone. Do not destroy it because you will never have access to its full power again. Take care of it and it shall aid you in the trials, {player.CharacterClass.Name}!";
                     scholar.TurnTo(player);
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     FinishQuest();
@@ -129,20 +119,14 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
-                string reply = string.Format(
-                    "Vara was a very skilled healer and she put her skills {0} {1} {2}",
-                    "into the Healer's Embrace cloak. It would help me to unlock them if I was to read",
-                    "her Medical Log. Please give me Vara's Medical Log now so that I may awaken the",
-                    "magic within the Cloak for you.");
+                string reply = "Vara was a very skilled healer and she put her skills into the Healer\'s Embrace cloak. It would help me to unlock them if I was to read her Medical Log. Please give me Vara\'s Medical Log now so that I may awaken the magic within the Cloak for you.";
                 scholar.TurnTo(player);
                 scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                 Step = 2;
@@ -175,18 +159,12 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "A Healing Embrace"; }
-        }
+        public override string Name => "A Healing Embrace";
 
         /// <summary>
         /// The reward for this quest.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return "Healer's Embrace"; }
-        }
+        public override string ArtifactId => "Healer's Embrace";
 
         public override void Notify(DOLEvent e, object sender, EventArgs args)
         {

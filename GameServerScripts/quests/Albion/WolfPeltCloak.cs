@@ -762,7 +762,7 @@ namespace DOL.GS.Quests.Albion
                 if (gArgs.Target.Name == don.Name && gArgs.Item.Id_nb == wolfPeltCloak.Id_nb)
                 {
                     don.SayTo(player, "Thank you! Your service to the church will been noted!");
-                    RemoveItem(don, m_questPlayer, wolfPeltCloak);
+                    RemoveItem(don, QuestPlayer, wolfPeltCloak);
                     don.SayTo(player, "Well done! You've helped the children get over the harsh winter.");
 
                     // Give reward to player here ...
@@ -794,8 +794,8 @@ namespace DOL.GS.Quests.Albion
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                 if (gArgs.Target.Name == stewardWillie.Name && gArgs.Item.Id_nb == wolfFur.Id_nb)
                 {
-                    stewardWillie.TurnTo(m_questPlayer);
-                    stewardWillie.SayTo(m_questPlayer, "Take this token from His Lordship. If ye give it to Seamstress Lynnet in Ludlow, she'll give ye your reward. Thank ye for your fine services to His Lordship.");
+                    stewardWillie.TurnTo(QuestPlayer);
+                    stewardWillie.SayTo(QuestPlayer, "Take this token from His Lordship. If ye give it to Seamstress Lynnet in Ludlow, she'll give ye your reward. Thank ye for your fine services to His Lordship.");
 
                     RemoveItem(stewardWillie, player, wolfFur);
                     GiveItem(stewardWillie, player, wolfHeadToken);
@@ -820,8 +820,8 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, wolfFur, false);
-            RemoveItem(m_questPlayer, wolfHeadToken, false);
+            RemoveItem(QuestPlayer, wolfFur, false);
+            RemoveItem(QuestPlayer, wolfHeadToken, false);
         }
 
         public override void FinishQuest()
@@ -829,12 +829,12 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            GiveItem(lynnet, m_questPlayer, wolfPeltCloak);
+            GiveItem(lynnet, QuestPlayer, wolfPeltCloak);
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 50, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 50, true);
             long money = Money.GetMoney(0, 0, 0, 0, 30 + Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} for your service.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} for your service.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

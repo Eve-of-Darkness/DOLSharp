@@ -891,21 +891,21 @@ namespace DOL.GS.Quests.Hibernia
                 switch (Step)
                 {
                     case 1:
-                        return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ImportantDelivery.Description.Step1");
+                        return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ImportantDelivery.Description.Step1");
                     case 2:
-                        return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ImportantDelivery.Description.Step2");
+                        return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ImportantDelivery.Description.Step2");
                     case 3:
-                        return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ImportantDelivery.Description.Step3");
+                        return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ImportantDelivery.Description.Step3");
                     case 4:
-                        return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ImportantDelivery.Description.Step4");
+                        return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ImportantDelivery.Description.Step4");
                     case 5:
-                        return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ImportantDelivery.Description.Step5");
+                        return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ImportantDelivery.Description.Step5");
                     case 6:
-                        return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ImportantDelivery.Description.Step6");
+                        return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ImportantDelivery.Description.Step6");
                     case 7:
-                        return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ImportantDelivery.Description.Step7");
+                        return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ImportantDelivery.Description.Step7");
                     case 8:
-                        return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ImportantDelivery.Description.Step8");
+                        return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ImportantDelivery.Description.Step8");
                 }
 
                 return base.Description;
@@ -971,10 +971,10 @@ namespace DOL.GS.Quests.Hibernia
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, ticketToArdee, false);
-            RemoveItem(m_questPlayer, ticketToTirnamBeo, false);
-            RemoveItem(m_questPlayer, sackOfSupplies, false);
-            RemoveItem(m_questPlayer, crateOfVegetables, false);
+            RemoveItem(QuestPlayer, ticketToArdee, false);
+            RemoveItem(QuestPlayer, ticketToTirnamBeo, false);
+            RemoveItem(QuestPlayer, sackOfSupplies, false);
+            RemoveItem(QuestPlayer, crateOfVegetables, false);
         }
 
         public override void FinishQuest()
@@ -982,12 +982,12 @@ namespace DOL.GS.Quests.Hibernia
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            GiveItem(freagus, m_questPlayer, recruitsCloak);
+            GiveItem(freagus, QuestPlayer, recruitsCloak);
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 12);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 12);
             long money = Money.GetMoney(0, 0, 0, 1, Util.Random(50));
-            m_questPlayer.AddMoney(money, LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ImportantDelivery.FinishQuest.RecieveReward"));
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ImportantDelivery.FinishQuest.RecieveReward"));
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

@@ -337,7 +337,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(Amorasaidmistyc));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(Amorasaidmistyc));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Lycla,-1);
                 a.AddTrigger(eTriggerType.Interact,null,Lycla);

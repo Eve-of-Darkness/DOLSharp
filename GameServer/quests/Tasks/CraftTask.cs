@@ -21,6 +21,7 @@ using System.Collections;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
+using log4net;
 
 namespace DOL.GS.Quests
 {
@@ -30,9 +31,9 @@ namespace DOL.GS.Quests
     /// </summary>
     public class CraftTask : AbstractTask
     {
-        protected static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        protected static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public const string RECIEVER_ZONE = "recieverZone";
+        private const string RECIEVER_ZONE = "recieverZone";
 
         // public string ItemName;
         public const double RewardMoneyRatio = 1.25;
@@ -55,58 +56,34 @@ namespace DOL.GS.Quests
         {
         }
 
-        private long m_rewardmoney = 0;
+        private long _rewardmoney;
 
-        public override long RewardMoney
-        {
-            get
-            {
-                return m_rewardmoney;
-            }
-        }
+        public override long RewardMoney => _rewardmoney;
 
         public void SetRewardMoney(long money)
         {
-            m_rewardmoney = money;
+            _rewardmoney = money;
         }
 
-        public override IList RewardItems
-        {
-            get { return null; }
-        }
+        public override IList RewardItems => null;
 
         /// <summary>
         /// Retrieves the name of the task
         /// </summary>
-        public override string Name
-        {
-            get { return "Craft Task"; }
-        }
+        public override string Name => "Craft Task";
 
         /// <summary>
         /// Retrieves the description
         /// </summary>
-        public override string Description
-        {
-            get { return "Craft the " + ItemName + " for " + RecieverName + " in " + RecieverZone; }
-        }
+        public override string Description => $"Craft the {ItemName} for {RecieverName} in {RecieverZone}";
 
         /// <summary>
         /// Zone related to task stored in dbTask
         /// </summary>
         public virtual string RecieverZone
         {
-            get { return GetCustomProperty(RECIEVER_ZONE); }
-            set { SetCustomProperty(RECIEVER_ZONE, value); }
-        }
-
-        /// <summary>
-        /// Called to finish the task.
-        /// Should be overridden and some rewards given etc.
-        /// </summary>
-        public override void FinishTask()
-        {
-            base.FinishTask();
+            get => GetCustomProperty(RECIEVER_ZONE);
+            set => SetCustomProperty(RECIEVER_ZONE, value);
         }
 
         /// <summary>
@@ -136,7 +113,11 @@ namespace DOL.GS.Quests
             if (e == GamePlayerEvent.GiveItem)
             {
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
-                GameLiving target = gArgs.Target as GameLiving;
+                if (!(gArgs.Target is GameLiving target))
+                {
+                    return;
+                }
+
                 InventoryItem item = gArgs.Item;
 
                 if (player.Task.RecieverName == target.Name && item.Name == player.Task.ItemName)
@@ -153,7 +134,7 @@ namespace DOL.GS.Quests
         /// </summary>
         /// <param name="player">Level of Generated Item</param>
         /// <returns>A Generated NPC Item</returns>
-        public static ItemTemplate GenerateNPCItem(GamePlayer player)
+        public static ItemTemplate GenerateNpcItem(GamePlayer player)
         {
             int mediumCraftingLevel = player.GetCraftingSkillValue(player.CraftingPrimarySkill) + 20;
             int lowLevel = mediumCraftingLevel - 20;
@@ -178,19 +159,19 @@ namespace DOL.GS.Quests
                 return false;
             }
 
-            GameNPC NPC = GetRandomNPC(player);
-            if (NPC == null)
+            GameNPC npc = GetRandomNpc(player);
+            if (npc == null)
             {
                 player.Out.SendMessage("I have no task for you, come back some time later.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return false;
             }
 
-            ItemTemplate taskItem = GenerateNPCItem(player);
+            ItemTemplate taskItem = GenerateNpcItem(player);
 
             if (taskItem == null)
             {
                 player.Out.SendMessage("I can't think of anything for you to make, perhaps you should ask again.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                log.ErrorFormat("Craft task item is null for player {0} at level {1}.", player.Name, player.Level);
+                Log.Error($"Craft task item is null for player {player.Name} at level {player.Level}.");
                 return false;
             }
 
@@ -198,41 +179,33 @@ namespace DOL.GS.Quests
                                 {
                                     TimeOut = DateTime.Now.AddHours(2),
                                     ItemName = taskItem.Name,
-                                    RecieverName = NPC.Name,
-                                    RecieverZone = NPC.CurrentZone.Description
+                                    RecieverName = npc.Name,
+                                    RecieverZone = npc.CurrentZone.Description
                                 };
 
             craftTask.SetRewardMoney((long)(taskItem.Price * RewardMoneyRatio));
 
             player.Task = craftTask;
 
-            player.Out.SendMessage("Craft " + taskItem.GetName(0, false) + " for " + NPC.Name + " in " + NPC.CurrentZone.Description, eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+            player.Out.SendMessage($"Craft {taskItem.GetName(0, false)} for {npc.Name} in {npc.CurrentZone.Description}", eChatType.CT_Say, eChatLoc.CL_PopupWindow);
             return true;
         }
 
         /// <summary>
         /// Find a Random NPC
         /// </summary>
-        /// <param name="Player">The GamePlayer Object</param>
+        /// <param name="player">The GamePlayer Object</param>
         /// <returns>The GameNPC Searched</returns>
-        public static GameNPC GetRandomNPC(GamePlayer Player)
+        public static GameNPC GetRandomNpc(GamePlayer player)
         {
-            return Player.CurrentZone.GetRandomNPC(new eRealm[] { eRealm.Albion, eRealm.Hibernia, eRealm.Midgard });
+            return player.CurrentZone.GetRandomNPC(new[] { eRealm.Albion, eRealm.Hibernia, eRealm.Midgard });
         }
 
         public new static bool CheckAvailability(GamePlayer player, GameLiving target)
         {
-            if (target == null)
+            if ((target as CraftNPC)?.TheCraftingSkill == player.CraftingPrimarySkill)
             {
-                return false;
-            }
-
-            if (target is CraftNPC)
-            {
-                if ((target as CraftNPC).TheCraftingSkill == player.CraftingPrimarySkill)
-                {
-                    return AbstractTask.CheckAvailability(player, target, CHANCE);
-                }
+                return CheckAvailability(player, target, Chance);
             }
 
             return false;// else return false

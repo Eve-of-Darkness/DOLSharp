@@ -243,7 +243,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(Bearskins));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(Bearskins));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Helen,-1);
                 a.AddTrigger(eTriggerType.Interact,null,Helen);

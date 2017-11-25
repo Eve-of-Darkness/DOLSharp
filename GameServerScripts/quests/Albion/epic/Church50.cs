@@ -1041,8 +1041,8 @@ namespace DOL.GS.Quests.Albion
                 {
                     if (gArgs.Target.Name == Blythe.Name)
                     {
-                        m_questPlayer.Out.SendMessage("As you search the dead body of sister Blythe, you find a sacred " + statue_of_arawn.Name + ", bring it to " + Roben.Name + " has proof of your success.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        GiveItem(m_questPlayer, statue_of_arawn);
+                        QuestPlayer.Out.SendMessage("As you search the dead body of sister Blythe, you find a sacred " + statue_of_arawn.Name + ", bring it to " + Roben.Name + " has proof of your success.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        GiveItem(QuestPlayer, statue_of_arawn);
                         Step = 2;
                         return;
                     }
@@ -1066,43 +1066,43 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, statue_of_arawn, false);
+            RemoveItem(QuestPlayer, statue_of_arawn, false);
         }
 
         public override void FinishQuest()
         {
-            if (m_questPlayer.Inventory.IsSlotsFree(6, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+            if (QuestPlayer.Inventory.IsSlotsFree(6, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
             {
-                RemoveItem(m_questPlayer, statue_of_arawn, true);
+                RemoveItem(QuestPlayer, statue_of_arawn, true);
 
                 base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-                if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Cleric)
+                if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Cleric)
                 {
-                    GiveItem(m_questPlayer, ClericEpicBoots);
-                    GiveItem(m_questPlayer, ClericEpicArms);
-                    GiveItem(m_questPlayer, ClericEpicGloves);
-                    GiveItem(m_questPlayer, ClericEpicHelm);
-                    GiveItem(m_questPlayer, ClericEpicVest);
-                    GiveItem(m_questPlayer, ClericEpicLegs);
+                    GiveItem(QuestPlayer, ClericEpicBoots);
+                    GiveItem(QuestPlayer, ClericEpicArms);
+                    GiveItem(QuestPlayer, ClericEpicGloves);
+                    GiveItem(QuestPlayer, ClericEpicHelm);
+                    GiveItem(QuestPlayer, ClericEpicVest);
+                    GiveItem(QuestPlayer, ClericEpicLegs);
                 }
-                else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Paladin)
+                else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Paladin)
                 {
-                    GiveItem(m_questPlayer, PaladinEpicBoots);
-                    GiveItem(m_questPlayer, PaladinEpicArms);
-                    GiveItem(m_questPlayer, PaladinEpicGloves);
-                    GiveItem(m_questPlayer, PaladinEpicHelm);
-                    GiveItem(m_questPlayer, PaladinEpicVest);
-                    GiveItem(m_questPlayer, PaladinEpicLegs);
+                    GiveItem(QuestPlayer, PaladinEpicBoots);
+                    GiveItem(QuestPlayer, PaladinEpicArms);
+                    GiveItem(QuestPlayer, PaladinEpicGloves);
+                    GiveItem(QuestPlayer, PaladinEpicHelm);
+                    GiveItem(QuestPlayer, PaladinEpicVest);
+                    GiveItem(QuestPlayer, PaladinEpicLegs);
                 }
 
-                m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 1937768448, true);
+                QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 1937768448, true);
 
-                // m_questPlayer.AddMoney(Money.GetMoney(0,0,0,2,Util.Random(50)), "You recieve {0} as a reward.");
+                // mQuestPlayer.AddMoney(Money.GetMoney(0,0,0,2,Util.Random(50)), "You recieve {0} as a reward.");
             }
             else
             {
-                m_questPlayer.Out.SendMessage("You do not have enough free space in your inventory!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                QuestPlayer.Out.SendMessage("You do not have enough free space in your inventory!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
         }
 

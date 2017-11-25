@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Traldor's Oracle Encounter"; }
-        }
+        public override string Name => "Traldor's Oracle Encounter";
     }
 }

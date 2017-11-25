@@ -712,10 +712,10 @@ namespace DOL.GS.Quests.Albion
                     GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                     if (gArgs.Target.Name == elvarTambor.Name && gArgs.Item.Id_nb == letterToElvar.Id_nb)
                     {
-                        RemoveItem(elvarTambor, m_questPlayer, letterToElvar);
+                        RemoveItem(elvarTambor, QuestPlayer, letterToElvar);
 
-                        elvarTambor.TurnTo(m_questPlayer);
-                        elvarTambor.SayTo(m_questPlayer, "Ah!  A letter from my Ydenia.  Thank you for delivering it to me.  I can't wait to see what she has to say.  I was just sitting here wondering if there was going to be someone who was traveling back to [Cotswold].");
+                        elvarTambor.TurnTo(QuestPlayer);
+                        elvarTambor.SayTo(QuestPlayer, "Ah!  A letter from my Ydenia.  Thank you for delivering it to me.  I can't wait to see what she has to say.  I was just sitting here wondering if there was going to be someone who was traveling back to [Cotswold].");
 
                         Step = 2;
                         return;
@@ -727,10 +727,10 @@ namespace DOL.GS.Quests.Albion
                     GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                     if (gArgs.Target.Name == ydeniaPhilpott.Name && gArgs.Item.Id_nb == letterToYdenia.Id_nb)
                     {
-                        RemoveItem(ydeniaPhilpott, m_questPlayer, letterToYdenia);
+                        RemoveItem(ydeniaPhilpott, QuestPlayer, letterToYdenia);
 
-                        ydeniaPhilpott.TurnTo(m_questPlayer);
-                        ydeniaPhilpott.SayTo(m_questPlayer, "Thank you friend!  Here, I have [something] for you.");
+                        ydeniaPhilpott.TurnTo(QuestPlayer);
+                        ydeniaPhilpott.SayTo(QuestPlayer, "Thank you friend!  Here, I have [something] for you.");
 
                         Step = 4;
                         return;
@@ -743,8 +743,8 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, letterToElvar, false);
-            RemoveItem(m_questPlayer, letterToYdenia, false);
+            RemoveItem(QuestPlayer, letterToElvar, false);
+            RemoveItem(QuestPlayer, letterToYdenia, false);
         }
 
         public override void FinishQuest()
@@ -752,12 +752,12 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            GiveItem(ydeniaPhilpott, m_questPlayer, silverRingOfHealth);
+            GiveItem(ydeniaPhilpott, QuestPlayer, silverRingOfHealth);
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 20 + (m_questPlayer.Level - 1) * 5, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 20 + (QuestPlayer.Level - 1) * 5, true);
             long money = Money.GetMoney(0, 0, 0, 5, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You are awarded 5 silver and some copper!");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You are awarded 5 silver and some copper!");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

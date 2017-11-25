@@ -520,7 +520,7 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, boarCarcass, false);
+            RemoveItem(QuestPlayer, boarCarcass, false);
         }
 
         public override void FinishQuest()
@@ -528,10 +528,10 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)((m_questPlayer.ExperienceForNextLevel - m_questPlayer.ExperienceForCurrentLevel) / 9.42), true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)((QuestPlayer.ExperienceForNextLevel - QuestPlayer.ExperienceForCurrentLevel) / 9.42), true);
             long money = Money.GetMoney(0, 0, 0, 9, 30 + Util.Random(50));
-            m_questPlayer.AddMoney(money, "You are awarded 9 silver and some copper!");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You are awarded 9 silver and some copper!");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

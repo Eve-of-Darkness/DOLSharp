@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Crocodile's Tooth Encounter"; }
-        }
+        public override string Name => "Crocodile's Tooth Encounter";
     }
 }

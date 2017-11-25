@@ -1105,8 +1105,8 @@ namespace DOL.GS.Quests.Midgard
                 EnemyKilledEventArgs gArgs = (EnemyKilledEventArgs)args;
                 if (gArgs.Target.Name == Loken.Name)
                 {
-                    m_questPlayer.Out.SendMessage("You get a ball of flame", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    GiveItem(m_questPlayer, ball_of_flame);
+                    QuestPlayer.Out.SendMessage("You get a ball of flame", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    GiveItem(QuestPlayer, ball_of_flame);
                     Step = 2;
                     return;
                 }
@@ -1140,44 +1140,44 @@ namespace DOL.GS.Quests.Midgard
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, sealed_pouch, false);
-            RemoveItem(m_questPlayer, ball_of_flame, false);
+            RemoveItem(QuestPlayer, sealed_pouch, false);
+            RemoveItem(QuestPlayer, ball_of_flame, false);
         }
 
         public override void FinishQuest()
         {
-            if (m_questPlayer.Inventory.IsSlotsFree(6, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+            if (QuestPlayer.Inventory.IsSlotsFree(6, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
             {
-                RemoveItem(Miri, m_questPlayer, sealed_pouch);
+                RemoveItem(Miri, QuestPlayer, sealed_pouch);
 
                 base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-                if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Shaman)
+                if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Shaman)
                 {
-                    GiveItem(m_questPlayer, ShamanEpicArms);
-                    GiveItem(m_questPlayer, ShamanEpicBoots);
-                    GiveItem(m_questPlayer, ShamanEpicGloves);
-                    GiveItem(m_questPlayer, ShamanEpicHelm);
-                    GiveItem(m_questPlayer, ShamanEpicLegs);
-                    GiveItem(m_questPlayer, ShamanEpicVest);
+                    GiveItem(QuestPlayer, ShamanEpicArms);
+                    GiveItem(QuestPlayer, ShamanEpicBoots);
+                    GiveItem(QuestPlayer, ShamanEpicGloves);
+                    GiveItem(QuestPlayer, ShamanEpicHelm);
+                    GiveItem(QuestPlayer, ShamanEpicLegs);
+                    GiveItem(QuestPlayer, ShamanEpicVest);
                 }
-                else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Healer)
+                else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Healer)
                 {
-                    GiveItem(m_questPlayer, HealerEpicArms);
-                    GiveItem(m_questPlayer, HealerEpicBoots);
-                    GiveItem(m_questPlayer, HealerEpicGloves);
-                    GiveItem(m_questPlayer, HealerEpicHelm);
-                    GiveItem(m_questPlayer, HealerEpicLegs);
-                    GiveItem(m_questPlayer, HealerEpicVest);
+                    GiveItem(QuestPlayer, HealerEpicArms);
+                    GiveItem(QuestPlayer, HealerEpicBoots);
+                    GiveItem(QuestPlayer, HealerEpicGloves);
+                    GiveItem(QuestPlayer, HealerEpicHelm);
+                    GiveItem(QuestPlayer, HealerEpicLegs);
+                    GiveItem(QuestPlayer, HealerEpicVest);
                 }
 
-                m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 1937768448, true);
+                QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 1937768448, true);
 
-                // m_questPlayer.AddMoney(Money.GetMoney(0,0,0,2,Util.Random(50)), "You recieve {0} as a reward.");
+                // mQuestPlayer.AddMoney(Money.GetMoney(0,0,0,2,Util.Random(50)), "You recieve {0} as a reward.");
             }
             else
             {
-                m_questPlayer.Out.SendMessage("You do not have enough free space in your inventory!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                QuestPlayer.Out.SendMessage("You do not have enough free space in your inventory!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
         }
 

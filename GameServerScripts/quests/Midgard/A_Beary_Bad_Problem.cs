@@ -312,7 +312,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(Abearybadproblem));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(Abearybadproblem));
             QuestBehaviour a;
             a = builder.CreateBehaviour(VikingKreimhilde,-1);
                 a.AddTrigger(eTriggerType.Interact,null,VikingKreimhilde);

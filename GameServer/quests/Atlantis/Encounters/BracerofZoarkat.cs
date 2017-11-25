@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Bracelet of Zo'arkat Encounter"; }
-        }
+        public override string Name => "Bracelet of Zo'arkat Encounter";
     }
 }

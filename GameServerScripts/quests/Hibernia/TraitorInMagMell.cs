@@ -839,8 +839,8 @@ namespace DOL.GS.Quests.Hibernia
 
         protected virtual int ResetPlayerModel(RegionTimer callingTimer)
         {
-            GameClient client = m_questPlayer.Client;
-            m_questPlayer.Model = (ushort)client.Account.Characters[client.ActiveCharIndex].CreationModel;
+            GameClient client = QuestPlayer.Client;
+            QuestPlayer.Model = (ushort)client.Account.Characters[client.ActiveCharIndex].CreationModel;
             SendSystemMessage("You change back to your normal form!");
             return 0;
         }
@@ -898,11 +898,11 @@ namespace DOL.GS.Quests.Hibernia
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                 if (gArgs.Target.Name == addrir.Name && gArgs.Item.Id_nb == sluaghPlans.Id_nb)
                 {
-                    RemoveItem(addrir, m_questPlayer, sluaghPlans);
+                    RemoveItem(addrir, QuestPlayer, sluaghPlans);
 
-                    addrir.TurnTo(m_questPlayer);
-                    addrir.SayTo(m_questPlayer, "Ah! Their plans, but alas, I can not read their language. Hrm...I shall have to think on this. I'm sure there is someone I can find to translate this for me. But never mind that right now. I have a [reward] for you for your hard work and bravery.");
-                    m_questPlayer.Out.SendEmoteAnimation(addrir, eEmote.Ponder);
+                    addrir.TurnTo(QuestPlayer);
+                    addrir.SayTo(QuestPlayer, "Ah! Their plans, but alas, I can not read their language. Hrm...I shall have to think on this. I'm sure there is someone I can find to translate this for me. But never mind that right now. I have a [reward] for you for your hard work and bravery.");
+                    QuestPlayer.Out.SendEmoteAnimation(addrir, eEmote.Ponder);
                     Step = 5;
                     return;
                 }
@@ -913,36 +913,36 @@ namespace DOL.GS.Quests.Hibernia
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, necklaceOfDoppelganger, false);
-            RemoveItem(m_questPlayer, sluaghPlans, false);
+            RemoveItem(QuestPlayer, necklaceOfDoppelganger, false);
+            RemoveItem(QuestPlayer, sluaghPlans, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
         {
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(addrir, m_questPlayer, necklaceOfDoppelganger);
+            RemoveItem(addrir, QuestPlayer, necklaceOfDoppelganger);
 
             // Give reward to player here ...
-            if (m_questPlayer.HasAbilityToUseItem(recruitsBoots))
+            if (QuestPlayer.HasAbilityToUseItem(recruitsBoots))
             {
-                GiveItem(addrir, m_questPlayer, recruitsBoots);
+                GiveItem(addrir, QuestPlayer, recruitsBoots);
             }
             else
             {
-                GiveItem(addrir, m_questPlayer, recruitsQuiltedBoots);
+                GiveItem(addrir, QuestPlayer, recruitsQuiltedBoots);
             }
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 40, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 40, true);
             long money = Money.GetMoney(0, 0, 0, 4, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} as a reward.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} as a reward.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

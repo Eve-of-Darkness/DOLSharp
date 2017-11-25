@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -30,7 +30,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
     class JacinasSash : ArtifactQuest
     {
         public JacinasSash()
-            : base() { }
+        { }
 
         public JacinasSash(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -48,7 +48,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init("Jacina's Sash", typeof(JacinasSash));
+            Init("Jacina's Sash", typeof(JacinasSash));
         }
 
         /// <summary>
@@ -81,27 +81,19 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
-                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                    ArtifactID,
-                    (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
                 if (versions.Count > 0 && RemoveItem(player, item))
                 {
-                    GiveItem(scholar, player, ArtifactID, versions[";;"]);
-                    string reply = string.Format(
-                        "Brilliant, thank you! Here, take the artifact. {0} {1} {2}",
-                        "I've unlocked its powers for you. As I've said before, I'm more interested",
-                        "in the stories and the history behind these artifacts than the actual items",
-                        "themselves.");
+                    GiveItem(scholar, player, ArtifactId, versions[";;"]);
+                    string reply = "Brilliant, thank you! Here, take the artifact. I\'ve unlocked its powers for you. As I\'ve said before, I\'m more interested in the stories and the history behind these artifacts than the actual items themselves.";
                     scholar.TurnTo(player);
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     FinishQuest();
@@ -126,14 +118,12 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
                 string reply = "Oh, the mysterious Jacina's Sash. Do you have the scrolls on it? I've found a few that allude to its true nature, but haven't found anything with any detail.";
                 scholar.TurnTo(player);
@@ -168,17 +158,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Jacina's Sash"; }
-        }
+        public override string Name => "Jacina's Sash";
 
         /// <summary>
         /// The reward for this quest.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return "Jacina's Sash"; }
-        }
+        public override string ArtifactId => "Jacina's Sash";
     }
 }

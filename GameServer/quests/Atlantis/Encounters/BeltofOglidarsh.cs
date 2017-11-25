@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Belt of Oglidarsh Encounter"; }
-        }
+        public override string Name => "Belt of Oglidarsh Encounter";
     }
 }

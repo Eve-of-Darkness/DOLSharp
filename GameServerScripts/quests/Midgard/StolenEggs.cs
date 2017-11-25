@@ -580,7 +580,7 @@ namespace DOL.GS.Quests.Midgard
             grifflet.Model = 1236;
             grifflet.Name = LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.StolenEggs.InitGrifflet.NPCGrifflet");
 
-            // grifflet.GuildName = "Part of " + m_questPlayer.GetName(0, false) + "'s " + questTitle + " Quest";
+            // grifflet.GuildName = "Part of " + mQuestPlayer.GetName(0, false) + "'s " + questTitle + " Quest";
             grifflet.Flags ^= GameNPC.eFlags.PEACE;
             grifflet.CurrentRegionID = askefruerTrainer.CurrentRegionID;
             grifflet.Size = 20;
@@ -1055,20 +1055,20 @@ namespace DOL.GS.Quests.Midgard
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, trainerWhip, false);
+            RemoveItem(QuestPlayer, trainerWhip, false);
 
-            if (m_questPlayer.HasAbilityToUseItem(recruitsVest))
+            if (QuestPlayer.HasAbilityToUseItem(recruitsVest))
             {
-                RemoveItem(m_questPlayer, recruitsVest, false);
+                RemoveItem(QuestPlayer, recruitsVest, false);
             }
             else
             {
-                RemoveItem(m_questPlayer, recruitsQuiltedVest, false);
+                RemoveItem(QuestPlayer, recruitsQuiltedVest, false);
             }
 
             deleteGrifflet();
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
@@ -1076,12 +1076,12 @@ namespace DOL.GS.Quests.Midgard
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 507, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 507, true);
             long money = Money.GetMoney(0, 0, 0, 7, Util.Random(50));
-            m_questPlayer.AddMoney(money, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.StolenEggs.FinishQuest.Text1"));
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.StolenEggs.FinishQuest.Text1"));
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

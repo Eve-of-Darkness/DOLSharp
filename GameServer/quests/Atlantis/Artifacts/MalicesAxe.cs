@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -34,10 +34,10 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public MalicesAxe()
-            : base() { }
+        { }
 
         public MalicesAxe(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -57,7 +57,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init(m_artifactID, typeof(MalicesAxe));
+            Init(m_artifactID, typeof(MalicesAxe));
         }
 
         /// <summary>
@@ -90,26 +90,17 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
                 scholar.TurnTo(player);
                 if (RemoveItem(player, item))
                 {
-                    string reply = string.Format(
-                        "You now have a decision to make, {0}. {1} {2} {3} {4} {5}",
-                        player.CharacterClass.Name,
-                        "I can unlock your Malice Axe so it uses [slashing] skills or so it uses",
-                        "[crushing] skills. In both cases, I can unlock it as a one-handed weapon",
-                        "or a two-handed one. All you must do is decide which kind of damage you",
-                        "would like to do to your enemies. Once you have chosen, you cannot change",
-                        "your mind.");
+                    string reply = $"You now have a decision to make, {player.CharacterClass.Name}. I can unlock your Malice Axe so it uses [slashing] skills or so it uses [crushing] skills. In both cases, I can unlock it as a one-handed weapon or a two-handed one. All you must do is decide which kind of damage you would like to do to your enemies. Once you have chosen, you cannot change your mind.";
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     Step = 3;
                     return true;
@@ -133,14 +124,12 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
                 string reply = "Ah, yes, the axe of Malice. It has an interesting tale, but I'm not sure I believe it. Did you find the story of the axe? If you have, please give it to me now.";
                 scholar.TurnTo(player);
@@ -156,10 +145,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                     case "crushing":
                         {
                             SetCustomProperty("DamageType", text.ToLower());
-                            string reply = string.Format(
-                                "Would you like your {0} Malice's Axe to be {1}",
-                                text.ToLower(),
-                                "[one handed] or [two handed]?");
+                            string reply = $"Would you like your {text.ToLower()} Malice\'s Axe to be [one handed] or [two handed]?";
                             scholar.TurnTo(player);
                             scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                             Step = 4;
@@ -176,25 +162,18 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                     case "one handed":
                     case "two handed":
                         {
-                            string versionID = string.Format(
-                                "{0};{1};",
-                                GetCustomProperty("DamageType"), text.ToLower());
-                            Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                                ArtifactID,
-                                (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
-                            ItemTemplate template = versions[versionID];
+                            string versionId = $"{GetCustomProperty("DamageType")};{text.ToLower()};";
+                            Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
+                            ItemTemplate template = versions[versionId];
                             if (template == null)
                             {
-                                log.Warn(string.Format("Artifact version {0} not found", versionID));
+                                Log.Warn($"Artifact version {versionId} not found");
                                 return false;
                             }
 
-                            if (GiveItem(scholar, player, ArtifactID, template))
+                            if (GiveItem(scholar, player, ArtifactId, template))
                             {
-                                string reply = string.Format(
-                                    "Here's your {0}. May it serve you well. {1}",
-                                    template.Name,
-                                    "Just don't lose it. You can't ever replace it.");
+                                string reply = $"Here\'s your {template.Name}. May it serve you well. Just don\'t lose it. You can\'t ever replace it.";
                                 scholar.TurnTo(player);
                                 scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                                 FinishQuest();
@@ -238,17 +217,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Malice's Axe"; }
-        }
+        public override string Name => "Malice's Axe";
 
         /// <summary>
         /// The artifact ID.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return m_artifactID; }
-        }
+        public override string ArtifactId => m_artifactID;
     }
 }

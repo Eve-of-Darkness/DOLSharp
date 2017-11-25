@@ -1,6 +1,6 @@
 ﻿namespace DOL.GS.Quests
 {
-    public enum eStepCheckType : int
+    public enum eStepCheckType
     {
         Qualification,
         Offer,

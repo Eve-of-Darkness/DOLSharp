@@ -367,7 +367,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(thebirthdaygift));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(thebirthdaygift));
             QuestBehaviour a;
             a = builder.CreateBehaviour(BarkeepNognar,-1);
                 a.AddTrigger(eTriggerType.Interact,null,BarkeepNognar);

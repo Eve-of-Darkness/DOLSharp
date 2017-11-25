@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -29,13 +29,8 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
     /// <author>Aredhel</author>
     class EirenesHauberk : ArtifactQuest
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         public EirenesHauberk()
-            : base() { }
+        { }
 
         public EirenesHauberk(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -53,7 +48,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init("Eirene's Chestpiece", typeof(EirenesHauberk));
+            Init("Eirene's Chestpiece", typeof(EirenesHauberk));
         }
 
         /// <summary>
@@ -85,21 +80,19 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
                 scholar.TurnTo(player);
                 if (RemoveItem(player, item))
                 {
-                    Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactID, (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                    Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
-                    string reply = string.Empty;
+                    string reply;
 
                     if (versions.Count > 1)
                     {
@@ -108,19 +101,14 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                         Step = 3;
                         return true;
                     }
-                    else
-                    {
-                        reply = string.Format(
-                            "The magic of Eirene's Chestpiece is unlocked {0} {1}. {2} {3} {4} {5}, {1}!",
-                            "and linked now to you,", player.CharacterClass.Name,
-                            "Please know that if you lose or destroy this Chestpiece, it will be gone",
-                            "from you forever. I hope it will help you succeed in the trials.",
-                            "Bring glory to", GlobalConstants.RealmToName(player.Realm));
 
-                        Dictionary<string, ItemTemplate>.Enumerator venum = versions.GetEnumerator();
+                    reply = $"The magic of Eirene\'s Chestpiece is unlocked and linked now to you, {player.CharacterClass.Name}. Please know that if you lose or destroy this Chestpiece, it will be gone from you forever. I hope it will help you succeed in the trials. Bring glory to {GlobalConstants.RealmToName(player.Realm)}, {player.CharacterClass.Name}!";
+
+                    using (Dictionary<string, ItemTemplate>.Enumerator venum = versions.GetEnumerator())
+                    {
                         venum.MoveNext();
 
-                        if (GiveItem(scholar, player, ArtifactID, venum.Current.Value))
+                        if (GiveItem(scholar, player, ArtifactId, venum.Current.Value))
                         {
                             scholar.TurnTo(player);
                             scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
@@ -147,9 +135,9 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
 
         public void DisplayStep3(Scholar scholar, GamePlayer player, string reply)
         {
-            Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactID, (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+            Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
-            reply += "Now you need to decide what version of " + ArtifactID + " you would like.  The following are available to you, please choose wisely. ";
+            reply += $"Now you need to decide what version of {ArtifactId} you would like.  The following are available to you, please choose wisely. ";
 
             // versions will be in the format Name;  ... strip the ; when displaying, add it back when searching
             foreach (string version in versions.Keys)
@@ -176,20 +164,14 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
-                string reply = string.Format(
-                    "There is powerful magic flowing through that artifact, {0}, {1} {2}",
-                    player.CharacterClass.Name,
-                    "but I cannot release it without the spell hidden in the Journal. Please give me Eirene's",
-                    "Journal now. If you no longer have it, go and find the pages again. I will wait for you.");
+                string reply = $"There is powerful magic flowing through that artifact, {player.CharacterClass.Name}, but I cannot release it without the spell hidden in the Journal. Please give me Eirene\'s Journal now. If you no longer have it, go and find the pages again. I will wait for you.";
                 scholar.TurnTo(player);
                 scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                 Step = 2;
@@ -198,19 +180,14 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
 
             if (Step == 3)
             {
-                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactID, (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
                 string version = text + ";;";
 
                 if (versions.ContainsKey(version))
                 {
-                    if (GiveItem(scholar, player, ArtifactID, versions[version]))
+                    if (GiveItem(scholar, player, ArtifactId, versions[version]))
                     {
-                        string reply = string.Format(
-                            "The magic of Eirene's Chestpiece is unlocked {0} {1}. {2} {3} {4} {5}, {1}!",
-                            "and linked now to you,", player.CharacterClass.Name,
-                            "Please know that if you lose or destroy this Chestpiece, it will be gone",
-                            "from you forever. I hope it will help you succeed in the trials.",
-                            "Bring glory to ", GlobalConstants.RealmToName(player.Realm));
+                        string reply = $"The magic of Eirene\'s Chestpiece is unlocked and linked now to you, {player.CharacterClass.Name}. Please know that if you lose or destroy this Chestpiece, it will be gone from you forever. I hope it will help you succeed in the trials. Bring glory to  {GlobalConstants.RealmToName(player.Realm)}, {player.CharacterClass.Name}!";
                         scholar.TurnTo(player);
                         scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                         FinishQuest();
@@ -247,18 +224,12 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Eirene's Hauberk"; }
-        }
+        public override string Name => "Eirene's Hauberk";
 
         /// <summary>
         /// The reward for this quest.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return "Eirene's Chestpiece"; }
-        }
+        public override string ArtifactId => "Eirene's Chestpiece";
     }
 }
 

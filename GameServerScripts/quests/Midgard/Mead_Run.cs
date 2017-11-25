@@ -377,7 +377,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(meadrun));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(meadrun));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Audun,-1);
                 a.AddTrigger(eTriggerType.Interact,null,Audun);

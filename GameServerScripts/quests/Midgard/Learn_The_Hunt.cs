@@ -243,7 +243,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(Learnthehunt));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(Learnthehunt));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Aegan,-1);
                 a.AddTrigger(eTriggerType.Interact,null,Aegan);

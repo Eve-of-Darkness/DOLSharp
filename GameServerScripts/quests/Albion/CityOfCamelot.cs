@@ -834,7 +834,7 @@ namespace DOL.GS.Quests.Albion
          */
         protected void TeleportTo(GameLocation target)
         {
-            TeleportTo(m_questPlayer, assistant, target, 5);
+            TeleportTo(QuestPlayer, assistant, target, 5);
             TeleportTo(assistant, assistant, target, 25, 50);
         }
 
@@ -932,22 +932,22 @@ namespace DOL.GS.Quests.Albion
         {
             if (assistant != null && assistant.ObjectState == GameObject.eObjectState.Active)
             {
-                assistant.MoveTo(m_questPlayer.CurrentRegionID, m_questPlayer.X + 50, m_questPlayer.Y + 30, m_questPlayer.Z, m_questPlayer.Heading);
+                assistant.MoveTo(QuestPlayer.CurrentRegionID, QuestPlayer.X + 50, QuestPlayer.Y + 30, QuestPlayer.Z, QuestPlayer.Heading);
             }
             else
             {
                 assistant = new GameNPC();
                 assistant.Model = 951;
-                assistant.Name = m_questPlayer.Name + "'s Assistant";
+                assistant.Name = QuestPlayer.Name + "'s Assistant";
                 assistant.GuildName = "Part of " + questTitle + " Quest";
-                assistant.Realm = m_questPlayer.Realm;
-                assistant.CurrentRegionID = m_questPlayer.CurrentRegionID;
+                assistant.Realm = QuestPlayer.Realm;
+                assistant.CurrentRegionID = QuestPlayer.CurrentRegionID;
                 assistant.Size = 25;
                 assistant.Level = 5;
-                assistant.X = m_questPlayer.X + 50;
-                assistant.Y = m_questPlayer.Y + 50;
-                assistant.Z = m_questPlayer.Z;
-                assistant.Heading = m_questPlayer.Heading;
+                assistant.X = QuestPlayer.X + 50;
+                assistant.Y = QuestPlayer.Y + 50;
+                assistant.Z = QuestPlayer.Z;
+                assistant.Heading = QuestPlayer.Heading;
 
                 assistant.AddToWorld();
 
@@ -1190,22 +1190,22 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, assistantNecklace, false);
-            RemoveItem(m_questPlayer, chestOfCoins, false);
-            RemoveItem(m_questPlayer, letterFrederick, false);
-            RemoveItem(m_questPlayer, scrollUrqhart, false);
-            RemoveItem(m_questPlayer, ticketToCotswold, false);
+            RemoveItem(QuestPlayer, assistantNecklace, false);
+            RemoveItem(QuestPlayer, chestOfCoins, false);
+            RemoveItem(QuestPlayer, letterFrederick, false);
+            RemoveItem(QuestPlayer, scrollUrqhart, false);
+            RemoveItem(QuestPlayer, ticketToCotswold, false);
 
             // remove the 7 xp you get on quest start for beeing so nice to bombard again.
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, -7, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, -7, true);
 
             if (assistantTimer != null)
             {
                 assistantTimer.Start(1);
             }
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
@@ -1213,22 +1213,22 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            if (m_questPlayer.HasAbilityToUseItem(recruitsRoundShield))
+            if (QuestPlayer.HasAbilityToUseItem(recruitsRoundShield))
             {
-                GiveItem(masterFrederick, m_questPlayer, recruitsRoundShield);
+                GiveItem(masterFrederick, QuestPlayer, recruitsRoundShield);
             }
             else
             {
-                GiveItem(masterFrederick, m_questPlayer, recruitsBracer);
+                GiveItem(masterFrederick, QuestPlayer, recruitsBracer);
             }
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 26, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 26, true);
             long money = Money.GetMoney(0, 0, 0, 2, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} as a reward.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} as a reward.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

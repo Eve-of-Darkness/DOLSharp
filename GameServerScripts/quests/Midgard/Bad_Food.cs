@@ -290,7 +290,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(badfood));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(badfood));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Pedra,-1);
                 a.AddTrigger(eTriggerType.Interact,null,Pedra);

@@ -873,18 +873,18 @@ namespace DOL.GS.Quests.Midgard
         {
             if (briediClone != null && (briediClone.IsAlive || briediClone.ObjectState == GameObject.eObjectState.Active))
             {
-                m_animSpellObjectQueue.Enqueue(briediClone);
-                m_animSpellTeleportTimerQueue.Enqueue(new RegionTimer(briediClone, new RegionTimerCallback(MakeAnimSpellSequence), 4000));
+                AnimSpellObjectQueue.Enqueue(briediClone);
+                AnimSpellTeleportTimerQueue.Enqueue(new RegionTimer(briediClone, new RegionTimerCallback(MakeAnimSpellSequence), 4000));
 
-                m_animEmoteObjectQueue.Enqueue(briediClone);
-                m_animEmoteTeleportTimerQueue.Enqueue(new RegionTimer(briediClone, new RegionTimerCallback(MakeAnimEmoteSequence), 5000));
+                AnimEmoteObjectQueue.Enqueue(briediClone);
+                AnimEmoteTeleportTimerQueue.Enqueue(new RegionTimer(briediClone, new RegionTimerCallback(MakeAnimEmoteSequence), 5000));
 
                 for (int i = 0; i < recruits.Length; i++)
                 {
                     if (recruits[i] != null)
                     {
-                        m_animEmoteObjectQueue.Enqueue(recruits[i]);
-                        m_animEmoteTeleportTimerQueue.Enqueue(new RegionTimer(recruits[i], new RegionTimerCallback(MakeAnimEmoteSequence), 4500));
+                        AnimEmoteObjectQueue.Enqueue(recruits[i]);
+                        AnimEmoteTeleportTimerQueue.Enqueue(new RegionTimer(recruits[i], new RegionTimerCallback(MakeAnimEmoteSequence), 4500));
                     }
                 }
             }
@@ -1292,9 +1292,9 @@ namespace DOL.GS.Quests.Midgard
 
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, queenVuunaHead, false);
+            RemoveItem(QuestPlayer, queenVuunaHead, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
@@ -1305,24 +1305,24 @@ namespace DOL.GS.Quests.Midgard
             ResetMasterBriedi();
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 1012, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 1012, true);
             long money = Money.GetMoney(0, 0, 0, 9, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} as a reward.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
-            if (m_questPlayer.HasAbilityToUseItem(recruitsGauntlets))
+            QuestPlayer.AddMoney(money, "You recieve {0} as a reward.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
+            if (QuestPlayer.HasAbilityToUseItem(recruitsGauntlets))
             {
-                GiveItem(dalikor, m_questPlayer, recruitsGauntlets);
-                GiveItem(dalikor, m_questPlayer, recruitsJewel);
+                GiveItem(dalikor, QuestPlayer, recruitsGauntlets);
+                GiveItem(dalikor, QuestPlayer, recruitsJewel);
             }
             else
             {
-                GiveItem(dalikor, m_questPlayer, recruitsGloves);
-                GiveItem(dalikor, m_questPlayer, recruitsJewelCloth);
+                GiveItem(dalikor, QuestPlayer, recruitsGloves);
+                GiveItem(dalikor, QuestPlayer, recruitsJewelCloth);
             }
 
-            GiveItem(dalikor, m_questPlayer, recruitsBracer);
+            GiveItem(dalikor, QuestPlayer, recruitsBracer);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

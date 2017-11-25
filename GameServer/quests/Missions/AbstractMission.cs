@@ -20,40 +20,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Reflection;
-
 using DOL.Events;
 using DOL.GS.PacketHandler;
-
-using log4net;
 
 namespace DOL.GS.Quests
 {
     public class AbstractMission
     {
         /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        /// <summary>
-        /// The temp property name for next check mission millisecond
-        /// </summary>
-        protected const string CHECK_MISSION_TICK = "checkMissionTick";
-
-        /// <summary>
-        /// Time player must wait after failed mission check to get new mission, in milliseconds
-        /// "Once a player has a personal mission,
-        /// a new Personal mission cannot be obtained for 30 minutes,
-        /// or until the current Personal mission is complete
-        /// - whichever occurs first."
-        /// </summary>
-        protected const int CHECK_MISSION_DELAY = 30 * 60 * 1000; // 30 minutes
-
-        /// <summary>
         /// possible mission types
         /// </summary>
-        public enum eMissionType : int
+        public enum eMissionType
         {
             None = 0,
             Personal = 1,
@@ -66,29 +43,29 @@ namespace DOL.GS.Quests
         {
             get
             {
-                if (m_owner is GamePlayer)
+                if (Owner is GamePlayer)
                 {
                     return eMissionType.Personal;
                 }
-                else if (m_owner is Group)
+
+                if (Owner is Group)
                 {
                     return eMissionType.Group;
                 }
-                else if (m_owner is eRealm)
+
+                if (Owner is eRealm)
                 {
                     return eMissionType.Realm;
                 }
-                else
-                {
-                    return eMissionType.None;
-                }
+
+                return eMissionType.None;
             }
         }
 
         /// <summary>
         /// owner of the mission
         /// </summary>
-        protected object m_owner = null;
+        protected object Owner;
 
         /// <summary>
         /// Constructs a new Mission
@@ -96,29 +73,14 @@ namespace DOL.GS.Quests
         /// <param name="owner">The owner of the mission</param>
         public AbstractMission(object owner)
         {
-            m_owner = owner;
+            Owner = owner;
         }
 
-        public virtual long RewardXP
-        {
-            get { return 0; }
-        }
+        public virtual long RewardXp => 0;
 
-        public virtual long RewardMoney
-        {
-            get
-            {
-                return 50 * 100 * 100;
-            }
-        }
+        public virtual long RewardMoney => 50 * 100 * 100;
 
-        public virtual long RewardRealmPoints
-        {
-            get
-            {
-                return 1500;
-            }
-        }
+        public virtual long RewardRealmPoints => 1500;
 
         /// <summary>
         /// Retrieves the name of the mission
@@ -142,15 +104,12 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Retrieves the description for the mission
         /// </summary>
-        public virtual string Description
-        {
-            get { return "MISSION DESCRIPTION UNDEFINED!"; }
-        }
+        public virtual string Description => "MISSION DESCRIPTION UNDEFINED!";
 
         /// <summary>
         /// This HybridDictionary holds all the custom properties of this quest
         /// </summary>
-        protected HybridDictionary m_customProperties = new HybridDictionary();
+        private readonly HybridDictionary _customProperties = new HybridDictionary();
 
         /// <summary>
         /// This method sets a custom Property to a specific value
@@ -161,12 +120,12 @@ namespace DOL.GS.Quests
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
             if (value == null)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
 
             // Make the string safe
@@ -174,9 +133,9 @@ namespace DOL.GS.Quests
             key = key.Replace('=', '-');
             value = value.Replace(';', ',');
             value = value.Replace('=', '-');
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                m_customProperties[key] = value;
+                _customProperties[key] = value;
             }
         }
 
@@ -188,12 +147,12 @@ namespace DOL.GS.Quests
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                m_customProperties.Remove(key);
+                _customProperties.Remove(key);
             }
         }
 
@@ -206,10 +165,10 @@ namespace DOL.GS.Quests
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
-            return (string)m_customProperties[key];
+            return (string)_customProperties[key];
         }
 
         /// <summary>
@@ -219,23 +178,23 @@ namespace DOL.GS.Quests
         {
             foreach (GamePlayer player in Targets)
             {
-                if (m_owner is Group)
+                if (Owner is Group group)
                 {
-                    if (!player.IsWithinRadius((m_owner as Group).Leader, WorldMgr.MAX_EXPFORKILL_DISTANCE))
+                    if (!player.IsWithinRadius(group.Leader, WorldMgr.MAX_EXPFORKILL_DISTANCE))
                     {
                         continue;
                     }
                 }
 
-                if (RewardXP > 0)
+                if (RewardXp > 0)
                 {
-                    player.GainExperience(GameLiving.eXPSource.Mission, RewardXP);
+                    player.GainExperience(GameLiving.eXPSource.Mission, RewardXp);
                 }
 
                 if (RewardMoney > 0)
                 {
                     player.AddMoney(RewardMoney, "You recieve {0} for completing your task.");
-                    InventoryLogging.LogInventoryAction("(MISSION;" + MissionType + ")", player, eInventoryActionType.Quest, RewardMoney);
+                    InventoryLogging.LogInventoryAction($"(MISSION;{MissionType})", player, eInventoryActionType.Quest, RewardMoney);
                 }
 
                 if (RewardRealmPoints > 0)
@@ -248,13 +207,11 @@ namespace DOL.GS.Quests
 
             switch (MissionType)
             {
-                case eMissionType.Personal: (m_owner as GamePlayer).Mission = null; break;
-                case eMissionType.Group: (m_owner as Group).Mission = null; break;
-
-                // case eMissionType.Realm: (m_owner.RealmMission = null; break;
+                case eMissionType.Personal: ((GamePlayer) Owner).Mission = null; break;
+                case eMissionType.Group: ((Group) Owner).Mission = null; break;
             }
 
-            m_customProperties.Clear();
+            _customProperties.Clear();
         }
 
         private List<GamePlayer> Targets
@@ -264,21 +221,22 @@ namespace DOL.GS.Quests
                 switch (MissionType)
                 {
                     case eMissionType.Personal:
+                    {
+                        GamePlayer player = Owner as GamePlayer;
+                        List<GamePlayer> list = new List<GamePlayer>
                         {
-                            GamePlayer player = m_owner as GamePlayer;
-                            List<GamePlayer> list = new List<GamePlayer>();
-                            list.Add(player);
-                            return list;
-                        }
+                            player
+                        };
+
+                        return list;
+                    }
 
                     case eMissionType.Group:
-                        {
-                            Group group = m_owner as Group;
-                            return new List<GamePlayer>(group.GetPlayersInTheGroup());
-                        }
+                    {
+                        Group group = (Group) Owner;
+                        return new List<GamePlayer>(group.GetPlayersInTheGroup());
+                    }
 
-                    case eMissionType.Realm:
-                    case eMissionType.None:
                     default: return new List<GamePlayer>();
                 }
             }
@@ -291,18 +249,18 @@ namespace DOL.GS.Quests
         {
             foreach (GamePlayer player in Targets)
             {
-                player.Out.SendMessage("Your " + Name + " has expired!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"Your {Name} has expired!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
 
             switch (MissionType)
             {
-                case eMissionType.Personal: (m_owner as GamePlayer).Mission = null; break;
-                case eMissionType.Group: (m_owner as Group).Mission = null; break;
+                case eMissionType.Personal: ((GamePlayer) Owner).Mission = null; break;
+                case eMissionType.Group: ((Group) Owner).Mission = null; break;
 
                 // case eMissionType.Realm: m_owner.RealmMission = null; break;
             }
 
-            m_customProperties.Clear();
+            _customProperties.Clear();
         }
 
         public virtual void UpdateMission()

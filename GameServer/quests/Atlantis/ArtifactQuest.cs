@@ -35,20 +35,12 @@ namespace DOL.GS.Quests.Atlantis
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        /// <summary>
-        /// if quest qualification fails use this string to store the reason why
-        /// </summary>
-        protected string m_reasonFailQualification = string.Empty;
-
-        public string ReasonFailQualification
-        {
-            get { return m_reasonFailQualification; }
-        }
+        public string ReasonFailQualification { get; private set; } = string.Empty;
 
         public ArtifactQuest()
-            : base() { }
+        { }
 
         public ArtifactQuest(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -64,43 +56,43 @@ namespace DOL.GS.Quests.Atlantis
         /// <summary>
         /// Quest initialisation.
         /// </summary>
-        public static void Init(string artifactID, Type questType)
+        public static void Init(string artifactId, Type questType)
         {
-            if (artifactID == null || questType == null)
+            if (artifactId == null || questType == null)
             {
                 return;
             }
 
-            string[] scholars = ArtifactMgr.GetScholars(artifactID);
+            string[] scholars = ArtifactMgr.GetScholars(artifactId);
             if (scholars != null)
             {
                 eRealm realm = eRealm.Albion;
-                GameNPC[] npcs;
 
                 foreach (string scholar in scholars)
                 {
                     string title;
 
+                    GameNPC[] npcs;
                     switch (realm)
                     {
                         case eRealm.Albion:
                             title = "Scholar";
-                            npcs = WorldMgr.GetObjectsByName<GameNPC>(string.Format("{0} {1}", title, scholar), realm);
+                            npcs = WorldMgr.GetObjectsByName<GameNPC>($"{title} {scholar}", realm);
                             break;
                         case eRealm.Midgard:
                             title = "Loremaster";
-                            npcs = WorldMgr.GetObjectsByName<GameNPC>(string.Format("{0} {1}", title, scholar), realm);
+                            npcs = WorldMgr.GetObjectsByName<GameNPC>($"{title} {scholar}", realm);
 
                             if (npcs.Length == 0)
                             {
                                 title = "Loremistress";
-                                npcs = WorldMgr.GetObjectsByName<GameNPC>(string.Format("{0} {1}", title, scholar), realm);
+                                npcs = WorldMgr.GetObjectsByName<GameNPC>($"{title} {scholar}", realm);
                             }
 
                             break;
                         case eRealm.Hibernia:
                             title = "Sage";
-                            npcs = WorldMgr.GetObjectsByName<GameNPC>(string.Format("{0} {1}", title, scholar), realm);
+                            npcs = WorldMgr.GetObjectsByName<GameNPC>($"{title} {scholar}", realm);
                             break;
                         default:
                             title = "<unknown title>";
@@ -110,7 +102,7 @@ namespace DOL.GS.Quests.Atlantis
 
                     if (npcs.Length == 0)
                     {
-                        log.Warn(string.Format("ARTIFACTQUEST: {0} {1} not found in {2} for artifact {3}", title, scholar, GlobalConstants.RealmToName(realm), artifactID));
+                        Log.Warn($"ARTIFACTQUEST: {title} {scholar} not found in {GlobalConstants.RealmToName(realm)} for artifact {artifactId}");
                     }
                     else
                     {
@@ -122,17 +114,14 @@ namespace DOL.GS.Quests.Atlantis
             }
             else
             {
-                log.Warn("ARTIFACTQUEST: scholars is null for artifact " + artifactID);
+                Log.Warn($"ARTIFACTQUEST: scholars is null for artifact {artifactId}");
             }
         }
 
         /// <summary>
         /// The artifact ID.
         /// </summary>
-        public virtual string ArtifactID
-        {
-            get { return "UNDEFINED"; }
-        }
+        public virtual string ArtifactId => "UNDEFINED";
 
         /// <summary>
         /// Check if player is eligible for this quest.
@@ -143,55 +132,55 @@ namespace DOL.GS.Quests.Atlantis
         {
             // Must have the encounter, must have the book; must not be on the quest
             // and must not have the quest finished either.
-            Type encounterType = ArtifactMgr.GetEncounterType(ArtifactID);
+            Type encounterType = ArtifactMgr.GetEncounterType(ArtifactId);
 
             if (encounterType == null)
             {
-                m_reasonFailQualification = "It does not appear this encounter type is set up correctly.";
-                log.Warn("ArtifactQuest: EncounterType is null for ArtifactID " + ArtifactID);
+                ReasonFailQualification = "It does not appear this encounter type is set up correctly.";
+                Log.Warn($"ArtifactQuest: EncounterType is null for ArtifactID {ArtifactId}");
                 return false;
             }
 
             if (player == null)
             {
-                m_reasonFailQualification = "Player is null for quest, serious error!";
-                log.Warn("ArtifactQuest: Player is null for ArtifactID " + ArtifactID + " encounterType " + encounterType.FullName);
+                ReasonFailQualification = "Player is null for quest, serious error!";
+                Log.Warn($"ArtifactQuest: Player is null for ArtifactID {ArtifactId} encounterType {encounterType.FullName}");
                 return false;
             }
 
-            if (player.CanReceiveArtifact(ArtifactID) == false)
+            if (player.CanReceiveArtifact(ArtifactId) == false)
             {
-                m_reasonFailQualification = "Your class is not eligible for this artifact.";
+                ReasonFailQualification = "Your class is not eligible for this artifact.";
                 return false;
             }
 
             if (player.Level < Level)
             {
-                m_reasonFailQualification = "You must be at least level " + Level + " in order to complete this quest.";
+                ReasonFailQualification = $"You must be at least level {Level} in order to complete this quest.";
                 return false;
             }
 
             if (player.HasFinishedQuest(GetType()) != 0)
             {
-                m_reasonFailQualification = "You've already completed the quest for this artifact.";
+                ReasonFailQualification = "You've already completed the quest for this artifact.";
                 return false;
             }
 
             if (player.HasFinishedQuest(encounterType) <= 0)
             {
-                m_reasonFailQualification = "You must first get the encounter credit for this artifact.";
+                ReasonFailQualification = "You must first get the encounter credit for this artifact.";
                 return false;
             }
 
-            if (!ArtifactMgr.HasBook(player, ArtifactID))
+            if (!ArtifactMgr.HasBook(player, ArtifactId))
             {
-                m_reasonFailQualification = "You are missing the correct book for this artifact.";
+                ReasonFailQualification = "You are missing the correct book for this artifact.";
                 return false;
             }
 
             if (player.IsDoingQuest(GetType()) != null)
             {
-                m_reasonFailQualification = "You've already started the quest for this artifact.";
+                ReasonFailQualification = "You've already started the quest for this artifact.";
                 return false;
             }
 
@@ -210,9 +199,7 @@ namespace DOL.GS.Quests.Atlantis
                 return false;
             }
 
-            Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                ArtifactID,
-                (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+            Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
             return versions.Count > 0;
         }
@@ -220,19 +207,16 @@ namespace DOL.GS.Quests.Atlantis
         /// <summary>
         /// Minimum level requirement, adjust this for lowbie artifacts.
         /// </summary>
-        public override int Level
-        {
-            get { return 45; }
-        }
+        public override int Level => 45;
 
         /// <summary>
         /// Hand out an artifact.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="player"></param>
-        /// <param name="artifactID"></param>
+        /// <param name="artifactId"></param>
         /// <param name="itemTemplate"></param>
-        protected static bool GiveItem(GameLiving source, GamePlayer player, string artifactID, ItemTemplate itemTemplate)
+        protected static bool GiveItem(GameLiving source, GamePlayer player, string artifactId, ItemTemplate itemTemplate)
         {
             InventoryItem item = new InventoryArtifact(itemTemplate);
             if (!player.ReceiveItem(source, item))
@@ -292,7 +276,7 @@ namespace DOL.GS.Quests.Atlantis
             {
                 if (player.Inventory.RemoveItem(item))
                 {
-                    InventoryLogging.LogInventoryAction(player, "(ARTIFACT;" + Name + ")", eInventoryActionType.Quest, item.Template, item.Count);
+                    InventoryLogging.LogInventoryAction(player, $"(ARTIFACT;{Name})", eInventoryActionType.Quest, item.Template, item.Count);
                     return true;
                 }
             }
@@ -308,7 +292,7 @@ namespace DOL.GS.Quests.Atlantis
         {
             base.FinishQuest();
 
-            Type encounterType = ArtifactMgr.GetEncounterType(ArtifactID);
+            Type encounterType = ArtifactMgr.GetEncounterType(ArtifactId);
 
             QuestPlayer.RemoveEncounterCredit(encounterType);
         }

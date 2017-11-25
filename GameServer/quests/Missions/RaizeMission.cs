@@ -9,31 +9,31 @@ namespace DOL.GS.Quests
 {
     public class RaizeMission : AbstractMission
     {
-        private AbstractGameKeep m_keep = null;
+        private readonly AbstractGameKeep _keep;
 
         public RaizeMission(object owner)
             : base(owner)
         {
             eRealm realm = 0;
-            if (owner is Group)
+            if (owner is Group group1)
             {
-                realm = (owner as Group).Leader.Realm;
+                realm = group1.Leader.Realm;
             }
             else if (owner is GamePlayer)
             {
-                realm = (owner as GamePlayer).Realm;
+                realm = ((GamePlayer) owner).Realm;
             }
 
             ArrayList list = new ArrayList();
 
             ICollection<AbstractGameKeep> keeps;
-            if (owner is Group)
+            if (owner is Group group)
             {
-                keeps = GameServer.KeepManager.GetKeepsOfRegion((owner as Group).Leader.CurrentRegionID);
+                keeps = GameServer.KeepManager.GetKeepsOfRegion(group.Leader.CurrentRegionID);
             }
             else if (owner is GamePlayer)
             {
-                keeps = GameServer.KeepManager.GetKeepsOfRegion((owner as GamePlayer).CurrentRegionID);
+                keeps = GameServer.KeepManager.GetKeepsOfRegion(((GamePlayer) owner).CurrentRegionID);
             }
             else
             {
@@ -55,7 +55,7 @@ namespace DOL.GS.Quests
 
             if (list.Count > 0)
             {
-                m_keep = list[Util.Random(list.Count - 1)] as AbstractGameKeep;
+                _keep = list[Util.Random(list.Count - 1)] as AbstractGameKeep;
             }
 
             GameEventMgr.AddHandler(KeepEvent.TowerRaized, new DOLEventHandler(Notify));
@@ -68,9 +68,12 @@ namespace DOL.GS.Quests
                 return;
             }
 
-            KeepEventArgs kargs = args as KeepEventArgs;
+            if (!(args is KeepEventArgs kargs))
+            {
+                return;
+            }
 
-            if (kargs.Keep != m_keep)
+            if (kargs.Keep != _keep)
             {
                 return;
             }
@@ -94,14 +97,12 @@ namespace DOL.GS.Quests
         {
             get
             {
-                if (m_keep == null)
+                if (_keep == null)
                 {
                     return "Keep is null when trying to send the description";
                 }
-                else
-                {
-                    return "Raize " + m_keep.Name;
-                }
+
+                return $"Raize {_keep.Name}";
             }
         }
     }

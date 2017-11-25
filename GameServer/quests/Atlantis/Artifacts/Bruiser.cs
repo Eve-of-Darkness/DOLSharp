@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -34,10 +34,10 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public Bruiser()
-            : base() { }
+        { }
 
         public Bruiser(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -57,7 +57,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init(m_artifactID, typeof(Bruiser));
+            Init(m_artifactID, typeof(Bruiser));
         }
 
         /// <summary>
@@ -90,19 +90,17 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
                 scholar.TurnTo(player);
                 if (RemoveItem(player, item))
                 {
-                    string reply = string.Format("Great! Now, I can make you a [single] handed or [double] handed version");
+                    string reply = "Great! Now, I can make you a [single] handed or [double] handed version";
 
                     switch (player.CharacterClass.ID)
                     {
@@ -137,64 +135,54 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
-                string reply = string.Format(
-                    "Ah, Bruiser! Many smiths would love a hammer {0} {1} {2} {3}",
-                    "such as that! Well, for ",
-                    player.GetName(1, false),
-                    "like you, I am not sure what purpose it will serve! I hope you have better luck than",
-                    "its previous owner! Do you have any scrolls with it?");
+                string reply =
+                    $"Ah, Bruiser! Many smiths would love a hammer such as that! Well, for  {player.GetName(1, false)} like you, I am not sure what purpose it will serve! I hope you have better luck than its previous owner! Do you have any scrolls with it?";
                 scholar.TurnTo(player);
                 scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                 Step = 2;
                 return true;
             }
-            else if (Step == 3)
+
+            if (Step == 3)
             {
                 switch (text.ToLower())
                 {
                     case "single":
                     case "double":
                     case "polearm":
+                    {
+                        if (text.ToLower() == "polearm" && player.CharacterClass.ID != (int)eCharacterClass.Armsman)
                         {
-                            if (text.ToLower() == "polearm" &&
-                                player.CharacterClass.ID != (int)eCharacterClass.Armsman)
-                            {
-                                return false;
-                            }
-
-                            string versionID = string.Format(";{0};", text.ToLower());
-                            Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                                ArtifactID,
-                                (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
-                            if (!versions.ContainsKey(versionID))
-                            {
-                                log.Warn(string.Format("Artifact version {0} not found", versionID));
-                                return false;
-                            }
-
-                            ItemTemplate template = versions[versionID];
-                            if (GiveItem(scholar, player, ArtifactID, template))
-                            {
-                                string reply = string.Format(
-                                    "May Bruiser serve you well. Do not lose {0}",
-                                    "this, for I can only unlock the artifact's powers once.");
-                                scholar.TurnTo(player);
-                                scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
-                                FinishQuest();
-                                return true;
-                            }
-
                             return false;
                         }
+
+                        string versionId = $";{text.ToLower()};";
+                        Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
+                        if (!versions.ContainsKey(versionId))
+                        {
+                            Log.Warn($"Artifact version {versionId} not found");
+                            return false;
+                        }
+
+                        ItemTemplate template = versions[versionId];
+                        if (GiveItem(scholar, player, ArtifactId, template))
+                        {
+                            string reply ="May Bruiser serve you well. Do not lose this, for I can only unlock the artifact\'s powers once.";
+                            scholar.TurnTo(player);
+                            scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
+                            FinishQuest();
+                            return true;
+                        }
+
+                        return false;
+                    }
                 }
 
                 return false;
@@ -228,17 +216,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Bruiser"; }
-        }
+        public override string Name => "Bruiser";
 
         /// <summary>
         /// The artifact ID.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return m_artifactID; }
-        }
+        public override string ArtifactId => m_artifactID;
     }
 }

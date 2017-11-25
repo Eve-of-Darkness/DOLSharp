@@ -39,39 +39,38 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The temp property name for next check task millisecond
         /// </summary>
-        protected const string CHECK_TASK_TICK = "checkTaskTick";
+        private const string CheckTaskTick = "checkTaskTick";
 
         /// <summary>
         /// Time player must wait after failed task check to get new chance for a task, in milliseconds
         /// </summary>
-        protected static int CHECK_TASK_DELAY = ServerProperties.Properties.TASK_PAUSE_TICKS; // moved to server properties to avoid tasks overruns...
+        private static readonly int CheckTaskDelay = ServerProperties.Properties.TASK_PAUSE_TICKS; // moved to server properties to avoid tasks overruns...
 
         /// <summary>
         /// Chance of npc having task for player
         /// </summary>
-        protected const int CHANCE = 50;
+        protected const int Chance = 50;
 
         // allowed number of tasks per level
-        // private static int[] m_maxTasksDone = new int[20] {1,2,3,5,6,7,9,10,12,14,16,18,20,22,24,26,28,30,32,34};
-        private static readonly int[] m_maxTasksDone = new int[20] { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 };
+        private static readonly int[] _maxTasksDone = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 };
 
-        protected const string RECIEVER_NAME = "recieverName";
-        protected const string ITEM_NAME = "itemName";
+        private const string RECIEVER_NAME = "recieverName";
+        private const string ITEM_NAME = "itemName";
 
         /// <summary>
         /// The player doing the quest
         /// </summary>
-        protected GamePlayer m_taskPlayer = null;
+        protected GamePlayer m_taskPlayer;
         /// <summary>
         /// The quest database object, storing the information for the player
         /// and the quest. Eg. QuestStep etc.
         /// </summary>
-        private DBTask m_dbTask = null;
+        private readonly DBTask _dbTask;
 
         /// <summary>
         /// Constructs a new Quest
@@ -87,7 +86,7 @@ namespace DOL.GS.Quests
             // if yes reuse dbtask object to keep TasksDone from old dbtask object.
             if (taskPlayer.Task != null)
             {
-                dbTask = taskPlayer.Task.m_dbTask;
+                dbTask = taskPlayer.Task._dbTask;
             }
             else // if player has no active task, load dbtask an use tasksdone
             {
@@ -102,13 +101,15 @@ namespace DOL.GS.Quests
             // this should happen only if player never did a task and has no entry in DBTask.
             if (dbTask == null)
             {
-                dbTask = new DBTask();
-                dbTask.Character_ID = taskPlayer.QuestPlayerID;
+                dbTask = new DBTask
+                {
+                    Character_ID = taskPlayer.QuestPlayerID
+                };
             }
 
             dbTask.TaskType = GetType().FullName;
 
-            m_dbTask = dbTask;
+            _dbTask = dbTask;
 
             ParseCustomProperties();
             SaveIntoDatabase();
@@ -122,7 +123,7 @@ namespace DOL.GS.Quests
         public AbstractTask(GamePlayer taskPlayer, DBTask dbTask)
         {
             m_taskPlayer = taskPlayer;
-            m_dbTask = dbTask;
+            _dbTask = dbTask;
             ParseCustomProperties();
             SaveIntoDatabase();
         }
@@ -130,64 +131,45 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Task already finished or still active.
         /// </summary>
-        public bool TaskActive
-        {
-            get
-            {
-                return m_dbTask.TaskType != null && m_dbTask.TaskType != string.Empty && m_dbTask.TaskType != typeof(AbstractTask).ToString();
-            }
-        }
+        public bool TaskActive => !string.IsNullOrEmpty(_dbTask.TaskType) && _dbTask.TaskType != typeof(AbstractTask).ToString();
 
         public DateTime TimeOut
         {
-            get { return m_dbTask.TimeOut; }
-            set { m_dbTask.TimeOut = value; }
+            get => _dbTask.TimeOut;
+            set => _dbTask.TimeOut = value;
         }
 
         public int TasksDone
         {
-            get { return m_dbTask.TasksDone; }
-            set { m_dbTask.TasksDone = value; }
+            get => _dbTask.TasksDone;
+            set => _dbTask.TasksDone = value;
         }
 
         // Characters under level 20 can do the same number of tasks as their level.
         // (eg: Level two can do two tasks) The total xp from these Tasks will be 30% of
         // the total xp required for that level. This might diminsh to 25% by level 19.
-        public virtual long RewardXP
+        public virtual long RewardXp
         {
             get
             {
-                long XPNeeded = m_taskPlayer.ExperienceForNextLevel - m_taskPlayer.ExperienceForCurrentLevel;
+                long xpNeeded = m_taskPlayer.ExperienceForNextLevel - m_taskPlayer.ExperienceForCurrentLevel;
                 if (m_taskPlayer.Level < 19)
                 {
-                    return (long)(XPNeeded * 0.30 / m_taskPlayer.Level); // 30% of total xp for level
+                    return (long)(xpNeeded * 0.30 / m_taskPlayer.Level); // 30% of total xp for level
                 }
-                else
-                {
-                    return (long)(XPNeeded * 0.25 / m_taskPlayer.Level); // 25% of total xp for level
-                }
+
+                return (long)(xpNeeded * 0.25 / m_taskPlayer.Level); // 25% of total xp for level
             }
         }
 
-        public virtual long RewardMoney
-        {
-            get {
-                return 0;
-            }
-        }
+        public virtual long RewardMoney => 0;
 
-        public virtual IList RewardItems
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual IList RewardItems => null;
 
         public virtual string RecieverName
         {
-            get { return GetCustomProperty(RECIEVER_NAME); }
-            set { SetCustomProperty(RECIEVER_NAME,value); }
+            get => GetCustomProperty(RECIEVER_NAME);
+            set => SetCustomProperty(RECIEVER_NAME,value);
         }
 
         /// <summary>
@@ -195,8 +177,8 @@ namespace DOL.GS.Quests
         /// </summary>
         public virtual string ItemName
         {
-            get { return GetCustomProperty(ITEM_NAME); }
-            set { SetCustomProperty(ITEM_NAME,value); }
+            get => GetCustomProperty(ITEM_NAME);
+            set => SetCustomProperty(ITEM_NAME,value);
         }
 
         /// <summary>
@@ -208,7 +190,7 @@ namespace DOL.GS.Quests
         public static AbstractTask LoadFromDatabase(GamePlayer targetPlayer, DBTask dbTask)
         {
             // if we have a active task load it, else the taksdone will be updated on creation of first task instance in AbstractTask(GamePlayer) constructor
-            if (dbTask.TaskType != null && dbTask.TaskType != string.Empty)
+            if (!string.IsNullOrEmpty(dbTask.TaskType))
             {
                 Type taskType = null;
                 foreach (Assembly asm in ScriptMgr.Scripts)
@@ -227,20 +209,18 @@ namespace DOL.GS.Quests
 
                 if (taskType == null)
                 {
-                    if (log.IsErrorEnabled)
+                    if (Log.IsErrorEnabled)
                     {
-                        log.Error("Could not find task: " + dbTask.TaskType + "!!!");
+                        Log.Error($"Could not find task: {dbTask.TaskType}!!!");
                     }
 
                     return null;
                 }
 
-                return (AbstractTask)Activator.CreateInstance(taskType, new object[] { targetPlayer, dbTask });
+                return (AbstractTask)Activator.CreateInstance(taskType, targetPlayer, dbTask);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -248,13 +228,13 @@ namespace DOL.GS.Quests
         /// </summary>
         public virtual void SaveIntoDatabase()
         {
-            if (m_dbTask.IsPersisted)
+            if (_dbTask.IsPersisted)
             {
-                GameServer.Database.SaveObject(m_dbTask);
+                GameServer.Database.SaveObject(_dbTask);
             }
             else
             {
-                GameServer.Database.AddObject(m_dbTask);
+                GameServer.Database.AddObject(_dbTask);
             }
         }
 
@@ -263,12 +243,12 @@ namespace DOL.GS.Quests
         /// </summary>
         public virtual void DeleteFromDatabase()
         {
-            if (!m_dbTask.IsPersisted)
+            if (!_dbTask.IsPersisted)
             {
                 return;
             }
 
-            DBTask dbTask = (DBTask)GameServer.Database.FindObjectByKey<DBTask>(m_dbTask.ObjectId);
+            DBTask dbTask = GameServer.Database.FindObjectByKey<DBTask>(_dbTask.ObjectId);
             if (dbTask != null)
             {
                 GameServer.Database.DeleteObject(dbTask);
@@ -278,23 +258,17 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Retrieves the name of the quest
         /// </summary>
-        public virtual string Name
-        {
-            get { return "TASK NAME UNDEFINED!"; }
-        }
+        public virtual string Name => "TASK NAME UNDEFINED!";
 
         /// <summary>
         /// Retrieves the description for the current quest step
         /// </summary>
-        public virtual string Description
-        {
-            get { return "TASK DESCRIPTION UNDEFINED!"; }
-        }
+        public virtual string Description => "TASK DESCRIPTION UNDEFINED!";
 
         /// <summary>
         /// This HybridDictionary holds all the custom properties of this quest
         /// </summary>
-        protected HybridDictionary m_customProperties = new HybridDictionary();
+        private readonly HybridDictionary _customProperties = new HybridDictionary();
 
         /// <summary>
         /// This method parses the custom properties string of the m_dbQuest
@@ -302,20 +276,20 @@ namespace DOL.GS.Quests
         /// </summary>
         public void ParseCustomProperties()
         {
-            if (m_dbTask.CustomPropertiesString == null)
+            if (_dbTask.CustomPropertiesString == null)
             {
                 return;
             }
 
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                m_customProperties.Clear();
-                foreach (string property in m_dbTask.CustomPropertiesString.SplitCSV())
+                _customProperties.Clear();
+                foreach (string property in _dbTask.CustomPropertiesString.SplitCSV())
                 {
                     if (property.Length > 0)
                 {
                     string[] values = property.Split('=');
-                    m_customProperties[values[0]] = values[1];
+                    _customProperties[values[0]] = values[1];
                 }
                 }
             }
@@ -330,12 +304,12 @@ namespace DOL.GS.Quests
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
             if (value == null)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
 
             // Make the string safe
@@ -343,9 +317,9 @@ namespace DOL.GS.Quests
             key = key.Replace('=','-');
             value = value.Replace(';',',');
             value = value.Replace('=','-');
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                m_customProperties[key] = value;
+                _customProperties[key] = value;
             }
 
             SaveCustomProperties();
@@ -357,18 +331,18 @@ namespace DOL.GS.Quests
         protected void SaveCustomProperties()
         {
             StringBuilder builder = new StringBuilder();
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                foreach (string hKey in m_customProperties.Keys)
+                foreach (string hKey in _customProperties.Keys)
                 {
                     builder.Append(hKey);
                     builder.Append("=");
-                    builder.Append(m_customProperties[hKey]);
+                    builder.Append(_customProperties[hKey]);
                     builder.Append(";");
                 }
             }
 
-            m_dbTask.CustomPropertiesString = builder.ToString();
+            _dbTask.CustomPropertiesString = builder.ToString();
             SaveIntoDatabase();
         }
 
@@ -380,12 +354,12 @@ namespace DOL.GS.Quests
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                m_customProperties.Remove(key);
+                _customProperties.Remove(key);
             }
 
             SaveCustomProperties();
@@ -400,10 +374,10 @@ namespace DOL.GS.Quests
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
-            return (string)m_customProperties[key];
+            return (string)_customProperties[key];
         }
 
         /// <summary>
@@ -411,15 +385,15 @@ namespace DOL.GS.Quests
         /// </summary>
         public virtual void FinishTask()
         {
-            if (RewardXP > 0)
+            if (RewardXp > 0)
             {
-                m_taskPlayer.GainExperience(GameLiving.eXPSource.Task, RewardXP);
+                m_taskPlayer.GainExperience(GameLiving.eXPSource.Task, RewardXp);
             }
 
             if (RewardMoney > 0)
             {
                 m_taskPlayer.AddMoney(RewardMoney, "You recieve {0} for completing your task.");
-                InventoryLogging.LogInventoryAction("(TASK;" + m_dbTask.TaskType + ")", m_taskPlayer, eInventoryActionType.Quest, RewardMoney);
+                InventoryLogging.LogInventoryAction($"(TASK;{_dbTask.TaskType})", m_taskPlayer, eInventoryActionType.Quest, RewardMoney);
             }
 
             if (RewardItems != null && RewardItems.Count > 0)
@@ -429,18 +403,18 @@ namespace DOL.GS.Quests
                 {
                     if (m_taskPlayer.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, item))
                     {
-                        InventoryLogging.LogInventoryAction("(TASK;" + m_dbTask.TaskType + ")", m_taskPlayer, eInventoryActionType.Quest, item.Template, item.Count);
+                        InventoryLogging.LogInventoryAction($"(TASK;{_dbTask.TaskType})", m_taskPlayer, eInventoryActionType.Quest, item.Template, item.Count);
                     }
                 }
 
                 m_taskPlayer.Inventory.CommitChanges();
             }
 
-            m_taskPlayer.Out.SendMessage("You finish the " + Name + "!",eChatType.CT_System,eChatLoc.CL_SystemWindow);
-            m_dbTask.TaskType = typeof(AbstractTask).ToString();
-            m_dbTask.CustomPropertiesString = null;
-            m_customProperties.Clear();
-            m_dbTask.TasksDone += 1;
+            m_taskPlayer.Out.SendMessage($"You finish the {Name}!",eChatType.CT_System,eChatLoc.CL_SystemWindow);
+            _dbTask.TaskType = typeof(AbstractTask).ToString();
+            _dbTask.CustomPropertiesString = null;
+            _customProperties.Clear();
+            _dbTask.TasksDone += 1;
 
             SaveIntoDatabase();
         }
@@ -458,17 +432,17 @@ namespace DOL.GS.Quests
                     if (item != null)
                     {
                         m_taskPlayer.Inventory.RemoveItem(item);
-                        InventoryLogging.LogInventoryAction(m_taskPlayer, "(TASK;" + m_dbTask.TaskType + ")", eInventoryActionType.Quest, item.Template, item.Count);
+                        InventoryLogging.LogInventoryAction(m_taskPlayer, $"(TASK;{_dbTask.TaskType})", eInventoryActionType.Quest, item.Template, item.Count);
                     }
                 }
 
                 m_taskPlayer.Out.SendMessage("Your task related item has been removed from your inventory.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
 
-            m_taskPlayer.Out.SendMessage("Your " + Name + " has expired!",eChatType.CT_System,eChatLoc.CL_SystemWindow);
-            m_dbTask.TaskType = typeof(AbstractTask).ToString();
-            m_dbTask.CustomPropertiesString = null;
-            m_customProperties.Clear();
+            m_taskPlayer.Out.SendMessage($"Your {Name} has expired!",eChatType.CT_System,eChatLoc.CL_SystemWindow);
+            _dbTask.TaskType = typeof(AbstractTask).ToString();
+            _dbTask.CustomPropertiesString = null;
+            _customProperties.Clear();
             SaveIntoDatabase();
         }
 
@@ -504,52 +478,49 @@ namespace DOL.GS.Quests
         {
             if (level <= 20)
             {
-                return m_maxTasksDone[level - 1];
+                return _maxTasksDone[level - 1];
             }
-            else
-            {
-                return 20;
-            }
+
+            return 20;
         }
 
         /// <summary>
         /// Create an InventoryItem of given Name and Level
         /// </summary>
-        /// <param name="ItemName">Name for the object</param>
-        /// <param name="ItemLevel">Level to give to the object</param>
-        /// <param name="Model">Model for the object</param>
+        /// <param name="itemName">Name for the object</param>
+        /// <param name="itemLevel">Level to give to the object</param>
+        /// <param name="model">Model for the object</param>
         /// <returns>InventoryItem of given Name and Level</returns>
-        public static InventoryItem GenerateItem(string ItemName, int ItemLevel, int Model)
+        public static InventoryItem GenerateItem(string itemName, int itemLevel, int model)
         {
-            ItemUnique TaskItems = new ItemUnique();
-            TaskItems.Name = ItemName;
-            TaskItems.Level = ItemLevel;
-            TaskItems.DPS_AF = 0;
-            TaskItems.SPD_ABS = 0;
-            TaskItems.Hand = 0;
+            ItemUnique taskItems = new ItemUnique
+            {
+                Name = itemName,
+                Level = itemLevel,
+                DPS_AF = 0,
+                SPD_ABS = 0,
+                Hand = 0,
+                Object_Type = 0,
+                Item_Type = 1,
+                Weight = 1,
+                Model = model,
+                Price = 0,
+                Color = 0,
+                IsDropable = true,
+                IsPickable = true,
+                Quality = 80 + itemLevel,
+                MaxCondition = 90,
+                MaxDurability = 1000
+            };
 
-            // TaskItems.Type_Damage = 0;
-            TaskItems.Object_Type = 0;
-            TaskItems.Item_Type = 1;
-            TaskItems.Weight = 1;
-            TaskItems.Model = Model;
-            TaskItems.Price = 0;
-            TaskItems.Color = 0;
-            TaskItems.IsDropable = true;
-            TaskItems.IsPickable = true;
-
-            // TaskItems.IsStackable = false;
-            TaskItems.Quality = 80 + ItemLevel;
-            TaskItems.MaxCondition = 90;
-            TaskItems.MaxDurability = 1000;
-            GameServer.Database.AddObject(TaskItems);
-            InventoryItem InvTaskItems = GameInventoryItem.Create(TaskItems);
-            return InvTaskItems;
+            GameServer.Database.AddObject(taskItems);
+            InventoryItem invTaskItems = GameInventoryItem.Create(taskItems);
+            return invTaskItems;
         }
 
         public static bool CheckAvailability(GamePlayer player, GameLiving target)
         {
-            return CheckAvailability(player,target,CHANCE);
+            return CheckAvailability(player,target,Chance);
         }
 
         /// <summary>
@@ -588,10 +559,10 @@ namespace DOL.GS.Quests
             }
             else if (player.Task != null && player.Task.TasksDone >= MaxTasksDone(player.Level))
             {
-                player.Out.SendMessage("You cannot do more than " + MaxTasksDone(player.Level).ToString() + " tasks at your level!",eChatType.CT_System,eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"You cannot do more than {MaxTasksDone(player.Level)} tasks at your level!",eChatType.CT_System,eChatLoc.CL_SystemWindow);
                 return false;
             }
-            else if (player.TempProperties.getProperty<int>(CHECK_TASK_TICK) > Environment.TickCount)
+            else if (player.TempProperties.getProperty<int>(CheckTaskTick) > Environment.TickCount)
             {
                 player.Out.SendMessage("I have no tasks for you at the moment. Come back sometime later, perhaps then you can help me with something.",eChatType.CT_Say,eChatLoc.CL_PopupWindow);
                 return false;
@@ -605,7 +576,7 @@ namespace DOL.GS.Quests
                 player.Out.SendMessage("I have no tasks for you at the moment. Come back sometime later, perhaps then you can help me with something.",eChatType.CT_Say,eChatLoc.CL_PopupWindow);
 
                 // stored time of try to disable task for defined time.
-                player.TempProperties.setProperty(CHECK_TASK_TICK, Environment.TickCount + CHECK_TASK_DELAY);
+                player.TempProperties.setProperty(CheckTaskTick, Environment.TickCount + CheckTaskDelay);
                 return false;
             }
         }

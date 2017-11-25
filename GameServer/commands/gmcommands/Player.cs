@@ -2362,7 +2362,7 @@ namespace DOL.GS.Commands
 
                                 if (questArea.DataQuest != null)
                                 {
-                                    areaInfo += " : DataQuest ID: " + questArea.DataQuest.ID;
+                                    areaInfo += " : DataQuest ID: " + questArea.DataQuest.Id;
 
                                     if (questArea.Step > 0)
                                     {

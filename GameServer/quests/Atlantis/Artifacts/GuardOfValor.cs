@@ -16,12 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
-using log4net;
-using System.Reflection;
 
 namespace DOL.GS.Quests.Atlantis.Artifacts
 {
@@ -31,13 +29,8 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
     /// <author>Aredhel</author>
     public class GuardOfValor : ArtifactQuest
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public GuardOfValor()
-            : base() { }
+        { }
 
         public GuardOfValor(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -57,7 +50,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init(m_artifactID, typeof(GuardOfValor));
+            Init(m_artifactID, typeof(GuardOfValor));
         }
 
         /// <summary>
@@ -90,33 +83,20 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
                 scholar.TurnTo(player);
-                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                    ArtifactID,
-                    (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
                 if (versions.Count > 0 && RemoveItem(player, item))
                 {
-                    GiveItem(scholar, player, ArtifactID, versions[";;"]);
-                    string reply = "Can you feel the magic of the Guard of Valor flowing once again? ";
-                    reply += "It comes from Aloeus' love for his beautiful Nikolia. When Aloeus ";
-                    reply += "presented the gift to Nikolia, the magic in it bound to her. And now as ";
-                    reply += "I present it to you, the magic in it will bind itself to you, so that no ";
-                    reply += string.Format(
-                        "other may wear it. I beg you, {0}, take care not to destroy ",
-                        player.CharacterClass.Name);
-                    reply += string.Format(
-                        "such a gift! It cannot be replaced! I wish you well, {0}.",
-                        player.CharacterClass.Name);
+                    GiveItem(scholar, player, ArtifactId, versions[";;"]);
+                    string reply = $"Can you feel the magic of the Guard of Valor flowing once again? It comes from Aloeus\' love for his beautiful Nikolia. When Aloeus presented the gift to Nikolia, the magic in it bound to her. And now as I present it to you, the magic in it will bind itself to you, so that no other may wear it. I beg you, {player.CharacterClass.Name}, take care not to destroy such a gift! It cannot be replaced! I wish you well, {player.CharacterClass.Name}.";
                     scholar.TurnTo(player);
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     FinishQuest();
@@ -141,22 +121,14 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
-                string reply = string.Format(
-                    "Tell me, {0}, do you have any versions of the Love Story {1} {2} {3} {4}",
-                    player.CharacterClass.Name,
-                    "to go with the Guard of Valor? I have found a few copies, but I am always looking",
-                    "for more. Each one has different information in them that helps me with",
-                    "my research. Please give me the Love Story now while I finish up with",
-                    "the Guard of Valor.");
+                string reply = $"Tell me, {player.CharacterClass.Name}, do you have any versions of the Love Story to go with the Guard of Valor? I have found a few copies, but I am always looking for more. Each one has different information in them that helps me with my research. Please give me the Love Story now while I finish up with the Guard of Valor.";
                 scholar.TurnTo(player);
                 scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                 Step = 2;
@@ -190,17 +162,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "A Gift of Love"; }
-        }
+        public override string Name => "A Gift of Love";
 
         /// <summary>
         /// The artifact ID.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return m_artifactID; }
-        }
+        public override string ArtifactId => m_artifactID;
     }
 }

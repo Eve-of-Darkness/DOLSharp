@@ -831,8 +831,8 @@ namespace DOL.GS.Quests.Albion
 
         protected virtual int ResetPlayerModel(RegionTimer callingTimer)
         {
-            GameClient client = m_questPlayer.Client;
-            m_questPlayer.Model = (ushort)client.Account.Characters[client.ActiveCharIndex].CreationModel;
+            GameClient client = QuestPlayer.Client;
+            QuestPlayer.Model = (ushort)client.Account.Characters[client.ActiveCharIndex].CreationModel;
             SendSystemMessage("You change back to your normal form!");
             return 0;
         }
@@ -890,11 +890,11 @@ namespace DOL.GS.Quests.Albion
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                 if (gArgs.Target.Name == masterFrederick.Name && gArgs.Item.Id_nb == fairyPlans.Id_nb)
                 {
-                    RemoveItem(masterFrederick, m_questPlayer, fairyPlans);
+                    RemoveItem(masterFrederick, QuestPlayer, fairyPlans);
 
-                    masterFrederick.TurnTo(m_questPlayer);
-                    masterFrederick.SayTo(m_questPlayer, "This is a very small parchment. Hrm...Let me see if I can make out the words.");
-                    m_questPlayer.Out.SendEmoteAnimation(masterFrederick, eEmote.Ponder);
+                    masterFrederick.TurnTo(QuestPlayer);
+                    masterFrederick.SayTo(QuestPlayer, "This is a very small parchment. Hrm...Let me see if I can make out the words.");
+                    QuestPlayer.Out.SendEmoteAnimation(masterFrederick, eEmote.Ponder);
                     Step = 5;
                     return;
                 }
@@ -905,36 +905,36 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, necklaceOfDoppelganger, false);
-            RemoveItem(m_questPlayer, fairyPlans, false);
+            RemoveItem(QuestPlayer, necklaceOfDoppelganger, false);
+            RemoveItem(QuestPlayer, fairyPlans, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
         {
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(masterFrederick, m_questPlayer, necklaceOfDoppelganger);
+            RemoveItem(masterFrederick, QuestPlayer, necklaceOfDoppelganger);
 
             // Give reward to player here ...
-            if (m_questPlayer.HasAbilityToUseItem(recruitsBoots))
+            if (QuestPlayer.HasAbilityToUseItem(recruitsBoots))
             {
-                GiveItem(masterFrederick, m_questPlayer, recruitsBoots);
+                GiveItem(masterFrederick, QuestPlayer, recruitsBoots);
             }
             else
             {
-                GiveItem(masterFrederick, m_questPlayer, recruitsQuiltedBoots);
+                GiveItem(masterFrederick, QuestPlayer, recruitsQuiltedBoots);
             }
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 40, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 40, true);
             long money = Money.GetMoney(0, 0, 0, 4, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} as a reward.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} as a reward.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -34,10 +34,10 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public Battler()
-            : base() { }
+        { }
 
         public Battler(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -57,7 +57,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init(m_artifactID, typeof(Battler));
+            Init(m_artifactID, typeof(Battler));
         }
 
         /// <summary>
@@ -90,26 +90,17 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
                 scholar.TurnTo(player);
                 if (RemoveItem(player, item))
                 {
-                    string reply = string.Format(
-                        "You now have a decision to make, {0}. {1} {2} {3} {4} {5}",
-                        player.CharacterClass.Name,
-                        "I can unlock your Battler so it uses [slashing] skills or so it uses",
-                        "[crushing] skills. In both cases, I can unlock it as a one-handed weapon",
-                        "or a two-handed one. All you must do is decide which kind of damage you",
-                        "would like to do to your enemies. Once you have chosen, you cannot change",
-                        "your mind.");
+                    string reply = $"You now have a decision to make, {player.CharacterClass.Name}. I can unlock your Battler so it uses [slashing] skills or so it uses [crushing] skills. In both cases, I can unlock it as a one-handed weapon or a two-handed one. All you must do is decide which kind of damage you would like to do to your enemies. Once you have chosen, you cannot change your mind.";
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     Step = 3;
                     return true;
@@ -133,14 +124,12 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
                 string reply = "Battler, eh? Careful, when I unlock this sword's abilities, for it has a thirst for blood, from what we've learned of it. Do you have the scrolls that talk about Battler?";
                 scholar.TurnTo(player);
@@ -148,58 +137,53 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 Step = 2;
                 return true;
             }
-            else if (Step == 3)
+
+            if (Step == 3)
             {
                 switch (text.ToLower())
                 {
                     case "slashing":
                     case "crushing":
-                        {
-                            SetCustomProperty("DamageType", text.ToLower());
-                            string reply = string.Format(
-                                "Now, would you like your Battler{0} to be {1}",
-                                (text.ToLower() == "slashing") ? string.Empty : " Mace",
-                                "[one handed] or [two handed]?");
-                            scholar.TurnTo(player);
-                            scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
-                            Step = 4;
-                            return true;
-                        }
+                    {
+                        SetCustomProperty("DamageType", text.ToLower());
+                        string reply = $"Now, would you like your Battler{(text.ToLower() == "slashing" ? string.Empty : " Mace")} to be [one handed] or [two handed]?";
+                        scholar.TurnTo(player);
+                        scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
+                        Step = 4;
+                        return true;
+                    }
                 }
 
                 return false;
             }
-            else if (Step == 4)
+
+            if (Step == 4)
             {
                 switch (text.ToLower())
                 {
                     case "one handed":
                     case "two handed":
+                    {
+                        string versionId = $"{GetCustomProperty("DamageType")};{text.ToLower()};";
+                        Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
+                        ItemTemplate template = versions[versionId];
+                        if (template == null)
                         {
-                            string versionID = string.Format(
-                                "{0};{1};",
-                                GetCustomProperty("DamageType"), text.ToLower());
-                            Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                                ArtifactID,
-                                (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
-                            ItemTemplate template = versions[versionID];
-                            if (template == null)
-                            {
-                                log.Warn(string.Format("Artifact version {0} not found", versionID));
-                                return false;
-                            }
-
-                            if (GiveItem(scholar, player, ArtifactID, template))
-                            {
-                                string reply = string.Format("Here you are. Do not lose {0}, for it is irreplaceable.", template.Name);
-                                scholar.TurnTo(player);
-                                scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
-                                FinishQuest();
-                                return true;
-                            }
-
+                            Log.Warn($"Artifact version {versionId} not found");
                             return false;
                         }
+
+                        if (GiveItem(scholar, player, ArtifactId, template))
+                        {
+                            string reply = $"Here you are. Do not lose {template.Name}, for it is irreplaceable.";
+                            scholar.TurnTo(player);
+                            scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
+                            FinishQuest();
+                            return true;
+                        }
+
+                        return false;
+                    }
                 }
 
                 return false;
@@ -236,17 +220,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Battler"; }
-        }
+        public override string Name => "Battler";
 
         /// <summary>
         /// The artifact ID.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return m_artifactID; }
-        }
+        public override string ArtifactId => m_artifactID;
     }
 }

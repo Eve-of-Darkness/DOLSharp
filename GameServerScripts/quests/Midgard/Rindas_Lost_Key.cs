@@ -458,7 +458,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(rindaslostkey));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(rindaslostkey));
             QuestBehaviour a;
             a = builder.CreateBehaviour(DwarvenGuardRinda,-1);
                 a.AddTrigger(eTriggerType.Interact,null,DwarvenGuardRinda);

@@ -21,9 +21,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Reflection;
 using System.Linq;
-
 using log4net;
-
 using DOL.GS.Quests.Atlantis;
 using DOL.Database;
 
@@ -41,23 +39,9 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        /// <summary>
-        /// Holds all the quests descriptors used in the world (unique id => descriptor)
-        /// </summary>
-        private static readonly IDictionary m_questDescriptors = new HybridDictionary(1);
-
-        /// <summary>
-        /// Holds all the npc quests descriptors used in the world (npc => list of descriptors)
-        /// </summary>
-        private static readonly IDictionary m_questDescriptorsByNPC = new HybridDictionary();
-
-        private static readonly IDictionary m_questTypeMap = new HybridDictionary();
-
-        private static readonly IDictionary m_questActionMap = new HybridDictionary();
-        private static readonly IDictionary m_questTriggerMap = new HybridDictionary();
-        private static readonly IDictionary m_questRequirementMap = new HybridDictionary();
+        private static readonly IDictionary QuestTypeMap = new HybridDictionary();
 
         #endregion
 
@@ -79,15 +63,15 @@ namespace DOL.GS.Quests
 
                     if (type.IsSubclassOf(typeof(AbstractQuest)))
                     {
-                        if (log.IsInfoEnabled)
+                        if (Log.IsInfoEnabled)
                         {
-                            log.Info("Registering quest: " + type.FullName);
+                            Log.Info($"Registering quest: {type.FullName}");
                         }
 
                         RegisterQuestType(type);
                         if (type.IsSubclassOf(typeof(ArtifactQuest)))
                         {
-                            log.Info(string.Format("Initialising quest: {0}", type.FullName));
+                            Log.Info($"Initialising quest: {type.FullName}");
                             type.InvokeMember(
                                 "Init",
                                 BindingFlags.InvokeMethod,
@@ -109,7 +93,7 @@ namespace DOL.GS.Quests
         /// </summary>
         /// <param name="questType">Type of Quest this Builder is used for</param>
         /// <returns>QuestBuilder</returns>
-        public static QuestBuilder getBuilder(Type questType)
+        public static QuestBuilder GetBuilder(Type questType)
         {
             return new QuestBuilder(questType);
         }
@@ -140,37 +124,40 @@ namespace DOL.GS.Quests
         /// </summary>
         /// <param name="identifier"></param>
         /// <param name="defaultLiving"></param>
-        /// <param name="lookupDB"></param>
+        /// <param name="lookupDb"></param>
         /// <returns></returns>
-        public static GameLiving ResolveLiving(object identifier, GameLiving defaultLiving, bool lookupDB)
+        public static GameLiving ResolveLiving(object identifier, GameLiving defaultLiving, bool lookupDb)
         {
             GameLiving living = null;
 
             if (identifier is string || identifier is int)
             {
-                string tempID = Convert.ToString(identifier);
+                string tempId = Convert.ToString(identifier);
 
                 // TODO: Dirty Hack this should be done better
-                Mob mob = GameServer.Database.SelectObjects<Mob>("`Mob_ID` = @MobID OR `Name` = @Name", new[] { new QueryParameter("@MobID", tempID), new QueryParameter("@Name", tempID) }).FirstOrDefault();
+                Mob mob = GameServer.Database.SelectObjects<Mob>("`Mob_ID` = @MobID OR `Name` = @Name", new[] { new QueryParameter("@MobID", tempId), new QueryParameter("@Name", tempId) }).FirstOrDefault();
 
-                GameNPC[] livings = WorldMgr.GetObjectsByName<GameNPC>(mob.Name, (eRealm)mob.Realm);
+                if (mob != null)
+                {
+                    GameNPC[] livings = WorldMgr.GetObjectsByName<GameNPC>(mob.Name, (eRealm)mob.Realm);
 
-                if (livings.Length == 1)
-                {
-                    living = livings[0];
-                }
-                else if (livings.Length > 1)
-                {
-                    if (log.IsWarnEnabled)
+                    if (livings.Length == 1)
                     {
-                        log.Warn("Found more than one living with name :" + tempID + " in " + (lookupDB ? "Database" : "WorldMgr"));
+                        living = livings[0];
                     }
-                }
-                else
-                {
-                    if (log.IsWarnEnabled)
+                    else if (livings.Length > 1)
                     {
-                        log.Warn("Couldn't find GameLiving with id or name:" + tempID + " in " + (lookupDB ? "Database" : "WorldMgr"));
+                        if (Log.IsWarnEnabled)
+                        {
+                            Log.Warn($"Found more than one living with name :{tempId} in {(lookupDb ? "Database" : "WorldMgr")}");
+                        }
+                    }
+                    else
+                    {
+                        if (Log.IsWarnEnabled)
+                        {
+                            Log.Warn($"Couldn\'t find GameLiving with id or name:{tempId} in {(lookupDb ? "Database" : "WorldMgr")}");
+                        }
                     }
                 }
             }
@@ -180,12 +167,7 @@ namespace DOL.GS.Quests
             }
 
             // use default otherwise
-            if (living == null)
-            {
-                living = defaultLiving;
-            }
-
-            return living;
+            return living ?? defaultLiving;
         }
 
         /// <summary>
@@ -202,21 +184,21 @@ namespace DOL.GS.Quests
         /// Searches for a NPC with the given id or name in WorldMgr
         /// </summary>
         /// <param name="identifier"></param>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <returns></returns>
-        public static GameNPC ResolveNPC(object identifier, GameNPC defaultNPC)
+        public static GameNPC ResolveNPC(object identifier, GameNPC defaultNpc)
         {
-            return ResolveNPC(identifier,defaultNPC, false);
+            return ResolveNPC(identifier,defaultNpc, false);
         }
 
         /// <summary>
         /// Searches for a NPC with the given id or name either in worldMgr or Database if lookukDB is true
         /// </summary>
         /// <param name="identifier"></param>
-        /// <param name="defaultNPC"></param>
-        /// <param name="lookupDB"></param>
+        /// <param name="defaultNpc"></param>
+        /// <param name="lookupDb"></param>
         /// <returns></returns>
-        public static GameNPC ResolveNPC(object identifier, GameNPC defaultNPC, bool lookupDB)
+        public static GameNPC ResolveNPC(object identifier, GameNPC defaultNpc, bool lookupDb)
         {
             GameNPC npc = null;
 
@@ -234,16 +216,16 @@ namespace DOL.GS.Quests
                 }
                 else if (npcs.Length > 1)
                 {
-                    if (log.IsWarnEnabled)
+                    if (Log.IsWarnEnabled)
                     {
-                        log.Warn("Found more than one npc with id or name:" + tempID + " in WorldMgr");
+                        Log.Warn($"Found more than one npc with id or name:{tempID} in WorldMgr");
                     }
                 }
                 else
                 {
-                    if (log.IsWarnEnabled)
+                    if (Log.IsWarnEnabled)
                     {
-                        log.Warn("Couldn't find NPC with id or name:" + tempID + " in WorldMgr");
+                        Log.Warn($"Couldn\'t find NPC with id or name:{tempID} in WorldMgr");
                     }
                 }
             }
@@ -255,7 +237,7 @@ namespace DOL.GS.Quests
             // use default otherwise
             if (npc == null)
             {
-                npc = defaultNPC;
+                npc = defaultNpc;
             }
 
             return npc;
@@ -267,19 +249,18 @@ namespace DOL.GS.Quests
         /// <param name="type"></param>
         public static void RegisterQuestType(Type type)
         {
-// ushort typeId =(ushort) type.GetHashCode();
-            ushort typeId = (ushort)(m_questTypeMap.Count + 1);
-            if (m_questTypeMap.Contains(typeId))
+            ushort typeId = (ushort)(QuestTypeMap.Count + 1);
+            if (QuestTypeMap.Contains(typeId))
             {
-                if (log.IsErrorEnabled)
+                if (Log.IsErrorEnabled)
                 {
-                    log.Error(type.FullName + ": Quest with computed id of=" + typeId + " already found.");
+                    Log.Error($"{type.FullName}: Quest with computed id of={typeId} already found.");
                 }
 
                 return;
             }
 
-            m_questTypeMap.Add(typeId, type);
+            QuestTypeMap.Add(typeId, type);
         }
 
         /// <summary>
@@ -294,7 +275,7 @@ namespace DOL.GS.Quests
 //        }
         public static ushort GetIDForQuestType(Type questType)
         {
-            IDictionaryEnumerator questEnumerator = m_questTypeMap.GetEnumerator();
+            IDictionaryEnumerator questEnumerator = QuestTypeMap.GetEnumerator();
             while (questEnumerator.MoveNext())
             {
                 if ((Type)questEnumerator.Value == questType)
@@ -314,7 +295,7 @@ namespace DOL.GS.Quests
         /// <returns></returns>
         public static Type GetQuestTypeForID(ushort typeId)
         {
-            return (Type)m_questTypeMap[typeId];
+            return (Type)QuestTypeMap[typeId];
         }
 
         /// <summary>
@@ -326,12 +307,17 @@ namespace DOL.GS.Quests
         /// <returns>the number of time the quest can be done again</returns>
         public static int CanGiveQuest(Type questType, GamePlayer target, GameNPC source)
         {
+            return NewMethod(questType, target, source);
+        }
+
+        private static int NewMethod(Type questType, GamePlayer target, GameNPC source)
+        {
             if (source != null)
             {
                 return source.CanGiveQuest(questType, target);
-            } else {
-                return 0;
             }
+
+            return 0;
         }
 
         /// <summary>
@@ -344,7 +330,6 @@ namespace DOL.GS.Quests
         /// <returns></returns>
         public static bool ProposeQuestToPlayer(Type questType, string sentence, GamePlayer player, GameNPC source)
         {
-
             if (CanGiveQuest(questType, player, source) > 0)
             {
                 if (questType.IsSubclassOf(typeof(RewardQuest)))
@@ -358,9 +343,9 @@ namespace DOL.GS.Quests
                         }
                         catch (Exception e)
                         {
-                            if (log.IsErrorEnabled)
+                            if (Log.IsErrorEnabled)
                             {
-                                log.Error("ProposeQuestToPlayer.RewardQuest", e);
+                                Log.Error("ProposeQuestToPlayer.RewardQuest", e);
                             }
                         }
 
@@ -374,15 +359,13 @@ namespace DOL.GS.Quests
                 }
                 else
                 {
-                    player.Out.SendQuestSubscribeCommand(source, QuestMgr.GetIDForQuestType(questType), sentence);
+                    player.Out.SendQuestSubscribeCommand(source, GetIDForQuestType(questType), sentence);
                 }
 
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         /// <summary>
@@ -397,13 +380,11 @@ namespace DOL.GS.Quests
         {
             if (player.IsDoingQuest(questType) != null)
             {
-                player.Out.SendQuestAbortCommand(source, QuestMgr.GetIDForQuestType(questType), sentence);
+                player.Out.SendQuestAbortCommand(source, GetIDForQuestType(questType), sentence);
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         /// <summary>
@@ -439,7 +420,7 @@ namespace DOL.GS.Quests
         /// <returns>true if added</returns>
         public static bool GiveQuestToPlayer(Type questType, byte startingStep, GamePlayer player, GameNPC source)
         {
-            if (source != null && QuestMgr.CanGiveQuest(questType, player, source as GameNPC) <= 0)
+            if (source != null && CanGiveQuest(questType, player, source) <= 0)
             {
                 return false;
             }

@@ -287,7 +287,7 @@ namespace DOL.GS.Quests.Examples
 
             #region defineQuestParts
 
-            QuestBuilder builder = QuestMgr.getBuilder(typeof(HelpSirQuait));
+            QuestBuilder builder = QuestMgr.GetBuilder(typeof(HelpSirQuait));
                 QuestBehaviour a;
                 a = builder.CreateBehaviour(SirQuait,-1);
                     a.AddTrigger(eTriggerType.Interact,null,SirQuait);

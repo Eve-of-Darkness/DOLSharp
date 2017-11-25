@@ -922,7 +922,7 @@ namespace DOL.GS.Quests.Albion
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                 if (gArgs.Target.Name == kealan.Name && (gArgs.Item.Id_nb == bloatedFang.Id_nb || gArgs.Item.Id_nb == spiderChitin.Id_nb))
                 {
-                    kealan.TurnTo(m_questPlayer);
+                    kealan.TurnTo(QuestPlayer);
                     if (Step == 4)
                     {
                         kealan.SayTo(player, "Very well now hand me over the rest and you will revieve your reward...");
@@ -944,55 +944,55 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, spiderChitin, false);
-            RemoveItem(m_questPlayer, bloatedFang, false);
+            RemoveItem(QuestPlayer, spiderChitin, false);
+            RemoveItem(QuestPlayer, bloatedFang, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
         {
-            kealan.SayTo(m_questPlayer, "Great, the bloated spider fang and Arachneida's chitin. You did your job well! Now here, take this as a token of my gratitude.");
+            kealan.SayTo(QuestPlayer, "Great, the bloated spider fang and Arachneida's chitin. You did your job well! Now here, take this as a token of my gratitude.");
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 40050, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 40050, true);
             long money = Money.GetMoney(0, 0, 0, 22, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} for your service.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} for your service.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
-            if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Wizard ||
-                m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Sorcerer ||
-                m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Cabalist ||
-                m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Theurgist)
+            if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Wizard ||
+                QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Sorcerer ||
+                QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Cabalist ||
+                QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Theurgist)
             {
-                GiveItem(kealan, m_questPlayer, spiderSilkenRobe);
+                GiveItem(kealan, QuestPlayer, spiderSilkenRobe);
             }
-            else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Paladin ||
-                m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Armsman ||
-                m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Reaver ||
-                m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Mercenary)
+            else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Paladin ||
+                QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Armsman ||
+                QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Reaver ||
+                QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Mercenary)
             {
-                GiveItem(kealan, m_questPlayer, ringedSpiderChitinTunic);
+                GiveItem(kealan, QuestPlayer, ringedSpiderChitinTunic);
             }
-            else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Cleric ||
-                m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Scout ||
-                m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Minstrel)
+            else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Cleric ||
+                QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Scout ||
+                QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Minstrel)
             {
-                GiveItem(kealan, m_questPlayer, studdedSpiderEyeVest);
+                GiveItem(kealan, QuestPlayer, studdedSpiderEyeVest);
             }
-            else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Friar)
+            else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Friar)
             {
-                GiveItem(kealan, m_questPlayer, spiderEmblazonedTunic);
+                GiveItem(kealan, QuestPlayer, spiderEmblazonedTunic);
             }
-            else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Infiltrator)
+            else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Infiltrator)
             {
-                GiveItem(kealan, m_questPlayer, embossedSpiderTunic);
+                GiveItem(kealan, QuestPlayer, embossedSpiderTunic);
             }
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Golden Scarab Vest Encounter"; }
-        }
+        public override string Name => "Golden Scarab Vest Encounter";
     }
 }

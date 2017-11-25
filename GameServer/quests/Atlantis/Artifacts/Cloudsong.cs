@@ -32,7 +32,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
     class Cloudsong : ArtifactQuest
     {
         public Cloudsong()
-            : base() { }
+        { }
 
         public Cloudsong(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -50,7 +50,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init("Cloudsong", typeof(Cloudsong));
+            Init("Cloudsong", typeof(Cloudsong));
         }
 
         /// <summary>
@@ -78,28 +78,22 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// <returns></returns>
         public override bool ReceiveItem(GameLiving source, GameLiving target, InventoryItem item)
         {
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
-                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                    ArtifactID,
-                    (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
                 IDictionaryEnumerator versionsEnum = versions.GetEnumerator();
                 versionsEnum.MoveNext();
 
                 if (versions.Count > 0 && RemoveItem(player, item))
                 {
-                    GiveItem(scholar, player, ArtifactID, versionsEnum.Value as ItemTemplate);
-                    string reply = string.Format(
-                        "Thank you! Here, take this cloak. {0}",
-                        "I hope you find it useful. Please don't lose it, I can't replace it!");
+                    GiveItem(scholar, player, ArtifactId, versionsEnum.Value as ItemTemplate);
+                    string reply = "Thank you! Here, take this cloak. I hope you find it useful. Please don\'t lose it, I can\'t replace it!";
                     scholar.TurnTo(player);
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     FinishQuest();
@@ -124,22 +118,16 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
             if (Step == 1)
             {
-                if (text.ToLower() == ArtifactID.ToLower())
+                if (text.ToLower() == ArtifactId.ToLower())
                 {
-                    string reply = string.Format(
-                        "Do you have the story that goes with Cloudsong? {0} {1} {2}",
-                        "I'd very much like to read it. If you don't, go, get the scrolls and use them.",
-                        "Then, when you've translated them into a book, return the book to me, and I will",
-                        "give you the artifact. Do you have the [story]?");
+                    string reply = "Do you have the story that goes with Cloudsong? I\'d very much like to read it. If you don\'t, go, get the scrolls and use them. Then, when you\'ve translated them into a book, return the book to me, and I will give you the artifact. Do you have the [story]?";
                     scholar.TurnTo(player);
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     Step = 2;
@@ -181,22 +169,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Cloudsong"; }
-        }
+        public override string Name => "Cloudsong";
 
         /// <summary>
         /// The reward for this quest.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return "Cloudsong"; }
-        }
-
-        public override void Notify(DOLEvent e, object sender, EventArgs args)
-        {
-            // Need to do anything here?
-        }
+        public override string ArtifactId => "Cloudsong";
     }
 }
