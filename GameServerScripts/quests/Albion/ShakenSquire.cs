@@ -694,10 +694,10 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)(m_questPlayer.ExperienceForNextLevel / 35), true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)(QuestPlayer.ExperienceForNextLevel / 35), true);
             long money = Money.GetMoney(0, 0, 0, 1, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You are awarded 1 silver and some copper!");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You are awarded 1 silver and some copper!");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

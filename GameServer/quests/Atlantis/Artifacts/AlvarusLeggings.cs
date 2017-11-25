@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -30,7 +30,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
     class AlvarusLeggings : ArtifactQuest
     {
         public AlvarusLeggings()
-            : base() { }
+        { }
 
         public AlvarusLeggings(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -48,7 +48,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init("Alvarus's Leggings", typeof(AlvarusLeggings));
+            Init("Alvarus's Leggings", typeof(AlvarusLeggings));
         }
 
         /// <summary>
@@ -81,22 +81,16 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
-                string armorType = GlobalConstants.ArmorLevelToName(
-                    player.BestArmorLevel,
-                    (eRealm)player.Realm);
+                string armorType = GlobalConstants.ArmorLevelToName(player.BestArmorLevel, player.Realm);
                 ItemTemplate template = null;
-                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                    ArtifactID,
-                    (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
                 foreach (string versionKey in versions.Keys)
                 {
@@ -110,14 +104,8 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
 
                 if (template != null && RemoveItem(player, item))
                 {
-                    GiveItem(scholar, player, ArtifactID, template);
-                    string reply = string.Format(
-                        "The spell is complete and the magic {0} {1}! {2} {3} {4}",
-                        "of the Leggings has been reawakened from its long sleep! But heed this warning,",
-                        player.CharacterClass.Name,
-                        "Take good care of these leggings, because the magic contained within them is",
-                        "fragile and if the leggings are lost or destroyed, the magic will be gone forever.",
-                        "May these leggings serve you well as you travel through the trial planes.");
+                    GiveItem(scholar, player, ArtifactId, template);
+                    string reply = $"The spell is complete and the magic of the Leggings has been reawakened from its long sleep! But heed this warning, {player.CharacterClass.Name}! Take good care of these leggings, because the magic contained within them is fragile and if the leggings are lost or destroyed, the magic will be gone forever. May these leggings serve you well as you travel through the trial planes.";
                     scholar.TurnTo(player);
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     FinishQuest();
@@ -142,21 +130,14 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
-                string reply = string.Format(
-                    "The magic contained in the Alvarus' Letter has {0} {1} {2} {3}",
-                    "already begun to work on the Leggings while they were in your possession. All I",
-                    "need now are the letters you have bundled up so that the spell will be complete.",
-                    "If you have accidentally lost those letters, you must go and find them before",
-                    "the spell can be completed.");
+                string reply = "The magic contained in the Alvarus\' Letter has already begun to work on the Leggings while they were in your possession. All I need now are the letters you have bundled up so that the spell will be complete. If you have accidentally lost those letters, you must go and find them before the spell can be completed.";
                 scholar.TurnTo(player);
                 scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                 Step = 2;
@@ -189,17 +170,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Alvarus' Leggings"; }
-        }
+        public override string Name => "Alvarus' Leggings";
 
         /// <summary>
         /// The reward for this quest.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return "Alvarus's Leggings"; }
-        }
+        public override string ArtifactId => "Alvarus's Leggings";
     }
 }

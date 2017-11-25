@@ -282,13 +282,13 @@ namespace DOL.GS.PacketHandler
                     string goalDesc = string.Format("{0}\r", goal.Description);
                     pak.WriteShortLowEndian((ushort)goalDesc.Length);
                     pak.WriteStringBytes(goalDesc);
-                    pak.WriteShortLowEndian((ushort)goal.ZoneID2);
+                    pak.WriteShortLowEndian((ushort)goal.ZoneId2);
                     pak.WriteShortLowEndian((ushort)goal.XOffset2);
                     pak.WriteShortLowEndian((ushort)goal.YOffset2);
                     pak.WriteShortLowEndian(0x00);  // unknown
                     pak.WriteShortLowEndian((ushort)goal.Type);
                     pak.WriteShortLowEndian(0x00);  // unknown
-                    pak.WriteShortLowEndian((ushort)goal.ZoneID1);
+                    pak.WriteShortLowEndian((ushort)goal.ZoneId1);
                     pak.WriteShortLowEndian((ushort)goal.XOffset1);
                     pak.WriteShortLowEndian((ushort)goal.YOffset1);
                     pak.WriteByte((byte)(goal.IsAchieved ? 0x01 : 0x00));

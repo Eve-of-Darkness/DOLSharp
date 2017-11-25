@@ -1090,11 +1090,11 @@ namespace DOL.GS.Quests.Midgard
         {
             if (briediClone != null && (briediClone.IsAlive || briediClone.ObjectState == GameObject.eObjectState.Active))
             {
-                m_animSpellObjectQueue.Enqueue(briediClone);
-                m_animSpellTeleportTimerQueue.Enqueue(new RegionTimer(briediClone, new RegionTimerCallback(MakeAnimEmoteSequence), 500));
+                AnimSpellObjectQueue.Enqueue(briediClone);
+                AnimSpellTeleportTimerQueue.Enqueue(new RegionTimer(briediClone, new RegionTimerCallback(MakeAnimEmoteSequence), 500));
 
-                m_animEmoteObjectQueue.Enqueue(briediClone);
-                m_animEmoteTeleportTimerQueue.Enqueue(new RegionTimer(briediClone, new RegionTimerCallback(MakeAnimEmoteSequence), 2500));
+                AnimEmoteObjectQueue.Enqueue(briediClone);
+                AnimEmoteTeleportTimerQueue.Enqueue(new RegionTimer(briediClone, new RegionTimerCallback(MakeAnimEmoteSequence), 2500));
             }
 
             if (briediClone != null)
@@ -1119,8 +1119,8 @@ namespace DOL.GS.Quests.Midgard
         {
             if (Step == 17)
             {
-                briediClone.SayTo(m_questPlayer, "Ah, what a well fought battle, don't you think Eeinken? Now look, you tell Dalikor that I went back home, alright? I don't fancy being out here in his part of the world. So don't forget to tell him.");
-                briediClone.SayTo(m_questPlayer, "Off to Gotar I go!");
+                briediClone.SayTo(QuestPlayer, "Ah, what a well fought battle, don't you think Eeinken? Now look, you tell Dalikor that I went back home, alright? I don't fancy being out here in his part of the world. So don't forget to tell him.");
+                briediClone.SayTo(QuestPlayer, "Off to Gotar I go!");
 
                 ResetMasterBriedi();
                 Step = 18;
@@ -1453,7 +1453,7 @@ namespace DOL.GS.Quests.Midgard
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                 if (gArgs.Target.Name == briedi.Name && gArgs.Item.Id_nb == scrollBriedi.Id_nb)
                 {
-                    briedi.SayTo(m_questPlayer, "Hmph, what's this? A letter for me, eh? Well, let's see what it has to say.");
+                    briedi.SayTo(QuestPlayer, "Hmph, what's this? A letter for me, eh? Well, let's see what it has to say.");
                     RemoveItem(briedi, player, scrollBriedi);
                     SendEmoteMessage(player, "Master Briedi unrolls the scroll and reads through it. When he is finished, he returns his attentions to you.");
                     Step = 3;
@@ -1505,21 +1505,21 @@ namespace DOL.GS.Quests.Midgard
                 {
                     if (Step == 10 && gArgs.Item.Id_nb == tatteredShirt.Id_nb)
                     {
-                        briedi.SayTo(m_questPlayer, "Uh huh, yes...Alright, now give me that claw from those smiera-gattos.");
+                        briedi.SayTo(QuestPlayer, "Uh huh, yes...Alright, now give me that claw from those smiera-gattos.");
                         RemoveItem(briedi, player, tatteredShirt);
                         Step = 11;
                         return;
                     }
                     else if (Step == 11 && gArgs.Item.Id_nb == smieraGattoClaw.Id_nb)
                     {
-                        briedi.SayTo(m_questPlayer, "Yes, this is a claw alright. Now, for the coastal wolf blood. You better have gotten me enough of this.");
+                        briedi.SayTo(QuestPlayer, "Yes, this is a claw alright. Now, for the coastal wolf blood. You better have gotten me enough of this.");
                         RemoveItem(briedi, player, smieraGattoClaw);
                         Step = 12;
                         return;
                     }
                     else if (Step == 12 && gArgs.Item.Id_nb == coastalWolfBlood.Id_nb)
                     {
-                        briedi.SayTo(m_questPlayer, "Well, it's a little less than I was hoping for, but it will do. Now listen kid. You go back to that no good son of mine and tell him I'll go ahead and help him with his little problem. In fact, let me [expedite] your journey for you.");
+                        briedi.SayTo(QuestPlayer, "Well, it's a little less than I was hoping for, but it will do. Now listen kid. You go back to that no good son of mine and tell him I'll go ahead and help him with his little problem. In fact, let me [expedite] your journey for you.");
                         RemoveItem(briedi, player, coastalWolfBlood);
                         Step = 13;
                         return;
@@ -1547,7 +1547,7 @@ namespace DOL.GS.Quests.Midgard
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                 if (gArgs.Target.Name == dalikor.Name && gArgs.Item.Id_nb == princessAiyrHead.Id_nb)
                 {
-                    dalikor.SayTo(m_questPlayer, "Interesting. I shall present this to the council as well. I do so hope this is the end of our Askefruer problems, but somehow, I sense it is not. Nevertheless, I have here a [reward] for you from the council.");
+                    dalikor.SayTo(QuestPlayer, "Interesting. I shall present this to the council as well. I do so hope this is the end of our Askefruer problems, but somehow, I sense it is not. Nevertheless, I have here a [reward] for you from the council.");
                     RemoveItem(dalikor, player, princessAiyrHead);
                     Step = 19;
                     return;
@@ -1561,15 +1561,15 @@ namespace DOL.GS.Quests.Midgard
 
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, scrollBriedi, false);
-            RemoveItem(m_questPlayer, listBriedi, false);
-            RemoveItem(m_questPlayer, coastalWolfBlood, false);
-            RemoveItem(m_questPlayer, tatteredShirt, false);
-            RemoveItem(m_questPlayer, smieraGattoClaw, false);
-            RemoveItem(m_questPlayer, princessAiyrHead, false);
+            RemoveItem(QuestPlayer, scrollBriedi, false);
+            RemoveItem(QuestPlayer, listBriedi, false);
+            RemoveItem(QuestPlayer, coastalWolfBlood, false);
+            RemoveItem(QuestPlayer, tatteredShirt, false);
+            RemoveItem(QuestPlayer, smieraGattoClaw, false);
+            RemoveItem(QuestPlayer, princessAiyrHead, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
         }
 
         public override void FinishQuest()
@@ -1580,23 +1580,23 @@ namespace DOL.GS.Quests.Midgard
             ResetMasterBriedi();
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 507, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 507, true);
             long money = Money.GetMoney(0, 0, 0, 8, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} as a reward.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
-            if (m_questPlayer.HasAbilityToUseItem(recruitsHelm))
+            QuestPlayer.AddMoney(money, "You recieve {0} as a reward.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
+            if (QuestPlayer.HasAbilityToUseItem(recruitsHelm))
             {
-                GiveItem(dalikor, m_questPlayer, recruitsHelm);
+                GiveItem(dalikor, QuestPlayer, recruitsHelm);
             }
             else
             {
-                GiveItem(dalikor, m_questPlayer, recruitsCap);
+                GiveItem(dalikor, QuestPlayer, recruitsCap);
             }
 
-            GiveItem(dalikor, m_questPlayer, recruitsRing);
+            GiveItem(dalikor, QuestPlayer, recruitsRing);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
         }
     }
 }

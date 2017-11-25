@@ -72,14 +72,14 @@ namespace DOL.GS
                             }
                         }
 
-                        if (player.CanReceiveArtifact(quest.ArtifactID))
+                        if (player.CanReceiveArtifact(quest.ArtifactId))
                         {
                             if (count > 0 && numQuests < quests.Count)
                             {
                                 artifacts += (numQuests == 1) ? ", or " : ", ";
                             }
 
-                            artifacts += string.Format("[{0}]", quest.ArtifactID);
+                            artifacts += string.Format("[{0}]", quest.ArtifactId);
 
                             ++count;
                         }
@@ -142,11 +142,11 @@ namespace DOL.GS
                 // Start new quest...
                 foreach (ArtifactQuest quest in QuestListToGive)
                 {
-                    if (text.ToLower() == quest.ArtifactID.ToLower())
+                    if (text.ToLower() == quest.ArtifactId.ToLower())
                     {
                         if (quest.CheckQuestQualification(player))
                         {
-                            if (player.CanReceiveArtifact(quest.ArtifactID))
+                            if (player.CanReceiveArtifact(quest.ArtifactId))
                             {
                                 GiveArtifactQuest(player, quest.GetType());
                             }
@@ -247,7 +247,7 @@ namespace DOL.GS
             }
 
             player.AddQuest(quest);
-            quest.WhisperReceive(player, this, quest.ArtifactID);
+            quest.WhisperReceive(player, this, quest.ArtifactId);
         }
 
         /// <summary>

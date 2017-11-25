@@ -1606,67 +1606,67 @@ namespace DOL.GS.Quests.Albion
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Fighter"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedboots_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedcap_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedgloves_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedjerkin_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedleggings_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedsleeves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedboots_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedcap_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedgloves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedjerkin_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedleggings_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedsleeves_alb);
                         quest.FinishQuest();
                     }
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Mage"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedboots_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedcap_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedgloves_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedpants_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedsleeves_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedvest_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedboots_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedcap_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedgloves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedpants_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedsleeves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedvest_alb);
                         quest.FinishQuest();
                     }
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Disciple"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedboots_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedcap_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedgloves_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedpants_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedsleeves_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedvest_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedboots_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedcap_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedgloves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedpants_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedsleeves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedvest_alb);
                         quest.FinishQuest();
                     }
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Elementalist"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedboots_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedcap_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedgloves_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedpants_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedsleeves_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedvest_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedboots_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedcap_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedgloves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedpants_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedsleeves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedvest_alb);
                         quest.FinishQuest();
                     }
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.AlbionRogue"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherboots_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathercap_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathergloves_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherjerkin_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherleggings_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathersleeves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherboots_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathercap_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathergloves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherjerkin_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherleggings_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathersleeves_alb);
                         quest.FinishQuest();
                     }
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Acolyte"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherboots_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathercap_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathergloves_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherjerkin_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherleggings_alb);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathersleeves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherboots_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathercap_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathergloves_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherjerkin_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherleggings_alb);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathersleeves_alb);
                         quest.FinishQuest();
                     }
                 }
@@ -1811,11 +1811,11 @@ namespace DOL.GS.Quests.Albion
                 // k109: Update each time a kill is made.
                 if (Step == 1)
                 {
-                    return LanguageMgr.GetTranslation(m_questPlayer.Client, "Alb.ChildsPlay.Description.Text1");
+                    return LanguageMgr.GetTranslation(QuestPlayer.Client, "Alb.ChildsPlay.Description.Text1");
                 }
                 else if (Step == 2)
                 {
-                    return LanguageMgr.GetTranslation(m_questPlayer.Client, "Alb.ChildsPlay.Description.Text2");
+                    return LanguageMgr.GetTranslation(QuestPlayer.Client, "Alb.ChildsPlay.Description.Text2");
                 }
 
                 return base.Description;
@@ -1832,9 +1832,9 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // k109: xp and money Rewards...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 2, true);
-            m_questPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 67), LanguageMgr.GetTranslation(m_questPlayer.Client, "ChildsPlay.FinishQuest.Text1"));
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, 67);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 2, true);
+            QuestPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 67), LanguageMgr.GetTranslation(QuestPlayer.Client, "ChildsPlay.FinishQuest.Text1"));
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, 67);
         }
     }
 }

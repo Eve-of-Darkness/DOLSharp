@@ -27,13 +27,13 @@ namespace DOL.GS.Quests.Actions
     public class OfferQuestAction : AbstractAction<Type,string>
     {
 
-        public OfferQuestAction(GameNPC defaultNPC, eActionType actionType, object p, object q)
-            : base(defaultNPC, eActionType.OfferQuest, p, q)
+        public OfferQuestAction(GameNPC defaultNpc, eActionType actionType, object p, object q)
+            : base(defaultNpc, eActionType.OfferQuest, p, q)
         {
         }
 
         public OfferQuestAction(GameNPC defaultNPC, Type questType, string offerMessage)
-            : this(defaultNPC, eActionType.OfferQuest, (object)questType, (object)offerMessage) { }
+            : this(defaultNPC, eActionType.OfferQuest, questType, offerMessage) { }
 
         public override void Perform(DOLEvent e, object sender, EventArgs args)
         {

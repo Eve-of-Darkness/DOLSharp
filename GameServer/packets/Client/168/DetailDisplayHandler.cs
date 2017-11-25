@@ -431,7 +431,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 return; // questID == 0, wrong ID ?
                             }
 
-                            if (questID <= DataQuest.DATAQUEST_CLIENTOFFSET)
+                            if (questID <= DataQuest.DataquestClientoffset)
                             {
                                 AbstractQuest q = client.Player.IsDoingQuest(QuestMgr.GetQuestTypeForID(questID));
 
@@ -484,7 +484,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                                 foreach (DBDataQuest d in GameObject.DataQuestCache)
                                 {
-                                    if (d.ID == questID - DataQuest.DATAQUEST_CLIENTOFFSET)
+                                    if (d.ID == questID - DataQuest.DataquestClientoffset)
                                     {
                                         dq = new DataQuest(d);
                                         break;

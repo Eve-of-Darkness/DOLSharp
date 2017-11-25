@@ -823,10 +823,10 @@ namespace DOL.GS.Quests.Albion
                     GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                     if (gArgs.Target.Name == georNadren.Name && gArgs.Item.Id_nb == bundleOfBearSkins.Id_nb)
                     {
-                        RemoveItem(georNadren, m_questPlayer, bundleOfBearSkins);
+                        RemoveItem(georNadren, QuestPlayer, bundleOfBearSkins);
 
-                        georNadren.TurnTo(m_questPlayer);
-                        georNadren.SayTo(m_questPlayer, "Ah!  These must be the skins I've been waiting for from Andrew.  My, my, these are very high quality.  He's a very skilled hunter indeed, with a fine eye for good pelts.  Excellent!  I have but one more [errand] I need for you to run for me.");
+                        georNadren.TurnTo(QuestPlayer);
+                        georNadren.SayTo(QuestPlayer, "Ah!  These must be the skins I've been waiting for from Andrew.  My, my, these are very high quality.  He's a very skilled hunter indeed, with a fine eye for good pelts.  Excellent!  I have but one more [errand] I need for you to run for me.");
 
                         Step = 2;
                         return;
@@ -837,15 +837,15 @@ namespace DOL.GS.Quests.Albion
                     GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                     if (gArgs.Target.Name == georNadren.Name && gArgs.Item.Id_nb == spoolOfLeatherworkingThread.Id_nb)
                     {
-                        RemoveItem(georNadren, m_questPlayer, spoolOfLeatherworkingThread);
+                        RemoveItem(georNadren, QuestPlayer, spoolOfLeatherworkingThread);
 
-                        georNadren.TurnTo(m_questPlayer);
-                        georNadren.SayTo(m_questPlayer, "Excellent!  Why, there is enough here to make several suits of armor.  Thank you friend!  Now, I think you need to return to Andrew in Cotswold and let him know I received the skins.  Thank you again, and good journeys to you " + m_questPlayer.Name + ".");
+                        georNadren.TurnTo(QuestPlayer);
+                        georNadren.SayTo(QuestPlayer, "Excellent!  Why, there is enough here to make several suits of armor.  Thank you friend!  Now, I think you need to return to Andrew in Cotswold and let him know I received the skins.  Thank you again, and good journeys to you " + QuestPlayer.Name + ".");
 
-                        m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 40, true);
+                        QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 40, true);
                         long money = Money.GetMoney(0, 0, 0, 2, Util.Random(50));
-                        m_questPlayer.AddMoney(money, "You are awarded 2 silver and some copper!");
-                        InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+                        QuestPlayer.AddMoney(money, "You are awarded 2 silver and some copper!");
+                        InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
                         Step = 4;
                         return;
@@ -858,8 +858,8 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, bundleOfBearSkins, false);
-            RemoveItem(m_questPlayer, spoolOfLeatherworkingThread, false);
+            RemoveItem(QuestPlayer, bundleOfBearSkins, false);
+            RemoveItem(QuestPlayer, spoolOfLeatherworkingThread, false);
         }
 
         public override void FinishQuest()
@@ -867,12 +867,12 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            GiveItem(andrewWyatt, m_questPlayer, chokerOfTheBear);
+            GiveItem(andrewWyatt, QuestPlayer, chokerOfTheBear);
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 80, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 80, true);
             long money = Money.GetMoney(0, 0, 0, 4, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You are awarded 4 silver and some copper!");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You are awarded 4 silver and some copper!");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

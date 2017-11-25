@@ -18,8 +18,6 @@
  */
 using System;
 using DOL.Events;
-using log4net;
-using System.Reflection;
 using DOL.GS.Behaviour.Attributes;
 using DOL.GS.Behaviour;
 
@@ -33,24 +31,22 @@ namespace DOL.GS.Quests.Triggers
     [Trigger(TriggerType=eTriggerType.DeclineQuest)]
     public class DeclineQuestTrigger : AbstractTrigger<Unused,Type>
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Creates a new questtrigger and does some simple triggertype parameter compatibility checking
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="notifyHandler"></param>
         /// <param name="k"></param>
         /// <param name="i"></param>
-        public DeclineQuestTrigger(GameNPC defaultNPC, DOLEventHandler notifyHandler, object k, object i)
-            : base(defaultNPC, notifyHandler, eTriggerType.DeclineQuest, k, i)
+        public DeclineQuestTrigger(GameNPC defaultNpc, DOLEventHandler notifyHandler, object k, object i)
+            : base(defaultNpc, notifyHandler, eTriggerType.DeclineQuest, k, i)
         { }
 
         /// <summary>
         /// Creates a new questtrigger and does some simple triggertype parameter compatibility checking
         /// </summary>
         public DeclineQuestTrigger(GameNPC defaultNPC, DOLEventHandler notifyHandler, Type questType)
-            : this(defaultNPC,notifyHandler, (object)null, (object)questType)
+            : this(defaultNPC,notifyHandler, null, questType)
         { }
 
         /// <summary>
@@ -72,7 +68,7 @@ namespace DOL.GS.Quests.Triggers
                 Type type = QuestMgr.GetQuestTypeForID(qArgs.QuestID);
                 if (type != null)
                 {
-                    result = qArgs.Player.ObjectID == player.ObjectID && type.Equals(I);
+                    result = qArgs.Player.ObjectID == player.ObjectID && type == I;
                 }
             }
 

@@ -370,7 +370,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(essenceoflife));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(essenceoflife));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Ballach,-1);
                 a.AddTrigger(eTriggerType.Interact,null,Ballach);

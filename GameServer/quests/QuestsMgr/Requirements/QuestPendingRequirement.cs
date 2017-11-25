@@ -18,8 +18,6 @@
  */
 using System;
 using DOL.Events;
-using log4net;
-using System.Reflection;
 using DOL.GS.Behaviour.Attributes;
 using DOL.GS.Behaviour;
 
@@ -34,28 +32,26 @@ namespace DOL.GS.Quests.Requirements
     [Requirement(RequirementType=eRequirementType.QuestPending)]
     public class QuestPendingRequirement : AbstractRequirement<Type,Unused>
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Creates a new QuestRequirement and does some basich compativilite checks for the parameters
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="n"></param>
         /// <param name="v"></param>
         /// <param name="comp"></param>
-        public QuestPendingRequirement(GameNPC defaultNPC, object n, object v, eComparator comp)
-            : base(defaultNPC,eRequirementType.QuestPending, n, v, comp)
+        public QuestPendingRequirement(GameNPC defaultNpc, object n, object v, eComparator comp)
+            : base(defaultNpc,eRequirementType.QuestPending, n, v, comp)
         {
         }
 
         /// <summary>
         /// Creates a new QuestRequirement and does some basich compativilite checks for the parameters
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="questType"></param>
         /// <param name="comp"></param>
-        public QuestPendingRequirement(GameNPC defaultNPC, Type questType, eComparator comp)
-            : this(defaultNPC, (object)questType, (object)null, comp)
+        public QuestPendingRequirement(GameNPC defaultNpc, Type questType, eComparator comp)
+            : this(defaultNpc, questType, null, comp)
         {
         }
 
@@ -68,9 +64,9 @@ namespace DOL.GS.Quests.Requirements
         /// <returns></returns>
         public override bool Check(DOLEvent e, object sender, EventArgs args)
         {
-            bool result = true;
             GamePlayer player = BehaviourUtils.GuessGamePlayerFromNotify(e, sender, args);
 
+            bool result;
             if (Comparator == eComparator.Not)
             {
                 result = player.IsDoingQuest(N) == null;

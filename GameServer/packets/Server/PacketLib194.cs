@@ -50,7 +50,7 @@ namespace DOL.GS.PacketHandler
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.Dialog)))
             {
-                ushort QuestID = quest.ClientQuestID;
+                ushort QuestID = quest.ClientQuestId;
                 pak.WriteShort(offer ? (byte)0x22 : (byte)0x21); // Dialog
                 pak.WriteShort(QuestID);
                 pak.WriteShort((ushort)questNPC.ObjectID);

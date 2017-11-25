@@ -11,84 +11,49 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public enum eTDMissionType : int
+        public enum eTDMissionType
         {
             Clear = 0,
             Boss = 1,
             Specific = 2,
         }
 
-        public enum eDungeonType : int
+        public enum eDungeonType
         {
             Melee = 0,
             Ranged = 1,
         }
 
-        private eDungeonType m_dungeonType = eDungeonType.Melee;
+        public eDungeonType DungeonType { get; } = eDungeonType.Melee;
 
-        public eDungeonType DungeonType
-        {
-            get { return m_dungeonType; }
-        }
+        public eTDMissionType TdMissionType { get; }
 
-        private eTDMissionType m_missionType;
+        public TaskDungeonInstance TaskRegion { get; }
 
-        public eTDMissionType TDMissionType
-        {
-            get { return m_missionType; }
-        }
+        public int Current { get; private set; }
 
-        private TaskDungeonInstance m_taskRegion;
+        public long Total { get; }
 
-        public TaskDungeonInstance TaskRegion
-        {
-            get { return m_taskRegion; }
-        }
+        public string BossName { get; } = string.Empty;
 
-        private int m_current = 0;
+        public string TargetName { get; } = string.Empty;
 
-        public int Current
-        {
-            get { return m_current; }
-        }
-
-        private long m_total = 0;
-
-        public long Total
-        {
-            get { return m_total; }
-        }
-
-        private string m_bossName = string.Empty;
-
-        public string BossName
-        {
-            get { return m_bossName; }
-        }
-
-        private string m_targetName = string.Empty;
-
-        public string TargetName
-        {
-            get { return m_targetName; }
-        }
-
-        private bool[] m_mobIsAlive;
+        private readonly bool[] _mobIsAlive;
 
         public TaskDungeonMission(object owner, eDungeonType dungeonType = eDungeonType.Ranged)
             : base(owner)
         {
-            log.Info("INFO: Successfully entered TaskDungeonMission!");
+            Log.Info("INFO: Successfully entered TaskDungeonMission!");
             GamePlayer player = owner as GamePlayer;
 
-            if (owner is Group)
+            if (owner is Group group)
             {
-                player = (owner as Group).Leader;
+                player = group.Leader;
 
                 // Assign the mission to the group.
-                (owner as Group).Mission = this;
+                group.Mission = this;
             }
 
             if (player == null)
@@ -100,7 +65,7 @@ namespace DOL.GS.Quests
             ushort rid = GetRegionFromLevel(player.Level, player.Realm, dungeonType);
 
             TaskDungeonInstance instance = (TaskDungeonInstance)WorldMgr.CreateInstance(rid, typeof(TaskDungeonInstance));
-            m_taskRegion = instance;
+            TaskRegion = instance;
             instance.Mission = this;
 
             // Dinberg: I've removed instance level, and have commented this out so it compiles.
@@ -113,67 +78,67 @@ namespace DOL.GS.Quests
             // Lets load the region from the InstanceXElementDB!
 
             // First we get the instance keyname.
-            string keyname = "TaskDungeon" + rid + ".1"; // TODO; variations, eg .2, .3 etc.
+            string keyname = $"TaskDungeon{rid}.1"; // TODO; variations, eg .2, .3 etc.
             instance.LoadFromDatabase(keyname);
 
             // Now, search for the boss and possible targets in the instance!
-            foreach (GameNPC npc in instance.Objects)
+            foreach (var o in instance.Objects)
             {
-                if (npc == null)
+                if (!(o is GameNPC npc))
                 {
                     continue;
                 }
 
                 if (npc.Name.ToLower() != npc.Name)
                 {
-                    if (m_bossName == string.Empty)
+                    if (BossName == string.Empty)
                     {
-                        m_bossName = npc.Name; // Some instances have multiple bosses, eg Gregorian - why break?
+                        BossName = npc.Name; // Some instances have multiple bosses, eg Gregorian - why break?
                     }
                     else if (Util.Chance(50))
                     {
-                        m_bossName = npc.Name;
+                        BossName = npc.Name;
                     }
                 } // else what if we aren't looking at a boss, but a normal mob?
                 else
-                    if (Util.Chance(20) || m_targetName == string.Empty)
+                    if (Util.Chance(20) || TargetName == string.Empty)
                 {
-                    m_targetName = npc.Name;
+                    TargetName = npc.Name;
                 }
             }
 
             int specificCount = 0;
 
             // Draw the mission type before we do anymore counting...
-            if (Util.Chance(40) && m_bossName != string.Empty)
+            if (Util.Chance(40) && BossName != string.Empty)
             {
-                m_missionType = eTDMissionType.Boss;
+                TdMissionType = eTDMissionType.Boss;
             }
-            else if (Util.Chance(20) && m_targetName != string.Empty)
+            else if (Util.Chance(20) && TargetName != string.Empty)
             {
-                m_missionType = eTDMissionType.Specific;
+                TdMissionType = eTDMissionType.Specific;
             }
             else
             {
-                m_missionType = eTDMissionType.Clear;
+                TdMissionType = eTDMissionType.Clear;
             }
 
             // Now, count if we need to.
-            if (m_missionType != eTDMissionType.Boss)
+            if (TdMissionType != eTDMissionType.Boss)
             {
-                foreach (GameNPC entry in instance.Objects)
+                foreach (var o in instance.Objects)
                 {
-                    if (entry == null)
+                    if (!(o is GameNPC entry))
                     {
                         continue;
                     }
 
                     // Now, if we want all mobs, get all mobs...
-                    if (m_missionType == eTDMissionType.Clear)
+                    if (TdMissionType == eTDMissionType.Clear)
                     {
                         specificCount++;
                     }
-                    else if (entry.Name == m_targetName)
+                    else if (entry.Name == TargetName)
                     {
                         // only count target mobs for specific dungeons.
                         specificCount++;
@@ -182,7 +147,7 @@ namespace DOL.GS.Quests
             }
 
             // append the count to the total!
-            m_total = specificCount;
+            Total = specificCount;
 
             // Set the mission description again if owner is group, otherwise
             // mission description is always "Clear" before entering the dungeon.
@@ -191,10 +156,10 @@ namespace DOL.GS.Quests
                 UpdateMission();
             }
 
-            m_mobIsAlive = new bool[m_total];
-            for (int i = 0; i < m_total; i++)
+            _mobIsAlive = new bool[Total];
+            for (int i = 0; i < Total; i++)
             {
-                m_mobIsAlive[i] = true;
+                _mobIsAlive[i] = true;
             }
         }
 
@@ -203,68 +168,68 @@ namespace DOL.GS.Quests
         #region Albion Task Instances
 
         // Burial Tomb
-        private static ushort[] burial_tomb_long = new ushort[] { 295, 400, 402, 404 };
-        private static ushort[] burial_tomb_laby = new ushort[] { 293, 294, 401, 403 };
+        private static readonly ushort[] BurialTombLong = { 295, 400, 402, 404 };
+        private static readonly ushort[] BurialTombLaby = { 293, 294, 401, 403 };
 
         // Forgotten Mines
-        private static ushort[] forgotten_mines_long = new ushort[] { 256, 257, 258, };
-        private static ushort[] forgotten_mines_laby = new ushort[] { 410, 411, 412, 413, 414 };
+        private static readonly ushort[] ForgottenMinesLong = { 256, 257, 258, };
+        private static readonly ushort[] ForgottenMinesLaby = { 410, 411, 412, 413, 414 };
 
         // Desecrated Ground
-        private static ushort[] desecrated_grounds_long = new ushort[] { 297, 298, 409 };
-        private static ushort[] desecrated_grounds_laby = new ushort[] { 296, 405, 406, 407, 408 };
+        private static readonly ushort[] DesecratedGroundsLong = { 297, 298, 409 };
+        private static readonly ushort[] DesecratedGroundsLaby = { 296, 405, 406, 407, 408 };
 
         // Funerary Hall
-        private static ushort[] funerary_hall_long = new ushort[] { 379, 382, 383, 419 };
-        private static ushort[] funerary_hall_laby = new ushort[] { 415, 416, 417, 418 };
+        private static readonly ushort[] FuneraryHallLong = { 379, 382, 383, 419 };
+        private static readonly ushort[] FuneraryHallLaby = { 415, 416, 417, 418 };
 
         // Sundered Tombs
-        private static ushort[] sundered_tombs_long = new ushort[] { 386, 387, 388, };
-        private static ushort[] sundered_tombs_laby = new ushort[] { 420, 421, 422, 423, 424 };
+        private static readonly ushort[] SunderedTombsLong = { 386, 387, 388, };
+        private static readonly ushort[] SunderedTombsLaby = { 420, 421, 422, 423, 424 };
         #endregion
         #region Midgard Task Instances
 
         // Damp Cavern
-        private static ushort[] damp_cavern_long = new ushort[] { 278, 279, 280, 301 };
-        private static ushort[] damp_cavern_laby = new ushort[] { 300, 302, 303, 304 };
+        private static readonly ushort[] DampCavernLong = { 278, 279, 280, 301 };
+        private static readonly ushort[] DampCavernLaby = { 300, 302, 303, 304 };
 
         // Forgotten Sepulchre
-        private static ushort[] forgotten_sepulchre_long = new ushort[] { 281, 282, 283, 307 };
-        private static ushort[] forgotten_sepulchre_laby = new ushort[] { 305, 306, 308, 309 };
+        private static readonly ushort[] ForgottenSepulchreLong = { 281, 282, 283, 307 };
+        private static readonly ushort[] ForgottenSepulchreLaby = { 305, 306, 308, 309 };
 
         // The Concealed Guardhouse
-        private static ushort[] the_concealed_guardhouse_long = new ushort[] { 284, 285, 286 };
-        private static ushort[] the_concealed_guardhouse_laby = new ushort[] { 310, 311, 312, 313, 314 };
+        private static readonly ushort[] TheConcealedGuardhouseLong = { 284, 285, 286 };
+        private static readonly ushort[] TheConcealedGuardhouseLaby = { 310, 311, 312, 313, 314 };
 
         // The Gossamer Grotto
-        private static ushort[] the_gossamer_grotto_long = new ushort[] { 287, 288, 289 };
-        private static ushort[] the_gossamer_grotto_laby = new ushort[] { 315, 316, 317, 318, 319 };
+        private static readonly ushort[] TheGossamerGrottoLong = { 287, 288, 289 };
+        private static readonly ushort[] TheGossamerGrottoLaby = { 315, 316, 317, 318, 319 };
 
         // Underground Tunnel
-        private static ushort[] underground_tunnel_long = new ushort[] { 290, 291, 292 };
-        private static ushort[] underground_tunnel_laby = new ushort[] { 320, 321, 322, 323, 324 };
+        private static readonly ushort[] UndergroundTunnelLong = { 290, 291, 292 };
+        private static readonly ushort[] UndergroundTunnelLaby = { 320, 321, 322, 323, 324 };
         #endregion
         #region Hibernia Task Instances
 
         // The Cursed Barrow
-        private static ushort[] the_cursed_barrow_long = new ushort[] { 427, 428, 431, 454 };
-        private static ushort[] the_cursed_barrow_laby = new ushort[] { 450, 451, 452, 453 };
+        private static readonly ushort[] TheCursedBarrowLong = { 427, 428, 431, 454 };
+        private static readonly ushort[] TheCursedBarrowLaby = { 450, 451, 452, 453 };
 
         // Dismal Grotto
-        private static ushort[] dismal_grotto_long = new ushort[] { 432, 441, 444, 459 };
-        private static ushort[] dismal_grotto_laby = new ushort[] { 455, 456, 457, 458 };
+        private static readonly ushort[] DismalGrottoLong = { 432, 441, 444, 459 };
+        private static readonly ushort[] DismalGrottoLaby = { 455, 456, 457, 458 };
 
         // The Accursed Caves
-        private static ushort[] the_accursed_caves_long = new ushort[] { 464, 477, 478, 481 };
-        private static ushort[] the_accursed_caves_laby = new ushort[] { 460, 461, 462, 463 };
+        private static readonly ushort[] TheAccursedCavesLong = { 464, 477, 478, 481 };
+        private static readonly ushort[] TheAccursedCavesLaby = { 460, 461, 462, 463 };
 
         // Dark Cavern
-        private static ushort[] dark_cavern_long = new ushort[] { 445, 448, 449 };
-        private static ushort[] dark_cavern_laby = new ushort[] { 465, 466, 467, 468, 469 };
+        private static readonly ushort[] DarkCavernLong = { 445, 448, 449 };
+        private static readonly ushort[] DarkCavernLaby = { 465, 466, 467, 468, 469 };
 
         // Unused Mine
-        private static ushort[] unused_mine_long = new ushort[] { 474, 482, 485, 486 };
-        private static ushort[] unused_mine_laby = new ushort[] { 048, 471, 472, 473 };
+        private static readonly ushort[] UnusedMineLong = { 474, 482, 485, 486 };
+        private static readonly ushort[] UnusedMineLaby = { 048, 471, 472, 473 };
         #endregion
 
         private static ushort GetRegionFromLevel(byte level, eRealm realm, eDungeonType dungeonType)
@@ -280,31 +245,31 @@ namespace DOL.GS.Quests
                     case eRealm.Albion:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(burial_tomb_long);
+                            return GetRandomRegion(BurialTombLong);
                         }
                         else
                         {
-                            return GetRandomRegion(burial_tomb_laby);
+                            return GetRandomRegion(BurialTombLaby);
                         }
 
                     case eRealm.Midgard:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(damp_cavern_long);
+                            return GetRandomRegion(DampCavernLong);
                         }
                         else
                         {
-                            return GetRandomRegion(damp_cavern_laby);
+                            return GetRandomRegion(DampCavernLaby);
                         }
 
                     case eRealm.Hibernia:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(the_cursed_barrow_long);
+                            return GetRandomRegion(TheCursedBarrowLong);
                         }
                         else
                         {
-                            return GetRandomRegion(the_cursed_barrow_laby);
+                            return GetRandomRegion(TheCursedBarrowLaby);
                         }
                 }
             }
@@ -315,31 +280,31 @@ namespace DOL.GS.Quests
                     case eRealm.Albion:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(forgotten_mines_long);
+                            return GetRandomRegion(ForgottenMinesLong);
                         }
                         else
                         {
-                            return GetRandomRegion(forgotten_mines_laby);
+                            return GetRandomRegion(ForgottenMinesLaby);
                         }
 
                     case eRealm.Midgard:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(forgotten_sepulchre_long);
+                            return GetRandomRegion(ForgottenSepulchreLong);
                         }
                         else
                         {
-                            return GetRandomRegion(forgotten_sepulchre_laby);
+                            return GetRandomRegion(ForgottenSepulchreLaby);
                         }
 
                     case eRealm.Hibernia:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(dismal_grotto_long);
+                            return GetRandomRegion(DismalGrottoLong);
                         }
                         else
                         {
-                            return GetRandomRegion(dismal_grotto_laby);
+                            return GetRandomRegion(DismalGrottoLaby);
                         }
                 }
             }
@@ -350,31 +315,31 @@ namespace DOL.GS.Quests
                     case eRealm.Albion:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(desecrated_grounds_long);
+                            return GetRandomRegion(DesecratedGroundsLong);
                         }
                         else
                         {
-                            return GetRandomRegion(desecrated_grounds_laby);
+                            return GetRandomRegion(DesecratedGroundsLaby);
                         }
 
                     case eRealm.Midgard:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(the_concealed_guardhouse_long);
+                            return GetRandomRegion(TheConcealedGuardhouseLong);
                         }
                         else
                         {
-                            return GetRandomRegion(the_concealed_guardhouse_laby);
+                            return GetRandomRegion(TheConcealedGuardhouseLaby);
                         }
 
                     case eRealm.Hibernia:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(the_accursed_caves_long);
+                            return GetRandomRegion(TheAccursedCavesLong);
                         }
                         else
                         {
-                            return GetRandomRegion(the_accursed_caves_laby);
+                            return GetRandomRegion(TheAccursedCavesLaby);
                         }
                 }
             }
@@ -385,31 +350,31 @@ namespace DOL.GS.Quests
                     case eRealm.Albion:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(funerary_hall_long);
+                            return GetRandomRegion(FuneraryHallLong);
                         }
                         else
                         {
-                            return GetRandomRegion(funerary_hall_laby);
+                            return GetRandomRegion(FuneraryHallLaby);
                         }
 
                     case eRealm.Midgard:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(the_gossamer_grotto_long);
+                            return GetRandomRegion(TheGossamerGrottoLong);
                         }
                         else
                         {
-                            return GetRandomRegion(the_gossamer_grotto_laby);
+                            return GetRandomRegion(TheGossamerGrottoLaby);
                         }
 
                     case eRealm.Hibernia:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(dark_cavern_long);
+                            return GetRandomRegion(DarkCavernLong);
                         }
                         else
                         {
-                            return GetRandomRegion(dark_cavern_laby);
+                            return GetRandomRegion(DarkCavernLaby);
                         }
                 }
             }
@@ -420,31 +385,31 @@ namespace DOL.GS.Quests
                     case eRealm.Albion:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(sundered_tombs_long);
+                            return GetRandomRegion(SunderedTombsLong);
                         }
                         else
                         {
-                            return GetRandomRegion(sundered_tombs_laby);
+                            return GetRandomRegion(SunderedTombsLaby);
                         }
 
                     case eRealm.Midgard:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(underground_tunnel_long);
+                            return GetRandomRegion(UndergroundTunnelLong);
                         }
                         else
                         {
-                            return GetRandomRegion(underground_tunnel_laby);
+                            return GetRandomRegion(UndergroundTunnelLaby);
                         }
 
                     case eRealm.Hibernia:
                         if (dungeonType == eDungeonType.Ranged)
                         {
-                            return GetRandomRegion(unused_mine_long);
+                            return GetRandomRegion(UnusedMineLong);
                         }
                         else
                         {
-                            return GetRandomRegion(unused_mine_laby);
+                            return GetRandomRegion(UnusedMineLaby);
                         }
                 }
             }
@@ -464,18 +429,21 @@ namespace DOL.GS.Quests
                 return;
             }
 
-            if (sender is GamePlayer && (sender as GamePlayer).CurrentRegion != m_taskRegion)
+            if (sender is GamePlayer player && player.CurrentRegion != TaskRegion)
             {
                 return;
             }
 
-            EnemyKilledEventArgs eargs = args as EnemyKilledEventArgs;
+            if (!(args is EnemyKilledEventArgs eargs))
+            {
+                return;
+            }
 
-            switch (m_missionType)
+            switch (TdMissionType)
             {
                 case eTDMissionType.Boss:
                     {
-                        if (eargs.Target.Name == m_bossName)
+                        if (eargs.Target.Name == BossName)
                         {
                             FinishMission();
                         }
@@ -485,32 +453,16 @@ namespace DOL.GS.Quests
 
                 case eTDMissionType.Specific:
                     {
-                        if (eargs.Target.Name == m_targetName)
+                        if (eargs.Target.Name == TargetName)
                         {
-                            if (m_mobIsAlive[eargs.Target.ObjectID - 1])
+                            if (_mobIsAlive[eargs.Target.ObjectID - 1])
                             {
-                                m_mobIsAlive[eargs.Target.ObjectID - 1] = false;
-                                m_current++;
+                                _mobIsAlive[eargs.Target.ObjectID - 1] = false;
+                                Current++;
                                 UpdateMission();
-                                if (m_current == m_total)
+                                if (Current == Total)
                                 {
                                     FinishMission();
-                                }
-                                else
-                                {
-                                    /* - Dinberg, disabled this. Messages extremely annoying.
-                                    if (m_owner is GamePlayer)
-                                    {
-                                        (m_owner as GamePlayer).Out.SendMessage((m_total - m_current) + " " + m_targetName + " Left", eChatType.CT_ScreenCenter_And_CT_System, eChatLoc.CL_ChatWindow);
-                                    }
-                                    else if (m_owner is Group)
-                                    {
-                                        foreach (GamePlayer player in (m_owner as Group).GetPlayersInTheGroup())
-                                        {
-                                            player.Out.SendMessage((m_total - m_current) + " " + m_targetName + " Left", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
-                                        }
-                                    }
-                                     */
                                 }
                             }
                         }
@@ -520,30 +472,14 @@ namespace DOL.GS.Quests
 
                 case eTDMissionType.Clear:
                     {
-                        if (m_mobIsAlive[eargs.Target.ObjectID - 1])
+                        if (_mobIsAlive[eargs.Target.ObjectID - 1])
                         {
-                            m_mobIsAlive[eargs.Target.ObjectID - 1] = false;
-                            m_current++;
+                            _mobIsAlive[eargs.Target.ObjectID - 1] = false;
+                            Current++;
                             UpdateMission();
-                            if (m_current == m_total)
+                            if (Current == Total)
                             {
                                 FinishMission();
-                            }
-                            else
-                            {
-                                /*
-                                if (m_owner is GamePlayer)
-                                {
-                                    (m_owner as GamePlayer).Out.SendMessage((m_total - m_current) + " Creatures Left", eChatType.CT_ScreenCenter_And_CT_System, eChatLoc.CL_ChatWindow);
-                                }
-                                else if (m_owner is Group)
-                                {
-                                    foreach (GamePlayer player in (m_owner as Group).GetPlayersInTheGroup())
-                                    {
-                                        player.Out.SendMessage((m_total - m_current) + " Creatures Left", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
-                                    }
-                                }
-                                 */
                             }
                         }
 
@@ -563,54 +499,50 @@ namespace DOL.GS.Quests
         {
             get
             {
-                switch (m_missionType)
+                switch (TdMissionType)
                 {
-                    case eTDMissionType.Boss: return "You have been asked to kill " + m_bossName + " in the nearby caves.";
-                    case eTDMissionType.Specific: return "You have been asked to kill " + m_total + " " + m_targetName + " in the nearby caves.";
+                    case eTDMissionType.Boss: return $"You have been asked to kill {BossName} in the nearby caves.";
+                    case eTDMissionType.Specific: return $"You have been asked to kill {Total} {TargetName} in the nearby caves.";
                     case eTDMissionType.Clear:
                         {
                             // Additional check if region is null in case of group mission.
                             // Otherwise else condition is used with m_total = 0.
-                            if ((m_owner is GamePlayer && (m_owner as GamePlayer).CurrentRegion != m_taskRegion) ||
-                                (m_owner is Group && m_taskRegion == null))
+                            if ((Owner is GamePlayer player && player.CurrentRegion != TaskRegion) || (Owner is Group && TaskRegion == null))
                             {
                                 return "You have been asked to clear the nearby caves.";
                             }
-                            else
-                            {
-                                bool test = m_total - m_current == 1;
-                                return "You have been asked to clear the nearby caves. " + (m_total - m_current) + " creature" + (test == true ? string.Empty : "s") + " left!";
-                            }
+
+                            bool test = Total - Current == 1;
+                            return $"You have been asked to clear the nearby caves. {Total - Current} creature{(test ? string.Empty : "s")} left!";
                         }
 
-                    default: return "No description for mission type " + m_missionType.ToString();
+                    default: return $"No description for mission type {TdMissionType}";
                 }
             }
         }
 
-        public override long RewardRealmPoints
-        {
-            get { return 0; }
-        }
+        public override long RewardRealmPoints => 0;
 
         public override long RewardMoney
         {
-            get {
-                GamePlayer player = m_owner as GamePlayer;
-                if (m_owner is Group)
+            get
+            {
+                GamePlayer player = (GamePlayer) Owner;
+
+                if (Owner is Group group)
                 {
-                    player = (m_owner as Group).Leader;
+                    player = group.Leader;
                 }
 
                 return player.Level * player.Level * 100;
             }
         }
 
-        private int XPMagicNumber
+        private int XpMagicNumber
         {
             get
             {
-                switch (m_missionType)
+                switch (TdMissionType)
                 {
                     case eTDMissionType.Clear: return 75;
                     case eTDMissionType.Boss:
@@ -621,39 +553,35 @@ namespace DOL.GS.Quests
             }
         }
 
-        public override long RewardXP
+        public override long RewardXp
         {
             get
             {
-                GamePlayer player = m_owner as GamePlayer;
-                if (m_owner is Group)
+                GamePlayer player = (GamePlayer) Owner;
+                if (Owner is Group group)
                 {
-                    player = (m_owner as Group).Leader;
+                    player = group.Leader;
                 }
 
-                long amount = XPMagicNumber * player.Level;
+                long amount = XpMagicNumber * player.Level;
                 if (player.Level > 1)
                 {
-                    amount += XPMagicNumber * (player.Level - 1);
+                    amount += XpMagicNumber * (player.Level - 1);
                 }
 
                 return amount;
-                /*
-                long XPNeeded = (m_owner as GamePlayer).ExperienceForNextLevel - (m_owner as GamePlayer).ExperienceForCurrentLevel;
-                return (long)(XPNeeded * 0.50 / (m_owner as GamePlayer).Level); // 50% of total xp for level
-                 */
             }
         }
 
         public override void FinishMission()
         {
-            if (m_owner is GamePlayer)
+            if (Owner is GamePlayer gamePlayer)
             {
-                (m_owner as GamePlayer).Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
+                gamePlayer.Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
             }
-            else if (m_owner is Group)
+            else if (Owner is Group pOwner)
             {
-                foreach (GamePlayer player in (m_owner as Group).GetPlayersInTheGroup())
+                foreach (GamePlayer player in pOwner.GetPlayersInTheGroup())
                 {
                     player.Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
                 }
@@ -672,17 +600,12 @@ namespace DOL.GS.Quests
         {
         }
 
-        private TaskDungeonMission m_mission;
         /// <summary>
         /// Gets/Sets the Mission of this instance.
         /// </summary>
-        public TaskDungeonMission Mission
-        {
-            get { return m_mission; }
-            set { m_mission = value; }
-        }
+        public TaskDungeonMission Mission { get; set; }
 
-        private int m_level;
+        private int _level;
 
         // Change instance level...
         // I've checked, this should be called correctly: player will be added/removed in time.
@@ -692,8 +615,8 @@ namespace DOL.GS.Quests
             UpdateInstanceLevel();
 
             // The player will not yet be in the instance, so wont receive the relevant text.
-            player.Out.SendMessage("You have entered " + Description + ".", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-            player.Out.SendMessage("This instance is currently level " + m_level + ".", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage($"You have entered {Description}.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage($"This instance is currently level {_level}.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
         }
 
         public override void OnPlayerLeaveInstance(GamePlayer player)
@@ -702,7 +625,7 @@ namespace DOL.GS.Quests
             UpdateInstanceLevel();
 
             // Expire task from player...
-            if (player.Mission == m_mission)
+            if (player.Mission == Mission)
             {
                 player.Mission.ExpireMission();
             }
@@ -712,34 +635,25 @@ namespace DOL.GS.Quests
         // because i want people to think carefully about how they change levels in their instance.
         public void UpdateInstanceLevel()
         {
-            m_level = (byte)GetInstanceLevel();
+            _level = (byte)GetInstanceLevel();
 
             // Set all mobs to that level...
-            if (m_level > 0)
+            if (_level > 0)
             {
                 foreach (GameObject obj in Objects)
                 {
-                    if (obj == null)
+                    if (!(obj is GameNPC npc))
                     {
                         continue;
                     }
 
-                    GameNPC npc = obj as GameNPC;
-                    if (npc == null)
-                    {
-                        continue;
-                    }
-
-                    npc.Level = (byte)m_level;
+                    npc.Level = (byte)_level;
                 }
 
                 // Update to the players..
                 foreach (GameClient client in WorldMgr.GetClientsOfRegion(ID))
                 {
-                    if (client != null)
-                    {
-                        client.Out.SendMessage("This instance is now level " + m_level, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                    }
+                    client?.Out.SendMessage($"This instance is now level {_level}", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
             }
         }
@@ -750,10 +664,7 @@ namespace DOL.GS.Quests
         public override void OnCollapse()
         {
             // We expire the mission as players can no longer reach or access the region once collapsed.
-            if (Mission != null)
-            {
-                Mission.ExpireMission();
-            }
+            Mission?.ExpireMission();
 
             base.OnCollapse();
         }

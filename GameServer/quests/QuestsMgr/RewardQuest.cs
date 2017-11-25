@@ -32,16 +32,10 @@ namespace DOL.GS.Quests
     /// <author>Aredhel</author>
     public class RewardQuest : BaseQuest
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        private GameNPC m_questGiver;
-        private List<QuestGoal> m_goals;
-        private QuestRewards m_rewards;
-
-        public RewardQuest() : base()
+        public RewardQuest()
         {
-            m_rewards = new QuestRewards(this);
-            m_goals = new List<QuestGoal>();
+            Rewards = new QuestRewards(this);
+            Goals = new List<QuestGoal>();
         }
 
         /// <summary>
@@ -59,8 +53,8 @@ namespace DOL.GS.Quests
         public RewardQuest(GamePlayer questingPlayer,int step)
             : base(questingPlayer, step)
         {
-            m_rewards = new QuestRewards(this);
-            m_goals = new List<QuestGoal>();
+            Rewards = new QuestRewards(this);
+            Goals = new List<QuestGoal>();
         }
 
         /// <summary>
@@ -71,8 +65,8 @@ namespace DOL.GS.Quests
         public RewardQuest(GamePlayer questingPlayer, DBQuest dbQuest)
             : base(questingPlayer, dbQuest)
         {
-            m_rewards = new QuestRewards(this);
-            m_goals = new List<QuestGoal>();
+            Rewards = new QuestRewards(this);
+            Goals = new List<QuestGoal>();
         }
 
         /// <summary>
@@ -84,8 +78,8 @@ namespace DOL.GS.Quests
         /// <param name="questItem"></param>
         protected QuestGoal AddGoal(string description, QuestGoal.GoalType type, int targetNumber, ItemTemplate questItem)
         {
-            QuestGoal goal = new QuestGoal("none", this, description, type, m_goals.Count + 1, targetNumber, questItem);
-            m_goals.Add(goal);
+            QuestGoal goal = new QuestGoal("none", this, description, type, Goals.Count + 1, targetNumber, questItem);
+            Goals.Add(goal);
             return goal;
         }
 
@@ -100,60 +94,40 @@ namespace DOL.GS.Quests
         /// <returns></returns>
         protected QuestGoal AddGoal(string id, string description, QuestGoal.GoalType type, int targetNumber, ItemTemplate questItem)
         {
-            QuestGoal goal = new QuestGoal(id, this, description, type, m_goals.Count + 1, targetNumber, questItem);
-            m_goals.Add(goal);
+            QuestGoal goal = new QuestGoal(id, this, description, type, Goals.Count + 1, targetNumber, questItem);
+            Goals.Add(goal);
             return goal;
         }
 
         /// <summary>
         /// The NPC giving the quest.
         /// </summary>
-        public GameNPC QuestGiver
-        {
-            get { return m_questGiver; }
-            set { m_questGiver = value; }
-        }
+        public GameNPC QuestGiver { get; set; }
 
         /// <summary>
         /// List of all goals for this quest
         /// </summary>
-        public List<QuestGoal> Goals
-        {
-            get { return m_goals; }
-        }
+        public List<QuestGoal> Goals { get; }
 
         /// <summary>
         /// The rewards given on successful completion of this quest.
         /// </summary>
-        public QuestRewards Rewards
-        {
-            get { return m_rewards; }
-            set { m_rewards = value; }
-        }
+        public QuestRewards Rewards { get; set; }
 
         /// <summary>
         /// The fully-fledged story to the quest.
         /// </summary>
-        public virtual string Story
-        {
-            get { return "QUEST STORY UNDEFINED"; }
-        }
+        public virtual string Story => "QUEST STORY UNDEFINED";
 
         /// <summary>
         /// A summary of the quest text.
         /// </summary>
-        public virtual string Summary
-        {
-            get { return "QUEST SUMMARY UNDEFINED"; }
-        }
+        public virtual string Summary => "QUEST SUMMARY UNDEFINED";
 
         /// <summary>
         /// Text showing upon finishing the quest.
         /// </summary>
-        public virtual string Conclusion
-        {
-            get { return "QUEST CONCLUSION UNDEFINED"; }
-        }
+        public virtual string Conclusion => "QUEST CONCLUSION UNDEFINED";
 
         public override bool CheckQuestQualification(GamePlayer player)
         {
@@ -193,8 +167,7 @@ namespace DOL.GS.Quests
             base.Notify(e, sender, args);
             if (e == GamePlayerEvent.QuestRewardChosen)
             {
-                QuestRewardChosenEventArgs rewardArgs = args as QuestRewardChosenEventArgs;
-                if (rewardArgs == null)
+                if (!(args is QuestRewardChosenEventArgs rewardArgs))
                 {
                     return;
                 }
@@ -244,7 +217,7 @@ namespace DOL.GS.Quests
                 QuestPlayer.Out.SendSoundEffect(11, 0, 0, 0, 0, 0);
                 QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, Rewards.Experience);
                 QuestPlayer.AddMoney(Rewards.Money);
-                InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, Rewards.Money);
+                InventoryLogging.LogInventoryAction($"(QUEST;{Name})", QuestPlayer, eInventoryActionType.Quest, Rewards.Money);
                 if (Rewards.GiveBountyPoints > 0)
                 {
                     QuestPlayer.GainBountyPoints(Rewards.GiveBountyPoints);
@@ -269,7 +242,7 @@ namespace DOL.GS.Quests
             }
             else
             {
-                QuestPlayer.Out.SendMessage(string.Format("Your inventory is full, you need {0} free slot(s) to complete this quest.", inventorySpaceRequired), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                QuestPlayer.Out.SendMessage($"Your inventory is full, you need {inventorySpaceRequired} free slot(s) to complete this quest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 Rewards.ChosenItems.Clear();
             }
         }
@@ -279,15 +252,13 @@ namespace DOL.GS.Quests
         /// </summary>
         public class QuestGoal
         {
-            private string m_id;
-            private RewardQuest m_quest;
-            private string m_description;
-            private int m_index;
-            private int m_current, m_target;
-            private int m_zoneID1 = 0, m_xOffset1 = 0, m_yOffset1 = 0;
-            private int m_zoneID2 = 0, m_xOffset2 = 0, m_yOffset2 = 0;
-            private GoalType m_goalType;
-            private ItemTemplate m_questItem = null;
+            private readonly RewardQuest _quest;
+            private readonly string _description;
+            private readonly int _index;
+
+            private int _current;
+            private int _target;
+            private ItemTemplate _questItem;
 
             public enum GoalType { KillTask = 3, ScoutMission = 5 };    // These are just a hunch for now.
 
@@ -302,24 +273,21 @@ namespace DOL.GS.Quests
             /// <param name="target"></param>
             public QuestGoal(string id, RewardQuest quest, string description, GoalType type, int index, int target, ItemTemplate questItem)
             {
-                m_id = id;
-                m_quest = quest;
-                m_description = description;
-                m_goalType = type;
-                m_index = index;
-                m_current = 0;
-                m_target = 0;
+                Id = id;
+                _quest = quest;
+                _description = description;
+                Type = type;
+                _index = index;
+                _current = 0;
+                _target = 0;
                 Target = target;
-                m_questItem = questItem;
+                _questItem = questItem;
             }
 
             /// <summary>
             /// An id for this quest goal
             /// </summary>
-            public string Id
-            {
-                get { return m_id; }
-            }
+            public string Id { get; }
 
             /// <summary>
             /// Ready-to-use description of the goal and its current status.
@@ -328,30 +296,27 @@ namespace DOL.GS.Quests
             {
                 get
                 {
-                    if (m_quest.QuestPlayer != null)
+                    if (_quest.QuestPlayer != null)
                     {
-                        return string.Format(LanguageMgr.GetTranslation((m_quest.QuestPlayer as GamePlayer).Client, "RewardQuest.Description", m_description, Current, Target));
+                        return string.Format(LanguageMgr.GetTranslation(_quest.QuestPlayer.Client, "RewardQuest.Description", _description, Current, Target));
                     }
 
-                    return m_description;
+                    return _description;
                 }
             }
 
             /// <summary>
             /// The type of the goal, i.e. whether to scout or to kill things.
             /// </summary>
-            public GoalType Type
-            {
-                get { return m_goalType; }
-            }
+            public GoalType Type { get; }
 
             /// <summary>
             /// The quest item required for this goal.
             /// </summary>
             public ItemTemplate QuestItem
             {
-                get { return (Current > 0) ? m_questItem : null; }
-                set { m_questItem = value; }
+                get => (Current > 0) ? _questItem : null;
+                set => _questItem = value;
             }
 
             /// <summary>
@@ -361,12 +326,12 @@ namespace DOL.GS.Quests
             {
                 get
                 {
-                    if (m_quest.QuestPlayer == null)
+                    if (_quest.QuestPlayer == null)
                     {
-                        return m_current;
+                        return _current;
                     }
 
-                    string propertyValue = m_quest.GetCustomProperty(string.Format("goal{0}Current", m_index));
+                    string propertyValue = _quest.GetCustomProperty($"goal{_index}Current");
                     if (propertyValue == null)
                     {
                         Current = 0;
@@ -378,14 +343,14 @@ namespace DOL.GS.Quests
 
                 set
                 {
-                    if (m_quest.QuestPlayer == null)
+                    if (_quest.QuestPlayer == null)
                     {
-                        m_current = value;
+                        _current = value;
                     }
                     else
                     {
-                        m_quest.SetCustomProperty(string.Format("goal{0}Current", m_index), value.ToString());
-                        m_quest.SaveIntoDatabase();
+                        _quest.SetCustomProperty($"goal{_index}Current", value.ToString());
+                        _quest.SaveIntoDatabase();
                     }
                 }
             }
@@ -397,12 +362,12 @@ namespace DOL.GS.Quests
             {
                 get
                 {
-                    if (m_quest.QuestPlayer == null)
+                    if (_quest.QuestPlayer == null)
                     {
-                        return m_current;
+                        return _current;
                     }
 
-                    string propertyValue = m_quest.GetCustomProperty(string.Format("goal{0}Target", m_index));
+                    string propertyValue = _quest.GetCustomProperty($"goal{_index}Target");
                     if (propertyValue == null)
                     {
                         Target = 0;
@@ -414,14 +379,14 @@ namespace DOL.GS.Quests
 
                 set
                 {
-                    if (m_quest.QuestPlayer == null)
+                    if (_quest.QuestPlayer == null)
                     {
-                        m_target = value;
+                        _target = value;
                     }
                     else
                     {
-                        m_quest.SetCustomProperty(string.Format("goal{0}Target", m_index), value.ToString());
-                        m_quest.SaveIntoDatabase();
+                        _quest.SetCustomProperty($"goal{_index}Target", value.ToString());
+                        _quest.SaveIntoDatabase();
                     }
                 }
             }
@@ -429,33 +394,30 @@ namespace DOL.GS.Quests
             /// <summary>
             /// Whether or not the goal has been achieved yet.
             /// </summary>
-            public bool IsAchieved
-            {
-                get { return Current == Target; }
-            }
+            public bool IsAchieved => Current == Target;
 
             public void Advance()
             {
                 if (Current < Target)
                 {
                     Current++;
-                    m_quest.QuestPlayer.Out.SendMessage(Description, eChatType.CT_ScreenCenter,
+                    _quest.QuestPlayer.Out.SendMessage(Description, eChatType.CT_ScreenCenter,
                         eChatLoc.CL_SystemWindow);
-                    m_quest.QuestPlayer.Out.SendQuestUpdate(m_quest);
+                    _quest.QuestPlayer.Out.SendQuestUpdate(_quest);
 
                     // Check for updates
                     if (IsAchieved)
                     {
                         // check if all quest is achieved
                         bool done = true;
-                        foreach (QuestGoal goal in m_quest.Goals)
+                        foreach (QuestGoal goal in _quest.Goals)
                         {
                             done &= goal.IsAchieved;
                         }
 
-                        if (done && m_quest.QuestGiver.IsWithinRadius(m_quest.QuestPlayer, WorldMgr.VISIBILITY_DISTANCE))
+                        if (done && _quest.QuestGiver.IsWithinRadius(_quest.QuestPlayer, WorldMgr.VISIBILITY_DISTANCE))
                         {
-                            m_quest.QuestPlayer.Out.SendNPCsQuestEffect(m_quest.QuestGiver, m_quest.QuestGiver.GetQuestIndicator(m_quest.QuestPlayer));
+                            _quest.QuestPlayer.Out.SendNPCsQuestEffect(_quest.QuestGiver, _quest.QuestGiver.GetQuestIndicator(_quest.QuestPlayer));
                         }
                     }
                 }
@@ -466,35 +428,17 @@ namespace DOL.GS.Quests
              * but have to provide it for the quest update packet nonetheless.
              */
 
-            public int ZoneID1
-            {
-                get { return m_zoneID1; }
-            }
+            public int ZoneId1 { get; } = 0;
 
-            public int XOffset1
-            {
-                get { return m_xOffset1; }
-            }
+            public int XOffset1 { get; } = 0;
 
-            public int YOffset1
-            {
-                get { return m_yOffset1; }
-            }
+            public int YOffset1 { get; } = 0;
 
-            public int ZoneID2
-            {
-                get { return m_zoneID2; }
-            }
+            public int ZoneId2 { get; } = 0;
 
-            public int XOffset2
-            {
-                get { return m_xOffset2; }
-            }
+            public int XOffset2 { get; } = 0;
 
-            public int YOffset2
-            {
-                get { return m_yOffset2; }
-            }
+            public int YOffset2 { get; } = 0;
         }
 
         /// <summary>
@@ -502,53 +446,37 @@ namespace DOL.GS.Quests
         /// </summary>
         public class QuestRewards
         {
-            private RewardQuest m_quest;
-            private int m_moneyPercent;
-            private long m_experience;
-            private List<ItemTemplate> m_basicItems, m_optionalItems;
-            private int m_choiceOf;
-            private List<ItemTemplate> m_chosenItems;
-            private int m_bountypoints;
-            private int m_realmpoints;
-            private int m_gold;
+            private readonly RewardQuest _quest;
+
+            private int _moneyPercent;
+            private long _experience;
+            private int _choiceOf;
 
             public QuestRewards(RewardQuest quest)
             {
-                m_quest = quest;
-                m_moneyPercent = 0;
-                m_experience = 0;
-                m_basicItems = new List<ItemTemplate>();
-                m_optionalItems = new List<ItemTemplate>();
-                m_choiceOf = 0;
-                m_chosenItems = new List<ItemTemplate>();
-                m_bountypoints = 0;
-                m_realmpoints = 0;
-                m_gold = 0;
+                _quest = quest;
+                _moneyPercent = 0;
+                _experience = 0;
+                BasicItems = new List<ItemTemplate>();
+                OptionalItems = new List<ItemTemplate>();
+                _choiceOf = 0;
+                ChosenItems = new List<ItemTemplate>();
+                GiveBountyPoints = 0;
+                GiveRealmPoints = 0;
+                GiveGold = 0;
             }
 
-            public int GiveGold
-            {
-                get { return m_gold; }
-                set { m_gold = value; }
-            }
+            public int GiveGold { get; set; }
 
-            public int GiveRealmPoints
-            {
-                get { return m_realmpoints; }
-                set { m_realmpoints = value; }
-            }
+            public int GiveRealmPoints { get; set; }
 
-            public int GiveBountyPoints
-            {
-                get { return m_bountypoints; }
-                set { m_bountypoints = value; }
-            }
+            public int GiveBountyPoints { get; set; }
 
             /// <summary>
             /// The maximum amount of copper awarded for a quest with a
             /// particular level.
             /// </summary>
-            private long[] m_maxCopperForLevel = {
+            private readonly long[] _maxCopperForLevel = {
                 0,
                 115,
                 310,
@@ -608,9 +536,9 @@ namespace DOL.GS.Quests
             /// <param name="reward"></param>
             public void AddBasicItem(ItemTemplate reward)
             {
-                if (m_basicItems.Count < 8)
+                if (BasicItems.Count < 8)
                 {
-                    m_basicItems.Add(reward);
+                    BasicItems.Add(reward);
                 }
             }
 
@@ -620,9 +548,9 @@ namespace DOL.GS.Quests
             /// <param name="reward"></param>
             public void AddOptionalItem(ItemTemplate reward)
             {
-                if (m_optionalItems.Count < 8)
+                if (OptionalItems.Count < 8)
                 {
-                    m_optionalItems.Add(reward);
+                    OptionalItems.Add(reward);
                 }
             }
 
@@ -633,12 +561,12 @@ namespace DOL.GS.Quests
             /// <returns></returns>
             public bool Choose(int reward)
             {
-                if (reward > m_optionalItems.Count)
+                if (reward > OptionalItems.Count)
                 {
                     return false;
                 }
 
-                m_chosenItems.Add(m_optionalItems[reward]);
+                ChosenItems.Add(OptionalItems[reward]);
                 return true;
             }
 
@@ -650,10 +578,10 @@ namespace DOL.GS.Quests
             /// </summary>
             public int MoneyPercent
             {
-                get { return m_moneyPercent; }
+                get => _moneyPercent;
                 set { if (value >= 0 && value <= 100)
                     {
-                        m_moneyPercent = value;
+                        _moneyPercent = value;
                     }
                 }
             }
@@ -663,13 +591,7 @@ namespace DOL.GS.Quests
             /// You shouldn't be able to set this directly, because a level dependent
             /// cap applies to all money earned from quests.
             /// </summary>
-            public long Money
-            {
-                get
-                {
-                    return (long)((m_maxCopperForLevel[m_quest.Level] * MoneyPercent / 100) + (GiveGold * 10000));
-                }
-            }
+            public long Money => (_maxCopperForLevel[_quest.Level] * MoneyPercent / 100) + (GiveGold * 10000);
 
             /// <summary>
             /// Experience awarded for completing this quest. This is a percentage
@@ -690,7 +612,7 @@ namespace DOL.GS.Quests
                 long experienceToLevel = player.GetExperienceNeededForLevel(currentLevel + 1) -
                     player.GetExperienceNeededForLevel(currentLevel);
 
-                return (int)((m_experience * 100) / experienceToLevel);
+                return (int)((_experience * 100) / experienceToLevel);
             }
 
             /// <summary>
@@ -698,14 +620,13 @@ namespace DOL.GS.Quests
             /// </summary>
             public long Experience
             {
-                get { return m_experience; }
-
+                get => _experience;
                 set
                 {
-                    m_experience = value;
-                    if (m_experience < 0)
+                    _experience = value;
+                    if (_experience < 0)
                     {
-                        m_experience = 0;
+                        _experience = 0;
                     }
                 }
             }
@@ -713,26 +634,17 @@ namespace DOL.GS.Quests
             /// <summary>
             /// List of basic item rewards.
             /// </summary>
-            public List<ItemTemplate> BasicItems
-            {
-                get { return m_basicItems; }
-            }
+            public List<ItemTemplate> BasicItems { get; }
 
             /// <summary>
             /// List of optional item rewards.
             /// </summary>
-            public List<ItemTemplate> OptionalItems
-            {
-                get { return m_optionalItems; }
-            }
+            public List<ItemTemplate> OptionalItems { get; }
 
             /// <summary>
             /// List of optional rewards the player actually picked.
             /// </summary>
-            public List<ItemTemplate> ChosenItems
-            {
-                get { return m_chosenItems; }
-            }
+            public List<ItemTemplate> ChosenItems { get; }
 
             /// <summary>
             /// The number of items the player can choose from the optional
@@ -740,13 +652,12 @@ namespace DOL.GS.Quests
             /// </summary>
             public int ChoiceOf
             {
-                get { return m_choiceOf; }
-
+                get => _choiceOf;
                 set
                 {
-                    if (m_optionalItems.Count > 0)
+                    if (OptionalItems.Count > 0)
                     {
-                        m_choiceOf = Math.Min(Math.Max(1, value), m_optionalItems.Count);
+                        _choiceOf = Math.Min(Math.Max(1, value), OptionalItems.Count);
                     }
                 }
             }

@@ -18,8 +18,6 @@
  */
 using System;
 using DOL.Events;
-using log4net;
-using System.Reflection;
 using DOL.GS.Behaviour.Attributes;
 using DOL.GS.Behaviour;
 
@@ -33,27 +31,25 @@ namespace DOL.GS.Quests.Triggers
     [Trigger(TriggerType=eTriggerType.AcceptQuest)]
     public class AcceptQuestTrigger : AbstractTrigger<Unused,Type>
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Creates a new questtrigger and does some simple triggertype parameter compatibility checking
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="notifyHandler"></param>
         /// <param name="k"></param>
         /// <param name="i"></param>
-        public AcceptQuestTrigger(GameNPC defaultNPC, DOLEventHandler notifyHandler, object k, object i)
-            : base(defaultNPC, notifyHandler, eTriggerType.AcceptQuest, k, i)
+        public AcceptQuestTrigger(GameNPC defaultNpc, DOLEventHandler notifyHandler, object k, object i)
+            : base(defaultNpc, notifyHandler, eTriggerType.AcceptQuest, k, i)
         { }
 
         /// <summary>
         /// Creates a new questtrigger and does some simple triggertype parameter compatibility checking
         /// </summary>
-        /// <param name="defautNPC"></param>
+        /// <param name="defautNpc"></param>
         /// <param name="notifyHandler"></param>
         /// <param name="questType"></param>
-        public AcceptQuestTrigger(GameNPC defautNPC, DOLEventHandler notifyHandler, Type questType)
-            : this(defautNPC,notifyHandler, (object)null, (object)questType)
+        public AcceptQuestTrigger(GameNPC defautNpc, DOLEventHandler notifyHandler, Type questType)
+            : this(defautNpc,notifyHandler, null, questType)
         { }
 
         /// <summary>
@@ -75,7 +71,7 @@ namespace DOL.GS.Quests.Triggers
                 Type type = QuestMgr.GetQuestTypeForID(qArgs.QuestID);
                 if (type != null)
                 {
-                    result = qArgs.Player.ObjectID == player.ObjectID && type.Equals(I);
+                    result = qArgs.Player.ObjectID == player.ObjectID && type == I;
                 }
             }
 

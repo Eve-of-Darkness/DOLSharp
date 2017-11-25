@@ -18,8 +18,6 @@
  */
 using System;
 using DOL.Events;
-using log4net;
-using System.Reflection;
 using DOL.GS.Behaviour.Attributes;
 using DOL.GS.Behaviour;
 
@@ -34,29 +32,27 @@ namespace DOL.GS.Quests.Requirements
     [Requirement(RequirementType=eRequirementType.QuestStep)]
     public class QuestStepRequirement : AbstractRequirement<Type,int>
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Creates a new QuestRequirement and does some basich compativilite checks for the parameters
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="n"></param>
         /// <param name="v"></param>
         /// <param name="comp"></param>
-        public QuestStepRequirement(GameNPC defaultNPC, object n, object v, eComparator comp)
-            : base(defaultNPC, eRequirementType.QuestStep, n, v, comp)
+        public QuestStepRequirement(GameNPC defaultNpc, object n, object v, eComparator comp)
+            : base(defaultNpc, eRequirementType.QuestStep, n, v, comp)
         {
         }
 
         /// <summary>
         /// Creates a new QuestRequirement and does some basich compativilite checks for the parameters
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="questType"></param>
         /// <param name="v"></param>
         /// <param name="comp"></param>
-        public QuestStepRequirement(GameNPC defaultNPC, Type questType,int v, eComparator comp)
-            : this(defaultNPC, (object)questType, (object)v, comp)
+        public QuestStepRequirement(GameNPC defaultNpc, Type questType,int v, eComparator comp)
+            : this(defaultNpc, questType as object, v, comp)
         {
         }
 
@@ -69,10 +65,10 @@ namespace DOL.GS.Quests.Requirements
         /// <returns></returns>
         public override bool Check(DOLEvent e, object sender, EventArgs args)
         {
-            bool result = true;
             GamePlayer player = BehaviourUtils.GuessGamePlayerFromNotify(e, sender, args);
-
             AbstractQuest playerQuest = player.IsDoingQuest(N);
+
+            bool result = true;
             if (playerQuest != null)
             {
                 result &= compare(playerQuest.Step, V, Comparator);

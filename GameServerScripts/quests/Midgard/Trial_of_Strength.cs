@@ -300,7 +300,7 @@ namespace DOL.GS.Quests.Midgard
 
             #region defineQuestParts
 
-            QuestBuilder builder = QuestMgr.getBuilder(typeof(trialofstrength));
+            QuestBuilder builder = QuestMgr.GetBuilder(typeof(trialofstrength));
             QuestBehaviour a;
             a = builder.CreateBehaviour(ToroldSterkkriger, -1);
             a.AddTrigger(eTriggerType.Interact, null, ToroldSterkkriger);

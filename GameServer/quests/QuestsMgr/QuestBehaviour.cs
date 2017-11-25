@@ -18,8 +18,6 @@
  */
 using System;
 using DOL.Events;
-using log4net;
-using System.Reflection;
 using DOL.GS.Behaviour;
 
 namespace DOL.GS.Quests
@@ -47,15 +45,9 @@ namespace DOL.GS.Quests
     public class QuestBehaviour : BaseBehaviour
     {
 
-        public const string NUMBER_OF_EXECUTIONS = "quest.numberOfExecutions";
-
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private const string NumberOfExecutions = "quest.numberOfExecutions";
 
         #region Variables
-
-        private Type questType;
-
-        private int maxNumberOfExecutions;
 
         #endregion
 
@@ -64,16 +56,9 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Type of quest this questpart belnogs to
         /// </summary>
-        public Type QuestType
-        {
-            get { return questType; }
-            set { questType = value; }
-        }
+        public Type QuestType { get; set; }
 
-        public int MaxNumberOfExecutions
-        {
-            get { return maxNumberOfExecutions; }
-        }
+        public int MaxNumberOfExecutions { get; }
 
         #endregion
 
@@ -93,8 +78,8 @@ namespace DOL.GS.Quests
         /// <param name="executions">Maximum number of executions the questpart should be execute during one quest for each player</param>
         public QuestBehaviour(Type questType, GameNPC npc, int executions) : base(npc)
         {
-            this.questType = questType;
-            maxNumberOfExecutions = executions;
+            QuestType = questType;
+            MaxNumberOfExecutions = executions;
         }
 
         /// <summary>
@@ -118,9 +103,9 @@ namespace DOL.GS.Quests
             AbstractQuest quest = player.IsDoingQuest(QuestType);
 
             int executions = 0;
-            if (quest != null && quest.GetCustomProperty(ID + "_" + NUMBER_OF_EXECUTIONS) != null)
+            if (quest?.GetCustomProperty($"{ID}_{NumberOfExecutions}") != null)
             {
-                executions = Convert.ToInt32(quest.GetCustomProperty(ID + "_" + NUMBER_OF_EXECUTIONS));
+                executions = Convert.ToInt32(quest.GetCustomProperty($"{ID}_{NumberOfExecutions}"));
             }
 
             if (MaxNumberOfExecutions < 0 || executions < MaxNumberOfExecutions)
@@ -132,10 +117,7 @@ namespace DOL.GS.Quests
                         action.Perform(e, sender, args);
                     }
 
-                    if (quest != null)
-                    {
-                        quest.SetCustomProperty(ID + "_" + NUMBER_OF_EXECUTIONS, Convert.ToString(executions + 1));
-                    }
+                    quest?.SetCustomProperty($"{ID}_{NumberOfExecutions}", Convert.ToString(executions + 1));
                 }
             }
         }

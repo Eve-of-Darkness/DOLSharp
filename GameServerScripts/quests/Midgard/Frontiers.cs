@@ -1043,7 +1043,7 @@ namespace DOL.GS.Quests.Midgard
 
         protected virtual int AliceTranslation(RegionTimer callingTimer)
         {
-            m_questPlayer.Out.SendEmoteAnimation(idora, eEmote.Yes);
+            QuestPlayer.Out.SendEmoteAnimation(idora, eEmote.Yes);
             idoraDone = true;
             return 0;
         }
@@ -1110,9 +1110,9 @@ namespace DOL.GS.Quests.Midgard
                 {
                     RemoveItem(njiedi, player, noteForNjiedi);
 
-                    njiedi.TurnTo(m_questPlayer);
-                    njiedi.SayTo(m_questPlayer, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.Notify.Text1"));
-                    m_questPlayer.Out.SendEmoteAnimation(dalikor, eEmote.Ponder);
+                    njiedi.TurnTo(QuestPlayer);
+                    njiedi.SayTo(QuestPlayer, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.Notify.Text1"));
+                    QuestPlayer.Out.SendEmoteAnimation(dalikor, eEmote.Ponder);
 
                     Step = 2;
                     return;
@@ -1125,9 +1125,9 @@ namespace DOL.GS.Quests.Midgard
                 {
                     RemoveItem(idora, player, askefruerPlans);
 
-                    idora.TurnTo(m_questPlayer);
-                    idora.SayTo(m_questPlayer, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.Notify.Text2"));
-                    m_questPlayer.Out.SendEmoteAnimation(idora, eEmote.Ponder);
+                    idora.TurnTo(QuestPlayer);
+                    idora.SayTo(QuestPlayer, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.Notify.Text2"));
+                    QuestPlayer.Out.SendEmoteAnimation(idora, eEmote.Ponder);
                     SendEmoteMessage(player, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.Notify.Text3"));
 
                     new RegionTimer(gArgs.Target, new RegionTimerCallback(AliceTranslation), 30000);
@@ -1143,9 +1143,9 @@ namespace DOL.GS.Quests.Midgard
                 {
                     RemoveItem(dalikor, player, translatedPlans);
 
-                    dalikor.TurnTo(m_questPlayer);
-                    dalikor.SayTo(m_questPlayer, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.Notify.Text4"));
-                    m_questPlayer.Out.SendEmoteAnimation(dalikor, eEmote.Ponder);
+                    dalikor.TurnTo(QuestPlayer);
+                    dalikor.SayTo(QuestPlayer, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.Notify.Text4"));
+                    QuestPlayer.Out.SendEmoteAnimation(dalikor, eEmote.Ponder);
                     SendEmoteMessage(player, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.Notify.Text5"));
 
                     Step = 6;
@@ -1158,17 +1158,17 @@ namespace DOL.GS.Quests.Midgard
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            if (Step < 3 && m_questPlayer.Inventory.GetFirstItemByID(ticketToSvasudFaste.Id_nb, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
+            if (Step < 3 && QuestPlayer.Inventory.GetFirstItemByID(ticketToSvasudFaste.Id_nb, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) == null)
             {
-                m_questPlayer.RemoveMoney(Money.GetMoney(0, 0, 0, 6, 0), null);
-                InventoryLogging.LogInventoryAction(m_questPlayer, "(QUEST;" + Name + ")", eInventoryActionType.Quest, 600);
+                QuestPlayer.RemoveMoney(Money.GetMoney(0, 0, 0, 6, 0), null);
+                InventoryLogging.LogInventoryAction(QuestPlayer, "(QUEST;" + Name + ")", eInventoryActionType.Quest, 600);
             }
 
-            RemoveItem(m_questPlayer, ticketToSvasudFaste, false);
-            RemoveItem(m_questPlayer, askefruerPlans, false);
-            RemoveItem(m_questPlayer, ticketToMularn, false);
-            RemoveItem(m_questPlayer, noteForNjiedi, false);
-            RemoveItem(m_questPlayer, translatedPlans, false);
+            RemoveItem(QuestPlayer, ticketToSvasudFaste, false);
+            RemoveItem(QuestPlayer, askefruerPlans, false);
+            RemoveItem(QuestPlayer, ticketToMularn, false);
+            RemoveItem(QuestPlayer, noteForNjiedi, false);
+            RemoveItem(QuestPlayer, translatedPlans, false);
         }
 
         public override void FinishQuest()
@@ -1176,19 +1176,19 @@ namespace DOL.GS.Quests.Midgard
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            if (m_questPlayer.HasAbilityToUseItem(recruitsLegs))
+            if (QuestPlayer.HasAbilityToUseItem(recruitsLegs))
             {
-                GiveItem(dalikor, m_questPlayer, recruitsLegs);
+                GiveItem(dalikor, QuestPlayer, recruitsLegs);
             }
             else
             {
-                GiveItem(dalikor, m_questPlayer, recruitsPants);
+                GiveItem(dalikor, QuestPlayer, recruitsPants);
             }
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 240, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 240, true);
             long money = Money.GetMoney(0, 0, 0, 5, Util.Random(50));
-            m_questPlayer.AddMoney(money, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.FinishQuest.Text1"));
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.Frontiers.FinishQuest.Text1"));
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

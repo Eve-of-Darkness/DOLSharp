@@ -614,10 +614,10 @@ namespace DOL.GS.Quests.Albion
                     GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                     if (gArgs.Target.Name == brotherLawrence.Name && gArgs.Item.Id_nb == lawrencesFilledFlask.Id_nb)
                     {
-                        RemoveItem(brotherLawrence, m_questPlayer, lawrencesFilledFlask);
+                        RemoveItem(brotherLawrence, QuestPlayer, lawrencesFilledFlask);
 
-                        brotherLawrence.TurnTo(m_questPlayer);
-                        brotherLawrence.SayTo(m_questPlayer, "Thank you for retrieving this. You've been a tremendous help to me in preparing for this visit.  With a little luck, perhaps soon all the Church's healers will be using my [methods].");
+                        brotherLawrence.TurnTo(QuestPlayer);
+                        brotherLawrence.SayTo(QuestPlayer, "Thank you for retrieving this. You've been a tremendous help to me in preparing for this visit.  With a little luck, perhaps soon all the Church's healers will be using my [methods].");
                         Step = 5;
                     }
                 }
@@ -628,8 +628,8 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, lawrencesEmptyFlask, false);
-            RemoveItem(m_questPlayer, lawrencesFilledFlask, false);
+            RemoveItem(QuestPlayer, lawrencesEmptyFlask, false);
+            RemoveItem(QuestPlayer, lawrencesFilledFlask, false);
         }
 
         public override void FinishQuest()
@@ -637,9 +637,9 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)(m_questPlayer.ExperienceForNextLevel / 15.5), true);
-            m_questPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 67), "You are awarded 67 copper!");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, 67);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)(QuestPlayer.ExperienceForNextLevel / 15.5), true);
+            QuestPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 67), "You are awarded 67 copper!");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, 67);
         }
     }
 }

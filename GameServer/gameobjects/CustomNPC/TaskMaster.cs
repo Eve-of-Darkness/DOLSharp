@@ -97,7 +97,7 @@ namespace DOL.GS
                          * Very well Gwirenn, it's good to see adventurers willing to help out the realm in such times. Clear the caves to the south of creatures. Good luck!
                          */
                         string msg = "Very well " + player.Name + ", it's good to see adventurers willing to help out the realm in such times.";
-                        switch (mission.TDMissionType)
+                        switch (mission.TdMissionType)
                         {
                             case TaskDungeonMission.eTDMissionType.Clear:
                                 msg += " Clear " + mission.TaskRegion.Description + " of creatures. Good luck!";

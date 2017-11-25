@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -30,7 +30,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
     class ArmsOfTheWinds : ArtifactQuest
     {
         public ArmsOfTheWinds()
-            : base() { }
+        { }
 
         public ArmsOfTheWinds(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -48,7 +48,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init("Arms of the Winds", typeof(ArmsOfTheWinds));
+            Init("Arms of the Winds", typeof(ArmsOfTheWinds));
         }
 
         /// <summary>
@@ -81,22 +81,16 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
-                string armorType = GlobalConstants.ArmorLevelToName(
-                    player.BestArmorLevel,
-                    (eRealm)player.Realm);
+                string armorType = GlobalConstants.ArmorLevelToName(player.BestArmorLevel, player.Realm);
                 ItemTemplate template = null;
-                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                    ArtifactID,
-                    (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
                 foreach (string versionKey in versions.Keys)
                 {
@@ -110,18 +104,8 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
 
                 if (template != null && RemoveItem(player, item))
                 {
-                    GiveItem(scholar, player, ArtifactID, template);
-                    string reply = string.Format(
-                        "I feel fortunate to {0} {1} {2} {3} {4}. {5} {6} {7} {8}.",
-                        "be able to study some of these artifacts that have survived from the days of the",
-                        "Atlanteans. I am only sad that I shall never get to meet the people that created",
-                        "wonderful objects like the Arms of the Winds. The magic in them has been",
-                        "reawakened for you,",
-                        player.CharacterClass.Name,
-                        "You must take care of these sleeves because I cannot do it again. If you lose them",
-                        "or they are  destroyed, the Arms of the Winds will be forever lost to you. I hope",
-                        "they serve you well,",
-                        player.CharacterClass.Name);
+                    GiveItem(scholar, player, ArtifactId, template);
+                    string reply = $"I feel fortunate to be able to study some of these artifacts that have survived from the days of the Atlanteans. I am only sad that I shall never get to meet the people that created wonderful objects like the Arms of the Winds. The magic in them has been reawakened for you, {player.CharacterClass.Name}. You must take care of these sleeves because I cannot do it again. If you lose them or they are  destroyed, the Arms of the Winds will be forever lost to you. I hope they serve you well, {player.CharacterClass.Name}.";
                     scholar.TurnTo(player);
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     FinishQuest();
@@ -146,20 +130,16 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
+            // ReSharper disable once UsePatternMatching
             GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (player == null || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
-                string reply = string.Format(
-                    "The Arms of the Winds! If I only had Anthos' {0} {1} {2}",
-                    "Fish Skin. It is important that I have the scales, since Anthos trapped the magic of",
-                    "the Arms of the Winds in the Skin. If you have lost the skin, and I hope you haven't,",
-                    "you will have to go find the scales again and bring them to me.");
+                string reply ="The Arms of the Winds! If I only had Anthos\' Fish Skin. It is important that I have the scales, since Anthos trapped the magic of the Arms of the Winds in the Skin. If you have lost the skin, and I hope you haven\'t, you will have to go find the scales again and bring them to me.";
                 scholar.TurnTo(player);
                 scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                 Step = 2;
@@ -192,17 +172,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Arms of the Winds"; }
-        }
+        public override string Name => "Arms of the Winds";
 
         /// <summary>
         /// The reward for this quest.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return "Arms of the Winds"; }
-        }
+        public override string ArtifactId => "Arms of the Winds";
     }
 }

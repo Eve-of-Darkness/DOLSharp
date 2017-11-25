@@ -1088,8 +1088,8 @@ namespace DOL.GS.Quests.Midgard
                 EnemyKilledEventArgs gArgs = (EnemyKilledEventArgs)args;
                 if (gArgs.Target.Name == Oona.Name)
                 {
-                    m_questPlayer.Out.SendMessage("You collect Oona's Head", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    GiveItem(m_questPlayer, oona_head);
+                    QuestPlayer.Out.SendMessage("You collect Oona's Head", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    GiveItem(QuestPlayer, oona_head);
                     Step = 2;
                     return;
                 }
@@ -1124,43 +1124,43 @@ namespace DOL.GS.Quests.Midgard
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, sealed_pouch, false);
+            RemoveItem(QuestPlayer, sealed_pouch, false);
         }
 
         public override void FinishQuest()
         {
-            if (m_questPlayer.Inventory.IsSlotsFree(6, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+            if (QuestPlayer.Inventory.IsSlotsFree(6, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
             {
-                RemoveItem(MorlinCaan, m_questPlayer, sealed_pouch);
+                RemoveItem(MorlinCaan, QuestPlayer, sealed_pouch);
 
                 base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-                if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Shadowblade)
+                if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Shadowblade)
                 {
-                    GiveItem(m_questPlayer, ShadowbladeEpicArms);
-                    GiveItem(m_questPlayer, ShadowbladeEpicBoots);
-                    GiveItem(m_questPlayer, ShadowbladeEpicGloves);
-                    GiveItem(m_questPlayer, ShadowbladeEpicHelm);
-                    GiveItem(m_questPlayer, ShadowbladeEpicLegs);
-                    GiveItem(m_questPlayer, ShadowbladeEpicVest);
+                    GiveItem(QuestPlayer, ShadowbladeEpicArms);
+                    GiveItem(QuestPlayer, ShadowbladeEpicBoots);
+                    GiveItem(QuestPlayer, ShadowbladeEpicGloves);
+                    GiveItem(QuestPlayer, ShadowbladeEpicHelm);
+                    GiveItem(QuestPlayer, ShadowbladeEpicLegs);
+                    GiveItem(QuestPlayer, ShadowbladeEpicVest);
                 }
-                else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Hunter)
+                else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Hunter)
                 {
-                    GiveItem(m_questPlayer, HunterEpicArms);
-                    GiveItem(m_questPlayer, HunterEpicBoots);
-                    GiveItem(m_questPlayer, HunterEpicGloves);
-                    GiveItem(m_questPlayer, HunterEpicHelm);
-                    GiveItem(m_questPlayer, HunterEpicLegs);
-                    GiveItem(m_questPlayer, HunterEpicVest);
+                    GiveItem(QuestPlayer, HunterEpicArms);
+                    GiveItem(QuestPlayer, HunterEpicBoots);
+                    GiveItem(QuestPlayer, HunterEpicGloves);
+                    GiveItem(QuestPlayer, HunterEpicHelm);
+                    GiveItem(QuestPlayer, HunterEpicLegs);
+                    GiveItem(QuestPlayer, HunterEpicVest);
                 }
 
-                m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 1937768448, true);
+                QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 1937768448, true);
 
-                // m_questPlayer.AddMoney(Money.GetMoney(0,0,0,2,Util.Random(50)), "You recieve {0} as a reward.");
+                // mQuestPlayer.AddMoney(Money.GetMoney(0,0,0,2,Util.Random(50)), "You recieve {0} as a reward.");
             }
             else
             {
-                m_questPlayer.Out.SendMessage("You do not have enough free space in your inventory!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                QuestPlayer.Out.SendMessage("You do not have enough free space in your inventory!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
         }
 

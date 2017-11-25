@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
 using DOL.Events;
 using DOL.GS.Keeps;
 
@@ -9,9 +8,9 @@ namespace DOL.GS.Quests
 {
     public class CaptureMission : AbstractMission
     {
-        private AbstractGameKeep m_keep = null;
+        private readonly AbstractGameKeep _keep;
 
-        public enum eCaptureType : int
+        public enum eCaptureType
         {
             Tower = 1,
             Keep = 2,
@@ -21,13 +20,13 @@ namespace DOL.GS.Quests
             : base(owner)
         {
             eRealm realm = eRealm.None;
-            if (owner is Group)
+            if (owner is Group group)
             {
-                realm = (owner as Group).Leader.Realm;
+                realm = group.Leader.Realm;
             }
             else if (owner is GamePlayer)
             {
-                realm = (owner as GamePlayer).Realm;
+                realm = ((GamePlayer) owner).Realm;
             }
 
             ArrayList list = new ArrayList();
@@ -37,13 +36,13 @@ namespace DOL.GS.Quests
                 case eCaptureType.Tower:
                     {
                         ICollection<AbstractGameKeep> keeps;
-                        if (owner is Group)
+                        if (owner is Group group1)
                         {
-                            keeps = GameServer.KeepManager.GetKeepsOfRegion((owner as Group).Leader.CurrentRegionID);
+                            keeps = GameServer.KeepManager.GetKeepsOfRegion(group1.Leader.CurrentRegionID);
                         }
                         else if (owner is GamePlayer)
                         {
-                            keeps = GameServer.KeepManager.GetKeepsOfRegion((owner as GamePlayer).CurrentRegionID);
+                            keeps = GameServer.KeepManager.GetKeepsOfRegion(((GamePlayer) owner).CurrentRegionID);
                         }
                         else
                         {
@@ -69,13 +68,13 @@ namespace DOL.GS.Quests
                 case eCaptureType.Keep:
                     {
                         ICollection<AbstractGameKeep> keeps;
-                        if (owner is Group)
+                        if (owner is Group group1)
                         {
-                            keeps = GameServer.KeepManager.GetKeepsOfRegion((owner as Group).Leader.CurrentRegionID);
+                            keeps = GameServer.KeepManager.GetKeepsOfRegion(group1.Leader.CurrentRegionID);
                         }
-                        else if (owner is GamePlayer)
+                        else if (owner is GamePlayer gOwner)
                         {
-                            keeps = GameServer.KeepManager.GetKeepsOfRegion((owner as GamePlayer).CurrentRegionID);
+                            keeps = GameServer.KeepManager.GetKeepsOfRegion(gOwner.CurrentRegionID);
                         }
                         else
                         {
@@ -107,15 +106,15 @@ namespace DOL.GS.Quests
                     {
                         if (keep.Name.ToLower().Contains(hint))
                         {
-                            m_keep = keep;
+                            _keep = keep;
                             break;
                         }
                     }
                 }
 
-                if (m_keep == null)
+                if (_keep == null)
                 {
-                    m_keep = list[Util.Random(list.Count - 1)] as AbstractGameKeep;
+                    _keep = list[Util.Random(list.Count - 1)] as AbstractGameKeep;
                 }
             }
 
@@ -129,28 +128,27 @@ namespace DOL.GS.Quests
                 return;
             }
 
-            KeepEventArgs kargs = args as KeepEventArgs;
-
-            if (kargs.Keep != m_keep)
+            if (args is KeepEventArgs kargs && kargs.Keep != _keep)
             {
                 return;
             }
 
             GamePlayer testPlayer = null;
-            if (m_owner is GamePlayer)
+            if (Owner is GamePlayer player)
             {
-                testPlayer = m_owner as GamePlayer;
+                testPlayer = player;
             }
-            else if (m_owner is Group)
+            else if (Owner is Group gOwner)
             {
-                testPlayer = (m_owner as Group).Leader;
+                testPlayer = gOwner.Leader;
             }
 
             if (testPlayer != null)
             {
-                foreach (AbstractArea area in testPlayer.CurrentAreas)
+                foreach (var area1 in testPlayer.CurrentAreas)
                 {
-                    if (area is KeepArea && (area as KeepArea).Keep == m_keep)
+                    var area = (AbstractArea) area1;
+                    if (area is KeepArea && (area as KeepArea).Keep == _keep)
                     {
                         FinishMission();
                     }
@@ -176,14 +174,12 @@ namespace DOL.GS.Quests
         {
             get
             {
-                if (m_keep == null)
+                if (_keep == null)
                 {
                     return "Keep is null when trying to send the description";
                 }
-                else
-                {
-                    return "Capture " + m_keep.Name;
-                }
+
+                return $"Capture {_keep.Name}";
             }
         }
 
@@ -191,18 +187,17 @@ namespace DOL.GS.Quests
         {
             get
             {
-                if (m_keep is GameKeep)
+                if (_keep is GameKeep)
                 {
                     return 1500;
                 }
-                else if (m_keep is GameKeepTower)
+
+                if (_keep is GameKeepTower)
                 {
-                    return 250 + (m_keep.Level * 50);
+                    return 250 + _keep.Level * 50;
                 }
-                else
-                {
-                    return 0;
-                }
+
+                return 0;
             }
         }
     }

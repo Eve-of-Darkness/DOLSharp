@@ -35,10 +35,7 @@ namespace DOL.GS.Quests.Catacombs.Obelisks
         /// <summary>
         /// Name of the discovery quest.
         /// </summary>
-        public override string Name
-        {
-            get { return "Shar Labyrinth Obelisk"; }
-        }
+        public override string Name => "Shar Labyrinth Obelisk";
 
         /// <summary>
         /// Only Hibernia can get credit.

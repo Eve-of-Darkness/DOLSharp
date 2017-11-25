@@ -564,18 +564,18 @@ namespace DOL.GS.Quests.Albion
                 {
                     if (Step == 5)
                     {
-                        RemoveItem(yettaFletcher, m_questPlayer, bundleOfDecayedZombieLegs);
+                        RemoveItem(yettaFletcher, QuestPlayer, bundleOfDecayedZombieLegs);
 
-                        yettaFletcher.TurnTo(m_questPlayer);
-                        yettaFletcher.SayTo(m_questPlayer, "Thank you, " + m_questPlayer.Name + ". Now, please hand me the other bundle of decaying zombie legs.");
+                        yettaFletcher.TurnTo(QuestPlayer);
+                        yettaFletcher.SayTo(QuestPlayer, "Thank you, " + QuestPlayer.Name + ". Now, please hand me the other bundle of decaying zombie legs.");
                         Step = 6;
                     }
                     else if (Step == 6)
                     {
-                        RemoveItem(yettaFletcher, m_questPlayer, bundleOfDecayedZombieLegs);
+                        RemoveItem(yettaFletcher, QuestPlayer, bundleOfDecayedZombieLegs);
 
-                        yettaFletcher.TurnTo(m_questPlayer);
-                        yettaFletcher.SayTo(m_questPlayer, "Wonderful! I shall begin right away on making the new arrows for the Defenders of Albion. Please take these coins with my thanks as well as the thanks of the Defenders!");
+                        yettaFletcher.TurnTo(QuestPlayer);
+                        yettaFletcher.SayTo(QuestPlayer, "Wonderful! I shall begin right away on making the new arrows for the Defenders of Albion. Please take these coins with my thanks as well as the thanks of the Defenders!");
 
                         FinishQuest();
                     }
@@ -587,8 +587,8 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, bundleOfDecayedZombieLegs, false);
-            RemoveItem(m_questPlayer, bundleOfDecayedZombieLegs, false);
+            RemoveItem(QuestPlayer, bundleOfDecayedZombieLegs, false);
+            RemoveItem(QuestPlayer, bundleOfDecayedZombieLegs, false);
         }
 
         public override void FinishQuest()
@@ -596,9 +596,9 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)(m_questPlayer.ExperienceForNextLevel / 15), true);
-            m_questPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 67), "You are awarded 67 copper!");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, 67);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)(QuestPlayer.ExperienceForNextLevel / 15), true);
+            QuestPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 67), "You are awarded 67 copper!");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, 67);
         }
     }
 }

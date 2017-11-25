@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -30,7 +30,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
     class EnyaliosBoots : ArtifactQuest
     {
         public EnyaliosBoots()
-            : base() { }
+        { }
 
         public EnyaliosBoots(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -48,7 +48,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init("Enyalio's Boots", typeof(EnyaliosBoots));
+            Init("Enyalio's Boots", typeof(EnyaliosBoots));
         }
 
         /// <summary>
@@ -81,22 +81,16 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
-                string armorType = GlobalConstants.ArmorLevelToName(
-                    player.BestArmorLevel,
-                    (eRealm)player.Realm);
+                string armorType = GlobalConstants.ArmorLevelToName(player.BestArmorLevel, player.Realm);
                 ItemTemplate template = null;
-                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                    ArtifactID,
-                    (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
                 foreach (string versionKey in versions.Keys)
                 {
@@ -110,10 +104,8 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
 
                 if (template != null && RemoveItem(player, item))
                 {
-                    GiveItem(scholar, player, ArtifactID, template);
-                    string reply = string.Format(
-                        "Here, take these boots! I hope you find {0}",
-                        "them useful. Don't lose them, I can only unlock their power for you once!");
+                    GiveItem(scholar, player, ArtifactId, template);
+                    string reply = "Here, take these boots! I hope you find them useful. Don\'t lose them, I can only unlock their power for you once!";
                     scholar.TurnTo(player);
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     FinishQuest();
@@ -138,19 +130,14 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
-                string reply = string.Format(
-                    "Do you have the story that goes along with that? {0} {1}",
-                    "If you do, hand it in to me, and I will unlock the power that these boots had",
-                    "been vested with. If not, go get the story!");
+                string reply = "Do you have the story that goes along with that? If you do, hand it in to me, and I will unlock the power that these boots had been vested with. If not, go get the story!";
                 scholar.TurnTo(player);
                 scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                 Step = 2;
@@ -183,17 +170,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Enyalios' Boots"; }
-        }
+        public override string Name => "Enyalios' Boots";
 
         /// <summary>
         /// The reward for this quest.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return "Enyalio's Boots"; }
-        }
+        public override string ArtifactId => "Enyalio's Boots";
     }
 }

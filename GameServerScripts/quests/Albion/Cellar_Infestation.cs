@@ -293,7 +293,7 @@ namespace DOL.GS.Quests.Albion
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(Cellarinfestation));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(Cellarinfestation));
             QuestBehaviour a;
             a = builder.CreateBehaviour(MistressLaws,-1);
                 a.AddTrigger(eTriggerType.Interact,null,MistressLaws);

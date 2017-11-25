@@ -27,22 +27,19 @@ namespace DOL.GS.Quests.Actions
     public class FinishQuestAction: AbstractAction<Type,Unused>
     {
 
-        public FinishQuestAction(GameNPC defaultNPC, object p, object q)
-            : base(defaultNPC, eActionType.FinishQuest, p, q)
+        public FinishQuestAction(GameNPC defaultNpc, object p, object q)
+            : base(defaultNpc, eActionType.FinishQuest, p, q)
         { }
 
-        public FinishQuestAction(GameNPC defaultNPC, Type questType)
-            : this(defaultNPC, (object)questType, (object)null)
+        public FinishQuestAction(GameNPC defaultNpc, Type questType)
+            : this(defaultNpc, questType, null)
         { }
 
         public override void Perform(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = BehaviourUtils.GuessGamePlayerFromNotify(e, sender, args);
             AbstractQuest playerQuest = player.IsDoingQuest(P);
-            if (playerQuest != null)
-            {
-                playerQuest.FinishQuest();
-            }
+            playerQuest?.FinishQuest();
         }
     }
 }

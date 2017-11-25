@@ -408,7 +408,7 @@ namespace DOL.GS.Quests.Midgard
 
         #region defineQuestParts
 
-        QuestBuilder builder = QuestMgr.getBuilder(typeof(sveabonehiltsword));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(sveabonehiltsword));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Gridash,-1);
                 a.AddTrigger(eTriggerType.Interact,null,Gridash);

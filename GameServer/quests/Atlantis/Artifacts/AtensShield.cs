@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -30,7 +30,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
     class AtensShield : ArtifactQuest
     {
         public AtensShield()
-            : base() { }
+        { }
 
         public AtensShield(GamePlayer questingPlayer)
             : base(questingPlayer) { }
@@ -48,7 +48,7 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// </summary>
         public static void Init()
         {
-            ArtifactQuest.Init("Aten's Shield", typeof(AtensShield));
+            Init("Aten's Shield", typeof(AtensShield));
         }
 
         /// <summary>
@@ -81,28 +81,19 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactID)
+            if (Step == 2 && ArtifactMgr.GetArtifactID(item.Name) == ArtifactId)
             {
-                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(
-                    ArtifactID,
-                    (eCharacterClass)player.CharacterClass.ID, (eRealm)player.Realm);
+                Dictionary<string, ItemTemplate> versions = ArtifactMgr.GetArtifactVersions(ArtifactId, (eCharacterClass)player.CharacterClass.ID, player.Realm);
 
                 if (versions.Count > 0 && RemoveItem(player, item))
                 {
-                    GiveItem(scholar, player, ArtifactID, versions[";;"]);
-                    string reply = string.Format(
-                        "Ahh. This is a tale about some great {0} {1} {2} {3}.",
-                        "crazy champion named Remus. There's not much known about him, or his father,",
-                        "except what is in this tale. I've read pieces of it, but never did we find all",
-                        "the letters. It's a great find. Thank you,",
-                        player.Name);
+                    GiveItem(scholar, player, ArtifactId, versions[";;"]);
+                    string reply = $"Ahh. This is a tale about some great crazy champion named Remus. There\'s not much known about him, or his father, except what is in this tale. I\'ve read pieces of it, but never did we find all the letters. It\'s a great find. Thank you, {player.Name}.";
                     scholar.TurnTo(player);
                     scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                     FinishQuest();
@@ -127,22 +118,14 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
                 return true;
             }
 
-            GamePlayer player = source as GamePlayer;
-            Scholar scholar = target as Scholar;
-            if (player == null || scholar == null)
+            if (!(source is GamePlayer player) || !(target is Scholar scholar))
             {
                 return false;
             }
 
-            if (Step == 1 && text.ToLower() == ArtifactID.ToLower())
+            if (Step == 1 && text.ToLower() == ArtifactId.ToLower())
             {
-                string reply = string.Format(
-                    "Some of the other scholars have been {0} {1} {2} {3} {4}",
-                    "studying this shield. It belonged to someone named Remus, supposedly a great champion.",
-                    "Do you happen to have the story of the Aten Shield? Perhaps it will tell us more of",
-                    "Remus. I'm curious what the Atlanteans considered a great champion. Also, with the story,",
-                    "I should be able to unlock the power of this shield. If you don't have the story, go seek",
-                    "it out amongst the creatures of Oceanus.");
+                string reply = "Some of the other scholars have been studying this shield. It belonged to someone named Remus, supposedly a great champion. Do you happen to have the story of the Aten Shield? Perhaps it will tell us more of Remus. I\'m curious what the Atlanteans considered a great champion. Also, with the story, I should be able to unlock the power of this shield. If you don\'t have the story, go seek it out amongst the creatures of Oceanus.";
                 scholar.TurnTo(player);
                 scholar.SayTo(player, eChatLoc.CL_PopupWindow, reply);
                 Step = 2;
@@ -175,17 +158,11 @@ namespace DOL.GS.Quests.Atlantis.Artifacts
         /// The name of the quest (not necessarily the same as
         /// the name of the reward).
         /// </summary>
-        public override string Name
-        {
-            get { return "Aten's Shield"; }
-        }
+        public override string Name => "Aten's Shield";
 
         /// <summary>
         /// The reward for this quest.
         /// </summary>
-        public override string ArtifactID
-        {
-            get { return "Aten's Shield"; }
-        }
+        public override string ArtifactId => "Aten's Shield";
     }
 }

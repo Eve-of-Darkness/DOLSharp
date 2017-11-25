@@ -35,10 +35,7 @@ namespace DOL.GS.Quests.Catacombs.Obelisks
         /// <summary>
         /// Name of the discovery quest.
         /// </summary>
-        public override string Name
-        {
-            get { return "Kobold Undercity Obelisk"; }
-        }
+        public override string Name => "Kobold Undercity Obelisk";
 
         /// <summary>
         /// Only Midgard can get credit.

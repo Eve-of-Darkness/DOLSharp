@@ -199,7 +199,7 @@ namespace DOL.GS.Quests.Albion
             #endregion
 
             #region defineBehaviours
-            QuestBuilder builder = QuestMgr.getBuilder(typeof(MovementAndInteraction));
+            QuestBuilder builder = QuestMgr.GetBuilder(typeof(MovementAndInteraction));
             QuestBehaviour a = null;
             string message1 = "Welcome to " + zoneName + ", <Class>. Here you will learn the basic skills needed to defend yourself as you explore our realm and grow in power and wisdom. Now, without further delay, let's get you started on your [training].";
             string message2 = "If you exit through the doors behind me, you will enter the courtyard. In the courtyard, you will find Master Gethin, who will be your training instructor. Go now and speak to Master Gethin.";

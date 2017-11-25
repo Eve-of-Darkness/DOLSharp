@@ -668,10 +668,10 @@ namespace DOL.GS.Quests.Albion
                     GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                     if (gArgs.Target.Name == farmerAsma.Name && gArgs.Item.Id_nb == farmerAsmasMap.Id_nb)
                     {
-                        RemoveItem(farmerAsma, m_questPlayer, farmerAsmasMap);
+                        RemoveItem(farmerAsma, QuestPlayer, farmerAsmasMap);
 
-                        farmerAsma.TurnTo(m_questPlayer);
-                        farmerAsma.SayTo(m_questPlayer, "Thank you for you help. I can only offer you a small bit of coin as a reward for your assistance, but I am grateful for your advice.");
+                        farmerAsma.TurnTo(QuestPlayer);
+                        farmerAsma.SayTo(QuestPlayer, "Thank you for you help. I can only offer you a small bit of coin as a reward for your assistance, but I am grateful for your advice.");
 
                         FinishQuest();
                         return;
@@ -684,10 +684,10 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, farmerAsmasMap, false);
+            RemoveItem(QuestPlayer, farmerAsmasMap, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
@@ -695,12 +695,12 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, m_questPlayer.Level * 10, true);
-            m_questPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 35 + m_questPlayer.Level), "You are awarded " + (35 + m_questPlayer.Level) + " copper!");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, 35 + m_questPlayer.Level);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, QuestPlayer.Level * 10, true);
+            QuestPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 35 + QuestPlayer.Level), "You are awarded " + (35 + QuestPlayer.Level) + " copper!");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, 35 + QuestPlayer.Level);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

@@ -1703,7 +1703,7 @@ namespace DOL.GS.Commands
 
                 foreach (DataQuest dq in targetMob.DataQuestList)
                 {
-                    client.Out.SendMessage("Quest Name: [" + dq.Name + "] : " + (DataQuest.eStartType)dq.DBDataQuest.StartType, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    client.Out.SendMessage("Quest Name: [" + dq.Name + "] : " + (DataQuest.eStartType)dq.DbDataQuest.StartType, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 }
             }
         }

@@ -1604,56 +1604,56 @@ namespace DOL.GS.Quests.Hibernia
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "ChildsPlay.TalkToCharles.Text3", questTitle), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Guardian"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedboots_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedcap_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedgloves_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedjerkin_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedleggings_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringstuddedsleeves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedboots_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedcap_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedgloves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedjerkin_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedleggings_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringstuddedsleeves_hib);
                         quest.FinishQuest();
                     }
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Magician"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedboots_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedcap_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedgloves_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedpants_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedsleeves_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedvest_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedboots_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedcap_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedgloves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedpants_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedsleeves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedvest_hib);
                         quest.FinishQuest();
                     }
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Forester"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedboots_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedcap_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedgloves_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedpants_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedsleeves_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringpaddedvest_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedboots_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedcap_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedgloves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedpants_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedsleeves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringpaddedvest_hib);
                         quest.FinishQuest();
                     }
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Stalker"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherboots_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathercap_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathergloves_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherjerkin_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherleggings_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathersleeves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherboots_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathercap_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathergloves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherjerkin_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherleggings_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathersleeves_hib);
                         quest.FinishQuest();
                     }
 
                     if (player.CharacterClass.BaseName == LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Name.Naturalist"))
                     {
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherboots_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathercap_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathergloves_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherjerkin_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleatherleggings_hib);
-                        GiveItem(Charles, quest.m_questPlayer, daringleathersleeves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherboots_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathercap_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathergloves_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherjerkin_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleatherleggings_hib);
+                        GiveItem(Charles, quest.QuestPlayer, daringleathersleeves_hib);
                         quest.FinishQuest();
                     }
                 }
@@ -1798,11 +1798,11 @@ namespace DOL.GS.Quests.Hibernia
                 // k109: Update each time a kill is made.
                 if (Step == 1)
                 {
-                    return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ChildsPlay.Description.Text1");
+                    return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ChildsPlay.Description.Text1");
                 }
                 else if (Step == 2)
                 {
-                    return LanguageMgr.GetTranslation(m_questPlayer.Client, "Hib.ChildsPlay.Description.Text2");
+                    return LanguageMgr.GetTranslation(QuestPlayer.Client, "Hib.ChildsPlay.Description.Text2");
                 }
 
                 return base.Description;
@@ -1819,9 +1819,9 @@ namespace DOL.GS.Quests.Hibernia
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // k109: xp and money Rewards...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 2, true);
-            m_questPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 67), LanguageMgr.GetTranslation(m_questPlayer.Client, "ChildsPlay.FinishQuest.Text1"));
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, 67);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 2, true);
+            QuestPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 67), LanguageMgr.GetTranslation(QuestPlayer.Client, "ChildsPlay.FinishQuest.Text1"));
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, 67);
         }
     }
 }

@@ -670,7 +670,7 @@ namespace DOL.GS.Quests.Hibernia
         public override void AbortQuest()
         {
             base.AbortQuest();
-            RemoveItem(m_questPlayer, reedFlute, false);
+            RemoveItem(QuestPlayer, reedFlute, false);
         }
     }
 }

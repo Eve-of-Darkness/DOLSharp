@@ -27,21 +27,20 @@ namespace DOL.GS.Quests.Actions
     public class SetQuestStepAction: AbstractAction<Type,int>
     {
 
-        public SetQuestStepAction(GameNPC defaultNPC, object p, object q)
-            : base(defaultNPC, eActionType.SetQuestStep, p, q)
+        public SetQuestStepAction(GameNPC defaultNpc, object p, object q)
+            : base(defaultNpc, eActionType.SetQuestStep, p, q)
         {
         }
 
-        public SetQuestStepAction(GameNPC defaultNPC, Type questType, int questStep)
-            : this(defaultNPC, (object)questType, (object)questStep)
+        public SetQuestStepAction(GameNPC defaultNpc, Type questType, int questStep)
+            : this(defaultNpc, questType, questStep as object)
         {
         }
 
         public override void Perform(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = BehaviourUtils.GuessGamePlayerFromNotify(e, sender, args);
-            AbstractQuest playerQuest = player.IsDoingQuest(P) as AbstractQuest;
-            if (playerQuest != null)
+            if (player.IsDoingQuest(P) is AbstractQuest playerQuest)
             {
                 playerQuest.Step = Q;
             }

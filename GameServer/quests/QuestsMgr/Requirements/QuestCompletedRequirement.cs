@@ -18,8 +18,6 @@
  */
 using System;
 using DOL.Events;
-using log4net;
-using System.Reflection;
 using DOL.GS.Behaviour.Attributes;
 using DOL.GS.Behaviour;
 
@@ -34,29 +32,27 @@ namespace DOL.GS.Quests.Requirements
     [Requirement(RequirementType=eRequirementType.Quest)]
     public class QuestCompletedRequirement : AbstractRequirement<Type,int>
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Creates a new QuestRequirement and does some basich compativilite checks for the parameters
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="n"></param>
         /// <param name="v"></param>
         /// <param name="comp"></param>
-        public QuestCompletedRequirement(GameNPC defaultNPC, object n, object v, eComparator comp)
-            : base(defaultNPC,eRequirementType.Quest, n, v, comp)
+        public QuestCompletedRequirement(GameNPC defaultNpc, object n, object v, eComparator comp)
+            : base(defaultNpc,eRequirementType.Quest, n, v, comp)
         {
         }
 
         /// <summary>
         /// Creates a new QuestRequirement and does some basich compativilite checks for the parameters
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="questType"></param>
         /// <param name="v"></param>
         /// <param name="comp"></param>
-        public QuestCompletedRequirement(GameNPC defaultNPC, Type questType, int v, eComparator comp)
-            : this(defaultNPC, (object)questType, (object)v, comp)
+        public QuestCompletedRequirement(GameNPC defaultNpc, Type questType, int v, eComparator comp)
+            : this(defaultNpc, questType as object, v, comp)
         {
         }
 
@@ -69,11 +65,10 @@ namespace DOL.GS.Quests.Requirements
         /// <returns></returns>
         public override bool Check(DOLEvent e, object sender, EventArgs args)
         {
-            bool result = true;
             GamePlayer player = BehaviourUtils.GuessGamePlayerFromNotify(e, sender, args);
 
             int finishedCount = player.HasFinishedQuest(N);
-            result = compare(finishedCount, V, Comparator);
+            var result = compare(finishedCount, V, Comparator);
 
             return result;
         }

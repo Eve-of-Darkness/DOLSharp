@@ -18,8 +18,6 @@
  */
 using System;
 using DOL.Events;
-using log4net;
-using System.Reflection;
 using DOL.GS.Behaviour.Attributes;
 using DOL.GS.Behaviour;
 
@@ -33,27 +31,25 @@ namespace DOL.GS.Quests.Triggers
     [Trigger(TriggerType=eTriggerType.AbortQuest)]
     public class AbortQuestTrigger : AbstractTrigger<Unused,Type>
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Creates a new questtrigger and does some simple triggertype parameter compatibility checking
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="notifyHandler"></param>
         /// <param name="k"></param>
         /// <param name="i"></param>
-        public AbortQuestTrigger(GameNPC defaultNPC, DOLEventHandler notifyHandler, object k, object i)
-            : base(defaultNPC,notifyHandler, eTriggerType.AbortQuest, k, i)
+        public AbortQuestTrigger(GameNPC defaultNpc, DOLEventHandler notifyHandler, object k, object i)
+            : base(defaultNpc,notifyHandler, eTriggerType.AbortQuest, k, i)
         { }
 
         /// <summary>
         /// Creates a new questtrigger and does some simple triggertype parameter compatibility checking
         /// </summary>
-        /// <param name="defaultNPC"></param>
+        /// <param name="defaultNpc"></param>
         /// <param name="notifyHandler"></param>
         /// <param name="questType"></param>
-        public AbortQuestTrigger(GameNPC defaultNPC, DOLEventHandler notifyHandler, Type questType)
-            : this(defaultNPC,notifyHandler, (object)null, (object)questType)
+        public AbortQuestTrigger(GameNPC defaultNpc, DOLEventHandler notifyHandler, Type questType)
+            : this(defaultNpc,notifyHandler, null, questType)
         { }
 
         /// <summary>
@@ -72,7 +68,7 @@ namespace DOL.GS.Quests.Triggers
             {
                 GamePlayer player = BehaviourUtils.GuessGamePlayerFromNotify(e, sender, args);
                 QuestEventArgs qArgs = (QuestEventArgs)args;
-                result = qArgs.Player.ObjectID == player.ObjectID && QuestMgr.GetQuestTypeForID(qArgs.QuestID).Equals(I);
+                result = qArgs.Player.ObjectID == player.ObjectID && QuestMgr.GetQuestTypeForID(qArgs.QuestID) == I;
             }
 
             return result;

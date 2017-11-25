@@ -755,13 +755,13 @@ namespace DOL.GS.Quests.Hibernia
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                 if (gArgs.Target.Name == addrir.Name && gArgs.Item.Id_nb == fullMagicBox.Id_nb)
                 {
-                    RemoveItem(addrir, m_questPlayer, fullMagicBox);
+                    RemoveItem(addrir, QuestPlayer, fullMagicBox);
 
-                    addrir.TurnTo(m_questPlayer);
-                    addrir.SayTo(m_questPlayer, "Ah, it is quite heavy, let me take a peek.");
-                    SendEmoteMessage(m_questPlayer, "Addrir takes the box from you and carefully opens the lid. When he sees what is inside, he closes the lid quickly.");
+                    addrir.TurnTo(QuestPlayer);
+                    addrir.SayTo(QuestPlayer, "Ah, it is quite heavy, let me take a peek.");
+                    SendEmoteMessage(QuestPlayer, "Addrir takes the box from you and carefully opens the lid. When he sees what is inside, he closes the lid quickly.");
 
-                    m_questPlayer.Out.SendEmoteAnimation(addrir, eEmote.Yes);
+                    QuestPlayer.Out.SendEmoteAnimation(addrir, eEmote.Yes);
                     Step = 3;
                     return;
                 }
@@ -772,11 +772,11 @@ namespace DOL.GS.Quests.Hibernia
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, emptyMagicBox, false);
-            RemoveItem(m_questPlayer, fullMagicBox, false);
+            RemoveItem(QuestPlayer, emptyMagicBox, false);
+            RemoveItem(QuestPlayer, fullMagicBox, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
@@ -784,22 +784,22 @@ namespace DOL.GS.Quests.Hibernia
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            if (m_questPlayer.HasAbilityToUseItem(recruitsShortSword))
+            if (QuestPlayer.HasAbilityToUseItem(recruitsShortSword))
             {
-                GiveItem(addrir, m_questPlayer, recruitsShortSword);
+                GiveItem(addrir, QuestPlayer, recruitsShortSword);
             }
             else
             {
-                GiveItem(addrir, m_questPlayer, recruitsStaff);
+                GiveItem(addrir, QuestPlayer, recruitsStaff);
             }
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 100, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 100, true);
             long money = Money.GetMoney(0, 0, 0, 3, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} as a reward.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} as a reward.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

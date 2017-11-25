@@ -27,13 +27,13 @@ namespace DOL.GS.Quests.Actions
     public class OfferQuestAbortAction : AbstractAction<Type,string>
     {
 
-        public OfferQuestAbortAction(GameNPC defaultNPC, object p, object q)
-            : base(defaultNPC, eActionType.OfferQuestAbort, p, q)
+        public OfferQuestAbortAction(GameNPC defaultNpc, object p, object q)
+            : base(defaultNpc, eActionType.OfferQuestAbort, p, q)
         {
         }
 
-        public OfferQuestAbortAction(GameNPC defaultNPC, Type questType, string offerAbortMessage)
-            : this(defaultNPC, (object)questType, (object)offerAbortMessage) { }
+        public OfferQuestAbortAction(GameNPC defaultNpc, Type questType, string offerAbortMessage)
+            : this(defaultNpc, questType as object, offerAbortMessage) { }
 
         public override void Perform(DOLEvent e, object sender, EventArgs args)
         {

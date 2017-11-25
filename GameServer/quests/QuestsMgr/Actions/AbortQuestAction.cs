@@ -27,22 +27,19 @@ namespace DOL.GS.Quests.Actions
     public class AbortQuestAction: AbstractAction<Type,Unused>
     {
 
-        public AbortQuestAction(GameNPC defaultNPC, object p, object q)
-            : base(defaultNPC, eActionType.AbortQuest, p, q)
+        public AbortQuestAction(GameNPC defaultNpc, object p, object q)
+            : base(defaultNpc, eActionType.AbortQuest, p, q)
         { }
 
-        public AbortQuestAction(GameNPC defaultNPC, Type questType)
-            : this(defaultNPC, (object)questType, (object)null)
+        public AbortQuestAction(GameNPC defaultNpc, Type questType)
+            : this(defaultNpc, questType, null)
         { }
 
         public override void Perform(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = BehaviourUtils.GuessGamePlayerFromNotify(e, sender, args);
             AbstractQuest playerQuest = player.IsDoingQuest(P);
-            if (playerQuest != null)
-            {
-                playerQuest.AbortQuest();
-            }
+            playerQuest?.AbortQuest();
         }
     }
 }

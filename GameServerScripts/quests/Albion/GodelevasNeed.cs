@@ -666,10 +666,10 @@ namespace DOL.GS.Quests.Albion
                     GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                     if (gArgs.Target.Name == godelevaDowden.Name && gArgs.Item.Id_nb == fullWoodenBucket.Id_nb)
                     {
-                        RemoveItem(godelevaDowden, m_questPlayer, fullWoodenBucket);
+                        RemoveItem(godelevaDowden, QuestPlayer, fullWoodenBucket);
 
-                        godelevaDowden.TurnTo(m_questPlayer);
-                        godelevaDowden.SayTo(m_questPlayer, "Ah, great! This is a good and full bucket! Thank you friend! Here is a little something for you. A traveler gave it to me, but it's not much use to me now. It will serve you better. Now, I'm off to clean. Be safe friend!");
+                        godelevaDowden.TurnTo(QuestPlayer);
+                        godelevaDowden.SayTo(QuestPlayer, "Ah, great! This is a good and full bucket! Thank you friend! Here is a little something for you. A traveler gave it to me, but it's not much use to me now. It will serve you better. Now, I'm off to clean. Be safe friend!");
 
                         FinishQuest();
                     }
@@ -681,11 +681,11 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, woodenBucket, false);
-            RemoveItem(m_questPlayer, fullWoodenBucket, false);
+            RemoveItem(QuestPlayer, woodenBucket, false);
+            RemoveItem(QuestPlayer, fullWoodenBucket, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
@@ -693,15 +693,15 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            GiveItem(godelevaDowden, m_questPlayer, reedBracer);
+            GiveItem(godelevaDowden, QuestPlayer, reedBracer);
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 40 + (m_questPlayer.Level - 1) * 4, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 40 + (QuestPlayer.Level - 1) * 4, true);
             long money = Money.GetMoney(0, 0, 0, 7, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You are awarded 7 silver and some copper!");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You are awarded 7 silver and some copper!");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

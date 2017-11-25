@@ -912,10 +912,10 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, ticketToBombard, false);
-            RemoveItem(m_questPlayer, ticketToLudlow, false);
-            RemoveItem(m_questPlayer, sackOfSupplies, false);
-            RemoveItem(m_questPlayer, crateOfVegetables, false);
+            RemoveItem(QuestPlayer, ticketToBombard, false);
+            RemoveItem(QuestPlayer, ticketToLudlow, false);
+            RemoveItem(QuestPlayer, sackOfSupplies, false);
+            RemoveItem(QuestPlayer, crateOfVegetables, false);
         }
 
         public override void FinishQuest()
@@ -923,12 +923,12 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            GiveItem(bombard, m_questPlayer, recruitsCloak);
+            GiveItem(bombard, QuestPlayer, recruitsCloak);
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 12, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 12, true);
             long money = Money.GetMoney(0, 0, 0, 1, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} as a reward.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} as a reward.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

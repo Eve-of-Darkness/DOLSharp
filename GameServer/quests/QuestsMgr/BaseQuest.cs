@@ -57,7 +57,7 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// DO NOT USE, always true.
@@ -69,15 +69,14 @@ namespace DOL.GS.Quests
         // Tolakram - this is not used anymore due to the fact items were saved based on the same setting
         // With the new inventory system all items must be saved.
         // To optionally not save NPC's use ServerProperties.Properties.SAVE_QUEST_MOBS_INTO_DATABASE
-        public Queue m_animEmoteTeleportTimerQueue = new Queue();
-        public Queue m_animEmoteObjectQueue = new Queue();
+        public Queue AnimEmoteTeleportTimerQueue = new Queue();
+        public Queue AnimEmoteObjectQueue = new Queue();
+        public Queue AnimSpellTeleportTimerQueue = new Queue();
+        public Queue AnimSpellObjectQueue = new Queue();
 
-        public Queue m_animSpellTeleportTimerQueue = new Queue();
-        public Queue m_animSpellObjectQueue = new Queue();
-
-        public Queue m_portTeleportTimerQueue = new Queue();
-        public Queue m_portObjectQueue = new Queue();
-        public Queue m_portDestinationQueue = new Queue();
+        private readonly Queue _portTeleportTimerQueue = new Queue();
+        private readonly Queue _portObjectQueue = new Queue();
+        private readonly Queue _portDestinationQueue = new Queue();
 
         // /// <summary>
         // /// List of all QuestParts that can be fired on interact Events.
@@ -88,7 +87,6 @@ namespace DOL.GS.Quests
         /// Create an empty Quest
         /// </summary>
         public BaseQuest()
-            : base()
         {
         }
 
@@ -123,15 +121,15 @@ namespace DOL.GS.Quests
         [ScriptUnloadedEvent]
         public static void ScriptUnloadedBase(DOLEvent e, object sender, EventArgs args)
         {
-            if (questParts != null)
+            if (QuestParts != null)
             {
-                for (int i = questParts.Count - 1; i >= 0; i--)
+                for (int i = QuestParts.Count - 1; i >= 0; i--)
                 {
-                    RemoveBehaviour((QuestBehaviour)questParts[i]);
+                    RemoveBehaviour((QuestBehaviour)QuestParts[i]);
                 }
             }
 
-            questParts = null;
+            QuestParts = null;
         }
 
         // Base QuestPart methods
@@ -161,17 +159,17 @@ namespace DOL.GS.Quests
         /// <param name="questPart">QuestPart to be added</param>
         public static void AddBehaviour(QuestBehaviour questPart)
         {
-            if (questParts == null)
+            if (QuestParts == null)
             {
-                questParts = new ArrayList();
+                QuestParts = new ArrayList();
             }
 
-            if (!questParts.Contains(questPart))
+            if (!QuestParts.Contains(questPart))
             {
-                questParts.Add(questPart);
+                QuestParts.Add(questPart);
             }
 
-            questPart.ID = questParts.Count; // fake id but ids only have to be unique quest wide its enough to use the number in the list as id.
+            questPart.ID = QuestParts.Count; // fake id but ids only have to be unique quest wide its enough to use the number in the list as id.
         }
 
         /// <summary>
@@ -180,13 +178,13 @@ namespace DOL.GS.Quests
         /// <param name="questPart">QuestPart to be removed</param>
         public static void RemoveBehaviour(QuestBehaviour questPart)
         {
-            if (questParts == null)
+            if (QuestParts == null)
             {
                 return;
             }
 
             UnRegisterBehaviour(questPart);
-            questParts.Remove(questPart);
+            QuestParts.Remove(questPart);
         }
 
         /// <summary>
@@ -197,22 +195,26 @@ namespace DOL.GS.Quests
         /// <param name="args"></param>
         public override void Notify(DOLEvent e, object sender, EventArgs args)
         {
-            if (sender is GamePlayer && e == GameObjectEvent.InteractWith)
+            if (sender is GamePlayer player && e == GameObjectEvent.InteractWith)
             {
-                InteractWithEventArgs iArgs = args as InteractWithEventArgs;
-                if (iArgs.Target is GameStaticItem)
+                if (!(args is InteractWithEventArgs iArgs))
                 {
-                    InteractWithObject(sender as GamePlayer, iArgs.Target as GameStaticItem);
+                    return;
+                }
+
+                if (iArgs.Target is GameStaticItem item)
+                {
+                    InteractWithObject(player, item);
                     return;
                 }
             }
 
-            if (questParts == null)
+            if (QuestParts == null)
             {
                 return;
             }
 
-            foreach (QuestBehaviour questPart in questParts)
+            foreach (QuestBehaviour questPart in QuestParts)
             {
                 questPart.Notify(e, sender, args);
             }
@@ -221,10 +223,10 @@ namespace DOL.GS.Quests
         // timer callbacks
         protected virtual int MakeAnimSpellSequence(RegionTimer callingTimer)
         {
-            if (m_animSpellTeleportTimerQueue.Count > 0)
+            if (AnimSpellTeleportTimerQueue.Count > 0)
             {
-                m_animSpellTeleportTimerQueue.Dequeue();
-                GameLiving animObject = (GameLiving)m_animSpellObjectQueue.Dequeue();
+                AnimSpellTeleportTimerQueue.Dequeue();
+                GameLiving animObject = (GameLiving)AnimSpellObjectQueue.Dequeue();
                 foreach (GamePlayer player in animObject.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
                     player.Out.SendSpellCastAnimation(animObject, 1, 20);
@@ -236,10 +238,10 @@ namespace DOL.GS.Quests
 
         protected virtual int MakeAnimEmoteSequence(RegionTimer callingTimer)
         {
-            if (m_animEmoteTeleportTimerQueue.Count > 0)
+            if (AnimEmoteTeleportTimerQueue.Count > 0)
             {
-                m_animEmoteTeleportTimerQueue.Dequeue();
-                GameLiving animObject = (GameLiving)m_animEmoteObjectQueue.Dequeue();
+                AnimEmoteTeleportTimerQueue.Dequeue();
+                GameLiving animObject = (GameLiving)AnimEmoteObjectQueue.Dequeue();
                 foreach (GamePlayer player in animObject.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
                     player.Out.SendEmoteAnimation(animObject, eEmote.Bind);
@@ -267,33 +269,33 @@ namespace DOL.GS.Quests
                 delay = 1;
             }
 
-            m_animSpellObjectQueue.Enqueue(caster);
-            m_animSpellTeleportTimerQueue.Enqueue(new RegionTimer(caster, new RegionTimerCallback(MakeAnimSpellSequence), (int)delay));
+            AnimSpellObjectQueue.Enqueue(caster);
+            AnimSpellTeleportTimerQueue.Enqueue(new RegionTimer(caster, new RegionTimerCallback(MakeAnimSpellSequence), (int)delay));
 
-            m_animEmoteObjectQueue.Enqueue(target);
-            m_animEmoteTeleportTimerQueue.Enqueue(new RegionTimer(target, new RegionTimerCallback(MakeAnimEmoteSequence), (int)delay + 2000));
+            AnimEmoteObjectQueue.Enqueue(target);
+            AnimEmoteTeleportTimerQueue.Enqueue(new RegionTimer(target, new RegionTimerCallback(MakeAnimEmoteSequence), (int)delay + 2000));
 
-            m_portObjectQueue.Enqueue(target);
+            _portObjectQueue.Enqueue(target);
 
             location.X += Util.Random(0 - fuzzyLocation, fuzzyLocation);
             location.Y += Util.Random(0 - fuzzyLocation, fuzzyLocation);
 
-            m_portDestinationQueue.Enqueue(location);
-            m_portTeleportTimerQueue.Enqueue(new RegionTimer(target, new RegionTimerCallback(MakePortSequence), (int)delay + 3000));
+            _portDestinationQueue.Enqueue(location);
+            _portTeleportTimerQueue.Enqueue(new RegionTimer(target, new RegionTimerCallback(MakePortSequence), (int)delay + 3000));
 
             if (location.Name != null)
             {
-                m_questPlayer.Out.SendMessage(LanguageMgr.GetTranslation(m_questPlayer.Client, "BaseQuest.TeleportTo.Text1", target.Name, location.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                QuestPlayer.Out.SendMessage(LanguageMgr.GetTranslation(QuestPlayer.Client, "BaseQuest.TeleportTo.Text1", target.Name, location.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
 
         protected virtual int MakePortSequence(RegionTimer callingTimer)
         {
-            if (m_portTeleportTimerQueue.Count > 0)
+            if (_portTeleportTimerQueue.Count > 0)
             {
-                m_portTeleportTimerQueue.Dequeue();
-                GameObject gameObject = (GameObject)m_portObjectQueue.Dequeue();
-                GameLocation location = (GameLocation)m_portDestinationQueue.Dequeue();
+                _portTeleportTimerQueue.Dequeue();
+                GameObject gameObject = (GameObject)_portObjectQueue.Dequeue();
+                GameLocation location = (GameLocation)_portDestinationQueue.Dequeue();
                 gameObject.MoveTo(location.RegionID, location.X, location.Y, location.Z, location.Heading);
             }
 
@@ -304,14 +306,14 @@ namespace DOL.GS.Quests
 
         protected struct QuestStepInteraction
         {
-            public string objectName;
-            public int numRequired;
-            public ItemTemplate itemResult;
-            public string interactText;
+            public string ObjectName { get; set; }
+            public int NumRequired { get; set; }
+            public ItemTemplate ItemResult { get; set; }
+            public string InteractText { get; set; }
         }
 
-        Dictionary<int, QuestStepInteraction> m_interactions = new Dictionary<int, QuestStepInteraction>();
-        const int INTERACT_ITEM_RESPAWN_SECONDS = 120;
+        private readonly Dictionary<int, QuestStepInteraction> _interactions = new Dictionary<int, QuestStepInteraction>();
+        private const int InteractItemRespawnSeconds = 120;
 
         /// <summary>
         /// Add an interact item associated with a step for this quest
@@ -325,17 +327,19 @@ namespace DOL.GS.Quests
         {
             try
             {
-                QuestStepInteraction info = new QuestStepInteraction();
-                info.objectName = objectName;
-                info.numRequired = numRequired;
-                info.itemResult = itemResult;
-                info.interactText = interactText;
+                QuestStepInteraction info = new QuestStepInteraction
+                {
+                    ObjectName = objectName,
+                    NumRequired = numRequired,
+                    ItemResult = itemResult,
+                    InteractText = interactText
+                };
 
-                m_interactions.Add(step, info);
+                _interactions.Add(step, info);
             }
             catch (Exception ex)
             {
-                log.Error("Error adding Interact Step, possible duplicate?", ex);
+                Log.Error("Error adding Interact Step, possible duplicate?", ex);
             }
         }
 
@@ -346,18 +350,18 @@ namespace DOL.GS.Quests
         /// <param name="staticItem"></param>
         protected void InteractWithObject(GamePlayer player, GameStaticItem staticItem)
         {
-            if (m_interactions.Count > 0)
+            if (_interactions.Count > 0)
             {
-                if (m_interactions.ContainsKey(Step))
+                if (_interactions.ContainsKey(Step))
                 {
-                    QuestStepInteraction info = m_interactions[Step];
+                    QuestStepInteraction info = _interactions[Step];
 
-                    if (staticItem.Name == info.objectName)
+                    if (staticItem.Name == info.ObjectName)
                     {
-                        if (GiveItem(player, info.itemResult, false))
+                        if (GiveItem(player, info.ItemResult, false))
                         {
-                            player.Out.SendMessage(info.interactText, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                            staticItem.RemoveFromWorld(INTERACT_ITEM_RESPAWN_SECONDS);
+                            player.Out.SendMessage(info.InteractText, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            staticItem.RemoveFromWorld(InteractItemRespawnSeconds);
                             OnObjectInteract(info);
                         }
                     }
@@ -372,7 +376,7 @@ namespace DOL.GS.Quests
         protected virtual void OnObjectInteract(QuestStepInteraction info)
         {
             // this is needed in order to support both Base and Reward quests
-            log.Error("Override OnObjectInteract to advance goal progress");
+            Log.Error("Override OnObjectInteract to advance goal progress");
         }
 
         #endregion World Item Interaction

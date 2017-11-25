@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Eerie Darkness Stone Encounter"; }
-        }
+        public override string Name => "Eerie Darkness Stone Encounter";
     }
 }

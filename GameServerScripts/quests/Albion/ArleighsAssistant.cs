@@ -657,9 +657,9 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, spritelingToes, false);
-            RemoveItem(m_questPlayer, wormRot, false);
-            RemoveItem(m_questPlayer, snakeSkin, false);
+            RemoveItem(QuestPlayer, spritelingToes, false);
+            RemoveItem(QuestPlayer, wormRot, false);
+            RemoveItem(QuestPlayer, snakeSkin, false);
         }
 
         private static string getRandomDyeColor()
@@ -699,13 +699,13 @@ namespace DOL.GS.Quests.Albion
             ItemTemplate dye = GameServer.Database.FindObjectByKey<ItemTemplate>("light_" + getRandomDyeColor() + "_cloth_dye");
             if (dye != null)
             {
-                GiveItem(arleighPenn, m_questPlayer, dye);
+                GiveItem(arleighPenn, QuestPlayer, dye);
             }
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 2560, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 2560, true);
             long money = Money.GetMoney(0, 0, 0, 0, 30 + Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} for your service.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} for your service.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
         }
     }
 }

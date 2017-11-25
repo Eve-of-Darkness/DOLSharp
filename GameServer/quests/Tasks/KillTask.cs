@@ -32,15 +32,13 @@ namespace DOL.GS.Quests
     public class KillTask : AbstractTask
     {
         // Chance of npc having task for player
-        protected new const ushort CHANCE = 75;
-
-        protected const string MOB_NAME = "mobName";
-        protected const string ITEM_INDEX = "itemIndex";
-
-        protected bool MobKilled = false;
+        private const ushort CHANCE = 75;
+        private const string MOB_NAME = "mobName";
+        private const string ITEM_INDEX = "itemIndex";
+        private bool _mobKilled;
 
         // private static int[] XPReward = new int[20]{25,50,100,200,400,800,1600,3200,6400,12800,18100,25600,36200,51200,72450,102400,144825,204800,289625,300000};
-        private static readonly int[] MoneyReward = new int[20] { 28,57,77,105,140,190,257,347,470,632,735,852,987,1147,1330,1542,1790,2077,2407,2801 };
+        private static readonly int[] MoneyReward = {28, 57, 77, 105, 140, 190, 257, 347, 470, 632, 735, 852, 987, 1147, 1330, 1542, 1790, 2077, 2407, 2801};
         private static readonly string[] TaskObjects = { "Skin", "Meat", "Bones", "Tooth", "Claw", "Skin", "Legs", "Collar", "Bone", "Ear", "Head", "Hair", "Carapace", "Skull", "Pile of dirt", "dust", "Slice", "Wings", "egg", "heart", "mandible" };
         private static readonly int[] ObjectModels = { 629, 102, 105, 106, 106, 629, 108, 109, 497, 501, 503, 506, 517, 540, 541, 541, 548, 551, 587, 595, 614 };
 
@@ -67,32 +65,19 @@ namespace DOL.GS.Quests
         {
             get
             {
-                const ushort Scarto = 3; // Add/Remove % to the Result
-
-                int ValueScarto = (MoneyReward[m_taskPlayer.Level - 1] / 100) * Scarto;
-                return Util.Random(MoneyReward[m_taskPlayer.Level - 1] - ValueScarto, MoneyReward[m_taskPlayer.Level - 1] + ValueScarto);
+                const ushort scarto = 3; // Add/Remove % to the Result
+                int valueScarto = (MoneyReward[m_taskPlayer.Level - 1] / 100) * scarto;
+                return Util.Random(MoneyReward[m_taskPlayer.Level - 1] - valueScarto, MoneyReward[m_taskPlayer.Level - 1] + valueScarto);
             }
         }
 
-        /*
-        public override long RewardXP
-        {
-            get
-            {
-                ushort Scarto = 3; // Add/Remove % to the Result
-
-                int ValueScarto = ((XPReward[m_taskPlayer.Level-1]/100)*Scarto);
-                return new Random().Next(XPReward[m_taskPlayer.Level-1]-ValueScarto,XPReward[m_taskPlayer.Level-1]+ValueScarto);
-            }
-        }
-         */
         /// <summary>
         /// Item index
         /// </summary>
         public int ItemIndex
         {
-            get { return int.Parse(GetCustomProperty(ITEM_INDEX)); }
-            set { SetCustomProperty(ITEM_INDEX, value.ToString()); }
+            get => int.Parse(GetCustomProperty(ITEM_INDEX));
+            set => SetCustomProperty(ITEM_INDEX, value.ToString());
         }
 
         public override string ItemName
@@ -105,43 +90,27 @@ namespace DOL.GS.Quests
             set { }
         }
 
-        public override IList RewardItems
-        {
-            get { return null; }
-        }
+        public override IList RewardItems => null;
 
         /// <summary>
         /// Retrieves the name of the task
         /// </summary>
-        public override string Name
-        {
-            get { return "Kill Task"; }
-        }
+        public override string Name => "Kill Task";
 
         /// <summary>
         /// Retrieves the description
         /// </summary>
-        public override string Description
-        {
-            get { return ((KillTask)m_taskPlayer.Task).MobKilled == false ? "Find a " + MobName + " and kill it then return to me for your reward." : "Return to " + RecieverName + " for your reward!"; }
-        }
+        public override string Description => ((KillTask) m_taskPlayer.Task)._mobKilled == false
+            ? $"Find a {MobName} and kill it then return to me for your reward."
+            : "Return to " + RecieverName + " for your reward!";
 
         /// <summary>
         /// Item related to task stored in dbTask
         /// </summary>
         public string MobName
         {
-            get { return GetCustomProperty(MOB_NAME); }
-            set { SetCustomProperty(MOB_NAME,value); }
-        }
-
-        /// <summary>
-        /// Called to finish the task.
-        /// Should be overridden and some rewards given etc.
-        /// </summary>
-        public override void FinishTask()
-        {
-            base.FinishTask();
+            get => GetCustomProperty(MOB_NAME);
+            set => SetCustomProperty(MOB_NAME,value);
         }
 
         /// <summary>
@@ -177,7 +146,7 @@ namespace DOL.GS.Quests
                 {
                     if (((KillTask)player.Task).MobName == target.Name)
                     {
-                        ((KillTask)player.Task).MobKilled = true;
+                        ((KillTask)player.Task)._mobKilled = true;
                         player.Out.SendMessage("You must now return to " + target.Name + " to recieve your reward!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                 }
@@ -229,10 +198,10 @@ namespace DOL.GS.Quests
                     // Only add task Loot if not killing grays
                     if (lowestCon >= -2)
                     {
-                        ArrayList Owners = new ArrayList();
+                        ArrayList owners = new ArrayList();
                         if (player.Group == null)
                         {
-                            Owners.Add(m_taskPlayer);
+                            owners.Add(m_taskPlayer);
                         }
                         else
                         {
@@ -243,66 +212,63 @@ namespace DOL.GS.Quests
                                 {
                                     if (((KillTask)p.Task).MobName == target.Name)
                                     {
-                                        Owners.Add(p);
+                                        owners.Add(p);
                                     }
                                 }
                             }
                         }
 
-                        if (Owners.Count > 0)
+                        if (owners.Count > 0)
                         {
-                            ArrayList dropMessages = new ArrayList();
                             InventoryItem itemdrop = GenerateItem(ItemName, 1, ObjectModels[ItemIndex]);
-                            WorldInventoryItem droppeditem = new WorldInventoryItem(itemdrop);
-                            for (int a = 0; a < Owners.Count; a++)
+                            WorldInventoryItem droppeditem = new WorldInventoryItem(itemdrop)
                             {
-                                droppeditem.AddOwner((GameObject)Owners[a]);
-                            }
+                                Name = itemdrop.Name,
+                                Level = 1,
+                                X = target.X,
+                                Y = target.Y,
+                                Z = target.Z,
+                                CurrentRegion = target.CurrentRegion
+                            };
 
-                            droppeditem.Name = itemdrop.Name;
-                            droppeditem.Level = 1;
-                            droppeditem.X = target.X;
-                            droppeditem.Y = target.Y;
-                            droppeditem.Z = target.Z;
-                            droppeditem.CurrentRegion = target.CurrentRegion;
                             droppeditem.AddToWorld();
-                            if (dropMessages.Count > 0)
+
+                            for (int a = 0; a < owners.Count; a++)
                             {
-                                foreach (GamePlayer visiblePlayer in target.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
-                                {
-                                    foreach (string str in dropMessages)
-                                    {
-                                        visiblePlayer.Out.SendMessage(str, eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
-                                    }
-                                }
+                                droppeditem.AddOwner((GameObject)owners[a]);
                             }
                         }
                     }
                 }
             }
-            else if (e == GameLivingEvent.InteractWith)
+            else if (e == GameObjectEvent.InteractWith)
             {
-                if (((KillTask)player.Task).MobKilled == true)
+                if (((KillTask)player.Task)._mobKilled)
                 {
                     InteractWithEventArgs myargs = (InteractWithEventArgs)args;
                     if (myargs.Target.Name == ((KillTask)player.Task).RecieverName)
                     {
-                        player.Out.SendMessage(myargs.Target.Name + " says, *Good work " + player.Name + ". Here is your reward as promised.*", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"{myargs.Target.Name} says, *Good work {player.Name}. Here is your reward as promised.*", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         FinishTask();
                     }
                 }
             }
-            else if (e == GamePlayerEvent.GiveItem && ServerProperties.Properties.TASK_GIVE_RANDOM_ITEM == true)
+            else if (e == GamePlayerEvent.GiveItem && ServerProperties.Properties.TASK_GIVE_RANDOM_ITEM)
             {
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
-                GameLiving target = gArgs.Target as GameLiving;
+
+                if (!(gArgs.Target is GameLiving target))
+                {
+                    return;
+                }
+
                 InventoryItem item = gArgs.Item;
 
                 if (player.Task.RecieverName == target.Name && item.Name == player.Task.ItemName)
                 {
                     player.Inventory.RemoveItem(item);
                     InventoryLogging.LogInventoryAction(player, target, eInventoryActionType.Quest, item.Template, item.Count);
-                    player.Out.SendMessage(target.Name + " says, *Good work " + player.Name + ". Here is your reward as promised.*", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"{target.Name} says, *Good work {player.Name}. Here is your reward as promised.*", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     FinishTask();
                 }
             }
@@ -321,62 +287,65 @@ namespace DOL.GS.Quests
                 return false;
             }
 
-            GameNPC Mob = GetRandomMob(player);
-            if (Mob == null)
+            GameNPC mob = GetRandomMob(player);
+            if (mob == null)
             {
                 player.Out.SendMessage("I have no task for you, come back later",eChatType.CT_Say,eChatLoc.CL_PopupWindow);
                 return false;
             }
-            else
+
+            player.Task = new KillTask(player)
             {
-                player.Task = new KillTask(player);
-                player.Task.TimeOut = DateTime.Now.AddHours(2);
-                ((KillTask)player.Task).MobKilled = false;
-                ((KillTask)player.Task).ItemIndex = Util.Random(0, TaskObjects.Length - 1);
-                ((KillTask)player.Task).MobName = Mob.Name;
-                player.Task.RecieverName = source.Name;
-                player.Out.SendMessage(source.Name + " says, *Very well " + player.Name + ", it's good to see adventurers willing to help out the realm in such times. Search to the " + GetDirectionFromHeading(Mob.Heading) + " and kill a " + Mob.Name + " and return to me for your reward. Good luck!*", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                player.Out.SendDialogBox(eDialogCode.SimpleWarning, 1, 1, 1, 1, eDialogType.Ok, false, "You have been given a task!");
-                return true;
-            }
+                TimeOut = DateTime.Now.AddHours(2)
+            };
+
+            ((KillTask)player.Task)._mobKilled = false;
+            ((KillTask)player.Task).ItemIndex = Util.Random(0, TaskObjects.Length - 1);
+            ((KillTask)player.Task).MobName = mob.Name;
+            player.Task.RecieverName = source.Name;
+            player.Out.SendMessage($"{source.Name} says, *Very well {player.Name}, it\'s good to see adventurers willing to help out the realm in such times. Search to the {GetDirectionFromHeading(mob.Heading)} and kill a {mob.Name} and return to me for your reward. Good luck!*", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendDialogBox(eDialogCode.SimpleWarning, 1, 1, 1, 1, eDialogType.Ok, false, "You have been given a task!");
+            return true;
         }
 
         public static string GetDirectionFromHeading(ushort heading)
         {
-            if (heading < 0)
-            {
-                heading += 4096;
-            }
-
             if (heading >= 3840 || heading <= 256)
             {
                 return "South";
             }
-            else if (heading > 256 && heading < 768)
+
+            if (heading > 256 && heading < 768)
             {
                 return "South West";
             }
-            else if (heading >= 768 && heading <= 1280)
+
+            if (heading >= 768 && heading <= 1280)
             {
                 return "West";
             }
-            else if (heading > 1280 && heading < 1792)
+
+            if (heading > 1280 && heading < 1792)
             {
                 return "North West";
             }
-            else if (heading >= 1792 && heading <= 2304)
+
+            if (heading >= 1792 && heading <= 2304)
             {
                 return "North";
             }
-            else if (heading > 2304 && heading < 2816)
+
+            if (heading > 2304 && heading < 2816)
             {
                 return "North East";
             }
-            else if (heading >= 2816 && heading <= 3328)
+
+            if (heading >= 2816 && heading <= 3328)
             {
                 return "East";
             }
-            else if (heading > 3328 && heading < 3840)
+
+            if (heading > 3328 && heading < 3840)
             {
                 return "South East";
             }
@@ -392,7 +361,7 @@ namespace DOL.GS.Quests
         public static GameNPC GetRandomMob(GamePlayer Player)
         {
             int minLevel = GameLiving.NoXPForLevel[Player.Level] + 1;
-            int maxLevel = (int)(2 * ((double)(Player.Level / 10 + 1))) + Player.Level;
+            int maxLevel = (int)(2 * (double)(Player.Level / 10 + 1)) + Player.Level;
 
             GameNPC npc = Player.CurrentZone.GetRandomNPC(eRealm.None, minLevel,maxLevel);
             return npc;
@@ -441,7 +410,7 @@ namespace DOL.GS.Quests
 
             string name = living.Name;
 
-            if (name.IndexOf("Guard") >= 0)
+            if (name.IndexOf("Guard", StringComparison.Ordinal) >= 0)
             {
 
                 if (name == "Guardian")
@@ -492,12 +461,12 @@ namespace DOL.GS.Quests
                 return true;
             }
 
-            if (name.StartsWith("Sir ") && (living.GuildName == null || living.GuildName == string.Empty))
+            if (name.StartsWith("Sir ") && string.IsNullOrEmpty(living.GuildName))
             {
                 return true;
             }
 
-            if (name.StartsWith("Captain ") && (living.GuildName == null || living.GuildName == string.Empty))
+            if (name.StartsWith("Captain ") && string.IsNullOrEmpty(living.GuildName))
             {
                 return true;
             }
@@ -507,7 +476,7 @@ namespace DOL.GS.Quests
                 return true;
             }
 
-            if (name.StartsWith("Lady ") && (living.GuildName == null || living.GuildName == string.Empty))
+            if (name.StartsWith("Lady ") && string.IsNullOrEmpty(living.GuildName))
             {
                 return true;
             }
@@ -532,7 +501,7 @@ namespace DOL.GS.Quests
                 return true;
             }
 
-            if (name.IndexOf("Viking") >= 0)
+            if (name.IndexOf("Viking", StringComparison.Ordinal) >= 0)
             {
                 if (name.EndsWith("Archer"))
                 {
@@ -577,7 +546,7 @@ namespace DOL.GS.Quests
                 return false;
             }
 
-            return AbstractTask.CheckAvailability(player,target,CHANCE);
+            return CheckAvailability(player,target,CHANCE);
         }
     }
 }

@@ -746,13 +746,13 @@ namespace DOL.GS.Quests.Albion
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                 if (gArgs.Target.Name == masterFrederick.Name && gArgs.Item.Id_nb == fullMagicBox.Id_nb)
                 {
-                    RemoveItem(masterFrederick, m_questPlayer, fullMagicBox);
+                    RemoveItem(masterFrederick, QuestPlayer, fullMagicBox);
 
-                    masterFrederick.TurnTo(m_questPlayer);
-                    masterFrederick.SayTo(m_questPlayer, "Ah, it is quite heavy, let me take a peek.");
-                    SendEmoteMessage(m_questPlayer, "Master Frederick opens the box carefully. When he sees the contents, he quickly closes it and turns his attention back to you.");
+                    masterFrederick.TurnTo(QuestPlayer);
+                    masterFrederick.SayTo(QuestPlayer, "Ah, it is quite heavy, let me take a peek.");
+                    SendEmoteMessage(QuestPlayer, "Master Frederick opens the box carefully. When he sees the contents, he quickly closes it and turns his attention back to you.");
 
-                    m_questPlayer.Out.SendEmoteAnimation(masterFrederick, eEmote.Yes);
+                    QuestPlayer.Out.SendEmoteAnimation(masterFrederick, eEmote.Yes);
                     Step = 3;
                     return;
                 }
@@ -763,11 +763,11 @@ namespace DOL.GS.Quests.Albion
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, emptyMagicBox, false);
-            RemoveItem(m_questPlayer, fullMagicBox, false);
+            RemoveItem(QuestPlayer, emptyMagicBox, false);
+            RemoveItem(QuestPlayer, fullMagicBox, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
@@ -775,22 +775,22 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
             // Give reward to player here ...
-            if (m_questPlayer.HasAbilityToUseItem(recruitsShortSword))
+            if (QuestPlayer.HasAbilityToUseItem(recruitsShortSword))
             {
-                GiveItem(masterFrederick, m_questPlayer, recruitsShortSword);
+                GiveItem(masterFrederick, QuestPlayer, recruitsShortSword);
             }
             else
             {
-                GiveItem(masterFrederick, m_questPlayer, recruitsStaff);
+                GiveItem(masterFrederick, QuestPlayer, recruitsStaff);
             }
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 100, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 100, true);
             long money = Money.GetMoney(0, 0, 0, 3, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} as a reward.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You recieve {0} as a reward.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

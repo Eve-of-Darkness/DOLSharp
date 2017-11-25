@@ -35,10 +35,7 @@ namespace DOL.GS.Quests.Catacombs.Obelisks
         /// <summary>
         /// Name of the discovery quest.
         /// </summary>
-        public override string Name
-        {
-            get { return "Inconnu Crypt Obelisk"; }
-        }
+        public override string Name => "Inconnu Crypt Obelisk";
 
         /// <summary>
         /// Only Albion can get credit.

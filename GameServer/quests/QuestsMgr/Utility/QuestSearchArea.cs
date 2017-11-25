@@ -25,17 +25,12 @@ namespace DOL.GS.Quests
 {
     public class QuestSearchArea : Area.Circle
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public const int DEFAULT_SEARCH_SECONDS = 5;
-        public const int DEFAULT_SEARCH_RADIUS = 150;
+        private const int DefaultSearchSeconds = 5;
+        private const int DefaultSearchRadius = 150;
 
-        ushort m_regionId = 0;
-        Type m_questType;
-        DataQuest m_dataQuest = null;
-        int m_validStep;
-        int m_searchSeconds;
-        string m_popupText = string.Empty;
+        private ushort _regionId;
 
         /// <summary>
         /// Create an area used for /search.  Area will only be active when player is doing associated quest
@@ -49,9 +44,9 @@ namespace DOL.GS.Quests
         /// <param name="y"></param>
         /// <param name="z"></param>
         public QuestSearchArea(Type questType, int validStep, string text, ushort regionId, int x, int y, int z)
-            : base(text, x, y, z, DEFAULT_SEARCH_RADIUS)
+            : base(text, x, y, z, DefaultSearchRadius)
         {
-            CreateArea(questType, validStep, DEFAULT_SEARCH_SECONDS, text, regionId);
+            CreateArea(questType, validStep, DefaultSearchSeconds, text, regionId);
         }
 
         /// <summary>
@@ -84,7 +79,7 @@ namespace DOL.GS.Quests
         /// <param name="y"></param>
         /// <param name="radius"></param>
         /// <param name="searchSeconds"></param>
-        public QuestSearchArea(DataQuest dataQuest, int validStep, string text, ushort regionId, int x, int y, int radius = DEFAULT_SEARCH_RADIUS, int searchSeconds = DEFAULT_SEARCH_SECONDS)
+        public QuestSearchArea(DataQuest dataQuest, int validStep, string text, ushort regionId, int x, int y, int radius = DefaultSearchRadius, int searchSeconds = DefaultSearchSeconds)
             : base(text, x, y, 0, radius)
         {
             CreateArea(dataQuest, validStep, searchSeconds, text, regionId);
@@ -92,11 +87,11 @@ namespace DOL.GS.Quests
 
         protected void CreateArea(Type questType, int validStep, int searchSeconds, string text, ushort regionId)
         {
-            m_regionId = regionId;
-            m_questType = questType;
-            m_validStep = validStep;
-            m_searchSeconds = searchSeconds;
-            m_popupText = text;
+            _regionId = regionId;
+            QuestType = questType;
+            Step = validStep;
+            SearchSeconds = searchSeconds;
+            PopupText = text;
             DisplayMessage = false;
 
             if (WorldMgr.GetRegion(regionId) != null)
@@ -105,18 +100,19 @@ namespace DOL.GS.Quests
             }
             else
             {
-                log.Error("Could not find region " + regionId + " when trying to create QuestSearchArea for quest " + m_questType);
+                Log.Error(
+                    $"Could not find region {regionId} when trying to create QuestSearchArea for quest {QuestType}");
             }
         }
 
         protected void CreateArea(DataQuest dataQuest, int validStep, int searchSeconds, string text, ushort regionId)
         {
-            m_regionId = regionId;
-            m_questType = typeof(DataQuest);
-            m_dataQuest = dataQuest;
-            m_validStep = validStep;
-            m_searchSeconds = searchSeconds;
-            m_popupText = text;
+            _regionId = regionId;
+            QuestType = typeof(DataQuest);
+            DataQuest = dataQuest;
+            Step = validStep;
+            SearchSeconds = searchSeconds;
+            PopupText = text;
             DisplayMessage = false;
 
             if (WorldMgr.GetRegion(regionId) != null)
@@ -125,17 +121,17 @@ namespace DOL.GS.Quests
             }
             else
             {
-                string errorText = "Could not find region " + regionId + " when trying to create QuestSearchArea! ";
+                string errorText = $"Could not find region {regionId} when trying to create QuestSearchArea! ";
                 dataQuest.LastErrorText += errorText;
-                log.Error(errorText);
+                Log.Error(errorText);
             }
         }
 
         public virtual void RemoveArea()
         {
-            if (WorldMgr.GetRegion(m_regionId) != null)
+            if (WorldMgr.GetRegion(_regionId) != null)
             {
-                WorldMgr.GetRegion(m_regionId).RemoveArea(this);
+                WorldMgr.GetRegion(_regionId).RemoveArea(this);
             }
         }
 
@@ -143,19 +139,16 @@ namespace DOL.GS.Quests
         {
             bool showText = false;
 
-            if (m_dataQuest != null)
+            if (DataQuest != null)
             {
-                ChatUtil.SendDebugMessage(player, "Entered QuestSearchArea for DataQuest ID:" + m_dataQuest.ID + ", Step " + Step);
+                ChatUtil.SendDebugMessage(player, $"Entered QuestSearchArea for DataQuest ID:{DataQuest.Id}, Step {Step}");
 
                 // first check active data quests
                 foreach (AbstractQuest quest in player.QuestList)
                 {
-                    if (quest is DataQuest)
+                    if ((quest as DataQuest)?.Id == DataQuest.Id && quest.Step == Step && PopupText != string.Empty)
                     {
-                        if ((quest as DataQuest).ID == m_dataQuest.ID && quest.Step == Step && m_popupText != string.Empty)
-                        {
-                            showText = true;
-                        }
+                        showText = true;
                     }
                 }
 
@@ -167,10 +160,10 @@ namespace DOL.GS.Quests
             }
             else
             {
-                ChatUtil.SendDebugMessage(player, "Entered QuestSearchArea for " + m_questType.Name + ", Step " + Step);
+                ChatUtil.SendDebugMessage(player, $"Entered QuestSearchArea for {QuestType.Name}, Step {Step}");
 
                 // popup a dialog telling the player they should search here
-                if (player.IsDoingQuest(m_questType) != null && player.IsDoingQuest(m_questType).Step == m_validStep && PopupText != string.Empty)
+                if (player.IsDoingQuest(QuestType) != null && player.IsDoingQuest(QuestType).Step == Step && PopupText != string.Empty)
                 {
                     showText = true;
                 }
@@ -178,33 +171,18 @@ namespace DOL.GS.Quests
 
             if (showText)
             {
-                player.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true, m_popupText);
+                player.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true, PopupText);
             }
         }
 
-        public Type QuestType
-        {
-            get { return m_questType; }
-        }
+        public Type QuestType { get; private set; }
 
-        public DataQuest DataQuest
-        {
-            get { return m_dataQuest; }
-        }
+        public DataQuest DataQuest { get; private set; }
 
-        public int Step
-        {
-            get { return m_validStep; }
-        }
+        public int Step { get; private set; }
 
-        public int SearchSeconds
-        {
-            get { return m_searchSeconds; }
-        }
+        public int SearchSeconds { get; private set; }
 
-        public string PopupText
-        {
-            get { return m_popupText; }
-        }
+        public string PopupText { get; private set; } = string.Empty;
     }
 }

@@ -364,7 +364,7 @@ namespace DOL.GS.Quests.Hibernia
             #endregion
 
             #region defineBehaviours
-            QuestBuilder builder = QuestMgr.getBuilder(typeof(BonesToBlades));
+            QuestBuilder builder = QuestMgr.GetBuilder(typeof(BonesToBlades));
             QuestBehaviour a = null;
             string message1 = "Oh, have you been standing there long, <Class>? If you have, I apologize for ignoring you. I find my mind is quite distracted these days after the meeting I had yesterday with a [new client].";
             string message2 = "Ah, I would love to tell you the name of the client, but I promised to keep their identity a secret. I keep the identity of all my clients secret because I don't want the other merchants in this area to try to steal them away from me! See, there I go again, getting distracted when I should be thinking about [those blades].";

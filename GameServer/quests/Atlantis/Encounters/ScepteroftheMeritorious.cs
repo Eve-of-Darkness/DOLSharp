@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Scepter of the Meritorious Encounter"; }
-        }
+        public override string Name => "Scepter of the Meritorious Encounter";
     }
 }

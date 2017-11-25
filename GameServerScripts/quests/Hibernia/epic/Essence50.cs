@@ -1558,8 +1558,8 @@ namespace DOL.GS.Quests.Hibernia
                 EnemyKilledEventArgs gArgs = (EnemyKilledEventArgs)args;
                 if (gArgs.Target.Name == Caithor.Name)
                 {
-                    m_questPlayer.Out.SendMessage("You collect the Moonstone from Caithor", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    GiveItem(m_questPlayer, Moonstone);
+                    QuestPlayer.Out.SendMessage("You collect the Moonstone from Caithor", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    GiveItem(QuestPlayer, Moonstone);
                     Step = 2;
                     return;
                 }
@@ -1581,61 +1581,61 @@ namespace DOL.GS.Quests.Hibernia
         {
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, Moonstone, false);
+            RemoveItem(QuestPlayer, Moonstone, false);
         }
 
         public override void FinishQuest()
         {
-            if (m_questPlayer.Inventory.IsSlotsFree(6, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+            if (QuestPlayer.Inventory.IsSlotsFree(6, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
             {
-                RemoveItem(Brigit, m_questPlayer, Moonstone);
+                RemoveItem(Brigit, QuestPlayer, Moonstone);
 
                 base.FinishQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-                if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Champion)
+                if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Champion)
                 {
-                    GiveItem(m_questPlayer, ChampionEpicArms);
-                    GiveItem(m_questPlayer, ChampionEpicBoots);
-                    GiveItem(m_questPlayer, ChampionEpicGloves);
-                    GiveItem(m_questPlayer, ChampionEpicHelm);
-                    GiveItem(m_questPlayer, ChampionEpicLegs);
-                    GiveItem(m_questPlayer, ChampionEpicVest);
+                    GiveItem(QuestPlayer, ChampionEpicArms);
+                    GiveItem(QuestPlayer, ChampionEpicBoots);
+                    GiveItem(QuestPlayer, ChampionEpicGloves);
+                    GiveItem(QuestPlayer, ChampionEpicHelm);
+                    GiveItem(QuestPlayer, ChampionEpicLegs);
+                    GiveItem(QuestPlayer, ChampionEpicVest);
                 }
-                else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Bard)
+                else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Bard)
                 {
-                    GiveItem(m_questPlayer, BardEpicArms);
-                    GiveItem(m_questPlayer, BardEpicBoots);
-                    GiveItem(m_questPlayer, BardEpicGloves);
-                    GiveItem(m_questPlayer, BardEpicHelm);
-                    GiveItem(m_questPlayer, BardEpicLegs);
-                    GiveItem(m_questPlayer, BardEpicVest);
+                    GiveItem(QuestPlayer, BardEpicArms);
+                    GiveItem(QuestPlayer, BardEpicBoots);
+                    GiveItem(QuestPlayer, BardEpicGloves);
+                    GiveItem(QuestPlayer, BardEpicHelm);
+                    GiveItem(QuestPlayer, BardEpicLegs);
+                    GiveItem(QuestPlayer, BardEpicVest);
                 }
-                else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Enchanter)
+                else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Enchanter)
                 {
-                    GiveItem(m_questPlayer, EnchanterEpicArms);
-                    GiveItem(m_questPlayer, EnchanterEpicBoots);
-                    GiveItem(m_questPlayer, EnchanterEpicGloves);
-                    GiveItem(m_questPlayer, EnchanterEpicHelm);
-                    GiveItem(m_questPlayer, EnchanterEpicLegs);
-                    GiveItem(m_questPlayer, EnchanterEpicVest);
+                    GiveItem(QuestPlayer, EnchanterEpicArms);
+                    GiveItem(QuestPlayer, EnchanterEpicBoots);
+                    GiveItem(QuestPlayer, EnchanterEpicGloves);
+                    GiveItem(QuestPlayer, EnchanterEpicHelm);
+                    GiveItem(QuestPlayer, EnchanterEpicLegs);
+                    GiveItem(QuestPlayer, EnchanterEpicVest);
                 }
-                else if (m_questPlayer.CharacterClass.ID == (byte)eCharacterClass.Nightshade)
+                else if (QuestPlayer.CharacterClass.ID == (byte)eCharacterClass.Nightshade)
                 {
-                    GiveItem(m_questPlayer, NightshadeEpicArms);
-                    GiveItem(m_questPlayer, NightshadeEpicBoots);
-                    GiveItem(m_questPlayer, NightshadeEpicGloves);
-                    GiveItem(m_questPlayer, NightshadeEpicHelm);
-                    GiveItem(m_questPlayer, NightshadeEpicLegs);
-                    GiveItem(m_questPlayer, NightshadeEpicVest);
+                    GiveItem(QuestPlayer, NightshadeEpicArms);
+                    GiveItem(QuestPlayer, NightshadeEpicBoots);
+                    GiveItem(QuestPlayer, NightshadeEpicGloves);
+                    GiveItem(QuestPlayer, NightshadeEpicHelm);
+                    GiveItem(QuestPlayer, NightshadeEpicLegs);
+                    GiveItem(QuestPlayer, NightshadeEpicVest);
                 }
 
-                m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 1937768448, true);
+                QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 1937768448, true);
 
-                // m_questPlayer.AddMoney(Money.GetMoney(0,0,0,2,Util.Random(50)), "You recieve {0} as a reward.");
+                // mQuestPlayer.AddMoney(Money.GetMoney(0,0,0,2,Util.Random(50)), "You recieve {0} as a reward.");
             }
             else
             {
-                m_questPlayer.Out.SendMessage("You do not have enough free space in your inventory!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                QuestPlayer.Out.SendMessage("You do not have enough free space in your inventory!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
         }
 

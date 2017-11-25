@@ -40,33 +40,28 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The level of the quest.
         /// </summary>
-        protected int m_questLevel = 1;
+        private int _questLevel = 1;
 
         /// <summary>
         /// The player doing the quest
         /// </summary>
-        protected GamePlayer m_questPlayer = null;
-
-        /// <summary>
-        /// The player who is being offered this quest
-        /// </summary>
-        protected GamePlayer m_offerPlayer = null;
+        private GamePlayer _questPlayer;
 
         /// <summary>
         /// The quest database object, storing the information for the player
         /// and the quest. Eg. QuestStep etc.
         /// </summary>
-        private DBQuest m_dbQuest = null;
+        private readonly DBQuest _dbQuest;
 
         /// <summary>
         /// List of all QuestParts that can be fired on notify method of quest.
         /// </summary>
-        protected static IList questParts = null;
+        protected static IList QuestParts = null;
 
         /// <summary>
         /// The various /commands supported by quests
@@ -78,7 +73,7 @@ namespace DOL.GS.Quests
             SearchStart,
         }
 
-        private List<QuestSearchArea> m_searchAreas = new List<QuestSearchArea>();
+        private readonly List<QuestSearchArea> _searchAreas = new List<QuestSearchArea>();
 
         /// <summary>
         /// Constructs a new empty Quest
@@ -102,13 +97,16 @@ namespace DOL.GS.Quests
         /// <param name="step">The current step the player is on</param>
         public AbstractQuest(GamePlayer questingPlayer,int step)
         {
-            m_questPlayer = questingPlayer;
+            _questPlayer = questingPlayer;
 
-            DBQuest dbQuest = new DBQuest();
-            dbQuest.Character_ID = questingPlayer.QuestPlayerID;
-            dbQuest.Name = GetType().FullName;
-            dbQuest.Step = step;
-            m_dbQuest = dbQuest;
+            DBQuest dbQuest = new DBQuest
+            {
+                Character_ID = questingPlayer.QuestPlayerID,
+                Name = GetType().FullName,
+                Step = step
+            };
+
+            _dbQuest = dbQuest;
             SaveIntoDatabase();
         }
 
@@ -119,8 +117,8 @@ namespace DOL.GS.Quests
         /// <param name="dbQuest">The database object</param>
         public AbstractQuest(GamePlayer questingPlayer, DBQuest dbQuest)
         {
-            m_questPlayer = questingPlayer;
-            m_dbQuest = dbQuest;
+            _questPlayer = questingPlayer;
+            _dbQuest = dbQuest;
             ParseCustomProperties();
             SaveIntoDatabase();
         }
@@ -150,15 +148,15 @@ namespace DOL.GS.Quests
 
             if (questType == null)
             {
-                if (log.IsErrorEnabled)
+                if (Log.IsErrorEnabled)
                 {
-                    log.Error("Could not find quest: " + dbQuest.Name + "!");
+                    Log.Error($"Could not find quest: {dbQuest.Name}!");
                 }
 
                 return null;
             }
 
-            return (AbstractQuest)Activator.CreateInstance(questType, new object[] { targetPlayer, dbQuest });
+            return (AbstractQuest)Activator.CreateInstance(questType, targetPlayer, dbQuest);
         }
 
         /// <summary>
@@ -166,13 +164,13 @@ namespace DOL.GS.Quests
         /// </summary>
         public virtual void SaveIntoDatabase()
         {
-            if (m_dbQuest.IsPersisted)
+            if (_dbQuest.IsPersisted)
             {
-                GameServer.Database.SaveObject(m_dbQuest);
+                GameServer.Database.SaveObject(_dbQuest);
             }
             else
             {
-                GameServer.Database.AddObject(m_dbQuest);
+                GameServer.Database.AddObject(_dbQuest);
             }
         }
 
@@ -181,12 +179,12 @@ namespace DOL.GS.Quests
         /// </summary>
         public virtual void DeleteFromDatabase()
         {
-            if (!m_dbQuest.IsPersisted)
+            if (!_dbQuest.IsPersisted)
             {
                 return;
             }
 
-            DBQuest dbQuest = (DBQuest)GameServer.Database.FindObjectByKey<DBQuest>(m_dbQuest.ObjectId);
+            DBQuest dbQuest = GameServer.Database.FindObjectByKey<DBQuest>(_dbQuest.ObjectId);
             if (dbQuest != null)
             {
                 GameServer.Database.DeleteObject(dbQuest);
@@ -196,59 +194,44 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Retrieves how much time player can do the quest
         /// </summary>
-        public virtual int MaxQuestCount
-        {
-            get { return 1; }
-        }
+        public virtual int MaxQuestCount { get; } = 1;
 
         /// <summary>
         /// Gets or sets the player doing the quest
         /// </summary>
         public GamePlayer QuestPlayer
         {
-            get { return m_questPlayer; }
-
+            get => _questPlayer;
             set
             {
-                m_questPlayer = value;
-                m_dbQuest.Character_ID = QuestPlayer.QuestPlayerID;
+                _questPlayer = value;
+                _dbQuest.Character_ID = QuestPlayer.QuestPlayerID;
             }
         }
 
-        public GamePlayer OfferPlayer
-        {
-            get { return m_offerPlayer; }
-            set { m_offerPlayer = value; }
-        }
+        public GamePlayer OfferPlayer { get; set; }
 
         /// <summary>
         /// Retrieves the name of the quest
         /// </summary>
-        public virtual string Name
-        {
-            get { return "QUEST NAME UNDEFINED!"; }
-        }
+        public virtual string Name => "QUEST NAME UNDEFINED!";
 
         /// <summary>
         /// Retrieves the description for the current quest step
         /// </summary>
-        public virtual string Description
-        {
-            get { return "QUEST DESCRIPTION UNDEFINED!"; }
-        }
+        public virtual string Description => "QUEST DESCRIPTION UNDEFINED!";
 
         /// <summary>
         /// Retrieves the minimum level for this quest.
         /// </summary>
         public virtual int Level
         {
-            get { return m_questLevel; }
-
+            get => _questLevel;
             set
             {
                 if (value >= 1 && value <= 50)
                 {
-                    m_questLevel = value;
+                    _questLevel = value;
                 }
             }
         }
@@ -261,13 +244,12 @@ namespace DOL.GS.Quests
         /// </summary>
         public virtual int Step
         {
-            get { return m_dbQuest.Step; }
-
+            get => _dbQuest.Step;
             set
             {
-                m_dbQuest.Step = value;
+                _dbQuest.Step = value;
                 SaveIntoDatabase();
-                m_questPlayer.Out.SendQuestUpdate(this);
+                _questPlayer.Out.SendQuestUpdate(this);
             }
         }
 
@@ -295,17 +277,17 @@ namespace DOL.GS.Quests
         public virtual void FinishQuest()
         {
             Step = -1; // -1 indicates finished or aborted quests etc, they won't show up in the list
-            m_questPlayer.Out.SendMessage(string.Format(LanguageMgr.GetTranslation(m_questPlayer.Client, "AbstractQuest.FinishQuest.Completed", Name)), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+            _questPlayer.Out.SendMessage(string.Format(LanguageMgr.GetTranslation(_questPlayer.Client, "AbstractQuest.FinishQuest.Completed", Name)), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
 
             // move quest from active list to finished list...
-            m_questPlayer.QuestList.Remove(this);
+            _questPlayer.QuestList.Remove(this);
 
-            if (m_questPlayer.HasFinishedQuest(GetType()) == 0)
+            if (_questPlayer.HasFinishedQuest(GetType()) == 0)
             {
-                m_questPlayer.QuestListFinished.Add(this);
+                _questPlayer.QuestListFinished.Add(this);
             }
 
-            m_questPlayer.Out.SendQuestListUpdate();
+            _questPlayer.Out.SendQuestListUpdate();
         }
 
         /// <summary>
@@ -314,10 +296,10 @@ namespace DOL.GS.Quests
         public virtual void AbortQuest()
         {
             Step = -1;
-            m_questPlayer.QuestList.Remove(this);
+            _questPlayer.QuestList.Remove(this);
             DeleteFromDatabase();
-            m_questPlayer.Out.SendQuestListUpdate();
-            m_questPlayer.Out.SendMessage(LanguageMgr.GetTranslation(m_questPlayer.Client, "AbstractQuest.AbortQuest"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            _questPlayer.Out.SendQuestListUpdate();
+            _questPlayer.Out.SendMessage(LanguageMgr.GetTranslation(_questPlayer.Client, "AbstractQuest.AbortQuest"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
             // Todo: quest giver should again "SendNPCsQuestEffect"
         }
@@ -344,19 +326,19 @@ namespace DOL.GS.Quests
 
         #region Quest Commands
 
-        protected eQuestCommand m_currentCommand = eQuestCommand.None;
+        private eQuestCommand _currentCommand = eQuestCommand.None;
 
         protected void AddSearchArea(QuestSearchArea searchArea)
         {
-            if (m_searchAreas.Contains(searchArea) == false)
+            if (_searchAreas.Contains(searchArea) == false)
             {
-                m_searchAreas.Add(searchArea);
+                _searchAreas.Add(searchArea);
             }
         }
 
         public virtual bool Command(GamePlayer player, eQuestCommand command, AbstractArea area = null)
         {
-            if (m_searchAreas == null || m_searchAreas.Count == 0)
+            if (_searchAreas == null || _searchAreas.Count == 0)
             {
                 return false;
             }
@@ -368,21 +350,17 @@ namespace DOL.GS.Quests
 
             if (command == eQuestCommand.Search)
             {
-                foreach (AbstractArea playerArea in player.CurrentAreas)
+                foreach (var area1 in player.CurrentAreas)
                 {
-                    if (playerArea is QuestSearchArea)
+                    var playerArea = (AbstractArea) area1;
+                    if (playerArea is QuestSearchArea questArea && questArea.Step == Step)
                     {
-                        QuestSearchArea questArea = playerArea as QuestSearchArea;
-
-                        if (questArea != null && questArea.Step == Step)
+                        foreach (QuestSearchArea searchArea in _searchAreas)
                         {
-                            foreach (QuestSearchArea searchArea in m_searchAreas)
+                            if (searchArea == questArea)
                             {
-                                if (searchArea == questArea)
-                                {
-                                    StartQuestActionTimer(player, command, questArea.SearchSeconds);
-                                    return true;
-                                }
+                                StartQuestActionTimer(player, command, questArea.SearchSeconds);
+                                return true;
                             }
                         }
                     }
@@ -403,7 +381,7 @@ namespace DOL.GS.Quests
         {
             if (player.QuestActionTimer == null)
             {
-                m_currentCommand = command;
+                _currentCommand = command;
                 AddActionHandlers(player);
 
                 if (label == string.Empty)
@@ -413,31 +391,28 @@ namespace DOL.GS.Quests
                 }
 
                 player.Out.SendTimerWindow(label, seconds);
-                player.QuestActionTimer = new RegionTimer(player);
-                player.QuestActionTimer.Callback = new RegionTimerCallback(QuestActionCallback);
+                player.QuestActionTimer = new RegionTimer(player)
+                {
+                    Callback = new RegionTimerCallback(QuestActionCallback)
+                };
+
                 player.QuestActionTimer.Start(seconds * 1000);
-            }
-            else
-            {
-                // error message about another action in progress
             }
         }
 
         protected virtual int QuestActionCallback(RegionTimer timer)
         {
-            GamePlayer player = timer.Owner as GamePlayer;
-
-            if (player != null)
+            if (timer.Owner is GamePlayer player)
             {
                 RemoveActionHandlers(player);
 
                 player.Out.SendCloseTimerWindow();
                 player.QuestActionTimer.Stop();
                 player.QuestActionTimer = null;
-                QuestCommandCompleted(m_currentCommand, player);
+                QuestCommandCompleted(_currentCommand, player);
             }
 
-            m_currentCommand = eQuestCommand.None;
+            _currentCommand = eQuestCommand.None;
             return 0;
         }
 
@@ -445,10 +420,10 @@ namespace DOL.GS.Quests
         {
             if (player != null)
             {
-                GameEventMgr.AddHandler(player, GamePlayerEvent.Moving, new DOLEventHandler(InterruptAction));
-                GameEventMgr.AddHandler(player, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(InterruptAction));
-                GameEventMgr.AddHandler(player, GamePlayerEvent.Dying, new DOLEventHandler(InterruptAction));
-                GameEventMgr.AddHandler(player, GamePlayerEvent.AttackFinished, new DOLEventHandler(InterruptAction));
+                GameEventMgr.AddHandler(player, GameLivingEvent.Moving, new DOLEventHandler(InterruptAction));
+                GameEventMgr.AddHandler(player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(InterruptAction));
+                GameEventMgr.AddHandler(player, GameLivingEvent.Dying, new DOLEventHandler(InterruptAction));
+                GameEventMgr.AddHandler(player, GameLivingEvent.AttackFinished, new DOLEventHandler(InterruptAction));
             }
         }
 
@@ -456,35 +431,33 @@ namespace DOL.GS.Quests
         {
             if (player != null)
             {
-                GameEventMgr.RemoveHandler(player, GamePlayerEvent.Moving, new DOLEventHandler(InterruptAction));
-                GameEventMgr.RemoveHandler(player, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(InterruptAction));
-                GameEventMgr.RemoveHandler(player, GamePlayerEvent.Dying, new DOLEventHandler(InterruptAction));
-                GameEventMgr.RemoveHandler(player, GamePlayerEvent.AttackFinished, new DOLEventHandler(InterruptAction));
+                GameEventMgr.RemoveHandler(player, GameLivingEvent.Moving, new DOLEventHandler(InterruptAction));
+                GameEventMgr.RemoveHandler(player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(InterruptAction));
+                GameEventMgr.RemoveHandler(player, GameLivingEvent.Dying, new DOLEventHandler(InterruptAction));
+                GameEventMgr.RemoveHandler(player, GameLivingEvent.AttackFinished, new DOLEventHandler(InterruptAction));
             }
         }
 
         protected void InterruptAction(DOLEvent e, object sender, EventArgs args)
         {
-            GamePlayer player = sender as GamePlayer;
-
-            if (player != null)
+            if (sender is GamePlayer player)
             {
-                if (m_currentCommand != eQuestCommand.None)
+                if (_currentCommand != eQuestCommand.None)
                 {
-                    string commandName = Enum.GetName(typeof(eQuestCommand), m_currentCommand).ToLower();
-                    if (m_currentCommand == eQuestCommand.SearchStart)
+                    string commandName = Enum.GetName(typeof(eQuestCommand), _currentCommand)?.ToLower();
+                    if (_currentCommand == eQuestCommand.SearchStart)
                     {
-                        commandName = Enum.GetName(typeof(eQuestCommand), eQuestCommand.Search).ToLower();
+                        commandName = Enum.GetName(typeof(eQuestCommand), eQuestCommand.Search)?.ToLower();
                     }
 
-                    player.Out.SendMessage("Your " + commandName + " is interrupted!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"Your {commandName} is interrupted!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
 
                 RemoveActionHandlers(player);
                 player.Out.SendCloseTimerWindow();
                 player.QuestActionTimer.Stop();
                 player.QuestActionTimer = null;
-                m_currentCommand = eQuestCommand.None;
+                _currentCommand = eQuestCommand.None;
             }
         }
 
@@ -530,7 +503,7 @@ namespace DOL.GS.Quests
         {
             if (itemTemplate == null)
             {
-                log.Error("itemtemplate is null in RemoveItem:" + Environment.StackTrace);
+                Log.Error("itemtemplate is null in RemoveItem:" + Environment.StackTrace);
                 return;
             }
 
@@ -543,12 +516,12 @@ namespace DOL.GS.Quests
                     InventoryLogging.LogInventoryAction(player, target, eInventoryActionType.Quest, item.Template, item.Count);
                     if (target != null)
                     {
-                        player.Out.SendMessage("You give the " + itemTemplate.Name + " to " + target.GetName(0, false), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"You give the {itemTemplate.Name} to {target.GetName(0, false)}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                 }
                 else if (notify)
                 {
-                    player.Out.SendMessage("You cannot remove the \"" + itemTemplate.Name + "\" because you don't have it.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"You cannot remove the \"{itemTemplate.Name}\" because you don\'t have it.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
         }
@@ -557,24 +530,17 @@ namespace DOL.GS.Quests
         {
             if (item == null)
             {
-                log.Error("item is null in RemoveItem:" + Environment.StackTrace);
+                Log.Error("item is null in RemoveItem:" + Environment.StackTrace);
                 return;
             }
 
             lock (player.Inventory)
             {
-                if (item != null)
+                player.Inventory.RemoveItem(item);
+                InventoryLogging.LogInventoryAction(player, target, eInventoryActionType.Quest, item.Template, item.Count);
+                if (target != null)
                 {
-                    player.Inventory.RemoveItem(item);
-                    InventoryLogging.LogInventoryAction(player, target, eInventoryActionType.Quest, item.Template, item.Count);
-                    if (target != null)
-                    {
-                        player.Out.SendMessage("You give the " + item.Name + " to " + target.GetName(0, false), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
-                }
-                else if (notify)
-                {
-                    player.Out.SendMessage("You cannot remove the \"" + item.Name + "\" because you don't have it.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"You give the {item.Name} to {target.GetName(0, false)}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
         }
@@ -585,7 +551,7 @@ namespace DOL.GS.Quests
 
             if (itemTemplate == null)
             {
-                log.Error("itemtemplate is null in RemoveItem:" + Environment.StackTrace);
+                Log.Error("itemtemplate is null in RemoveItem:" + Environment.StackTrace);
                 return 0;
             }
 
@@ -605,18 +571,15 @@ namespace DOL.GS.Quests
                 {
                     if (itemsRemoved == 0)
                     {
-                        player.Out.SendMessage("You cannot remove the \"" + itemTemplate.Name + "\" because you don't have it.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"You cannot remove the \"{itemTemplate.Name}\" because you don\'t have it.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                     else if (target != null)
                     {
-                        if (itemTemplate.Name.EndsWith("s"))
-                        {
-                            player.Out.SendMessage("You give the " + itemTemplate.Name + " to " + target.Name, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        }
-                        else
-                        {
-                            player.Out.SendMessage("You give the " + itemTemplate.Name + "'s to " + target.Name, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        }
+                        var message = itemTemplate.Name.EndsWith("s")
+                                ? $"You give the {itemTemplate.Name} to {target.Name}"
+                                : $"You give the {itemTemplate.Name}\'s to {target.Name}";
+
+                        player.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                 }
             }
@@ -625,19 +588,19 @@ namespace DOL.GS.Quests
         }
         #endregion
 
-        public static Queue m_sayTimerQueue = new Queue();
-        public static Queue m_sayObjectQueue = new Queue();
-        public static Queue m_sayMessageQueue = new Queue();
-        public static Queue m_sayChatTypeQueue = new Queue();
-        public static Queue m_sayChatLocQueue = new Queue();
+        private static readonly Queue SayTimerQueue = new Queue();
+        private static readonly Queue SayObjectQueue = new Queue();
+        private static readonly Queue SayMessageQueue = new Queue();
+        private static readonly Queue SayChatTypeQueue = new Queue();
+        private static readonly Queue SayChatLocQueue = new Queue();
 
         protected static int MakeSaySequence(RegionTimer callingTimer)
         {
-            m_sayTimerQueue.Dequeue();
-            GamePlayer player = (GamePlayer)m_sayObjectQueue.Dequeue();
-            string message = (string)m_sayMessageQueue.Dequeue();
-            eChatType chatType = (eChatType)m_sayChatTypeQueue.Dequeue();
-            eChatLoc chatLoc = (eChatLoc)m_sayChatLocQueue.Dequeue();
+            SayTimerQueue.Dequeue();
+            GamePlayer player = (GamePlayer)SayObjectQueue.Dequeue();
+            string message = (string)SayMessageQueue.Dequeue();
+            eChatType chatType = (eChatType)SayChatTypeQueue.Dequeue();
+            eChatLoc chatLoc = (eChatLoc)SayChatLocQueue.Dequeue();
 
             player.Out.SendMessage(message, chatType, chatLoc);
 
@@ -646,12 +609,12 @@ namespace DOL.GS.Quests
 
         protected void SendSystemMessage(string msg)
         {
-            SendSystemMessage(m_questPlayer, msg);
+            SendSystemMessage(_questPlayer, msg);
         }
 
         protected void SendEmoteMessage(string msg)
         {
-            SendEmoteMessage(m_questPlayer, msg, 0);
+            SendEmoteMessage(_questPlayer, msg, 0);
         }
 
         protected static void SendSystemMessage(GamePlayer player, string msg)
@@ -697,11 +660,11 @@ namespace DOL.GS.Quests
             }
             else
             {
-                m_sayMessageQueue.Enqueue(msg);
-                m_sayObjectQueue.Enqueue(player);
-                m_sayChatLocQueue.Enqueue(chatLoc);
-                m_sayChatTypeQueue.Enqueue(chatType);
-                m_sayTimerQueue.Enqueue(new RegionTimer(player, new RegionTimerCallback(MakeSaySequence), (int)delay * 100));
+                SayMessageQueue.Enqueue(msg);
+                SayObjectQueue.Enqueue(player);
+                SayChatLocQueue.Enqueue(chatLoc);
+                SayChatTypeQueue.Enqueue(chatType);
+                SayTimerQueue.Enqueue(new RegionTimer(player, new RegionTimerCallback(MakeSaySequence), (int)delay * 100));
             }
         }
 
@@ -732,12 +695,12 @@ namespace DOL.GS.Quests
 
         protected static bool GiveItem(GameLiving source, GamePlayer player, ItemTemplate itemTemplate, bool canDrop)
         {
-            InventoryItem item = null;
+            InventoryItem item;
 
-            if (itemTemplate is ItemUnique)
+            if (itemTemplate is ItemUnique unique)
             {
-                GameServer.Database.AddObject(itemTemplate as ItemUnique);
-                item = GameInventoryItem.Create(itemTemplate as ItemUnique);
+                GameServer.Database.AddObject(unique);
+                item = GameInventoryItem.Create(unique);
             }
             else
             {
@@ -749,7 +712,7 @@ namespace DOL.GS.Quests
                 if (canDrop)
                 {
                     player.CreateItemOnTheGround(item);
-                    player.Out.SendMessage(string.Format("Your backpack is full, {0} is dropped on the ground.", itemTemplate.Name), eChatType.CT_Important, eChatLoc.CL_PopupWindow);
+                    player.Out.SendMessage($"Your backpack is full, {itemTemplate.Name} is dropped on the ground.", eChatType.CT_Important, eChatLoc.CL_PopupWindow);
                 }
                 else
                 {
@@ -761,33 +724,29 @@ namespace DOL.GS.Quests
             return true;
         }
 
-        protected static ItemTemplate CreateTicketTo(string destination, string ticket_Id)
+        protected static ItemTemplate CreateTicketTo(string destination, string ticketId)
         {
-            ItemTemplate ticket = GameServer.Database.FindObjectByKey<ItemTemplate>(GameServer.Database.Escape(ticket_Id.ToLower()));
+            ItemTemplate ticket = GameServer.Database.FindObjectByKey<ItemTemplate>(GameServer.Database.Escape(ticketId.ToLower()));
             if (ticket == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("Could not find " + destination + ", creating it ...");
+                    Log.Warn($"Could not find {destination}, creating it ...");
                 }
 
-                ticket = new ItemTemplate();
-                ticket.Name = "ticket to " + destination;
-
-                ticket.Id_nb = ticket_Id.ToLower();
-
-                ticket.Model = 499;
-
-                ticket.Object_Type = (int)eObjectType.GenericItem;
-                ticket.Item_Type = 40;
-
-                ticket.IsPickable = true;
-                ticket.IsDropable = true;
-
-                ticket.Price = Money.GetMoney(0, 0, 0, 5, 3);
-
-                ticket.PackSize = 1;
-                ticket.Weight = 0;
+                ticket = new ItemTemplate
+                {
+                    Name = $"ticket to {destination}",
+                    Id_nb = ticketId.ToLower(),
+                    Model = 499,
+                    Object_Type = (int) eObjectType.GenericItem,
+                    Item_Type = 40,
+                    IsPickable = true,
+                    IsDropable = true,
+                    Price = Money.GetMoney(0, 0, 0, 5, 3),
+                    PackSize = 1,
+                    Weight = 0
+                };
 
                 GameServer.Database.AddObject(ticket);
             }
@@ -800,7 +759,7 @@ namespace DOL.GS.Quests
         /// <summary>
         /// This HybridDictionary holds all the custom properties of this quest
         /// </summary>
-        protected readonly HybridDictionary m_customProperties = new HybridDictionary();
+        private readonly HybridDictionary _customProperties = new HybridDictionary();
 
         /// <summary>
         /// This method parses the custom properties string of the m_dbQuest
@@ -808,21 +767,21 @@ namespace DOL.GS.Quests
         /// </summary>
         public void ParseCustomProperties()
         {
-            if (m_dbQuest.CustomPropertiesString == null)
+            if (_dbQuest.CustomPropertiesString == null)
             {
                 return;
             }
 
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                m_customProperties.Clear();
-                foreach (string property in m_dbQuest.CustomPropertiesString.SplitCSV())
+                _customProperties.Clear();
+                foreach (string property in _dbQuest.CustomPropertiesString.SplitCSV())
                 {
                     if (property.Length > 0)
-                {
-                    string[] values = property.Split('=');
-                    m_customProperties[values[0]] = values[1];
-                }
+                    {
+                        string[] values = property.Split('=');
+                        _customProperties[values[0]] = values[1];
+                    }
                 }
             }
         }
@@ -836,12 +795,12 @@ namespace DOL.GS.Quests
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
             if (value == null)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
 
             // Make the string safe
@@ -849,9 +808,9 @@ namespace DOL.GS.Quests
             key = key.Replace('=','-');
             value = value.Replace(';',',');
             value = value.Replace('=','-');
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                m_customProperties[key] = value;
+                _customProperties[key] = value;
             }
 
             SaveCustomProperties();
@@ -863,18 +822,18 @@ namespace DOL.GS.Quests
         protected void SaveCustomProperties()
         {
             StringBuilder builder = new StringBuilder();
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                foreach (string hKey in m_customProperties.Keys)
+                foreach (string hKey in _customProperties.Keys)
                 {
                     builder.Append(hKey);
                     builder.Append("=");
-                    builder.Append(m_customProperties[hKey]);
+                    builder.Append(_customProperties[hKey]);
                     builder.Append(";");
                 }
             }
 
-            m_dbQuest.CustomPropertiesString = builder.ToString();
+            _dbQuest.CustomPropertiesString = builder.ToString();
             SaveIntoDatabase();
         }
 
@@ -886,12 +845,12 @@ namespace DOL.GS.Quests
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
-            lock (m_customProperties)
+            lock (_customProperties)
             {
-                m_customProperties.Remove(key);
+                _customProperties.Remove(key);
             }
 
             SaveCustomProperties();
@@ -906,10 +865,13 @@ namespace DOL.GS.Quests
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
-            return (string)m_customProperties[key];
+            lock (_customProperties)
+            {
+                return (string)_customProperties[key];
+            }
         }
 
         #endregion

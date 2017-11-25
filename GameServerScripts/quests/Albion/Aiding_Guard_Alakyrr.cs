@@ -649,10 +649,10 @@ namespace DOL.GS.Quests.Albion
                     GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                     if (gArgs.Target.Name == GuardAlakyrr.Name && gArgs.Item.Id_nb == fullflaskoftenebrousessence.Id_nb)
                     {
-                        RemoveItem(GuardAlakyrr, m_questPlayer, fullflaskoftenebrousessence);
+                        RemoveItem(GuardAlakyrr, QuestPlayer, fullflaskoftenebrousessence);
 
-                        GuardAlakyrr.TurnTo(m_questPlayer);
-                        GuardAlakyrr.SayTo(m_questPlayer, "Thank you. This is a promising specimen for study. Please take this coin as a show of our appreciation. Blessings of Arawn be upon you.");
+                        GuardAlakyrr.TurnTo(QuestPlayer);
+                        GuardAlakyrr.SayTo(QuestPlayer, "Thank you. This is a promising specimen for study. Please take this coin as a show of our appreciation. Blessings of Arawn be upon you.");
 
                         FinishQuest();
                     }
@@ -726,26 +726,26 @@ namespace DOL.GS.Quests.Albion
         public override void AbortQuest()
         {
             base.AbortQuest();
-            RemoveItem(m_questPlayer, enchantedtenebrousflask, false);
-            RemoveItem(m_questPlayer, quarterfulltenebrousflask, false);
-            RemoveItem(m_questPlayer, halffulltenebrousflask, false);
-            RemoveItem(m_questPlayer, fullflaskoftenebrousessence, false);
+            RemoveItem(QuestPlayer, enchantedtenebrousflask, false);
+            RemoveItem(QuestPlayer, quarterfulltenebrousflask, false);
+            RemoveItem(QuestPlayer, halffulltenebrousflask, false);
+            RemoveItem(QuestPlayer, fullflaskoftenebrousessence, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
         {
             base.FinishQuest();
 
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 40 + (m_questPlayer.Level - 1) * 4, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 40 + (QuestPlayer.Level - 1) * 4, true);
             long money = Money.GetMoney(0, 0, 0, 7, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You are awarded 7 silver and some copper!");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
+            QuestPlayer.AddMoney(money, "You are awarded 7 silver and some copper!");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.UseSlot, new DOLEventHandler(PlayerUseSlot));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

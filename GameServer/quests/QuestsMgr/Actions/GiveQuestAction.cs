@@ -27,11 +27,11 @@ namespace DOL.GS.Quests.Actions
     public class GiveQuestAction : AbstractAction<Type,GameNPC>
     {
 
-        public GiveQuestAction(GameNPC defaultNPC, object p, object q)
-            : base(defaultNPC, eActionType.GiveQuest, p, q) { }
+        public GiveQuestAction(GameNPC defaultNpc, object p, object q)
+            : base(defaultNpc, eActionType.GiveQuest, p, q) { }
 
-        public GiveQuestAction(GameNPC defaultNPC, Type questType, GameNPC questGiver)
-            : this(defaultNPC, (object)questType, (object)questGiver) { }
+        public GiveQuestAction(GameNPC defaultNpc, Type questType, GameNPC questGiver)
+            : this(defaultNpc, questType as object, questGiver) { }
 
         public override void Perform(DOLEvent e, object sender, EventArgs args)
         {

@@ -853,18 +853,18 @@ namespace DOL.GS.Quests.Albion
         {
             if (dunwynClone != null && (dunwynClone.IsAlive || dunwynClone.ObjectState == GameObject.eObjectState.Active))
             {
-                m_animSpellObjectQueue.Enqueue(dunwynClone);
-                m_animSpellTeleportTimerQueue.Enqueue(new RegionTimer(dunwynClone, new RegionTimerCallback(MakeAnimSpellSequence), 4000));
+                AnimSpellObjectQueue.Enqueue(dunwynClone);
+                AnimSpellTeleportTimerQueue.Enqueue(new RegionTimer(dunwynClone, new RegionTimerCallback(MakeAnimSpellSequence), 4000));
 
-                m_animEmoteObjectQueue.Enqueue(dunwynClone);
-                m_animEmoteTeleportTimerQueue.Enqueue(new RegionTimer(dunwynClone, new RegionTimerCallback(MakeAnimEmoteSequence), 5000));
+                AnimEmoteObjectQueue.Enqueue(dunwynClone);
+                AnimEmoteTeleportTimerQueue.Enqueue(new RegionTimer(dunwynClone, new RegionTimerCallback(MakeAnimEmoteSequence), 5000));
 
                 for (int i = 0; i < recruits.Length; i++)
                 {
                     if (recruits[i] != null)
                     {
-                        m_animEmoteObjectQueue.Enqueue(recruits[i]);
-                        m_animEmoteTeleportTimerQueue.Enqueue(new RegionTimer(recruits[i], new RegionTimerCallback(MakeAnimEmoteSequence), 4500));
+                        AnimEmoteObjectQueue.Enqueue(recruits[i]);
+                        AnimEmoteTeleportTimerQueue.Enqueue(new RegionTimer(recruits[i], new RegionTimerCallback(MakeAnimEmoteSequence), 4500));
                     }
                 }
             }
@@ -1250,7 +1250,7 @@ namespace DOL.GS.Quests.Albion
                 GiveItemEventArgs gArgs = (GiveItemEventArgs)args;
                 if (gArgs.Target.Name == masterFrederick.Name && gArgs.Item.Id_nb == queenTatianasHead.Id_nb)
                 {
-                    masterFrederick.SayTo(m_questPlayer, "Wonderful! Now I know Cotswold will be safe, thanks in no small part to you, Recruit Vinde. Excellent work. Cotswold is forever in your debt. I have a [reward] for you. I hope you have some use for it.");
+                    masterFrederick.SayTo(QuestPlayer, "Wonderful! Now I know Cotswold will be safe, thanks in no small part to you, Recruit Vinde. Excellent work. Cotswold is forever in your debt. I have a [reward] for you. I hope you have some use for it.");
                     RemoveItem(masterFrederick, player, queenTatianasHead);
                     Step = 5;
                     return;
@@ -1264,9 +1264,9 @@ namespace DOL.GS.Quests.Albion
 
             base.AbortQuest(); // Defined in Quest, changes the state, stores in DB etc ...
 
-            RemoveItem(m_questPlayer, queenTatianasHead, false);
+            RemoveItem(QuestPlayer, queenTatianasHead, false);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
 
         public override void FinishQuest()
@@ -1277,24 +1277,24 @@ namespace DOL.GS.Quests.Albion
             ResetMasterDunwyn();
 
             // Give reward to player here ...
-            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 1012, true);
+            QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, 1012, true);
             long money = Money.GetMoney(0, 0, 0, 9, Util.Random(50));
-            m_questPlayer.AddMoney(money, "You recieve {0} as a reward.");
-            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
-            if (m_questPlayer.HasAbilityToUseItem(recruitsGauntlets))
+            QuestPlayer.AddMoney(money, "You recieve {0} as a reward.");
+            InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, money);
+            if (QuestPlayer.HasAbilityToUseItem(recruitsGauntlets))
             {
-                GiveItem(masterFrederick, m_questPlayer, recruitsGauntlets);
-                GiveItem(masterFrederick, m_questPlayer, recruitsJewel);
+                GiveItem(masterFrederick, QuestPlayer, recruitsGauntlets);
+                GiveItem(masterFrederick, QuestPlayer, recruitsJewel);
             }
             else
             {
-                GiveItem(masterFrederick, m_questPlayer, recruitsGloves);
-                GiveItem(masterFrederick, m_questPlayer, recruitsJewelCloth);
+                GiveItem(masterFrederick, QuestPlayer, recruitsGloves);
+                GiveItem(masterFrederick, QuestPlayer, recruitsJewelCloth);
             }
 
-            GiveItem(masterFrederick, m_questPlayer, recruitsBracer);
+            GiveItem(masterFrederick, QuestPlayer, recruitsBracer);
 
-            GameEventMgr.RemoveHandler(m_questPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
+            GameEventMgr.RemoveHandler(QuestPlayer, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
         }
     }
 }

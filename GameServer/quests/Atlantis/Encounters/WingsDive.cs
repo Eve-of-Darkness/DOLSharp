@@ -35,9 +35,6 @@ namespace DOL.GS.Quests.Atlantis.Encounters
         /// <summary>
         /// Name of the encounter.
         /// </summary>
-        public override string Name
-        {
-            get { return "Wing's Dive Encounter"; }
-        }
+        public override string Name => "Wing's Dive Encounter";
     }
 }

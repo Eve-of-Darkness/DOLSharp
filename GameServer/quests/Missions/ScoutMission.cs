@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
 using DOL.Events;
 using DOL.GS.Keeps;
 
@@ -9,31 +8,31 @@ namespace DOL.GS.Quests
 {
     public class ScoutMission : AbstractMission
     {
-        private AbstractGameKeep m_keep = null;
+        private readonly AbstractGameKeep _keep;
 
         public ScoutMission(object owner)
             : base(owner)
         {
             eRealm realm = 0;
-            if (owner is Group)
+            if (owner is Group group)
             {
-                realm = (owner as Group).Leader.Realm;
+                realm = group.Leader.Realm;
             }
-            else if (owner is GamePlayer)
+            else if (owner is GamePlayer player)
             {
-                realm = (owner as GamePlayer).Realm;
+                realm = player.Realm;
             }
 
             ArrayList list = new ArrayList();
 
             ICollection<AbstractGameKeep> keeps;
-            if (owner is Group)
+            if (owner is Group group1)
             {
-                keeps = GameServer.KeepManager.GetKeepsOfRegion((owner as Group).Leader.CurrentRegionID);
+                keeps = GameServer.KeepManager.GetKeepsOfRegion(group1.Leader.CurrentRegionID);
             }
-            else if (owner is GamePlayer)
+            else if (owner is GamePlayer gOwner)
             {
-                keeps = GameServer.KeepManager.GetKeepsOfRegion((owner as GamePlayer).CurrentRegionID);
+                keeps = GameServer.KeepManager.GetKeepsOfRegion(gOwner.CurrentRegionID);
             }
             else
             {
@@ -55,7 +54,7 @@ namespace DOL.GS.Quests
 
             if (list.Count > 0)
             {
-                m_keep = list[Util.Random(list.Count - 1)] as AbstractGameKeep;
+                _keep = list[Util.Random(list.Count - 1)] as AbstractGameKeep;
             }
 
             GameEventMgr.AddHandler(AreaEvent.PlayerEnter, new DOLEventHandler(Notify));
@@ -66,16 +65,20 @@ namespace DOL.GS.Quests
         {
             if (e == AreaEvent.PlayerEnter)
             {
-                AreaEventArgs kargs = args as AreaEventArgs;
-
-                if (m_owner is GamePlayer && kargs.GameObject != m_owner)
+                if (!(args is AreaEventArgs kargs))
                 {
                     return;
                 }
 
-                foreach (AbstractArea area in kargs.GameObject.CurrentAreas)
+                if (Owner is GamePlayer && kargs.GameObject != Owner)
                 {
-                    if (area is KeepArea && (area as KeepArea).Keep == m_keep)
+                    return;
+                }
+
+                foreach (var area1 in kargs.GameObject.CurrentAreas)
+                {
+                    var area = (AbstractArea) area1;
+                    if (area is KeepArea && (area as KeepArea).Keep == _keep)
                     {
                         FinishMission();
                         break;
@@ -84,9 +87,12 @@ namespace DOL.GS.Quests
             }
             else if (e == KeepEvent.KeepTaken)
             {
-                KeepEventArgs kargs = args as KeepEventArgs;
+                if (!(args is KeepEventArgs kargs))
+                {
+                    return;
+                }
 
-                if (kargs.Keep != m_keep)
+                if (kargs.Keep != _keep)
                 {
                     return;
                 }
@@ -113,23 +119,15 @@ namespace DOL.GS.Quests
         {
             get
             {
-                if (m_keep == null)
+                if (_keep == null)
                 {
                     return "Keep is null when trying to send the description";
                 }
-                else
-                {
-                    return "Scout the area around " + m_keep.Name;
-                }
+
+                return $"Scout the area around {_keep.Name}";
             }
         }
 
-        public override long RewardRealmPoints
-        {
-            get
-            {
-                return 250;
-            }
-        }
+        public override long RewardRealmPoints => 250;
     }
 }
