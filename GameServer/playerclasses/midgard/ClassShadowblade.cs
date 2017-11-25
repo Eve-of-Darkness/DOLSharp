@@ -26,26 +26,22 @@ namespace DOL.GS.PlayerClass
     [CharacterClass((int)eCharacterClass.Shadowblade, "Shadowblade", "MidgardRogue")]
     public class ClassShadowblade : ClassMidgardRogue
     {
-        private static readonly string[] AutotrainableSkills = new[] { Specs.Stealth };
+        private static readonly string[] AutotrainableSkills = { Specs.Stealth };
 
         public ClassShadowblade()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.Loki";
-            m_specializationMultiplier = 22;
-            m_primaryStat = eStat.DEX;
-            m_secondaryStat = eStat.QUI;
-            m_tertiaryStat = eStat.STR;
-            m_baseHP = 760;
+            Profession = "PlayerClass.Profession.Loki";
+            SpecPointsMultiplier = 22;
+            PrimaryStat = eStat.DEX;
+            SecondaryStat = eStat.QUI;
+            TertiaryStat = eStat.STR;
+            BaseHP = 760;
         }
 
         /// <summary>
         /// Checks whether player has ability to use lefthanded weapons
         /// </summary>
-        public override bool CanUseLefthandedWeapon
-        {
-            get { return true; }
-        }
+        public override bool CanUseLefthandedWeapon => true;
 
         public override IList<string> GetAutotrainableSkills()
         {

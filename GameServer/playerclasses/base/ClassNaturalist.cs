@@ -26,12 +26,11 @@ namespace DOL.GS.PlayerClass
     public class ClassNaturalist : CharacterClassBase
     {
         public ClassNaturalist()
-            : base()
         {
-            m_specializationMultiplier = 10;
-            m_wsbase = 360;
-            m_baseHP = 720;
-            m_manaStat = eStat.EMP;
+            SpecPointsMultiplier = 10;
+            WeaponSkillBase = 360;
+            BaseHP = 720;
+            ManaStat = eStat.EMP;
         }
 
         public override string GetTitle(GamePlayer player, int level)
@@ -39,10 +38,7 @@ namespace DOL.GS.PlayerClass
             return HasAdvancedFromBaseClass() ? base.GetTitle(player, level) : base.GetTitle(player, 0);
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         public override GameTrainer.eChampionTrainerType ChampionTrainerType()
         {

@@ -34,26 +34,19 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.Focus_EtherealShriek, eProperty.Focus_Witchcraft)]
     public class FocusLevelCalculator : PropertyCalculator
     {
-        public FocusLevelCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                int itemBonus = living.ItemBonus[(int)property];
-                int focusLevel = living.BaseBuffBonusCategory[(int)property];
-                if (SkillBase.CheckPropertyType(property, ePropertyType.Focus)
-                 && ((GamePlayer)living).CharacterClass.ClassType == eClassType.ListCaster)
+                int itemBonus = player.ItemBonus[(int)property];
+                int focusLevel = player.BaseBuffBonusCategory[(int)property];
+                if (SkillBase.CheckPropertyType(property, ePropertyType.Focus) && player.CharacterClass.ClassType == eClassType.ListCaster)
                 {
-                    focusLevel += living.BaseBuffBonusCategory[(int)eProperty.AllFocusLevels];
-                    itemBonus = Math.Max(itemBonus, living.ItemBonus[(int)eProperty.AllFocusLevels]);
+                    focusLevel += player.BaseBuffBonusCategory[(int)eProperty.AllFocusLevels];
+                    itemBonus = Math.Max(itemBonus, player.ItemBonus[(int)eProperty.AllFocusLevels]);
                 }
 
                 return focusLevel + Math.Min(50, itemBonus);
-            }
-            else
-            {
-                // TODO other living types
             }
 
             return 0;

@@ -31,8 +31,6 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.MaxConcentration)]
     public class MaxConcentrationCalculator : PropertyCalculator
     {
-        public MaxConcentrationCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
             if (living is GamePlayer)
@@ -47,13 +45,13 @@ namespace DOL.GS.PropertyCalc
                 int stat = player.GetModified((eProperty)player.CharacterClass.ManaStat);
                 int factor = (stat > 50) ? (stat - 50) / 2 : (stat - 50);
                 int conc = (concBase + concBase * factor / 100) / 2;
-                conc = (int)(player.Effectiveness * (double)conc);
+                conc = (int) (player.Effectiveness * conc);
 
                 if (conc < 0)
                 {
-                    if (log.IsWarnEnabled)
+                    if (Log.IsWarnEnabled)
                     {
-                        log.WarnFormat(living.Name + ": concentration is less than zerro (conc:{0} eff:{1:R} concBase:{2} stat:{3} factor:{4})", conc, player.Effectiveness, concBase, stat, factor);
+                        Log.Warn($"{living.Name}: concentration is less than zerro (conc:{conc} eff:{player.Effectiveness:R} concBase:{concBase} stat:{stat} factor:{factor})");
                     }
 
                     conc = 0;
@@ -67,10 +65,8 @@ namespace DOL.GS.PropertyCalc
 
                 return conc;
             }
-            else
-            {
-                return 1000000; // default
-            }
+
+            return 1000000; // default
         }
     }
 }

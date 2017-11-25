@@ -89,7 +89,7 @@ namespace DOL.GS.PlayerTitles
             {
                 // try get player ML Number
                 int mlline = GetPlayerMLLine(player);
-                return source.TryTranslateOrDefault(string.Format("!ML Title {0}!", mlline), string.Format("Titles.ML.Line{0}", mlline));
+                return source.TryTranslateOrDefault($"!ML Title {mlline}!", $"Titles.ML.Line{mlline}");
             }
 
             return source.TryTranslateOrDefault("!None!", "DetailDisplayHandler.HandlePacket.None");
@@ -98,10 +98,7 @@ namespace DOL.GS.PlayerTitles
         /// <summary>
         /// The event to hook.
         /// </summary>
-        public override DOLEvent Event
-        {
-            get { return GamePlayerEvent.BecomeML; }
-        }
+        public override DOLEvent Event => GamePlayerEvent.BecomeML;
 
         /// <summary>
         /// Verify whether the player is suitable for this title.
@@ -121,8 +118,7 @@ namespace DOL.GS.PlayerTitles
         /// <param name="arguments">The event arguments.</param>
         protected override void EventCallback(DOLEvent e, object sender, EventArgs arguments)
         {
-            GamePlayer p = sender as GamePlayer;
-            if (p != null && p.Titles.Contains(this))
+            if (sender is GamePlayer p && p.Titles.Contains(this))
             {
                 p.UpdateCurrentTitle();
                 return;

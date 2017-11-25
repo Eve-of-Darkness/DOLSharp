@@ -27,16 +27,15 @@ namespace DOL.GS.PlayerClass
     public class ClassValewalker : ClassForester
     {
         public ClassValewalker()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofAffinity";
-            m_specializationMultiplier = 15;
-            m_primaryStat = eStat.STR;
-            m_secondaryStat = eStat.INT;
-            m_tertiaryStat = eStat.CON;
-            m_manaStat = eStat.INT;
-            m_wsbase = 400;
-            m_baseHP = 720;
+            Profession = "PlayerClass.Profession.PathofAffinity";
+            SpecPointsMultiplier = 15;
+            PrimaryStat = eStat.STR;
+            SecondaryStat = eStat.INT;
+            TertiaryStat = eStat.CON;
+            ManaStat = eStat.INT;
+            WeaponSkillBase = 400;
+            BaseHP = 720;
         }
 
         public override bool HasAdvancedFromBaseClass()

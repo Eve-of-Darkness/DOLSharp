@@ -26,15 +26,14 @@ namespace DOL.GS.PlayerClass
     public class ClassDruid : ClassNaturalist
     {
         public ClassDruid()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofHarmony";
-            m_specializationMultiplier = 10;
-            m_primaryStat = eStat.EMP;
-            m_secondaryStat = eStat.CON;
-            m_tertiaryStat = eStat.STR;
-            m_manaStat = eStat.EMP;
-            m_wsbase = 320;
+            Profession = "PlayerClass.Profession.PathofHarmony";
+            SpecPointsMultiplier = 10;
+            PrimaryStat = eStat.EMP;
+            SecondaryStat = eStat.CON;
+            TertiaryStat = eStat.STR;
+            ManaStat = eStat.EMP;
+            WeaponSkillBase = 320;
         }
 
         public override bool HasAdvancedFromBaseClass()

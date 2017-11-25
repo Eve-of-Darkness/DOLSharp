@@ -36,11 +36,11 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.MaxSpeed)]
     public class MaxSpeedCalculator : PropertyCalculator
     {
-        public static readonly double SPEED1 = 1.753;
-        public static readonly double SPEED2 = 1.816;
-        public static readonly double SPEED3 = 1.91;
-        public static readonly double SPEED4 = 1.989;
-        public static readonly double SPEED5 = 2.068;
+        public static readonly double Speed1 = 1.753;
+        public static readonly double Speed2 = 1.816;
+        public static readonly double Speed3 = 1.91;
+        public static readonly double Speed4 = 1.989;
+        public static readonly double Speed5 = 2.068;
 
         public override int CalcValue(GameLiving living, eProperty property)
         {
@@ -51,10 +51,8 @@ namespace DOL.GS.PropertyCalc
 
             double speed = living.BuffBonusMultCategory1.Get((int)property);
 
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                GamePlayer player = (GamePlayer)living;
-
                 // Since Dark Age of Camelot's launch, we have heard continuous feedback from our community about the movement speed in our game. The concerns over how slow
                 //              our movement is has continued to grow as we have added more and more areas in which to travel. Because we believe these concerns are valid, we have decided
                 //              to make a long requested change to the game, enhancing the movement speed of all players who are out of combat. This new run state allows the player to move
@@ -80,10 +78,10 @@ namespace DOL.GS.PropertyCalc
 
                 if (player.IsOverencumbered && player.Client.Account.PrivLevel < 2 && ServerProperties.Properties.ENABLE_ENCUMBERANCE_SPEED_LOSS)
                 {
-                    double Enc = player.Encumberance; // calculating player.Encumberance is a bit slow with all those locks, don't call it much
-                    if (Enc > player.MaxEncumberance)
+                    double enc = player.Encumberance; // calculating player.Encumberance is a bit slow with all those locks, don't call it much
+                    if (enc > player.MaxEncumberance)
                     {
-                        speed *= (((player.MaxSpeedBase * 1.0 / GamePlayer.PLAYER_BASE_SPEED) * (-Enc)) / (player.MaxEncumberance * 0.35f)) + (player.MaxSpeedBase / GamePlayer.PLAYER_BASE_SPEED) + ((player.MaxSpeedBase / GamePlayer.PLAYER_BASE_SPEED) * player.MaxEncumberance / (player.MaxEncumberance * 0.35));
+                        speed *= (((player.MaxSpeedBase * 1.0 / GamePlayer.PLAYER_BASE_SPEED) * -enc) / (player.MaxEncumberance * 0.35f)) + (player.MaxSpeedBase / GamePlayer.PLAYER_BASE_SPEED) + ((player.MaxSpeedBase / GamePlayer.PLAYER_BASE_SPEED) * player.MaxEncumberance / (player.MaxEncumberance * 0.35));
                         if (speed <= 0)
                         {
                             speed = 0;
@@ -146,8 +144,7 @@ namespace DOL.GS.PropertyCalc
             {
                 if (!living.InCombat)
                 {
-                    IControlledBrain brain = ((GameNPC)living).Brain as IControlledBrain;
-                    if (brain != null)
+                    if (((GameNPC)living).Brain is IControlledBrain brain)
                     {
                         GameLiving owner = brain.GetLivingOwner();
                         if (owner != null)
@@ -156,7 +153,7 @@ namespace DOL.GS.PropertyCalc
                             {
                                 speed *= 1.25;
 
-                                double ownerSpeedAdjust = (double)owner.MaxSpeed / (double)GamePlayer.PLAYER_BASE_SPEED;
+                                double ownerSpeedAdjust = owner.MaxSpeed / (double)GamePlayer.PLAYER_BASE_SPEED;
 
                                 if (ownerSpeedAdjust > 1.0)
                                 {
@@ -188,7 +185,8 @@ namespace DOL.GS.PropertyCalc
                 {
                     return 248;
                 }
-                else if (speed > 191)
+
+                if (speed > 191)
                 {
                     return 191;
                 }

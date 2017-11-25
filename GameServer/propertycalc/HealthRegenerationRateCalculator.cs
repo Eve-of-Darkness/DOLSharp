@@ -33,8 +33,6 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.HealthRegenerationRate)]
     public class HealthRegenerationRateCalculator : PropertyCalculator
     {
-        public HealthRegenerationRateCalculator() { }
-
         /// <summary>
         /// calculates the final property value
         /// </summary>
@@ -53,7 +51,7 @@ namespace DOL.GS.PropertyCalc
                 return (int)(living.MaxHealth * 0.05); // 5% each time for keep door
             }
 
-            double regen = 1;
+            double regen;
 
             /* PATCH 1.87 COMBAT AND REGENERATION
               - While in combat, health and power regeneration ticks will happen twice as often.

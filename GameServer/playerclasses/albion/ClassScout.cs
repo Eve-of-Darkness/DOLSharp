@@ -16,7 +16,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System.Collections.Generic;
+using DOL.GS.ServerProperties;
 
 namespace DOL.GS.PlayerClass
 {
@@ -26,24 +28,20 @@ namespace DOL.GS.PlayerClass
     [CharacterClass((int)eCharacterClass.Scout, "Scout", "Rogue")]
     public class ClassScout : ClassAlbionRogue
     {
-        private static readonly string[] AutotrainableSkills = new[] { Specs.Archery, Specs.Longbow };
+        private static readonly string[] AutotrainableSkills = { Specs.Archery, Specs.Longbow };
 
         public ClassScout()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.DefendersofAlbion";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.DEX;
-            m_secondaryStat = eStat.QUI;
-            m_tertiaryStat = eStat.STR;
-            m_baseHP = 720;
-            m_manaStat = eStat.DEX;
+            Profession = "PlayerClass.Profession.DefendersofAlbion";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.DEX;
+            SecondaryStat = eStat.QUI;
+            TertiaryStat = eStat.STR;
+            BaseHP = 720;
+            ManaStat = eStat.DEX;
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         public override IList<string> GetAutotrainableSkills()
         {
@@ -63,7 +61,7 @@ namespace DOL.GS.PlayerClass
             switch (skill.KeyName)
             {
                 case Specs.Longbow:
-                    if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == true)
+                    if (Properties.ALLOW_OLD_ARCHERY)
                     {
                         if (skill.Level < 3)
                         {

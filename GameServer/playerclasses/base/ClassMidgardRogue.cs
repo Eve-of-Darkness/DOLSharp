@@ -26,11 +26,10 @@ namespace DOL.GS.PlayerClass
     public class ClassMidgardRogue : CharacterClassBase
     {
         public ClassMidgardRogue()
-            : base()
         {
-            m_specializationMultiplier = 10;
-            m_wsbase = 360; // higher than alb/hib stealthers
-            m_baseHP = 720;
+            SpecPointsMultiplier = 10;
+            WeaponSkillBase = 360; // higher than alb/hib stealthers
+            BaseHP = 720;
         }
 
         public override string GetTitle(GamePlayer player, int level)
@@ -38,10 +37,7 @@ namespace DOL.GS.PlayerClass
             return HasAdvancedFromBaseClass() ? base.GetTitle(player, level) : base.GetTitle(player, 0);
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.PureTank; }
-        }
+        public override eClassType ClassType => eClassType.PureTank;
 
         public override GameTrainer.eChampionTrainerType ChampionTrainerType()
         {

@@ -26,28 +26,21 @@ namespace DOL.GS.PlayerClass
     [CharacterClass((int)eCharacterClass.Ranger, "Ranger", "Stalker")]
     public class ClassRanger : ClassStalker
     {
-        private static readonly string[] AutotrainableSkills = new[] { Specs.Archery, Specs.RecurveBow };
+        private static readonly string[] AutotrainableSkills = { Specs.Archery, Specs.RecurveBow };
 
         public ClassRanger()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofFocus";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.DEX;
-            m_secondaryStat = eStat.QUI;
-            m_tertiaryStat = eStat.STR;
-            m_manaStat = eStat.DEX;
+            Profession = "PlayerClass.Profession.PathofFocus";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.DEX;
+            SecondaryStat = eStat.QUI;
+            TertiaryStat = eStat.STR;
+            ManaStat = eStat.DEX;
         }
 
-        public override bool CanUseLefthandedWeapon
-        {
-            get { return true; }
-        }
+        public override bool CanUseLefthandedWeapon => true;
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         public override IList<string> GetAutotrainableSkills()
         {
@@ -67,7 +60,7 @@ namespace DOL.GS.PlayerClass
             switch (skill.KeyName)
             {
                 case Specs.RecurveBow:
-                    if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == true)
+                    if (ServerProperties.Properties.ALLOW_OLD_ARCHERY)
                     {
                         if (skill.Level < 3)
                         {

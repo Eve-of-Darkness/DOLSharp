@@ -35,8 +35,6 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.CriticalMeleeHitChance)]
     public class CriticalMeleeHitChanceCalculator : PropertyCalculator
     {
-        public CriticalMeleeHitChanceCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
             // no berserk for ranged weapons
@@ -49,9 +47,9 @@ namespace DOL.GS.PropertyCalc
             // base 10% chance of critical for all with melee weapons plus ra bonus
             int chance = 10 + living.BuffBonusCategory4[(int)property] + living.AbilityBonus[(int)property];
 
-            if (living is GameNPC && (living as GameNPC).Brain is AI.Brain.IControlledBrain)
+            if (living is GameNPC npc && npc.Brain is AI.Brain.IControlledBrain)
             {
-                GamePlayer player = ((living as GameNPC).Brain as AI.Brain.IControlledBrain).GetPlayerOwner();
+                GamePlayer player = ((AI.Brain.IControlledBrain) npc.Brain)?.GetPlayerOwner();
                 if (player != null)
                 {
                     RealmAbilities.WildMinionAbility ab = player.GetAbility<RealmAbilities.WildMinionAbility>();
@@ -60,7 +58,7 @@ namespace DOL.GS.PropertyCalc
                         chance += ab.Amount;
                     }
 
-                    if (living is NecromancerPet)
+                    if (npc is NecromancerPet)
                     {
                         RealmAbilities.MasteryOfPain mop = player.GetAbility<RealmAbilities.MasteryOfPain>();
                         if (mop != null)

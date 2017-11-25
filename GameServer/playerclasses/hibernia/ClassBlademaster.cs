@@ -26,20 +26,16 @@ namespace DOL.GS.PlayerClass
     public class ClassBlademaster : ClassGuardian
     {
         public ClassBlademaster()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofHarmony";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.STR;
-            m_secondaryStat = eStat.DEX;
-            m_tertiaryStat = eStat.CON;
-            m_wsbase = 440;
+            Profession = "PlayerClass.Profession.PathofHarmony";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.STR;
+            SecondaryStat = eStat.DEX;
+            TertiaryStat = eStat.CON;
+            WeaponSkillBase = 440;
         }
 
-        public override bool CanUseLefthandedWeapon
-        {
-            get { return true; }
-        }
+        public override bool CanUseLefthandedWeapon => true;
 
         public override bool HasAdvancedFromBaseClass()
         {

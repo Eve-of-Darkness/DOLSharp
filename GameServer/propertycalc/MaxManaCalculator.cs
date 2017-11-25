@@ -32,13 +32,10 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.MaxMana)]
     public class MaxManaCalculator : PropertyCalculator
     {
-        public MaxManaCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            if (living is GamePlayer)
+            if (living is GamePlayer player)
             {
-                GamePlayer player = living as GamePlayer;
                 eStat manaStat = player.CharacterClass.ManaStat;
 
                 if (player.CharacterClass.ManaStat == eStat.UNDEFINED)
@@ -93,10 +90,8 @@ namespace DOL.GS.PropertyCalc
                 // The resulting power pool is adjusted by your power pool % increase bonus.
                 return (int)(manaBase + itemBonus + abilityBonus + (manaBase + itemBonus + abilityBonus) * poolBonus * 0.01);
             }
-            else
-            {
-                return 1000000; // default
-            }
+
+            return 1000000; // default
         }
     }
 }

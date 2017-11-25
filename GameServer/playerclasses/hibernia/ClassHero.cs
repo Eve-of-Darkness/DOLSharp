@@ -26,14 +26,13 @@ namespace DOL.GS.PlayerClass
     public class ClassHero : ClassGuardian
     {
         public ClassHero()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.PathofFocus";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.STR;
-            m_secondaryStat = eStat.CON;
-            m_tertiaryStat = eStat.DEX;
-            m_wsbase = 440;
+            Profession = "PlayerClass.Profession.PathofFocus";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.STR;
+            SecondaryStat = eStat.CON;
+            TertiaryStat = eStat.DEX;
+            WeaponSkillBase = 440;
         }
 
         public override bool HasAdvancedFromBaseClass()

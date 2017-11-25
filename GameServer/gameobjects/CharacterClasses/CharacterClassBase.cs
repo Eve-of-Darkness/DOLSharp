@@ -23,6 +23,7 @@ using DOL.GS.Effects;
 using DOL.Events;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using log4net;
 
 namespace DOL.GS
 {
@@ -31,76 +32,17 @@ namespace DOL.GS
     /// </summary>
     public abstract class CharacterClassBase : ICharacterClass
     {
-        protected static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        /// <summary>
-        /// id of class in Client
-        /// </summary>
-        protected int m_id;
+        protected static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Name of class
         /// </summary>
-        protected string m_name;
-
-        /// <summary>
-        /// Female name of class
-        /// </summary>
-        protected string m_femaleName;
-
-        /// <summary>
-        /// Base of this class
-        /// </summary>
-        protected string m_basename;
+        private string _name;
 
         /// <summary>
         /// Profession of character, e.g. Defenders of Albion
         /// </summary>
-        protected string m_profession;
-
-        /// <summary>
-        /// multiplier for specialization points per level in 10th
-        /// </summary>
-        protected int m_specializationMultiplier = 10;
-
-        /// <summary>
-        /// BaseHP for hp calculation
-        /// </summary>
-        protected int m_baseHP = 600;
-
-        /// <summary>
-        /// Stat gained every level.
-        /// see eStat consts
-        /// </summary>
-        protected eStat m_primaryStat = eStat.UNDEFINED;
-
-        /// <summary>
-        /// Stat gained every second level.
-        /// see eStat consts
-        /// </summary>
-        protected eStat m_secondaryStat = eStat.UNDEFINED;
-
-        /// <summary>
-        /// Stat gained every third level.
-        /// see eStat consts
-        /// </summary>
-        protected eStat m_tertiaryStat = eStat.UNDEFINED;
-
-        /// <summary>
-        /// Stat that affects the power/mana pool.
-        /// Do not set if they do not have a power pool/spells
-        /// </summary>
-        protected eStat m_manaStat = eStat.UNDEFINED;
-
-        /// <summary>
-        /// Weapon Skill Base value to influence weapon skill calc
-        /// </summary>
-        protected int m_wsbase = 400;
-
-        /// <summary>
-        /// Weapon Skill Base value to influence ranged weapon skill calc
-        /// </summary>
-        protected int m_wsbaseRanged = 440;
+        private string _profession;
 
         /// <summary>
         /// The GamePlayer for this character
@@ -109,25 +51,25 @@ namespace DOL.GS
 
         private static readonly string[] AutotrainableSkills = new string[0];
 
-        public CharacterClassBase()
+        protected CharacterClassBase()
         {
-            m_id = 0;
-            m_name = "Unknown Class";
-            m_basename = "Unknown Base Class";
-            m_profession = string.Empty;
+            ID = 0;
+            _name = "Unknown Class";
+            BaseName = "Unknown Base Class";
+            _profession = string.Empty;
 
             // initialize members from attributes
             Attribute[] attrs = Attribute.GetCustomAttributes(GetType(), typeof(CharacterClassAttribute));
             foreach (Attribute attr in attrs)
             {
-                if (attr is CharacterClassAttribute)
+                if (attr is CharacterClassAttribute attribute)
                 {
-                    m_id = ((CharacterClassAttribute)attr).ID;
-                    m_name = ((CharacterClassAttribute)attr).Name;
-                    m_basename = ((CharacterClassAttribute)attr).BaseName;
-                    if (Util.IsEmpty(((CharacterClassAttribute)attr).FemaleName) == false)
+                    ID = attribute.ID;
+                    _name = attribute.Name;
+                    BaseName = attribute.BaseName;
+                    if (Util.IsEmpty(attribute.FemaleName) == false)
                     {
-                        m_femaleName = ((CharacterClassAttribute)attr).FemaleName;
+                        FemaleName = attribute.FemaleName;
                     }
 
                     break;
@@ -138,101 +80,61 @@ namespace DOL.GS
         public virtual void Init(GamePlayer player)
         {
             // TODO : Should Throw Exception Here.
-            if (Player != null && log.IsWarnEnabled)
+            if (Player != null && Log.IsWarnEnabled)
             {
-                log.WarnFormat("Character Class initializing Player when it was already initialized ! Old Player : {0} New Player : {1}", Player, player);
+                Log.Warn($"Character Class initializing Player when it was already initialized ! Old Player : {Player} New Player : {player}");
             }
 
             Player = player;
         }
 
-        public string FemaleName
-        {
-            get { return m_femaleName; }
-        }
+        public string FemaleName { get; }
 
-        public int BaseHP
-        {
-            get { return m_baseHP; }
-        }
+        public int BaseHP { get; protected set; } = 600;
 
-        public int ID
-        {
-            get { return m_id; }
-        }
+        public int ID { get; protected set; }
 
         public string Name
         {
-            get { return (Player != null && Player.Gender == eGender.Female && !Util.IsEmpty(m_femaleName)) ? m_femaleName : m_name; }
+            get => Player != null && Player.Gender == eGender.Female && !Util.IsEmpty(FemaleName) ? FemaleName : _name;
+            protected set => _name = value;
         }
 
-        public string BaseName
-        {
-            get { return m_basename; }
-        }
+        public string BaseName { get; protected set; }
 
         /// <summary>
         /// Return Translated Profession
         /// </summary>
         public string Profession
         {
-            get
-            {
-                return Player.TryTranslateOrDefault(m_profession, m_profession);
-            }
+            get => Player.TryTranslateOrDefault(_profession, _profession);
+            protected set => _profession = value;
         }
 
-        public int SpecPointsMultiplier
-        {
-            get { return m_specializationMultiplier; }
-        }
+        public int SpecPointsMultiplier { get; protected set; } = 10;
 
         /// <summary>
         /// This is specifically used for adjusting spec points as needed for new training window
         /// For standard DOL classes this will simply return the standard spec multiplier
         /// </summary>
-        public int AdjustedSpecPointsMultiplier
-        {
-            get { return m_specializationMultiplier; }
-        }
+        public int AdjustedSpecPointsMultiplier => SpecPointsMultiplier;
 
-        public eStat PrimaryStat
-        {
-            get { return m_primaryStat; }
-        }
+        public eStat PrimaryStat { get; protected set; } = eStat.UNDEFINED;
 
-        public eStat SecondaryStat
-        {
-            get { return m_secondaryStat; }
-        }
+        public eStat SecondaryStat { get; protected set; } = eStat.UNDEFINED;
 
-        public eStat TertiaryStat
-        {
-            get { return m_tertiaryStat; }
-        }
+        public eStat TertiaryStat { get; protected set; } = eStat.UNDEFINED;
 
-        public eStat ManaStat
-        {
-            get { return m_manaStat; }
-        }
+        public eStat ManaStat { get; protected set; } = eStat.UNDEFINED;
 
-        public int WeaponSkillBase
-        {
-            get { return m_wsbase; }
-        }
+        public int WeaponSkillBase { get; protected set; } = 400;
 
-        public int WeaponSkillRangedBase
-        {
-            get { return m_wsbaseRanged; }
-        }
+        public int WeaponSkillRangedBase { get; } = 440;
 
         /// <summary>
         /// Maximum number of pulsing spells that can be active simultaneously
         /// </summary>
-        public virtual ushort MaxPulsingSpells
-        {
-            get { return 1; }
-        }
+        public virtual ushort MaxPulsingSpells => 1;
 
         public virtual string GetTitle(GamePlayer player, int level)
         {
@@ -244,16 +146,13 @@ namespace DOL.GS
 
             if (clamplevel > 0)
             {
-                return player.TryTranslateOrDefault(string.Format("!{0}!", m_name), string.Format("PlayerClass.{0}.GetTitle.{1}", m_name, clamplevel));
+                return player.TryTranslateOrDefault($"!{_name}!", $"PlayerClass.{_name}.GetTitle.{clamplevel}");
             }
 
             return none;
         }
 
-        public virtual eClassType ClassType
-        {
-            get { return eClassType.ListCaster; }
-        }
+        public virtual eClassType ClassType => eClassType.ListCaster;
 
         /// <summary>
         /// Return the base list of Realm abilities that the class
@@ -293,7 +192,6 @@ namespace DOL.GS
             // we dont want to add things when players arent using their advanced class
             if (player.CharacterClass.BaseName == player.CharacterClass.Name)
             {
-                return;
             }
         }
 
@@ -309,10 +207,7 @@ namespace DOL.GS
         /// <summary>
         /// Checks whether player has ability to use lefthanded weapons
         /// </summary>
-        public virtual bool CanUseLefthandedWeapon
-        {
-            get { return false; }
-        }
+        public virtual bool CanUseLefthandedWeapon => false;
 
         public virtual bool HasAdvancedFromBaseClass()
         {
@@ -336,7 +231,7 @@ namespace DOL.GS
             {
                 if (controlledBrain.Owner != Player)
                 {
-                    throw new ArgumentException("ControlledNpc with wrong owner is set (player=" + Player.Name + ", owner=" + controlledBrain.Owner.Name + ")", "controlledNpc");
+                    throw new ArgumentException($"ControlledNpc with wrong owner is set (player={Player.Name}, owner={controlledBrain.Owner.Name})", nameof(controlledBrain));
                 }
 
                 if (Player.ControlledBrain == null)
@@ -364,12 +259,8 @@ namespace DOL.GS
         public virtual void CommandNpcRelease()
         {
             IControlledBrain controlledBrain = Player.ControlledBrain;
-            if (controlledBrain == null)
-            {
-                return;
-            }
 
-            GameNPC npc = controlledBrain.Body;
+            GameNPC npc = controlledBrain?.Body;
             if (npc == null)
             {
                 return;
@@ -398,13 +289,7 @@ namespace DOL.GS
         /// <summary>
         /// Return the health percent of this character
         /// </summary>
-        public virtual byte HealthPercentGroupWindow
-        {
-            get
-            {
-                return Player.HealthPercent;
-            }
-        }
+        public virtual byte HealthPercentGroupWindow => Player.HealthPercent;
 
         /// <summary>
         /// Create a shade effect for this player.
@@ -487,12 +372,11 @@ namespace DOL.GS
     public class DefaultCharacterClass : CharacterClassBase
     {
         public DefaultCharacterClass()
-            : base()
         {
-            m_id = 0;
-            m_name = "Unknown";
-            m_basename = "Unknown Class";
-            m_profession = "None";
+            ID = 0;
+            Name = "Unknown";
+            BaseName = "Unknown Class";
+            Profession = "None";
         }
     }
 }

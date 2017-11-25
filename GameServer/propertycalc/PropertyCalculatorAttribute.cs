@@ -28,29 +28,14 @@ namespace DOL.GS.PropertyCalc
     public class PropertyCalculatorAttribute : Attribute
     {
         /// <summary>
-        /// Defines lowest property of calculator properties range
-        /// </summary>
-        private readonly eProperty m_min;
-        /// <summary>
-        /// Defines highest property of calculator properties range
-        /// </summary>
-        private readonly eProperty m_max;
-
-        /// <summary>
         /// Gets the lowest property of calculator properties range
         /// </summary>
-        public eProperty Min
-        {
-            get { return m_min; }
-        }
+        public eProperty Min { get; }
 
         /// <summary>
         /// Gets the highest property of calculator properties range
         /// </summary>
-        public eProperty Max
-        {
-            get { return m_max; }
-        }
+        public eProperty Max { get; }
 
         /// <summary>
         /// Constructs a new calculator attribute for just one property
@@ -69,16 +54,16 @@ namespace DOL.GS.PropertyCalc
         {
             if (min > max)
             {
-                throw new ArgumentException("min property is higher than max (min=" + (int)min + " max=" + (int)max + ")");
+                throw new ArgumentException($"min property is higher than max (min={(int) min} max={(int) max})");
             }
 
             if (min < 0 || max > eProperty.MaxProperty)
             {
-                throw new ArgumentOutOfRangeException("max", (int)max, "property must be in 0 .. eProperty.MaxProperty range");
+                throw new ArgumentOutOfRangeException(nameof(max), (int)max, "property must be in 0 .. eProperty.MaxProperty range");
             }
 
-            m_min = min;
-            m_max = max;
+            Min = min;
+            Max = max;
         }
     }
 }

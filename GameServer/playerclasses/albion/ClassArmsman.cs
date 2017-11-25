@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System.Collections.Generic;
 
 namespace DOL.GS.PlayerClass
@@ -26,17 +27,16 @@ namespace DOL.GS.PlayerClass
     [CharacterClass((int)eCharacterClass.Armsman, "Armsman", "Fighter", "Armswoman")]
     public class ClassArmsman : ClassFighter
     {
-        private static readonly string[] AutotrainableSkills = new[] { Specs.Slash, Specs.Thrust };
+        private static readonly string[] AutotrainableSkills = { Specs.Slash, Specs.Thrust };
 
         public ClassArmsman()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.DefendersofAlbion";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.STR;
-            m_secondaryStat = eStat.CON;
-            m_tertiaryStat = eStat.DEX;
-            m_baseHP = 880;
+            Profession = "PlayerClass.Profession.DefendersofAlbion";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.STR;
+            SecondaryStat = eStat.CON;
+            TertiaryStat = eStat.DEX;
+            BaseHP = 880;
         }
 
         public override IList<string> GetAutotrainableSkills()

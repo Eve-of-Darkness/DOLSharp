@@ -33,17 +33,14 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.SpellLevel)]
     public class SpellLevelCalculator : PropertyCalculator
     {
-        public SpellLevelCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            return (int)(
-                +living.BaseBuffBonusCategory[(int)property]
-                + living.SpecBuffBonusCategory[(int)property]
-                - living.DebuffCategory[(int)property]
-                + living.BuffBonusCategory4[(int)property]
-                + living.AbilityBonus[(int)property]
-                + Math.Min(10, living.ItemBonus[(int)property]));
+            return +living.BaseBuffBonusCategory[(int)property]
+                   + living.SpecBuffBonusCategory[(int)property]
+                   - living.DebuffCategory[(int)property]
+                   + living.BuffBonusCategory4[(int)property]
+                   + living.AbilityBonus[(int)property]
+                   + Math.Min(10, living.ItemBonus[(int)property]);
         }
     }
 }

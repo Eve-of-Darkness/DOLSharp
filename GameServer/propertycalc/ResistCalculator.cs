@@ -33,8 +33,6 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.Resist_First, eProperty.Resist_Last)]
     public class ResistCalculator : PropertyCalculator
     {
-        public ResistCalculator() { }
-
         /// <summary>
         /// Calculate the actual resist amount for the given living and the given
         /// resist type, applying all possible caps and cap increases.
@@ -77,7 +75,7 @@ namespace DOL.GS.PropertyCalc
         {
             int propertyIndex = (int)property;
             int debuff = living.DebuffCategory[propertyIndex];
-            int racialBonus = (living is GamePlayer) ? SkillBase.GetRaceResist((living as GamePlayer).Race, (eResist)property) : 0;
+            int racialBonus = living is GamePlayer player ? SkillBase.GetRaceResist(player.Race, (eResist)property) : 0;
             int itemBonus = CalcValueFromItems(living, property);
             int buffBonus = CalcValueFromBuffs(living, property);
             buffBonus -= Math.Abs(debuff);
@@ -143,25 +141,17 @@ namespace DOL.GS.PropertyCalc
         /// <summary>
         /// Cap for player cast resist buffs.
         /// </summary>
-        public static int BuffBonusCap
-        {
-            get { return 24; }
-        }
+        public static int BuffBonusCap => 24;
 
         /// <summary>
         /// Hard cap for resists.
         /// </summary>
-        public static int HardCap
-        {
-            get { return 70; }
-        }
+        public static int HardCap => 70;
     }
 
     [PropertyCalculator(eProperty.Resist_Natural)]
     public class ResistNaturalCalculator : PropertyCalculator
     {
-        public ResistNaturalCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
             int propertyIndex = (int)property;
@@ -196,8 +186,8 @@ namespace DOL.GS.PropertyCalc
             return Math.Min(itemBonus, itemBonusCap);
         }
 
-        public static int BuffBonusCap { get { return 25; } }
+        public static int BuffBonusCap => 25;
 
-        public static int HardCap { get { return 70; } }
+        public static int HardCap => 70;
     }
 }

@@ -39,10 +39,8 @@ namespace DOL.GS.PropertyCalc
         {
             if (living is GamePlayer)
             {
-                int af;
-
                 // 1.5*1.25 spec line buff cap
-                af = Math.Min((int)(living.Level * 1.875), living.SpecBuffBonusCategory[(int)property]);
+                var af = Math.Min((int)(living.Level * 1.875), living.SpecBuffBonusCategory[(int)property]);
 
                 // debuff
                 af -= living.DebuffCategory[(int)property];
@@ -55,7 +53,8 @@ namespace DOL.GS.PropertyCalc
 
                 return af;
             }
-            else if (living is GameKeepDoor || living is GameKeepComponent)
+
+            if (living is GameKeepDoor || living is GameKeepComponent)
             {
                 GameKeepComponent component = null;
                 if (living is GameKeepDoor)
@@ -73,18 +72,14 @@ namespace DOL.GS.PropertyCalc
                 {
                     return amount;
                 }
-                else
-                {
-                    return amount / 2;
-                }
+
+                return amount / 2;
             }
-            else
-            {
-                return (int)((1 + (living.Level / 170.0)) * (living.Level << 1) * 4.67)
-                + living.SpecBuffBonusCategory[(int)property]
-                - living.DebuffCategory[(int)property]
-                + living.BuffBonusCategory4[(int)property];
-            }
+
+            return (int) ((1 + (living.Level / 170.0)) * (living.Level << 1) * 4.67)
+                   + living.SpecBuffBonusCategory[(int) property]
+                   - living.DebuffCategory[(int) property]
+                   + living.BuffBonusCategory4[(int) property];
         }
     }
 }

@@ -26,18 +26,17 @@ namespace DOL.GS.PlayerClass
     [CharacterClass((int)eCharacterClass.Hunter, "Hunter", "MidgardRogue", "Huntress")]
     public class ClassHunter : ClassMidgardRogue
     {
-        private static readonly string[] AutotrainableSkills = new[] { Specs.Archery, Specs.CompositeBow };
+        private static readonly string[] AutotrainableSkills = { Specs.Archery, Specs.CompositeBow };
 
         public ClassHunter()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.HouseofSkadi";
-            m_specializationMultiplier = 20;
-            m_primaryStat = eStat.DEX;
-            m_secondaryStat = eStat.QUI;
-            m_tertiaryStat = eStat.STR;
-            m_wsbase = 380;
-            m_manaStat = eStat.DEX;
+            Profession = "PlayerClass.Profession.HouseofSkadi";
+            SpecPointsMultiplier = 20;
+            PrimaryStat = eStat.DEX;
+            SecondaryStat = eStat.QUI;
+            TertiaryStat = eStat.STR;
+            WeaponSkillBase = 380;
+            ManaStat = eStat.DEX;
         }
 
         public override IList<string> GetAutotrainableSkills()
@@ -45,10 +44,7 @@ namespace DOL.GS.PlayerClass
             return AutotrainableSkills;
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         /// <summary>
         /// Add all spell-lines and other things that are new when this skill is trained
@@ -63,7 +59,7 @@ namespace DOL.GS.PlayerClass
             switch (skill.KeyName)
             {
                 case Specs.CompositeBow:
-                    if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == true)
+                    if (ServerProperties.Properties.ALLOW_OLD_ARCHERY)
                     {
                         if (skill.Level < 3)
                         {

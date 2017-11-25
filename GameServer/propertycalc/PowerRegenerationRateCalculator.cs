@@ -31,8 +31,6 @@ namespace DOL.GS.PropertyCalc
     [PropertyCalculator(eProperty.PowerRegenerationRate)]
     public class PowerRegenerationRateCalculator : PropertyCalculator
     {
-        public PowerRegenerationRateCalculator() { }
-
         public override int CalcValue(GameLiving living, eProperty property)
         {
             /* PATCH 1.87 COMBAT AND REGENERATION

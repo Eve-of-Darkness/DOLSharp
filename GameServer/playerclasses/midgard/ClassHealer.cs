@@ -26,14 +26,13 @@ namespace DOL.GS.PlayerClass
     public class ClassHealer : ClassSeer
     {
         public ClassHealer()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.HouseofEir";
-            m_specializationMultiplier = 10;
-            m_primaryStat = eStat.PIE;
-            m_secondaryStat = eStat.CON;
-            m_tertiaryStat = eStat.STR;
-            m_manaStat = eStat.PIE;
+            Profession = "PlayerClass.Profession.HouseofEir";
+            SpecPointsMultiplier = 10;
+            PrimaryStat = eStat.PIE;
+            SecondaryStat = eStat.CON;
+            TertiaryStat = eStat.STR;
+            ManaStat = eStat.PIE;
         }
 
         public override bool HasAdvancedFromBaseClass()

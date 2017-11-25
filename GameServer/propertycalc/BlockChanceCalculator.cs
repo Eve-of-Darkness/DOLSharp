@@ -33,8 +33,7 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 int shield = (player.GetModifiedSpecLevel(Specs.Shields) - 1) * (10 / 2);
                 int ability = player.AbilityBonus[(int)property] * 10;
@@ -43,8 +42,7 @@ namespace DOL.GS.PropertyCalc
                 return chance;
             }
 
-            GameNPC npc = living as GameNPC;
-            if (npc != null)
+            if (living is GameNPC npc)
             {
                 return npc.BlockChance * 10;
             }

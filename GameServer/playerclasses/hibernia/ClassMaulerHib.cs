@@ -26,27 +26,20 @@ namespace DOL.GS.PlayerClass
     public class ClassMaulerHib : ClassGuardian
     {
         public ClassMaulerHib()
-            : base()
         {
-            m_profession = "PlayerClass.Profession.TempleofIronFist";
-            m_specializationMultiplier = 15;
-            m_wsbase = 440;
-            m_baseHP = 600;
-            m_primaryStat = eStat.STR;
-            m_secondaryStat = eStat.CON;
-            m_tertiaryStat = eStat.QUI;
-            m_manaStat = eStat.STR;
+            Profession = "PlayerClass.Profession.TempleofIronFist";
+            SpecPointsMultiplier = 15;
+            WeaponSkillBase = 440;
+            BaseHP = 600;
+            PrimaryStat = eStat.STR;
+            SecondaryStat = eStat.CON;
+            TertiaryStat = eStat.QUI;
+            ManaStat = eStat.STR;
         }
 
-        public override bool CanUseLefthandedWeapon
-        {
-            get { return true; }
-        }
+        public override bool CanUseLefthandedWeapon => true;
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.Hybrid; }
-        }
+        public override eClassType ClassType => eClassType.Hybrid;
 
         public override GameTrainer.eChampionTrainerType ChampionTrainerType()
         {

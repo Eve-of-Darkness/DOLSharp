@@ -26,23 +26,19 @@ namespace DOL.GS.PlayerClass
     public class ClassBonedancer : CharacterClassBoneDancer
     {
         public ClassBonedancer()
-            : base()
         {
-            m_specializationMultiplier = 10;
-            m_wsbase = 280;
-            m_baseHP = 560;
-            m_manaStat = eStat.PIE;
+            SpecPointsMultiplier = 10;
+            WeaponSkillBase = 280;
+            BaseHP = 560;
+            ManaStat = eStat.PIE;
 
-            m_profession = "PlayerClass.Profession.HouseofBodgar";
-            m_primaryStat = eStat.PIE;
-            m_secondaryStat = eStat.DEX;
-            m_tertiaryStat = eStat.QUI;
+            Profession = "PlayerClass.Profession.HouseofBodgar";
+            PrimaryStat = eStat.PIE;
+            SecondaryStat = eStat.DEX;
+            TertiaryStat = eStat.QUI;
         }
 
-        public override eClassType ClassType
-        {
-            get { return eClassType.ListCaster; }
-        }
+        public override eClassType ClassType => eClassType.ListCaster;
 
         public override bool HasAdvancedFromBaseClass()
         {

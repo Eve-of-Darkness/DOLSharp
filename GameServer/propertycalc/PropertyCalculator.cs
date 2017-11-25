@@ -36,11 +36,7 @@ namespace DOL.GS.PropertyCalc
     /// </summary>
     public class PropertyCalculator : IPropertyCalculator
     {
-        protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        public PropertyCalculator()
-        {
-        }
+        protected static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// calculates the final property value
