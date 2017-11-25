@@ -62,10 +62,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 // SH: Also load the player if client player is NOT null but their charnames differ!!!
                 // only load player when on charscreen and player is not loaded yet
                 // packet is sent on every region change (and twice after "play" was pressed)
-                if (
-                    (
-                        (client.Player == null && client.Account.Characters != null)
-                        || (client.Player != null && client.Player.Name.ToLower() != charName.ToLower())) && client.ClientState == GameClient.eClientState.CharScreen)
+                if (((client.Player == null && client.Account.Characters != null) || (client.Player != null && client.Player.Name.ToLower() != charName.ToLower())) && client.ClientState == GameClient.eClientState.CharScreen)
                 {
                     bool charFound = false;
                     for (int i = 0; i < client.Account.Characters.Length; i++)

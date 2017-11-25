@@ -31,43 +31,22 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Max Length of resulting Delve String
         /// </summary>
-        public const ushort MAX_DELVE_STR_LENGTH = 2048;
+        private const ushort MaxDelveStrLength = 2048;
 
         /// <summary>
         /// Subject's Name
         /// </summary>
-        private string m_name;
-
-        /// <summary>
-        /// Subject's Name
-        /// </summary>
-        public string Name {
-            get { return m_name; }
-        }
+        public string Name { get; }
 
         /// <summary>
         /// Key / Value Collection
         /// </summary>
-        private Dictionary<string, string> m_values;
-
-        /// <summary>
-        /// Key / Value Collection
-        /// </summary>
-        public Dictionary<string, string> Values {
-            get { return m_values; }
-        }
-
-        /// <summary>
-        /// Times of Cache Expires
-        /// </summary>
-        private ulong m_expires;
+        public Dictionary<string, string> Values { get; }
 
         /// <summary>
         /// Times of Cache Expires, if 0 not sent to client.
         /// </summary>
-        public ulong Expires {
-            get { return m_expires; }
-        }
+        public ulong Expires { get; }
 
         /// <summary>
         /// Build a MiniDelveWriter with Implicit Expires.
@@ -85,9 +64,9 @@ namespace DOL.GS.PacketHandler
         /// <param name="expires"></param>
         public MiniDelveWriter(string name, ulong expires)
         {
-            m_name = name;
-            m_expires = expires;
-            m_values = new Dictionary<string, string>();
+            Name = name;
+            Expires = expires;
+            Values = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -107,7 +86,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="val"></param>
         public void AddKeyValuePair(string name, string val)
         {
-            m_values[name] = val;
+            Values[name] = val;
         }
 
         /// <summary>
@@ -117,13 +96,13 @@ namespace DOL.GS.PacketHandler
         /// <param name="val"></param>
         public void AppendKeyValuePair(string name, string val, string sep = ", ")
         {
-            if (m_values.ContainsKey(name))
+            if (Values.ContainsKey(name))
             {
-                m_values[name] += sep + val;
+                Values[name] += sep + val;
             }
             else
             {
-                m_values[name] = val;
+                Values[name] = val;
             }
         }
 
@@ -135,23 +114,23 @@ namespace DOL.GS.PacketHandler
         {
             StringBuilder res = new StringBuilder();
 
-            res.AppendFormat("({0} ", Name);
+            res.Append($"({Name} ");
 
             foreach (KeyValuePair<string, string> kv in Values)
             {
                 KeyValuePair<string, string> pair = kv;
 
-                if ((res.Length + pair.Key.Length + pair.Value.Length + 7) > MAX_DELVE_STR_LENGTH)
+                if ((res.Length + pair.Key.Length + pair.Value.Length + 7) > MaxDelveStrLength)
                 {
                     break;
                 }
 
-                res.AppendFormat("({0} \"{1}\")", pair.Key, pair.Value);
+                res.Append($"({pair.Key} \"{pair.Value}\")");
             }
 
-            if (Expires > 0 && (res.Length + 26) < MAX_DELVE_STR_LENGTH)
+            if (Expires > 0 && (res.Length + 26) < MaxDelveStrLength)
             {
-                res.AppendFormat("(Expires \"{0}\")", Expires);
+                res.Append($"(Expires \"{Expires}\")");
             }
 
             res.Append(")");

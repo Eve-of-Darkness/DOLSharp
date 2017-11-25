@@ -27,7 +27,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
@@ -35,9 +35,9 @@ namespace DOL.GS.PacketHandler.Client.v168
             GameClient target = WorldMgr.GetClientFromID(id);
             if (target == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn(string.Format("Client {0}:{1} account {2} requested invalid client {3} --- disconnecting", client.SessionID, client.TcpEndpointAddress, client.Account == null ? "null" : client.Account.Name, id));
+                    Log.Warn($"Client {client.SessionID}:{client.TcpEndpointAddress} account {(client.Account == null ? "null" : client.Account.Name)} requested invalid client {id} --- disconnecting");
                 }
 
                 client.Disconnect();

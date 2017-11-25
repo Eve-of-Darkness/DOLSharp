@@ -17,7 +17,6 @@
  *
  */
 using System.Linq;
-
 using DOL.Database;
 
 namespace DOL.GS.PacketHandler.Client.v168
@@ -25,8 +24,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.DuplicateNameCheck, "Checks if a character name already exists", eClientStatus.LoggedIn)]
     public class DupNameCheckRequestHandler : IPacketHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             string name = packet.ReadString(30);

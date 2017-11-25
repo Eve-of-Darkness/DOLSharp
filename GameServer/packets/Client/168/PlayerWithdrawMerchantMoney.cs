@@ -28,19 +28,14 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             // player is null, return
-            if (client.Player == null)
-            {
-                return;
-            }
 
             // active consignment merchant is null, return
-            GameConsignmentMerchant conMerchant = client.Player.ActiveInventoryObject as GameConsignmentMerchant;
-            if (conMerchant == null)
+            if (!(client.Player?.ActiveInventoryObject is GameConsignmentMerchant conMerchant))
             {
                 return;
             }
@@ -67,7 +62,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                     {
-                        client.Player.Out.SendMessage("You withdraw " + totalConMoney.ToString() + " BountyPoints from your Merchant.", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
+                        client.Player.Out.SendMessage($"You withdraw {totalConMoney} BountyPoints from your Merchant.", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
                         client.Player.BountyPoints += totalConMoney;
                         client.Player.Out.SendUpdatePoints();
                     }
@@ -82,7 +77,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     if (ServerProperties.Properties.MARKET_ENABLE_LOG)
                     {
-                        log.DebugFormat("CM: [{0}:{1}] withdraws {2} from CM on lot {3}.", client.Player.Name, client.Account.Name, totalConMoney, conMerchant.HouseNumber);
+                        Log.Debug($"CM: [{client.Player.Name}:{client.Account.Name}] withdraws {totalConMoney} from CM on lot {conMerchant.HouseNumber}.");
                     }
 
                     client.Out.SendConsignmentMerchantMoney(conMerchant.TotalMoney);

@@ -40,13 +40,13 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Holds jump point types
         /// </summary>
-        protected readonly Hashtable m_customJumpPointHandlers = new Hashtable();
+        private readonly Hashtable _customJumpPointHandlers = new Hashtable();
 
         #region IPacketHandler Members
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            ushort jumpSpotID = packet.ReadShort();
+            ushort jumpSpotId = packet.ReadShort();
 
             eRealm targetRealm = client.Player.Realm;
 
@@ -58,20 +58,27 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
 
             var zonePoint = GameServer.Database.SelectObjects<ZonePoint>(
-                "`Id` = @Id AND (`Realm` = @Realm OR `Realm` = @DefaultRealm OR `Realm` IS NULL)",
-                                                                         new [] { new QueryParameter("@Id", jumpSpotID), new QueryParameter("@Realm", (byte)targetRealm), new QueryParameter("@DefaultRealm", 0) }).FirstOrDefault();
+                    "`Id` = @Id AND (`Realm` = @Realm OR `Realm` = @DefaultRealm OR `Realm` IS NULL)",
+                    new[]
+                    {
+                        new QueryParameter("@Id", jumpSpotId), new QueryParameter("@Realm", (byte) targetRealm),
+                        new QueryParameter("@DefaultRealm", 0)
+                    })
+                .FirstOrDefault();
 
             if (zonePoint == null || zonePoint.TargetRegion == 0)
             {
-                ChatUtil.SendDebugMessage(client, "Invalid Jump (ZonePoint table): [" + jumpSpotID + "]" + ((zonePoint == null) ? ". Entry missing!" : ". TargetRegion is 0!"));
-                zonePoint = new ZonePoint();
-                zonePoint.Id = jumpSpotID;
+                ChatUtil.SendDebugMessage(client, $"Invalid Jump (ZonePoint table): [{jumpSpotId}]{((zonePoint == null) ? ". Entry missing!" : ". TargetRegion is 0!")}");
+                zonePoint = new ZonePoint
+                {
+                    Id = jumpSpotId
+                };
             }
 
             if (client.Account.PrivLevel > 1)
             {
-                client.Out.SendMessage("JumpSpotID = " + jumpSpotID, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                client.Out.SendMessage("ZonePoint Target: Region = " + zonePoint.TargetRegion + ", ClassType = '" + zonePoint.ClassType + "'", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage($"JumpSpotID = {jumpSpotId}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage($"ZonePoint Target: Region = {zonePoint.TargetRegion}, ClassType = \'{zonePoint.ClassType}\'", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
 
             // Dinberg: Fix - some jump points are handled code side, such as instances.
@@ -85,8 +92,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                     // otherwise the custom region should handle OnZonePoint for this check
                     if (client.Player.CurrentRegion.IsCustom == false && reg.IsDisabled)
                     {
-                        if ((client.Player.Mission is TaskDungeonMission &&
-                             (client.Player.Mission as TaskDungeonMission).TaskRegion.Skin == reg.Skin) == false)
+                        if ((client.Player.Mission is TaskDungeonMission mission &&
+                             mission.TaskRegion.Skin == reg.Skin) == false)
                         {
                             client.Out.SendMessage("This region has been disabled!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             if (client.Account.PrivLevel == 1)
@@ -106,19 +113,16 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             // check caps for battleground
             Battleground bg = GameServer.KeepManager.GetBattleground(zonePoint.TargetRegion);
-            if (bg != null)
+            if (client.Player.Level < bg?.MinLevel && client.Player.Level > bg.MaxLevel &&
+                client.Player.RealmLevel >= bg.MaxRealmLevel)
             {
-                if (client.Player.Level < bg.MinLevel && client.Player.Level > bg.MaxLevel &&
-                    client.Player.RealmLevel >= bg.MaxRealmLevel)
-                {
-                    return;
-                }
+                return;
             }
 
             IJumpPointHandler customHandler = null;
             if (string.IsNullOrEmpty(zonePoint.ClassType) == false)
             {
-                customHandler = (IJumpPointHandler)m_customJumpPointHandlers[zonePoint.ClassType];
+                customHandler = (IJumpPointHandler)_customJumpPointHandlers[zonePoint.ClassType];
 
                 // check for db change to update cached handler
                 if (customHandler != null && customHandler.GetType().FullName != zonePoint.ClassType)
@@ -137,12 +141,11 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     if (t == null)
                     {
-                        Log.ErrorFormat("jump point {0}: class {1} not found!", zonePoint.Id, zonePoint.ClassType);
+                        Log.Error($"jump point {zonePoint.Id}: class {zonePoint.ClassType} not found!");
                     }
                     else if (!typeof(IJumpPointHandler).IsAssignableFrom(t))
                     {
-                        Log.ErrorFormat("jump point {0}: class {1} must implement IJumpPointHandler interface!", zonePoint.Id,
-                                        zonePoint.ClassType);
+                        Log.Error($"jump point {zonePoint.Id}: class {zonePoint.ClassType} must implement IJumpPointHandler interface!");
                     }
                     else
                     {
@@ -153,16 +156,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                         catch (Exception e)
                         {
                             customHandler = null;
-                            Log.Error(
-                                string.Format("jump point {0}: error creating a new instance of jump point handler {1}", zonePoint.Id,
-                                              zonePoint.ClassType), e);
+                            Log.Error($"jump point {zonePoint.Id}: error creating a new instance of jump point handler {zonePoint.ClassType}", e);
                         }
                     }
                 }
 
                 if (customHandler != null)
                 {
-                    m_customJumpPointHandlers[zonePoint.ClassType] = customHandler;
+                    _customJumpPointHandlers[zonePoint.ClassType] = customHandler;
                 }
             }
 
@@ -176,17 +177,17 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles player region change requests
         /// </summary>
-        protected class RegionChangeRequestHandler : RegionAction
+        private class RegionChangeRequestHandler : RegionAction
         {
             /// <summary>
             /// Checks whether player is allowed to jump
             /// </summary>
-            protected readonly IJumpPointHandler m_checkHandler;
+            private readonly IJumpPointHandler _checkHandler;
 
             /// <summary>
             /// The target zone point
             /// </summary>
-            protected readonly ZonePoint m_zonePoint;
+            private readonly ZonePoint _zonePoint;
 
             /// <summary>
             /// Constructs a new RegionChangeRequestHandler
@@ -197,13 +198,8 @@ namespace DOL.GS.PacketHandler.Client.v168
             public RegionChangeRequestHandler(GamePlayer actionSource, ZonePoint zonePoint, IJumpPointHandler checkHandler)
                 : base(actionSource)
             {
-                if (zonePoint == null)
-                {
-                    throw new ArgumentNullException("zonePoint");
-                }
-
-                m_zonePoint = zonePoint;
-                m_checkHandler = checkHandler;
+                _zonePoint = zonePoint ?? throw new ArgumentNullException(nameof(zonePoint));
+                _checkHandler = checkHandler;
             }
 
             /// <summary>
@@ -213,26 +209,23 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 var player = (GamePlayer)m_actionSource;
 
-                Region reg = WorldMgr.GetRegion(m_zonePoint.TargetRegion);
+                Region reg = WorldMgr.GetRegion(_zonePoint.TargetRegion);
                 if (reg != null && reg.Expansion > (int)player.Client.ClientType)
                 {
-                    player.Out.SendMessage(
-                        "Destination region (" + reg.Description + ") is not supported by your client type.",
-                                           eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage($"Destination region ({reg.Description}) is not supported by your client type.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;
                 }
 
                 try
                 {
-
                     // check if the zonepoint has source locations set  Check prior to any zonepoint modification by handlers
-                    if (m_zonePoint.SourceRegion == 0)
+                    if (_zonePoint.SourceRegion == 0)
                     {
-                        m_zonePoint.SourceRegion = player.CurrentRegionID;
-                        m_zonePoint.SourceX = player.X;
-                        m_zonePoint.SourceY = player.Y;
-                        m_zonePoint.SourceZ = player.Z;
-                        GameServer.Database.SaveObject(m_zonePoint);
+                        _zonePoint.SourceRegion = player.CurrentRegionID;
+                        _zonePoint.SourceX = player.X;
+                        _zonePoint.SourceY = player.Y;
+                        _zonePoint.SourceZ = player.Z;
+                        GameServer.Database.SaveObject(_zonePoint);
                     }
                 }
                 catch (Exception ex)
@@ -240,11 +233,11 @@ namespace DOL.GS.PacketHandler.Client.v168
                     Log.Error("Can't save updated ZonePoint with source info.", ex);
                 }
 
-                if (m_checkHandler != null)
+                if (_checkHandler != null)
                 {
                     try
                     {
-                        if (!m_checkHandler.IsAllowedToJump(m_zonePoint, player))
+                        if (!_checkHandler.IsAllowedToJump(_zonePoint, player))
                         {
                             return;
                         }
@@ -253,17 +246,16 @@ namespace DOL.GS.PacketHandler.Client.v168
                     {
                         if (Log.IsErrorEnabled)
                         {
-                            Log.Error("Jump point handler (" + m_zonePoint.ClassType + ")", e);
+                            Log.Error($"Jump point handler ({_zonePoint.ClassType})", e);
                         }
 
-                        player.Out.SendMessage("exception in jump point (" + m_zonePoint.Id + ") handler...", eChatType.CT_System,
-                                               eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"exception in jump point ({_zonePoint.Id}) handler...", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
                 }
 
                 // move the player
-                player.MoveTo(m_zonePoint.TargetRegion, m_zonePoint.TargetX, m_zonePoint.TargetY, m_zonePoint.TargetZ, m_zonePoint.TargetHeading);
+                player.MoveTo(_zonePoint.TargetRegion, _zonePoint.TargetX, _zonePoint.TargetY, _zonePoint.TargetZ, _zonePoint.TargetHeading);
             }
         }
 

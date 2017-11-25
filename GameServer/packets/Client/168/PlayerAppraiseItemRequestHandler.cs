@@ -28,12 +28,12 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            uint X = packet.ReadInt();
-            uint Y = packet.ReadInt();
-            ushort id = packet.ReadShort();
-            ushort item_slot = packet.ReadShort();
+            packet.ReadInt(); // X
+            packet.ReadInt(); // Y
+            packet.ReadShort(); // id
+            ushort itemSlot = packet.ReadShort();
 
-            new AppraiseActionHandler(client.Player, item_slot).Start(1);
+            new AppraiseActionHandler(client.Player, itemSlot).Start(1);
         }
 
         #endregion
@@ -43,12 +43,12 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles item apprise actions
         /// </summary>
-        protected class AppraiseActionHandler : RegionAction
+        private class AppraiseActionHandler : RegionAction
         {
             /// <summary>
             /// The item slot
             /// </summary>
-            protected readonly int m_slot;
+            private readonly int _slot;
 
             /// <summary>
             /// Constructs a new AppraiseAction
@@ -57,7 +57,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="slot">The item slot</param>
             public AppraiseActionHandler(GamePlayer actionSource, int slot) : base(actionSource)
             {
-                m_slot = slot;
+                _slot = slot;
             }
 
             /// <summary>
@@ -72,15 +72,15 @@ namespace DOL.GS.PacketHandler.Client.v168
                     return;
                 }
 
-                InventoryItem item = player.Inventory.GetItem((eInventorySlot)m_slot);
+                InventoryItem item = player.Inventory.GetItem((eInventorySlot)_slot);
 
-                if (player.TargetObject is GameMerchant)
+                if (player.TargetObject is GameMerchant merchant)
                 {
-                    ((GameMerchant)player.TargetObject).OnPlayerAppraise(player, item, false);
+                    merchant.OnPlayerAppraise(player, item, false);
                 }
-                else if (player.TargetObject is GameLotMarker)
+                else
                 {
-                    ((GameLotMarker)player.TargetObject).OnPlayerAppraise(player, item, false);
+                    (player.TargetObject as GameLotMarker)?.OnPlayerAppraise(player, item, false);
                 }
             }
         }

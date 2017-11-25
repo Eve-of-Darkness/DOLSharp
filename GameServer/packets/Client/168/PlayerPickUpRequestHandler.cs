@@ -30,10 +30,10 @@ namespace DOL.GS.PacketHandler.Client.v168
                 return;
             }
 
-            uint X = packet.ReadInt();
-            uint Y = packet.ReadInt();
-            ushort id = (ushort)packet.ReadShort();
-            ushort obj = (ushort)packet.ReadShort();
+            packet.ReadInt(); // X
+            packet.ReadInt(); // Y
+            packet.ReadShort(); // id
+            packet.ReadShort(); // obj
 
             GameObject target = client.Player.TargetObject;
             if (target == null)

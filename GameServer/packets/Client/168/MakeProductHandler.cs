@@ -27,8 +27,8 @@ namespace DOL.GS.PacketHandler.Client.v168
     {
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            ushort ItemID = packet.ReadShort();
-            client.Player.CraftItem(ItemID);
+            ushort itemId = packet.ReadShort();
+            client.Player.CraftItem(itemId);
         }
     }
 }

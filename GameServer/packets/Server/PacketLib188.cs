@@ -17,18 +17,12 @@
 *
 */
 #define NOENCRYPTION
-using log4net;
-using System.Reflection;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(188, GameClient.eClientVersion.Version188)]
     public class PacketLib188 : PacketLib187
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.88 clients
@@ -41,14 +35,14 @@ namespace DOL.GS.PacketHandler
 
         public override void SendXFireInfo(byte flag)
         {
-            if (m_gameClient == null || m_gameClient.Player == null)
+            if (GameClient?.Player == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut((byte)eServerPackets.XFire))
             {
-                pak.WriteShort((ushort)m_gameClient.Player.ObjectID);
+                pak.WriteShort((ushort)GameClient.Player.ObjectID);
                 pak.WriteByte(flag);
                 pak.WriteByte(0x00);
                 SendTCP(pak);

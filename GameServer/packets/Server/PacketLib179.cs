@@ -17,9 +17,7 @@
  *
  */
 #define NOENCRYPTION
-using System.Reflection;
 using DOL.GS.PlayerTitles;
-using log4net;
 using DOL.GS.Housing;
 
 namespace DOL.GS.PacketHandler
@@ -27,10 +25,6 @@ namespace DOL.GS.PacketHandler
     [PacketLib(179, GameClient.eClientVersion.Version179)]
     public class PacketLib179 : PacketLib178
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.79 clients
@@ -42,7 +36,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendUpdatePlayer()
         {
-            GamePlayer player = m_gameClient.Player;
+            GamePlayer player = GameClient.Player;
             if (player == null)
             {
                 return;
@@ -55,7 +49,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteByte(0x00); // subtype
                 pak.WriteByte(0x00); // unk
                 // entry :
-                pak.WriteByte(player.GetDisplayLevel(m_gameClient.Player)); // level
+                pak.WriteByte(player.GetDisplayLevel(GameClient.Player)); // level
                 pak.WritePascalString(player.Name); // player name
                 pak.WriteByte((byte)(player.MaxHealth >> 8)); // maxhealth high byte ?
                 pak.WritePascalString(player.CharacterClass.Name); // class name
@@ -78,26 +72,11 @@ namespace DOL.GS.PacketHandler
                 pak.WritePascalString(player.RaceName); // Race name
                 pak.WriteByte(0x0);
 
-                if (player.GuildRank != null)
-                {
-                    pak.WritePascalString(player.GuildRank.Title); // Guild title
-                }
-                else
-                {
-                    pak.WritePascalString(string.Empty);
-                }
-
+                pak.WritePascalString(player.GuildRank?.Title ?? string.Empty);
                 pak.WriteByte(0x0);
 
                 AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(player.CraftingPrimarySkill);
-                if (skill != null)
-                {
-                    pak.WritePascalString(skill.Name); // crafter guilde: alchemist
-                }
-                else
-                {
-                    pak.WritePascalString("None"); // no craft skill at start
-                }
+                pak.WritePascalString(skill?.Name ?? "None");
 
                 pak.WriteByte(0x0);
                 pak.WritePascalString(player.CraftTitle.GetValue(player, player)); // crafter title: legendary alchemist
@@ -106,14 +85,7 @@ namespace DOL.GS.PacketHandler
 
                 // new in 1.75
                 pak.WriteByte(0x0);
-                if (player.CurrentTitle != PlayerTitleMgr.ClearTitle)
-                {
-                    pak.WritePascalString(player.CurrentTitle.GetValue(player, player)); // new in 1.74 - Custom title
-                }
-                else
-                {
-                    pak.WritePascalString("None");
-                }
+                pak.WritePascalString(player.CurrentTitle != PlayerTitleMgr.ClearTitle ? player.CurrentTitle.GetValue(player, player) : "None");
 
                 // new in 1.79
                 if (player.Champion)
@@ -132,19 +104,19 @@ namespace DOL.GS.PacketHandler
 
         public override void SendUpdatePoints()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CharacterPointsUpdate)))
             {
-                pak.WriteInt((uint)m_gameClient.Player.RealmPoints);
-                pak.WriteShort(m_gameClient.Player.LevelPermill);
-                pak.WriteShort((ushort)m_gameClient.Player.SkillSpecialtyPoints);
-                pak.WriteInt((uint)m_gameClient.Player.BountyPoints);
-                pak.WriteShort((ushort)m_gameClient.Player.RealmSpecialtyPoints);
-                pak.WriteShort(m_gameClient.Player.ChampionLevelPermill);
+                pak.WriteInt((uint)GameClient.Player.RealmPoints);
+                pak.WriteShort(GameClient.Player.LevelPermill);
+                pak.WriteShort((ushort)GameClient.Player.SkillSpecialtyPoints);
+                pak.WriteInt((uint)GameClient.Player.BountyPoints);
+                pak.WriteShort((ushort)GameClient.Player.RealmSpecialtyPoints);
+                pak.WriteShort(GameClient.Player.ChampionLevelPermill);
                 SendTCP(pak);
             }
         }

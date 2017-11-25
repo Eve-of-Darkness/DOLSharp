@@ -52,7 +52,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles player init requests
         /// </summary>
-        protected class PlayerInitRequestAction : RegionAction
+        private class PlayerInitRequestAction : RegionAction
         {
             /// <summary>
             /// Constructs a new PlayerInitRequestHandler
@@ -74,12 +74,9 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                 // update the region color scheme which may be wrong due to ALLOW_ALL_REALMS support
                 player.Out.SendRegionColorScheme();
-                if (player.CurrentRegion != null)
-                {
-                    player.CurrentRegion.Notify(RegionEvent.PlayerEnter, player.CurrentRegion, new RegionPlayerEventArgs(player));
-                }
+                player.CurrentRegion?.Notify(RegionEvent.PlayerEnter, player.CurrentRegion, new RegionPlayerEventArgs(player));
 
-                int mobs = SendMobsAndMobEquipmentToPlayer(player);
+                SendMobsAndMobEquipmentToPlayer(player);
                 player.Out.SendTime();
 
                 bool checkInstanceLogin = false;
@@ -115,7 +112,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 player.StartHealthRegeneration();
                 player.StartPowerRegeneration();
                 player.StartEnduranceRegeneration();
-                player.StartInvulnerabilityTimer(ServerProperties.Properties.TIMER_PLAYER_INIT * 1000, null);
+                player.StartInvulnerabilityTimer(Properties.TIMER_PLAYER_INIT * 1000, null);
 
                 if (player.Guild != null)
                 {
@@ -150,8 +147,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                 player.Out.SendMasterLevelWindow(0);
                 AssemblyName an = Assembly.GetExecutingAssembly().GetName();
-                player.Out.SendMessage("Dawn of Light " + an.Name + " Version: " + an.Version, eChatType.CT_System,
-                                       eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage($"Dawn of Light {an.Name} Version: {an.Version}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 if (Properties.TELEPORT_LOGIN_NEAR_ENEMY_KEEP)
                 {
@@ -160,14 +156,14 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                 if (Properties.TELEPORT_LOGIN_BG_LEVEL_EXCEEDED)
                 {
-                    CheckBGLevelCapForPlayerAndMoveIfNecessary(player);
+                    CheckBgLevelCapForPlayerAndMoveIfNecessary(player);
                 }
 
                 if (checkInstanceLogin)
                 {
                     if (WorldMgr.Regions[player.CurrentRegionID] == null || player.CurrentRegion == null || player.CurrentRegion.IsInstance)
                     {
-                        Log.WarnFormat("{0}:{1} logging into instance or CurrentRegion is null, moving to bind!", player.Name, player.Client.Account.Name);
+                        Log.Warn($"{player.Name}:{player.Client.Account.Name} logging into instance or CurrentRegion is null, moving to bind!");
                         player.MoveToBind();
                     }
                 }
@@ -180,7 +176,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 player.Client.ClientState = GameClient.eClientState.Playing;
             }
 
-            private static void CheckBGLevelCapForPlayerAndMoveIfNecessary(GamePlayer player)
+            private static void CheckBgLevelCapForPlayerAndMoveIfNecessary(GamePlayer player)
             {
                 if (player.Client.Account.PrivLevel == 1 && player.CurrentRegion.IsRvR && player.CurrentRegionID != 163)
                 {
@@ -195,12 +191,8 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         if (player.Level > k.BaseLevel)
                         {
-                            player.Out.SendMessage(
-                                LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.LevelCap"),
-                                                   eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
-                            player.MoveTo((ushort)player.BindRegion, player.BindXpos,
-                                          player.BindYpos, player.BindZpos,
-                                          (ushort)player.BindHeading);
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.LevelCap"), eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                            player.MoveTo((ushort)player.BindRegion, player.BindXpos, player.BindYpos, player.BindZpos, (ushort)player.BindHeading);
                             break;
                         }
                     }
@@ -219,8 +211,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     return;
                 }
 
-                int gracePeriodInMinutes = 0;
-                int.TryParse(Properties.RVR_LINK_DEATH_RELOG_GRACE_PERIOD, out gracePeriodInMinutes);
+                int.TryParse(Properties.RVR_LINK_DEATH_RELOG_GRACE_PERIOD, out var gracePeriodInMinutes);
                 AbstractGameKeep keep = GameServer.KeepManager.GetKeepCloseToSpot(player.CurrentRegionID, player, WorldMgr.VISIBILITY_DISTANCE);
                 if (keep != null && player.Client.Account.PrivLevel == 1 && GameServer.KeepManager.IsEnemy(keep, player))
                 {
@@ -251,12 +242,8 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             private static void SendMessageAndMoveToSafeLocation(GamePlayer player)
             {
-                player.Out.SendMessage(
-                    LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.SaferLocation"),
-                                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                player.MoveTo((ushort)player.BindRegion, player.BindXpos,
-                              player.BindYpos, player.BindZpos,
-                              (ushort)player.BindHeading);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.SaferLocation"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.MoveTo((ushort)player.BindRegion, player.BindXpos, player.BindYpos, player.BindZpos, (ushort)player.BindHeading);
             }
 
             private static void SendHouseRentRemindersToPlayer(GamePlayer player)
@@ -292,57 +279,42 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     if (player.GuildRank.GcHear && player.Guild.Motd != string.Empty)
                     {
-                        player.Out.SendMessage(
-                            LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.GuildMessage"),
-                                               eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.GuildMessage"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         player.Out.SendMessage(player.Guild.Motd, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
 
                     if (player.GuildRank.OcHear && player.Guild.Omotd != string.Empty)
                     {
-                        player.Out.SendMessage(
-                            LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.OfficerMessage", player.Guild.Omotd),
-                            eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.OfficerMessage", player.Guild.Omotd), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
 
                     if (player.Guild.alliance != null && player.GuildRank.AcHear && player.Guild.alliance.Dballiance.Motd != string.Empty)
                     {
-                        player.Out.SendMessage(
-                            LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.AllianceMessage",
-                                                       player.Guild.alliance.Dballiance.Motd), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.AllianceMessage", player.Guild.alliance.Dballiance.Motd), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("SendGuildMessageToPlayer exception, missing guild ranks for guild: " + player.Guild.Name + "?", ex);
-                    if (player != null)
-                    {
-                        player.Out.SendMessage(
-                            "There was an error sending motd for your guild. Guild ranks may be missing or corrupted.",
-                            eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                    }
+                    Log.Error($"SendGuildMessageToPlayer exception, missing guild ranks for guild: {player.Guild.Name}?", ex);
+                    player.Out.SendMessage("There was an error sending motd for your guild. Guild ranks may be missing or corrupted.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
             }
 
-            private static int SendMobsAndMobEquipmentToPlayer(GamePlayer player)
+            private static void SendMobsAndMobEquipmentToPlayer(GamePlayer player)
             {
-                int mobs = 0;
-
                 if (player.CurrentRegion != null)
                 {
                     var npcs = player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GameNPC>().ToArray();
                     foreach (GameNPC npc in npcs)
                     {
                         player.Out.SendNPCCreate(npc);
-                        mobs++;
+
                         if (npc.Inventory != null)
                         {
                             player.Out.SendLivingEquipmentUpdate(npc);
                         }
                     }
                 }
-
-                return mobs;
             }
         }
 

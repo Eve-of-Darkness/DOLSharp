@@ -16,22 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System.Reflection;
-using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.MarketSearchRequest, "Handles player market search", eClientStatus.PlayerInGame)]
     public class PlayerMarketSearchRequestHandler : IPacketHandler
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            if (client == null || client.Player == null)
+            if (client?.Player == null)
             {
                 return;
             }
@@ -41,32 +34,28 @@ namespace DOL.GS.PacketHandler.Client.v168
                 return;
             }
 
-            MarketSearch.SearchData search = new MarketSearch.SearchData();
+            MarketSearch.SearchData search = new MarketSearch.SearchData
+            {
+                name = packet.ReadString(64),
+                slot = (int) packet.ReadInt(),
+                skill = (int) packet.ReadInt(),
+                resist = (int) packet.ReadInt(),
+                bonus = (int) packet.ReadInt(),
+                hp = (int) packet.ReadInt(),
+                power = (int) packet.ReadInt(),
+                proc = (int) packet.ReadInt(),
+                qtyMin = (int) packet.ReadInt(),
+                qtyMax = (int) packet.ReadInt(),
+                levelMin = (int) packet.ReadInt(),
+                levelMax = (int) packet.ReadInt(),
+                priceMin = (int) packet.ReadInt(),
+                priceMax = (int) packet.ReadInt(),
+                visual = (int) packet.ReadInt(),
+                page = (byte) packet.ReadByte()
+            };
 
-            search.name = packet.ReadString(64);
-            search.slot = (int)packet.ReadInt();
-            search.skill = (int)packet.ReadInt();
-            search.resist = (int)packet.ReadInt();
-            search.bonus = (int)packet.ReadInt();
-            search.hp = (int)packet.ReadInt();
-            search.power = (int)packet.ReadInt();
-            search.proc = (int)packet.ReadInt();
-            search.qtyMin = (int)packet.ReadInt();
-            search.qtyMax = (int)packet.ReadInt();
-            search.levelMin = (int)packet.ReadInt();
-            search.levelMax = (int)packet.ReadInt();
-            search.priceMin = (int)packet.ReadInt();
-            search.priceMax = (int)packet.ReadInt();
-            search.visual = (int)packet.ReadInt();
-            search.page = (byte)packet.ReadByte();
-            byte unk1 = (byte)packet.ReadByte();
-            short unk2 = (short)packet.ReadShort();
-            byte unk3 = 0;
-            byte unk4 = 0;
-            byte unk5 = 0;
-            byte unk6 = 0;
-            byte unk7 = 0;
-            byte unk8 = 0;
+            packet.ReadByte(); // unk
+            packet.ReadShort(); // unk
 
             if (client.Version >= GameClient.eClientVersion.Version198)
             {
@@ -74,16 +63,16 @@ namespace DOL.GS.PacketHandler.Client.v168
                 // update this, when packets change and keep in mind, that this code reflects only the 1.98 changes
                 search.armorType = search.page; // page is now used for the armorType (still has to be logged, i just checked that 2 means leather, 0 = standard
                 search.damageType = (byte)packet.ReadByte(); // 1=crush, 2=slash, 3=thrust
-                unk3 = (byte)packet.ReadByte();
-                unk4 = (byte)packet.ReadByte();
-                unk5 = (byte)packet.ReadByte();
+                packet.ReadByte(); // unk
+                packet.ReadByte(); // unk
+                packet.ReadByte(); // unk
                 search.playerCrafted = (byte)packet.ReadByte(); // 1 = show only Player crafted, 0 = all
                 // 3 bytes unused
                 packet.Skip(3);
                 search.page = (byte)packet.ReadByte(); // page is now sent here
-                unk6 = (byte)packet.ReadByte();
-                unk7 = (byte)packet.ReadByte();
-                unk8 = (byte)packet.ReadByte();
+                packet.ReadByte(); // unk
+                packet.ReadByte(); // unk
+                packet.ReadByte(); // unk
             }
 
             search.clientVersion = client.Version.ToString();

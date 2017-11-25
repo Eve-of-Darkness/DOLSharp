@@ -17,8 +17,6 @@
  *
  */
 using System;
-using System.Reflection;
-using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
@@ -29,11 +27,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     public class UDPPingRequestHandler : IPacketHandler
     {
         /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        /// <summary>
         /// Called when the packet has been received
         /// </summary>
         /// <param name="client">Client that sent the packet</param>
@@ -41,11 +34,11 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <returns>Non zero if function was successfull</returns>
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            string localIP = packet.ReadString(22);
-            ushort localPort = packet.ReadShort();
+            string localIp = packet.ReadString(22);
+            packet.ReadShort(); // localPort
 
             // TODO check changed localIP
-            client.LocalIP = localIP;
+            client.LocalIP = localIp;
             client.UdpPingTime = DateTime.Now.Ticks;
         }
     }

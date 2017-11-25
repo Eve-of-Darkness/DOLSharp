@@ -23,15 +23,13 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.HouseMenuRequest, "Handles housing menu requests", eClientStatus.PlayerInGame)]
     public class HousingMenuRequestHandler : IPacketHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         #region IPacketHandler Members
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int housenumber = packet.ReadShort();
             int menuid = packet.ReadByte();
-            int flag = packet.ReadByte();
+            packet.ReadByte(); // flag
 
             var house = HouseMgr.GetHouse(client.Player.CurrentRegionID, housenumber);
             if (house == null)
@@ -139,7 +137,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     break;
 
                 default:
-                    client.Out.SendMessage("Invalid menu id " + menuid + " (hookpoint?).", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    client.Out.SendMessage($"Invalid menu id {menuid} (hookpoint?).", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     break;
             }
         }

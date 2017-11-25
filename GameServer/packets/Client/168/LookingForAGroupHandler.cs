@@ -43,11 +43,10 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
 
-            var Lfg = GroupMgr.LookingForGroupPlayers();
-
-            if (Lfg != null)
+            var lfg = GroupMgr.LookingForGroupPlayers();
+            if (lfg != null)
             {
-                foreach (GamePlayer player in Lfg)
+                foreach (GamePlayer player in lfg)
                 {
                     if (player != client.Player && GameServer.ServerRules.IsAllowedToGroup(client.Player, player, true))
                     {

@@ -18,19 +18,13 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using DOL.GS.Styles;
-using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.UseSkill, "Handles Player Use Skill Request.", eClientStatus.PlayerInGame)]
     public class UseSkillHandler : IPacketHandler
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region IPacketHandler Members
 
@@ -50,22 +44,22 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Handles player use skill actions
         /// </summary>
-        protected class UseSkillAction : RegionAction
+        private class UseSkillAction : RegionAction
         {
             /// <summary>
             /// The speed and flags data
             /// </summary>
-            protected readonly int m_flagSpeedData;
+            private readonly int _flagSpeedData;
 
             /// <summary>
             /// The skill index
             /// </summary>
-            protected readonly int m_index;
+            private readonly int _index;
 
             /// <summary>
             /// The skill type
             /// </summary>
-            protected readonly int m_type;
+            private readonly int _type;
 
             /// <summary>
             /// Constructs a new UseSkillAction
@@ -77,9 +71,9 @@ namespace DOL.GS.PacketHandler.Client.v168
             public UseSkillAction(GamePlayer actionSource, int flagSpeedData, int index, int type)
                 : base(actionSource)
             {
-                m_flagSpeedData = flagSpeedData;
-                m_index = index;
-                m_type = type;
+                _flagSpeedData = flagSpeedData;
+                _index = index;
+                _type = type;
             }
 
             /// <summary>
@@ -93,18 +87,18 @@ namespace DOL.GS.PacketHandler.Client.v168
                     return;
                 }
 
-                if ((m_flagSpeedData & 0x200) != 0)
+                if ((_flagSpeedData & 0x200) != 0)
                 {
-                    player.CurrentSpeed = (short)(-(m_flagSpeedData & 0x1ff)); // backward movement
+                    player.CurrentSpeed = (short)(-(_flagSpeedData & 0x1ff)); // backward movement
                 }
                 else
                 {
-                    player.CurrentSpeed = (short)(m_flagSpeedData & 0x1ff); // forwardmovement
+                    player.CurrentSpeed = (short)(_flagSpeedData & 0x1ff); // forwardmovement
                 }
 
-                player.IsStrafing = (m_flagSpeedData & 0x4000) != 0;
-                player.TargetInView = (m_flagSpeedData & 0xa000) != 0; // why 2 bits? that has to be figured out
-                player.GroundTargetInView = (m_flagSpeedData & 0x1000) != 0;
+                player.IsStrafing = (_flagSpeedData & 0x4000) != 0;
+                player.TargetInView = (_flagSpeedData & 0xa000) != 0; // why 2 bits? that has to be figured out
+                player.GroundTargetInView = (_flagSpeedData & 0x1000) != 0;
 
                 List<Tuple<Skill, Skill>> snap = player.GetAllUsableSkills();
 
@@ -112,26 +106,26 @@ namespace DOL.GS.PacketHandler.Client.v168
                 Skill sksib = null;
 
                 // we're not using a spec !
-                if (m_type > 0)
+                if (_type > 0)
                 {
 
                     // find the first non-specialization index.
                     int begin = Math.Max(0, snap.FindIndex(it => (it.Item1 is Specialization) == false));
 
                     // are we in list ?
-                    if (m_index + begin < snap.Count)
+                    if (_index + begin < snap.Count)
                     {
-                        sk = snap[m_index + begin].Item1;
-                        sksib = snap[m_index + begin].Item2;
+                        sk = snap[_index + begin].Item1;
+                        sksib = snap[_index + begin].Item2;
                     }
                 }
                 else
                 {
                     // mostly a spec !
-                    if (m_index < snap.Count)
+                    if (_index < snap.Count)
                     {
-                        sk = snap[m_index].Item1;
-                        sksib = snap[m_index].Item2;
+                        sk = snap[_index].Item1;
+                        sksib = snap[_index].Item2;
                     }
                 }
 
@@ -142,9 +136,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     int reuseTime = player.GetSkillDisabledDuration(sk);
                     if (reuseTime > 60000)
                     {
-                        player.Out.SendMessage(
-                            string.Format("You must wait {0} minutes {1} seconds to use this ability!", reuseTime / 60000, reuseTime % 60000 / 1000),
-                            eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"You must wait {reuseTime / 60000} minutes {reuseTime % 60000 / 1000} seconds to use this ability!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                         if (player.Client.Account.PrivLevel < 2)
                         {
@@ -153,9 +145,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
                     else if (reuseTime > 0)
                     {
-                        player.Out.SendMessage(
-                            string.Format("You must wait {0} seconds to use this ability!", reuseTime / 1000 + 1),
-                                               eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage($"You must wait {reuseTime / 1000 + 1} seconds to use this ability!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                         if (player.Client.Account.PrivLevel < 2)
                         {
@@ -164,14 +154,10 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
 
                     // See what we should do depending on skill type !
-                    if (sk is Specialization)
+                    if (sk is Specialization spec)
                     {
-                        Specialization spec = (Specialization)sk;
                         ISpecActionHandler handler = SkillBase.GetSpecActionHandler(spec.KeyName);
-                        if (handler != null)
-                        {
-                            handler.Execute(spec, player);
-                        }
+                        handler?.Execute(spec, player);
                     }
                     else if (sk is Ability)
                     {
@@ -187,9 +173,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
                     else if (sk is Spell)
                     {
-                        if (sksib != null && sksib is SpellLine)
+                        if (sksib is SpellLine line)
                         {
-                            player.CastSpell((Spell)sk, (SpellLine)sksib);
+                            player.CastSpell((Spell)sk, line);
                         }
                     }
                     else if (sk is Style)

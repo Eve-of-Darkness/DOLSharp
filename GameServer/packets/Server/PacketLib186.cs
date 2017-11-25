@@ -17,19 +17,12 @@
 *
 */
 #define NOENCRYPTION
-using log4net;
-using System.Reflection;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(186, GameClient.eClientVersion.Version186)]
     public class PacketLib186 : PacketLib185
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Constructs a new PacketLib for Version 1.86 clients
         /// </summary>
@@ -42,36 +35,24 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// The bow prepare animation
         /// </summary>
-        public override int BowPrepare
-        {
-            get { return 0x3E80; }
-        }
+        public override int BowPrepare => 0x3E80;
 
         /// <summary>
         /// one dual weapon hit animation
         /// </summary>
-        public override int OneDualWeaponHit
-        {
-            get { return 0x3E81; }
-        }
+        public override int OneDualWeaponHit => 0x3E81;
 
         /// <summary>
         /// both dual weapons hit animation
         /// </summary>
-        public override int BothDualWeaponHit
-        {
-            get { return 0x3E82; }
-        }
+        public override int BothDualWeaponHit => 0x3E82;
 
         /// <summary>
         /// The bow shoot animation
         /// </summary>
-        public override int BowShoot
-        {
-            get { return 0x3E83; }
-        }
+        public override int BowShoot => 0x3E83;
 
-        public override void SendCombatAnimation(GameObject attacker, GameObject defender, ushort weaponID, ushort shieldID, int style, byte stance, byte result, byte targetHealthPercent)
+        public override void SendCombatAnimation(GameObject attacker, GameObject defender, ushort weaponId, ushort shieldId, int style, byte stance, byte result, byte targetHealthPercent)
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CombatAnimation)))
             {
@@ -93,16 +74,16 @@ namespace DOL.GS.PacketHandler
                     pak.WriteShort(0x00);
                 }
 
-                pak.WriteShort(weaponID);
-                pak.WriteShort(shieldID);
+                pak.WriteShort(weaponId);
+                pak.WriteShort(shieldId);
                 pak.WriteShortLowEndian((ushort)style);
                 pak.WriteByte(stance);
                 pak.WriteByte(result);
 
                 // If Health Percent is invalid get the living Health.
-                if (defender is GameLiving && targetHealthPercent > 100)
+                if (defender is GameLiving living && targetHealthPercent > 100)
                 {
-                    targetHealthPercent = (defender as GameLiving).HealthPercent;
+                    targetHealthPercent = living.HealthPercent;
                 }
 
                 pak.WriteByte(targetHealthPercent);
@@ -115,7 +96,7 @@ namespace DOL.GS.PacketHandler
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.MinotaurRelicMapRemove)))
             {
-                pak.WriteIntLowEndian((uint)id);
+                pak.WriteIntLowEndian(id);
                 SendTCP(pak);
             }
         }
@@ -125,8 +106,8 @@ namespace DOL.GS.PacketHandler
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.MinotaurRelicMapUpdate)))
             {
 
-                pak.WriteIntLowEndian((uint)id);
-                pak.WriteIntLowEndian((uint)region);
+                pak.WriteIntLowEndian(id);
+                pak.WriteIntLowEndian(region);
                 pak.WriteIntLowEndian((uint)x);
                 pak.WriteIntLowEndian((uint)y);
                 pak.WriteIntLowEndian((uint)z);
@@ -141,7 +122,7 @@ namespace DOL.GS.PacketHandler
             {
 
                 pak.WriteShort((ushort)player.ObjectID);
-                pak.WriteByte((byte)13);
+                pak.WriteByte(13);
                 if (flag)
                 {
                     pak.WriteByte(0);
@@ -163,7 +144,7 @@ namespace DOL.GS.PacketHandler
             {
 
                 pak.WriteShort((ushort)player.ObjectID);
-                pak.WriteByte((byte)14);
+                pak.WriteByte(14);
                 pak.WriteByte(0);
 
                 // 4k maximum

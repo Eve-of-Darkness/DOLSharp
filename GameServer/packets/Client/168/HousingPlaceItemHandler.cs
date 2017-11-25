@@ -33,7 +33,7 @@ namespace DOL.GS.PacketHandler.Client.v168
     {
         private const string DeedWeak = "deedItem";
         private const string TargetHouse = "targetHouse";
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private int _position;
 
         #region IPacketHandler Members
@@ -42,17 +42,17 @@ namespace DOL.GS.PacketHandler.Client.v168
         {
             try
             {
-                int unknow1 = packet.ReadByte(); // 1=Money 0=Item (?)
+                packet.ReadByte(); // 1=Money 0=Item (?)
                 int slot = packet.ReadByte(); // Item/money slot
                 ushort housenumber = packet.ReadShort(); // N° of house
-                int unknow2 = (byte)packet.ReadByte();
+                packet.ReadByte(); // unknown
                 _position = (byte)packet.ReadByte();
                 int method = packet.ReadByte(); // 2=Wall 3=Floor
                 int rotation = packet.ReadByte(); // garden items only
                 var xpos = (short)packet.ReadShort(); // x for inside objs
                 var ypos = (short)packet.ReadShort(); // y for inside objs.
-                // Log.Info("U1: " + unknow1 + " - U2: " + unknow2);
-                ChatUtil.SendDebugMessage(client, string.Format("HousingPlaceItem: slot: {0}, position: {1}, method: {2}, xpos: {3}, ypos: {4}", slot, _position, method, xpos, ypos));
+
+                ChatUtil.SendDebugMessage(client, $"HousingPlaceItem: slot: {slot}, position: {_position}, method: {method}, xpos: {xpos}, ypos: {ypos}");
 
                 if (client.Player == null)
                 {
@@ -67,7 +67,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     return;
                 }
 
-                if ((slot >= 244) && (slot <= 248)) // money
+                if (slot >= 244 && slot <= 248) // money
                 {
                     // check that player has permission to pay rent
                     if (!house.CanPayRent(client.Player))
@@ -274,7 +274,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     method = 7;
                 }
 
-                ChatUtil.SendDebugMessage(client, string.Format("Place Item: method: {0}", method));
+                ChatUtil.SendDebugMessage(client, $"Place Item: method: {method}");
 
                 int pos;
                 switch (method)
@@ -305,12 +305,12 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                             // create an outdoor item to represent the item being placed
                             var oitem = new OutdoorItem
-                                            {
-                                                BaseItem = GameServer.Database.FindObjectByKey<ItemTemplate>(orgitem.Id_nb),
-                                                Model = orgitem.Model,
-                                                Position = (byte)_position,
-                                                Rotation = (byte)rotation
-                                            };
+                            {
+                                BaseItem = GameServer.Database.FindObjectByKey<ItemTemplate>(orgitem.Id_nb),
+                                Model = orgitem.Model,
+                                Position = (byte) _position,
+                                Rotation = (byte) rotation
+                            };
 
                             // add item in db
                             pos = GetFirstFreeSlot(house.OutdoorItems.Keys);
@@ -321,13 +321,12 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                             // remove the item from the player's inventory
                             client.Player.Inventory.RemoveItem(orgitem);
-                            InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                            InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
 
                             // add item to outdooritems
                             house.OutdoorItems.Add(pos, oitem);
 
-                            ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.GardenItemPlaced",
-                                                       Properties.MAX_OUTDOOR_HOUSE_ITEMS - house.OutdoorItems.Count);
+                            ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.GardenItemPlaced", Properties.MAX_OUTDOOR_HOUSE_ITEMS - house.OutdoorItems.Count);
                             ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.GardenItemPlacedName", orgitem.Name);
 
                             // update all nearby players
@@ -383,16 +382,16 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                             // create an indoor item to represent the item being placed
                             var iitem = new IndoorItem
-                                            {
-                                                Model = orgitem.Model,
-                                                Color = orgitem.Color,
-                                                X = xpos,
-                                                Y = ypos,
-                                                Size = orgitem.DPS_AF > 3 ? orgitem.DPS_AF : 100, // max size is 255
-                                                Position = _position,
-                                                PlacementMode = method,
-                                                BaseItem = null
-                                            };
+                            {
+                                Model = orgitem.Model,
+                                Color = orgitem.Color,
+                                X = xpos,
+                                Y = ypos,
+                                Size = orgitem.DPS_AF > 3 ? orgitem.DPS_AF : 100, // max size is 255
+                                Position = _position,
+                                PlacementMode = method,
+                                BaseItem = null
+                            };
 
                             // figure out proper rotation for item
                             int properRotation = client.Player.Heading / 10;
@@ -414,7 +413,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             {
                                 // its a housing item, so lets take it!
                                 client.Player.Inventory.RemoveItem(orgitem);
-                                InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                                InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
 
                                 // set right base item, so we can recreate it on take.
                                 if (orgitem.Id_nb.Contains("GuildBanner"))
@@ -473,7 +472,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                     {
                                         // remove the original item from the player's inventory
                                         client.Player.Inventory.RemoveItem(orgitem);
-                                        InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                                        InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
                                     }
                                     else
                                     {
@@ -497,7 +496,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                     {
                                         // remove the original item from the player's inventory
                                         client.Player.Inventory.RemoveItem(orgitem);
-                                        InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                                        InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
                                     }
                                     else
                                     {
@@ -521,7 +520,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                         {
                                             // remove the original item from the player's inventory
                                             client.Player.Inventory.RemoveItem(orgitem);
-                                            InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                                            InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
                                         }
                                         else
                                         {
@@ -568,7 +567,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                                 if (client.Account.PrivLevel == (int)ePrivLevel.Admin)
                                 {
-                                    if (client.Player.TempProperties.getProperty<bool>(HousingConstants.AllowAddHouseHookpoint, false))
+                                    if (client.Player.TempProperties.getProperty(HousingConstants.AllowAddHouseHookpoint, false))
                                     {
 
                                         ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.HookPointID", +_position);
@@ -609,8 +608,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 }
                                 else
                                 {
-                                    string error = string.Format("Hookpoint already has item on attempt to attach {0} to hookpoint {1} for house {2}!", orgitem.Id_nb, _position, house.HouseNumber);
-                                    log.ErrorFormat(error);
+                                    string error = $"Hookpoint already has item on attempt to attach {orgitem.Id_nb} to hookpoint {_position} for house {house.HouseNumber}!";
+                                    Log.ErrorFormat(error);
                                     client.Out.SendInventorySlotsUpdate(new[] { slot });
                                     throw new Exception(error);
                                 }
@@ -620,7 +619,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                                 // remove the original item from the player's inventory
                                 client.Player.Inventory.RemoveItem(orgitem);
-                                InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                                InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
 
                                 ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.HookPointAdded", null);
 
@@ -652,28 +651,28 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 house.OutdoorGuildBanner = true;
                                 ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.OutdoorBannersAdded", null);
                                 client.Player.Inventory.RemoveItem(orgitem);
-                                InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                                InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
                             }
                             else if (objType == 58) // We have outdoor shield
                             {
                                 house.OutdoorGuildShield = true;
                                 ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.OutdoorShieldsAdded", null);
                                 client.Player.Inventory.RemoveItem(orgitem);
-                                InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                                InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
                             }
                             else if (objType == 66) // We have indoor banner
                             {
                                 house.IndoorGuildBanner = true;
                                 ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.InteriorBannersAdded", null);
                                 client.Player.Inventory.RemoveItem(orgitem);
-                                InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                                InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
                             }
                             else if (objType == 67) // We have indoor shield
                             {
                                 house.IndoorGuildShield = true;
                                 ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.InteriorShieldsAdded", null);
                                 client.Player.Inventory.RemoveItem(orgitem);
-                                InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                                InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
                             }
                             else
                             {
@@ -699,8 +698,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             if (_position > HousingConstants.MaxHookpointLocations)
                             {
                                 ChatUtil.SendSystemMessage(client, "This hookpoint position is unknown, error logged.");
-                                log.Error("HOUSING: " + client.Player.Name + " working with invalid position " + _position + " in house " +
-                                          house.HouseNumber + " model " + house.Model);
+                                Log.Error($"HOUSING: {client.Player.Name} working with invalid position {_position} in house {house.HouseNumber} model {house.Model}");
 
                                 client.Out.SendInventorySlotsUpdate(new[] { slot });
                                 return;
@@ -713,7 +711,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                                 if (client.Account.PrivLevel == (int)ePrivLevel.Admin)
                                 {
-                                    if (client.Player.TempProperties.getProperty<bool>(HousingConstants.AllowAddHouseHookpoint, false))
+                                    if (client.Player.TempProperties.getProperty(HousingConstants.AllowAddHouseHookpoint, false))
                                     {
 
                                         ChatUtil.SendSystemMessage(client, "Scripts.Player.Housing.HookPointID", +_position);
@@ -734,8 +732,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             int vaultIndex = house.GetFreeVaultNumber();
                             if (vaultIndex < 0)
                             {
-                                client.Player.Out.SendMessage("You can't add any more vaults to this house!", eChatType.CT_System,
-                                                              eChatLoc.CL_SystemWindow);
+                                client.Player.Out.SendMessage("You can't add any more vaults to this house!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 client.Out.SendInventorySlotsUpdate(new[] { slot });
 
                                 return;
@@ -758,7 +755,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                             // remove the original item from the player's inventory
                             client.Player.Inventory.RemoveItem(orgitem);
-                            InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                            InventoryLogging.LogInventoryAction(client.Player, $"(HOUSE;{housenumber})", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
 
                             // save the house and broadcast uodates
                             house.SaveIntoDatabase();
@@ -776,7 +773,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
             catch (Exception ex)
             {
-                log.Error("HousingPlaceItemHandler", ex);
+                Log.Error("HousingPlaceItemHandler", ex);
                 client.Out.SendMessage("Error processing housing action; the error has been logged!", eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
                 client.Out.SendInventorySlotsUpdate(null);
             }
@@ -914,21 +911,16 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 ChatUtil.SendSystemMessage(player, "Scripts.Player.Housing.HookPointLogged", _position);
 
-                string action = string.Format(
-                    "HOUSING: {0} logged new HouseHookpointOffset for model {1}, position {2}, offset {3}, {4}, {5}",
-                                  player.Name, a.HouseModel, a.HookpointID, a.X, a.Y, a.Z);
+                string action = $"HOUSING: {player.Name} logged new HouseHookpointOffset for model {a.HouseModel}, position {a.HookpointID}, offset {a.X}, {a.Y}, {a.Z}";
 
-                log.Debug(action);
+                Log.Debug(action);
                 GameServer.Instance.LogGMAction(action);
             }
             else
             {
-                log.Error(
-                    string.Format(
-                        "HOUSING: Player {0} error adding HouseHookpointOffset for model {1}, position {2}, offset {3}, {4}, {5}",
-                        player.Name, a.HouseModel, a.HookpointID, a.X, a.Y, a.Z));
+                Log.Error($"HOUSING: Player {player.Name} error adding HouseHookpointOffset for model {a.HouseModel}, position {a.HookpointID}, offset {a.X}, {a.Y}, {a.Z}");
 
-                ChatUtil.SendSystemMessage(player, "Error adding position " + _position + ", error recorded in server error Log.");
+                ChatUtil.SendSystemMessage(player, $"Error adding position {_position}, error recorded in server error Log.");
             }
         }
 
@@ -970,8 +962,8 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
 
             player.Inventory.RemoveItem(item);
-            log.WarnFormat("HOUSING: {0}:{1} is removing house from lot {2} owned by {3}", player.Name, player.Client.Account.Name, house.HouseNumber, house.OwnerID);
-            InventoryLogging.LogInventoryAction(player, "(HOUSE;" + house.HouseNumber + ")", eInventoryActionType.Other, item.Template, item.Count);
+            Log.Warn($"HOUSING: {player.Name}:{player.Client.Account.Name} is removing house from lot {house.HouseNumber} owned by {house.OwnerID}");
+            InventoryLogging.LogInventoryAction(player, $"(HOUSE;{house.HouseNumber})", eInventoryActionType.Other, item.Template, item.Count);
             HouseMgr.RemoveHouse(house);
 
             ChatUtil.SendSystemMessage(player, "Your house has been removed!");
@@ -1007,7 +999,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             if (HouseMgr.UpgradeHouse(house, item))
             {
                 player.Inventory.RemoveItem(item);
-                InventoryLogging.LogInventoryAction(player, "(HOUSE;" + house.HouseNumber + ")", eInventoryActionType.Other, item.Template, item.Count);
+                InventoryLogging.LogInventoryAction(player, $"(HOUSE;{house.HouseNumber})", eInventoryActionType.Other, item.Template, item.Count);
             }
         }
     }

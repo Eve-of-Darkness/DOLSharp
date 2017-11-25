@@ -29,7 +29,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int level = packet.ReadByte();
-            int unk1 = packet.ReadByte();
+            packet.ReadByte(); // unk1
             ushort housenumber = packet.ReadShort();
 
             // make sure permission level is within bounds
@@ -74,7 +74,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             permission.CanBindInHouse = packet.ReadByte() != 0;
             permission.ConsignmentMerchant = (byte)packet.ReadByte();
             permission.CanPayRent = packet.ReadByte() != 0;
-            int unk2 = (byte)packet.ReadByte();
+            packet.ReadByte(); // unk2
 
             // save the updated permission
             GameServer.Database.SaveObject(permission);

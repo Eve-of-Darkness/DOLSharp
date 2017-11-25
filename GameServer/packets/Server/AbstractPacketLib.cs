@@ -27,20 +27,20 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The GameClient of this PacketLib
         /// </summary>
-        protected readonly GameClient m_gameClient;
+        protected GameClient GameClient { get; }
 
         /// <summary>
         /// Constructs a new PacketLib
         /// </summary>
         /// <param name="client">the gameclient this lib is associated with</param>
-        public AbstractPacketLib(GameClient client)
+        protected AbstractPacketLib(GameClient client)
         {
-            m_gameClient = client;
+            GameClient = client;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="packet">The packet to be sent</param>
         public void SendTCP(GSTCPPacketOut packet)
         {
-            m_gameClient.PacketProcessor.SendTCP(packet);
+            GameClient.PacketProcessor.SendTCP(packet);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="buf">Buffer containing the data to be sent</param>
         public void SendTCP(byte[] buf)
         {
-            m_gameClient.PacketProcessor.SendTCP(buf);
+            GameClient.PacketProcessor.SendTCP(buf);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="packet">Packet to send</param>
         public void SendTCPRaw(GSTCPPacketOut packet)
         {
-            m_gameClient.PacketProcessor.SendTCPRaw(packet);
+            GameClient.PacketProcessor.SendTCPRaw(packet);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="isForced">Force UDP packet if <code>true</code>, else packet can be sent over TCP</param>
         public virtual void SendUDP(GSUDPPacketOut packet, bool isForced)
         {
-            m_gameClient.PacketProcessor.SendUDP(packet, isForced);
+            GameClient.PacketProcessor.SendUDP(packet, isForced);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="buf">Packet to be sent</param>
         public void SendUDP(byte[] buf)
         {
-            m_gameClient.PacketProcessor.SendUDP(buf, false);
+            GameClient.PacketProcessor.SendUDP(buf, false);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="packet">Packet to be sent</param>
         public void SendUDPRaw(GSUDPPacketOut packet)
         {
-            m_gameClient.PacketProcessor.SendUDPRaw(packet);
+            GameClient.PacketProcessor.SendUDPRaw(packet);
         }
 
         /// <summary>
@@ -134,15 +134,15 @@ namespace DOL.GS.PacketHandler
                     {
                         try
                         {
-                            IPacketLib lib = (IPacketLib)Activator.CreateInstance(t, new object[] { client });
+                            IPacketLib lib = (IPacketLib)Activator.CreateInstance(t, client);
                             version = attr.ClientVersion;
                             return lib;
                         }
                         catch (Exception e)
                         {
-                            if (log.IsErrorEnabled)
+                            if (Log.IsErrorEnabled)
                             {
-                                log.Error("error creating packetlib (" + t.FullName + ") for raw version " + rawVersion, e);
+                                Log.Error($"error creating packetlib ({t.FullName}) for raw version {rawVersion}", e);
                             }
                         }
                     }
@@ -158,24 +158,22 @@ namespace DOL.GS.PacketHandler
         /// eg: 199 -> 1.99; 1100 -> 1.100
         /// </summary>
         /// <param name="version"></param>
-        /// <param name="IsMSB"></param>
+        /// <param name="isMsb"></param>
         /// <returns></returns>
-        public static byte ParseVersion(int version, bool IsMSB)
+        public static byte ParseVersion(int version, bool isMsb)
         {
-            int cte_version = 100;
+            int cteVersion = 100;
             if (version > 199)
             {
-                cte_version = 1000;
+                cteVersion = 1000;
             }
 
-            if (IsMSB)
+            if (isMsb)
             {
-                return (byte)(version / cte_version);
+                return (byte)(version / cteVersion);
             }
-            else
-            {
-                return (byte)((version % cte_version) / 10);
-            }
+
+            return (byte)((version % cteVersion) / 10);
         }
     }
 }

@@ -18,8 +18,6 @@
  */
 using DOL.Database;
 using DOL.Events;
-using System.Reflection;
-using log4net;
 using DOL.Language;
 
 namespace DOL.GS.PacketHandler.Client.v168
@@ -27,8 +25,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PlayerMoveItem, "Handle Moving Items Request", eClientStatus.PlayerInGame)]
     public class PlayerMoveItemRequestHandler : IPacketHandler
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             if (client.Player == null)
@@ -36,22 +32,20 @@ namespace DOL.GS.PacketHandler.Client.v168
                 return;
             }
 
-            ushort id = packet.ReadShort();
+            packet.ReadShort(); // id
             ushort toClientSlot = packet.ReadShort();
             ushort fromClientSlot = packet.ReadShort();
             ushort itemCount = packet.ReadShort();
 
-            // ChatUtil.SendDebugMessage(client, "GM: MoveItem; id=" + id.ToString() + " client fromSlot=" + fromClientSlot.ToString() + " client toSlot=" + toClientSlot.ToString() + " itemCount=" + itemCount.ToString());
-
             // If our toSlot is > 1000 then target is a game object (not a window) with an ObjectID of toSlot - 1000
             if (toClientSlot > 1000)
             {
-                ushort objectID = (ushort)(toClientSlot - 1000);
-                GameObject obj = WorldMgr.GetObjectByIDFromRegion(client.Player.CurrentRegionID, objectID);
+                ushort objectId = (ushort)(toClientSlot - 1000);
+                GameObject obj = WorldMgr.GetObjectByIDFromRegion(client.Player.CurrentRegionID, objectId);
                 if (obj == null || obj.ObjectState != GameObject.eObjectState.Active)
                 {
                     client.Out.SendInventorySlotsUpdate(new int[] { fromClientSlot });
-                    client.Out.SendMessage("Invalid trade target. (" + objectID + ")", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    client.Out.SendMessage($"Invalid trade target. ({objectId})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;
                 }
 
@@ -84,18 +78,15 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                 // Is the item we want to move in our backpack?
                 // we also allow drag'n drop from equipped to blacksmith
-                if ((fromClientSlot >= (ushort)eInventorySlot.FirstBackpack &&
-                     fromClientSlot <= (ushort)eInventorySlot.LastBackpack) ||
-                    (obj is Blacksmith &&
-                     fromClientSlot >= (ushort)eInventorySlot.MinEquipable &&
-                     fromClientSlot <= (ushort)eInventorySlot.MaxEquipable))
+                if (fromClientSlot >= (ushort)eInventorySlot.FirstBackpack && fromClientSlot <= (ushort)eInventorySlot.LastBackpack
+                    || obj is Blacksmith && fromClientSlot >= (ushort)eInventorySlot.MinEquipable && fromClientSlot <= (ushort)eInventorySlot.MaxEquipable)
                 {
                     if (!obj.IsWithinRadius(client.Player, WorldMgr.GIVE_ITEM_DISTANCE))
                     {
                         // show too far away message
-                        if (obj is GamePlayer)
+                        if (obj is GamePlayer player)
                         {
-                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "PlayerMoveItemRequestHandler.TooFarAway", client.Player.GetName((GamePlayer)obj)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "PlayerMoveItemRequestHandler.TooFarAway", client.Player.GetName(player)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }
                         else
                         {
@@ -110,7 +101,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     if (item == null)
                     {
                         client.Out.SendInventorySlotsUpdate(new int[] { fromClientSlot });
-                        client.Out.SendMessage("Null item (client slot# " + fromClientSlot + ").", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendMessage($"Null item (client slot# {fromClientSlot}).", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
 
@@ -121,7 +112,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
 
                     // If the item has been removed by the event handlers, return;
-                    if (item == null || item.OwnerID == null)
+                    if (item.OwnerID == null)
                     {
                         client.Out.SendInventorySlotsUpdate(new int[] { fromClientSlot });
                         return;
@@ -130,7 +121,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     // if a player to a GM and item is not dropable then don't allow trade???? This seems wrong.
                     if (client.Account.PrivLevel == (uint)ePrivLevel.Player && tradeTarget != null && tradeTarget.Client.Account.PrivLevel != (uint)ePrivLevel.Player)
                     {
-                        if (!item.IsDropable && !(obj is GameNPC && (obj is Blacksmith || obj is Recharger || (obj as GameNPC).CanTradeAnyItem)))
+                        if (!item.IsDropable)
                         {
                             client.Out.SendInventorySlotsUpdate(new int[] { fromClientSlot });
                             client.Out.SendMessage("You can not remove this item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -180,9 +171,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                     if (!obj.IsWithinRadius(client.Player, WorldMgr.GIVE_ITEM_DISTANCE))
                     {
                         // show too far away message
-                        if (obj is GamePlayer)
+                        if (obj is GamePlayer player)
                         {
-                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "PlayerMoveItemRequestHandler.TooFarAway", client.Player.GetName((GamePlayer)obj)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "PlayerMoveItemRequestHandler.TooFarAway", client.Player.GetName(player)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }
                         else
                         {
@@ -247,7 +238,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     if (item == null)
                     {
                         client.Out.SendInventorySlotsUpdate(new int[] { fromClientSlot });
-                        client.Out.SendMessage("Invalid item (slot# " + fromClientSlot + ").", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendMessage($"Invalid item (slot# {fromClientSlot}).", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
 
@@ -266,7 +257,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     if (client.Player.DropItem((eInventorySlot)fromClientSlot))
                     {
-                        client.Out.SendMessage("You drop " + item.GetName(0, false) + " on the ground!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendMessage($"You drop {item.GetName(0, false)} on the ground!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
 

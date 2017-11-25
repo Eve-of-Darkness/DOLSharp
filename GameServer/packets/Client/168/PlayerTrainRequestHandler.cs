@@ -36,24 +36,23 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             if (client.Account.PrivLevel == (int)ePrivLevel.Player)
             {
-                GameTrainer trainer = client.Player.TargetObject as DOL.GS.GameTrainer;
-                if (trainer == null || (trainer.CanTrain(client.Player) == false && trainer.CanTrainChampionLevels(client.Player) == false))
+                if (!(client.Player.TargetObject is GameTrainer trainer) || (trainer.CanTrain(client.Player) == false && trainer.CanTrainChampionLevels(client.Player) == false))
                 {
                     client.Out.SendMessage("You must select a valid trainer for your class.", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
                     return;
                 }
             }
 
-            uint x = packet.ReadInt();
-            uint y = packet.ReadInt();
+            packet.ReadInt(); // X
+            packet.ReadInt(); // Y
             int idLine = packet.ReadByte();
-            int unk = packet.ReadByte();
+            packet.ReadByte(); // unk
             int row = packet.ReadByte();
             int skillIndex = packet.ReadByte();
 
@@ -102,13 +101,11 @@ namespace DOL.GS.PacketHandler.Client.v168
                         client.Player.Out.SendUpdatePlayerSkills();
                         client.Player.UpdatePlayerStatus();
                         client.Player.Out.SendChampionTrainerWindow(idLine);
-
-                        return;
                     }
                     else
                     {
                         client.Out.SendMessage("Could not find Champion Spec!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        log.ErrorFormat("Could not find Champion Spec idline {0}, row {1}, skillindex {2}", idLine, row, skillIndex);
+                        Log.Error($"Could not find Champion Spec idline {idLine}, row {row}, skillindex {skillIndex}");
                     }
                 }
             }
@@ -119,7 +116,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                 if (skillIndex < speclist.Count)
                 {
-                    Specialization spec = (Specialization)speclist[skillIndex];
+                    Specialization spec = speclist[skillIndex];
                     if (spec.Level >= client.Player.BaseLevel)
                     {
                         client.Out.SendMessage("You can't train in this specialization again this level!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -138,18 +135,17 @@ namespace DOL.GS.PacketHandler.Client.v168
                         client.Out.SendTrainerWindow();
                         return;
                     }
-                    else
-                    {
-                        client.Out.SendMessage("That specialization costs " + (spec.Level + 1) + " specialization points!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        client.Out.SendMessage("You don't have that many specialization points left for this level.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        return;
-                    }
+
+                    client.Out.SendMessage($"That specialization costs {(spec.Level + 1)} specialization points!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    client.Out.SendMessage("You don't have that many specialization points left for this level.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
                 }
-                else if (skillIndex >= 100)
+
+                if (skillIndex >= 100)
                 {
                     // Realm Abilities
-                    var raList = SkillBase.GetClassRealmAbilities(client.Player.CharacterClass.ID).Where(ra => !(ra is RR5RealmAbility));
-                    if (skillIndex < raList.Count() + 100)
+                    var raList = SkillBase.GetClassRealmAbilities(client.Player.CharacterClass.ID).Where(ra => !(ra is RR5RealmAbility)).ToList();
+                    if (skillIndex < raList.Count + 100)
                     {
                         RealmAbility ra = raList.ElementAtOrDefault(skillIndex - 100);
                         if (ra != null)
@@ -160,14 +156,14 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                             if (client.Player.RealmSpecialtyPoints < cost)
                             {
-                                client.Out.SendMessage(ra.Name + " costs " + cost + " realm ability points!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                client.Out.SendMessage($"{ra.Name} costs {cost} realm ability points!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 client.Out.SendMessage("You don't have that many realm ability points left to get this.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
 
                             if (!ra.CheckRequirement(client.Player))
                             {
-                                client.Out.SendMessage("You are not experienced enough to get " + ra.Name + " now. Come back later.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                client.Out.SendMessage($"You are not experienced enough to get {ra.Name} now. Come back later.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
 
@@ -180,14 +176,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                         else
                         {
                             client.Out.SendMessage("Unfortunately your training failed. Please report that to admins or game master. Thank you.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                            log.Error("Realm Ability " + ra.Name + "(" + ra.KeyName + ") unexpected not found");
+                            Log.Error("Realm Ability not found");
                         }
                     }
                 }
 
-                if (log.IsErrorEnabled)
+                if (Log.IsErrorEnabled)
                 {
-                    log.Error("Player <" + client.Player.Name + "> requested to train incorrect skill index");
+                    Log.Error($"Player <{client.Player.Name}> requested to train incorrect skill index");
                 }
             }
         }
@@ -204,8 +200,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             if (client.Account.PrivLevel == (int)ePrivLevel.Player)
             {
                 // A trainer of the appropriate class must be around (or global trainer, with TrainedClass = eCharacterClass.Unknow
-                GameTrainer trainer = client.Player.TargetObject as DOL.GS.GameTrainer;
-                if (trainer == null || (trainer.CanTrain(client.Player) == false && trainer.CanTrainChampionLevels(client.Player) == false))
+                if (!(client.Player.TargetObject is GameTrainer trainer) || (trainer.CanTrain(client.Player) == false && trainer.CanTrainChampionLevels(client.Player) == false))
                 {
                     client.Out.SendMessage("You must select a valid trainer for your class.", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
                     return;
@@ -249,7 +244,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             IList<Specialization> specs = client.Player.GetSpecList().Where(e => e.Trainable).ToList();
             uint skillcount = 0;
-            IList<string> done = new List<string>();
             bool trained = false;
 
             // Graveen: the trainline command is called
@@ -260,7 +254,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     if (spec.Level < amounts[skillcount])
                     {
                         TrainCommandHandler train = new TrainCommandHandler(true);
-                        train.OnCommand(client, new string[] { "&trainline", spec.KeyName, amounts[skillcount].ToString() });
+                        train.OnCommand(client, new[] { "&trainline", spec.KeyName, amounts[skillcount].ToString() });
                         trained = true;
                     }
                 }
@@ -282,68 +276,58 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
 
-            if (amounts != null && amounts.Count > 0)
+            if (amounts.Count > 0)
             {
                 // Realm Abilities
-                var raList = SkillBase.GetClassRealmAbilities(client.Player.CharacterClass.ID).Where(ra => !(ra is RR5RealmAbility));
+                var raList = SkillBase.GetClassRealmAbilities(client.Player.CharacterClass.ID).Where(ra => !(ra is RR5RealmAbility)).ToList();
                 foreach (var kv in amounts)
                 {
                     RealmAbility ra = raList.ElementAtOrDefault((int)kv.Key);
                     if (ra != null)
                     {
-                        RealmAbility playerRA = (RealmAbility)client.Player.GetAbility(ra.KeyName);
+                        RealmAbility playerRa = (RealmAbility)client.Player.GetAbility(ra.KeyName);
 
-                        if (playerRA != null && (playerRA.Level >= ra.MaxLevel || playerRA.Level >= kv.Value))
+                        if (playerRa != null && (playerRa.Level >= ra.MaxLevel || playerRa.Level >= kv.Value))
                         {
                             continue;
                         }
 
                         int cost = 0;
-                        for (int i = playerRA != null ? playerRA.Level : 0; i < kv.Value; i++)
+                        for (int i = playerRa?.Level ?? 0; i < kv.Value; i++)
                         {
                             cost += ra.CostForUpgrade(i);
                         }
 
                         if (client.Player.RealmSpecialtyPoints < cost)
                         {
-                            client.Out.SendMessage(ra.Name + " costs " + cost + " realm ability points!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            client.Out.SendMessage($"{ra.Name} costs {cost} realm ability points!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             client.Out.SendMessage("You don't have that many realm ability points left to get this.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             continue;
                         }
 
                         if (!ra.CheckRequirement(client.Player))
                         {
-                            client.Out.SendMessage("You are not experienced enough to get " + ra.Name + " now. Come back later.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            client.Out.SendMessage($"You are not experienced enough to get {ra.Name} now. Come back later.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             continue;
                         }
 
-                        bool valid = false;
-                        if (playerRA != null)
+                        if (playerRa != null)
                         {
-                            playerRA.Level = (int)kv.Value;
-                            valid = true;
+                            playerRa.Level = (int)kv.Value;
                         }
                         else
                         {
                             ra.Level = (int)kv.Value;
-                            valid = true;
                             client.Player.AddRealmAbility(ra, false);
                         }
 
-                        if (valid)
-                        {
-                            client.Out.SendUpdatePoints();
-                            client.Out.SendUpdatePlayer();
-                            client.Out.SendCharResistsUpdate();
-                            client.Out.SendCharStatsUpdate();
-                            client.Out.SendUpdatePlayerSkills();
-                            client.Out.SendTrainerWindow();
-                            trained = true;
-                        }
-                        else
-                        {
-                            client.Out.SendMessage("Unfortunately your training failed. Please report that to admins or game master. Thank you.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        }
+                        client.Out.SendUpdatePoints();
+                        client.Out.SendUpdatePlayer();
+                        client.Out.SendCharResistsUpdate();
+                        client.Out.SendCharStatsUpdate();
+                        client.Out.SendUpdatePlayerSkills();
+                        client.Out.SendTrainerWindow();
+                        trained = true;
                     }
                     else
                     {
@@ -368,8 +352,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 if (client.Account.PrivLevel == (int)ePrivLevel.Player)
                 {
-                    GameTrainer trainer = client.Player.TargetObject as DOL.GS.GameTrainer;
-                    if (trainer == null || (trainer.CanTrain(client.Player) == false && trainer.CanTrainChampionLevels(client.Player) == false))
+                    if (!(client.Player.TargetObject is GameTrainer trainer) || (trainer.CanTrain(client.Player) == false && trainer.CanTrainChampionLevels(client.Player) == false))
                     {
                         client.Out.SendMessage("You must select a valid trainer for your class.", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
                         return;

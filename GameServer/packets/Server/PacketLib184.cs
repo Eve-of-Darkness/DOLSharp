@@ -29,7 +29,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.83 clients
@@ -41,7 +41,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendQuestListUpdate()
         {
-            if (m_gameClient == null || m_gameClient.Player == null)
+            if (GameClient?.Player == null)
             {
                 return;
             }
@@ -49,9 +49,9 @@ namespace DOL.GS.PacketHandler
             SendTaskInfo();
 
             int questIndex = 1;
-            lock (m_gameClient.Player.QuestList)
+            lock (GameClient.Player.QuestList)
             {
-                foreach (AbstractQuest quest in m_gameClient.Player.QuestList)
+                foreach (AbstractQuest quest in GameClient.Player.QuestList)
                 {
                     if (quest.Step != -1)
                     {
@@ -77,13 +77,13 @@ namespace DOL.GS.PacketHandler
                 }
                 else
                 {
-                    string name = string.Format("{0} (Level {1})", quest.Name, quest.Level);
-                    string desc = string.Format("[Step #{0}]: {1}", quest.Step, quest.Description);
+                    string name = $"{quest.Name} (Level {quest.Level})";
+                    string desc = $"[Step #{quest.Step}]: {quest.Description}";
                     if (name.Length > byte.MaxValue)
                     {
-                        if (log.IsWarnEnabled)
+                        if (Log.IsWarnEnabled)
                         {
-                            log.Warn(quest.GetType().ToString() + ": name is too long for 1.68+ clients (" + name.Length + ") '" + name + "'");
+                            Log.Warn($"{quest.GetType()}: name is too long for 1.68+ clients ({name.Length}) \'{name}\'");
                         }
 
                         name = name.Substring(0, byte.MaxValue);
@@ -91,9 +91,9 @@ namespace DOL.GS.PacketHandler
 
                     if (desc.Length > byte.MaxValue)
                     {
-                        if (log.IsWarnEnabled)
+                        if (Log.IsWarnEnabled)
                         {
-                            log.Warn(quest.GetType().ToString() + ": description is too long for 1.68+ clients (" + desc.Length + ") '" + desc + "'");
+                            Log.Warn($"{quest.GetType()}: description is too long for 1.68+ clients ({desc.Length}) \'{desc}\'");
                         }
 
                         desc = desc.Substring(0, byte.MaxValue);
@@ -119,9 +119,9 @@ namespace DOL.GS.PacketHandler
             {
                 pak.WriteByte(0); // index
                 pak.WriteShortLowEndian((ushort)name.Length);
-                pak.WriteByte((byte)0);
-                pak.WriteByte((byte)0);
-                pak.WriteByte((byte)0);
+                pak.WriteByte(0);
+                pak.WriteByte(0);
+                pak.WriteByte(0);
                 pak.WriteStringBytes(name); // Write Quest Name without trailing 0
                 pak.WriteStringBytes(string.Empty); // Write Quest Description without trailing 0
                 SendTCP(pak);

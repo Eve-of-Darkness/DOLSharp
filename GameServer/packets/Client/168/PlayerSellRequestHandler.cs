@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
 using DOL.Database;
 using DOL.GS.Housing;
 
@@ -27,10 +26,10 @@ namespace DOL.GS.PacketHandler.Client.v168
     {
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            uint x = packet.ReadInt();
-            uint y = packet.ReadInt();
-            ushort id = packet.ReadShort();
-            ushort item_slot = packet.ReadShort();
+            packet.ReadInt(); // X
+            packet.ReadInt(); // Y
+            packet.ReadShort(); // id
+            ushort itemSlot = packet.ReadShort();
 
             if (client.Player.TargetObject == null)
             {
@@ -40,23 +39,20 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             lock (client.Player.Inventory)
             {
-                InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)item_slot);
+                InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)itemSlot);
                 if (item == null)
                 {
                     return;
                 }
 
-                int itemCount = Math.Max(1, item.Count);
-                int packSize = Math.Max(1, item.PackSize);
-
-                if (client.Player.TargetObject is GameMerchant)
+                if (client.Player.TargetObject is GameMerchant merchant)
                 {
                     // Let the merchant choos how to handle the trade.
-                    ((GameMerchant)client.Player.TargetObject).OnPlayerSell(client.Player, item);
+                    merchant.OnPlayerSell(client.Player, item);
                 }
-                else if (client.Player.TargetObject is GameLotMarker)
+                else
                 {
-                    ((GameLotMarker)client.Player.TargetObject).OnPlayerSell(client.Player, item);
+                    (client.Player.TargetObject as GameLotMarker)?.OnPlayerSell(client.Player, item);
                 }
             }
         }

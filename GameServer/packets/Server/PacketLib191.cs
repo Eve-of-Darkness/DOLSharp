@@ -17,33 +17,22 @@
 *
 */
 #define NOENCRYPTION
-using System.Reflection;
 using DOL.GS.Effects;
 using DOL.GS.Spells;
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(191, GameClient.eClientVersion.Version191)]
     public class PacketLib191 : PacketLib190
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         protected override void WriteGroupMemberUpdate(GSTCPPacketOut pak, bool updateIcons, GameLiving living)
         {
             pak.WriteByte((byte)(living.GroupIndex + 1)); // From 1 to 8
-            bool sameRegion = living.CurrentRegion == m_gameClient.Player.CurrentRegion;
-            GamePlayer player = null;
+            bool sameRegion = living.CurrentRegion == GameClient.Player.CurrentRegion;
 
             if (sameRegion)
             {
-
-                player = living as GamePlayer;
-
-                if (player != null)
+                if (living is GamePlayer player)
                 {
                     pak.WriteByte(player.CharacterClass.HealthPercentGroupWindow);
                 }
@@ -71,22 +60,14 @@ namespace DOL.GS.PacketHandler
                     playerStatus |= 0x04;
                 }
 
-                if (SpellHelper.FindEffectOnTarget(living, "DamageOverTime") != null)
+                if (living.FindEffectOnTarget("DamageOverTime") != null)
                 {
                     playerStatus |= 0x08;
                 }
 
-                if (living is GamePlayer)
+                if ((living as GamePlayer)?.Client.ClientState == GameClient.eClientState.Linkdead)
                 {
-                    if ((living as GamePlayer).Client.ClientState == GameClient.eClientState.Linkdead)
-                    {
-                        playerStatus |= 0x10;
-                    }
-                }
-
-                if (!sameRegion)
-                {
-                    playerStatus |= 0x20;
+                    playerStatus |= 0x10;
                 }
 
                 if (living.DebuffCategory[(int)eProperty.SpellRange] != 0 || living.DebuffCategory[(int)eProperty.ArcheryRange] != 0)
@@ -139,44 +120,34 @@ namespace DOL.GS.PacketHandler
 
         public override void SendConcentrationList()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.ConcentrationList)))
             {
-                lock (m_gameClient.Player.ConcentrationEffects)
+                lock (GameClient.Player.ConcentrationEffects)
                 {
-                    pak.WriteByte((byte)m_gameClient.Player.ConcentrationEffects.Count);
+                    pak.WriteByte((byte)GameClient.Player.ConcentrationEffects.Count);
                     pak.WriteByte(0); // unknown
                     pak.WriteByte(0); // unknown
                     pak.WriteByte(0); // unknown
 
-                    for (int i = 0; i < m_gameClient.Player.ConcentrationEffects.Count; i++)
+                    for (int i = 0; i < GameClient.Player.ConcentrationEffects.Count; i++)
                     {
-                        IConcentrationEffect effect = m_gameClient.Player.ConcentrationEffects[i];
+                        IConcentrationEffect effect = GameClient.Player.ConcentrationEffects[i];
                         pak.WriteByte((byte)i);
                         pak.WriteByte(0); // unknown
                         pak.WriteByte(effect.Concentration);
                         pak.WriteShort(effect.Icon);
-                        if (effect.Name.Length > 14)
-                        {
-                            pak.WritePascalString(effect.Name.Substring(0, 12) + "..");
-                        }
-                        else
-                        {
-                            pak.WritePascalString(effect.Name);
-                        }
+                        pak.WritePascalString(effect.Name.Length > 14
+                            ? $"{effect.Name.Substring(0, 12)}.."
+                            : effect.Name);
 
-                        if (effect.OwnerName.Length > 14)
-                        {
-                            pak.WritePascalString(effect.OwnerName.Substring(0, 12) + "..");
-                        }
-                        else
-                        {
-                            pak.WritePascalString(effect.OwnerName);
-                        }
+                        pak.WritePascalString(effect.OwnerName.Length > 14
+                            ? $"{effect.OwnerName.Substring(0, 12)}.."
+                            : effect.OwnerName);
                     }
                 }
 

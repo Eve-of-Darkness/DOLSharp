@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using DOL.GS.Styles;
-
 using log4net;
 
 namespace DOL.GS.PacketHandler
@@ -32,7 +31,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.80 clients
@@ -72,7 +71,7 @@ namespace DOL.GS.PacketHandler
                     pak.WriteByte(player.ActiveHorse.SaddleColor);
                     pak.WriteByte(player.ActiveHorse.Slots);
                     pak.WriteByte(player.ActiveHorse.Armor);
-                    pak.WritePascalString(player.ActiveHorse.Name == null ? string.Empty : player.ActiveHorse.Name);
+                    pak.WritePascalString(player.ActiveHorse.Name ?? string.Empty);
                 }
                 else
                 {
@@ -125,19 +124,19 @@ namespace DOL.GS.PacketHandler
         {
             if (playerToCreate == null)
             {
-                if (log.IsErrorEnabled)
+                if (Log.IsErrorEnabled)
                 {
-                    log.Error("SendPlayerCreate: playerToCreate == null");
+                    Log.Error("SendPlayerCreate: playerToCreate == null");
                 }
 
                 return;
             }
 
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
-                if (log.IsErrorEnabled)
+                if (Log.IsErrorEnabled)
                 {
-                    log.Error("SendPlayerCreate: m_gameClient.Player == null");
+                    Log.Error("SendPlayerCreate: m_gameClient.Player == null");
                 }
 
                 return;
@@ -146,9 +145,9 @@ namespace DOL.GS.PacketHandler
             Region playerRegion = playerToCreate.CurrentRegion;
             if (playerRegion == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("SendPlayerCreate: playerRegion == null");
+                    Log.Warn("SendPlayerCreate: playerRegion == null");
                 }
 
                 return;
@@ -157,15 +156,15 @@ namespace DOL.GS.PacketHandler
             Zone playerZone = playerToCreate.CurrentZone;
             if (playerZone == null)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.Warn("SendPlayerCreate: playerZone == null");
+                    Log.Warn("SendPlayerCreate: playerZone == null");
                 }
 
                 return;
             }
 
-            if (playerToCreate.IsVisibleTo(m_gameClient.Player) == false)
+            if (playerToCreate.IsVisibleTo(GameClient.Player) == false)
             {
                 return;
             }
@@ -188,12 +187,12 @@ namespace DOL.GS.PacketHandler
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.LipSize)); // 1-4 = Ear size / 5-8 = Kin size
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.MoodType)); // 1-4 = Ear size / 5-8 = Kin size
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.EyeColor)); // 1-4 = Skin Color / 5-8 = Eye Color
-                pak.WriteByte(playerToCreate.GetDisplayLevel(m_gameClient.Player));
+                pak.WriteByte(playerToCreate.GetDisplayLevel(GameClient.Player));
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.HairColor)); // Hair: 1-4 = Color / 5-8 = unknown
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.FaceType)); // 1-4 = Unknown / 5-8 = Face type
                 pak.WriteByte(playerToCreate.GetFaceAttribute(eCharFacePart.HairStyle)); // 1-4 = Unknown / 5-8 = Hair Style
 
-                int flags = (GameServer.ServerRules.GetLivingRealm(m_gameClient.Player, playerToCreate) & 0x03) << 2;
+                int flags = (GameServer.ServerRules.GetLivingRealm(GameClient.Player, playerToCreate) & 0x03) << 2;
                 if (playerToCreate.IsAlive == false)
                 {
                     flags |= 0x01;
@@ -222,13 +221,13 @@ namespace DOL.GS.PacketHandler
                 pak.WriteByte((byte)flags);
                 pak.WriteByte(0x00); // new in 1.74
 
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerName(m_gameClient.Player, playerToCreate));
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerGuildName(m_gameClient.Player, playerToCreate));
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerLastName(m_gameClient.Player, playerToCreate));
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerName(GameClient.Player, playerToCreate));
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerGuildName(GameClient.Player, playerToCreate));
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerLastName(GameClient.Player, playerToCreate));
 
                 // RR 12 / 13
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerPrefixName(m_gameClient.Player, playerToCreate));
-                pak.WritePascalString(GameServer.ServerRules.GetPlayerTitle(m_gameClient.Player, playerToCreate)); // new in 1.74, NewTitle
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerPrefixName(GameClient.Player, playerToCreate));
+                pak.WritePascalString(GameServer.ServerRules.GetPlayerTitle(GameClient.Player, playerToCreate)); // new in 1.74, NewTitle
                 if (playerToCreate.IsOnHorse)
                 {
                     pak.WriteByte(playerToCreate.ActiveHorse.ID);
@@ -256,7 +255,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(playerToCreate.CurrentRegionID, (ushort)playerToCreate.ObjectID)] = GameTimer.GetTickCount();
+            GameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(playerToCreate.CurrentRegionID, (ushort)playerToCreate.ObjectID)] = GameTimer.GetTickCount();
 
             SendObjectGuildID(playerToCreate, playerToCreate.Guild); // used for nearest friendly/enemy object buttons and name colors on PvP server
 
@@ -288,18 +287,17 @@ namespace DOL.GS.PacketHandler
 
         public override void SendUpdatePlayerSkills()
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             // Get Skills as "Usable Skills" which are in network order ! (with forced update)
-            List<Tuple<Skill, Skill>> usableSkills = m_gameClient.Player.GetAllUsableSkills(true);
+            List<Tuple<Skill, Skill>> usableSkills = GameClient.Player.GetAllUsableSkills(true);
 
             bool sent = false; // set to true once we can't send packet anymore !
             int index = 0; // index of our position in the list !
             int total = usableSkills.Count; // cache List count.
-            int packetCount = 0; // Number of packet sent for the entire list
             while (!sent)
             {
                 int packetEntry = 0; // needed to tell client how much skill we send
@@ -308,8 +306,8 @@ namespace DOL.GS.PacketHandler
                 {
                     // Write header
                     pak.WriteByte(0x01); // subcode for skill
-                    pak.WriteByte((byte)0); // packet entries, can't know it for now...
-                    pak.WriteByte((byte)0x03); // subtype for following pages
+                    pak.WriteByte(0); // packet entries, can't know it for now...
+                    pak.WriteByte(0x03); // subtype for following pages
                     pak.WriteByte((byte)index); // packet first entry
 
                     // getting pak filled
@@ -325,35 +323,31 @@ namespace DOL.GS.PacketHandler
                         Skill skill = usableSkills[index].Item1;
                         Skill skillrelated = usableSkills[index].Item2;
 
-                        if (skill is Specialization)
+                        if (skill is Specialization spec)
                         {
-                            Specialization spec = (Specialization)skill;
                             pak.WriteByte((byte)Math.Max(1, spec.Level));
                             pak.WriteByte((byte)spec.SkillType);
                             pak.WriteShort(0);
-                            pak.WriteByte((byte)(m_gameClient.Player.GetModifiedSpecLevel(spec.KeyName) - spec.Level)); // bonus
-                            pak.WriteShort((ushort)spec.Icon);
+                            pak.WriteByte((byte)(GameClient.Player.GetModifiedSpecLevel(spec.KeyName) - spec.Level)); // bonus
+                            pak.WriteShort(spec.Icon);
                             pak.WritePascalString(spec.Name);
                         }
-                        else if (skill is Ability)
+                        else if (skill is Ability ab)
                         {
-                            Ability ab = (Ability)skill;
-
-                            pak.WriteByte((byte)0);
+                            pak.WriteByte(0);
                             pak.WriteByte((byte)ab.SkillType);
                             pak.WriteShort(0);
-                            pak.WriteByte((byte)0);
-                            pak.WriteShort((ushort)ab.Icon);
+                            pak.WriteByte(0);
+                            pak.WriteShort(ab.Icon);
                             pak.WritePascalString(ab.Name);
                         }
-                        else if (skill is Spell)
+                        else if (skill is Spell spell)
                         {
-                            Spell spell = (Spell)skill;
                             pak.WriteByte((byte)spell.Level);
                             pak.WriteByte((byte)spell.SkillType);
 
                             // spec index for this Spell - Special for Song and Unknown Indexes...
-                            int spin = 0;
+                            int spin;
                             if (spell.SkillType == eSkillPage.Songs)
                             {
                                 spin = 0xFF;
@@ -361,9 +355,9 @@ namespace DOL.GS.PacketHandler
                             else
                             {
                                 // find this line Specialization index !
-                                if (skillrelated is SpellLine && !Util.IsEmpty(((SpellLine)skillrelated).Spec))
+                                if (skillrelated is SpellLine line && !Util.IsEmpty(line.Spec))
                                 {
-                                    spin = usableSkills.FindIndex(sk => (sk.Item1 is Specialization) && ((Specialization)sk.Item1).KeyName == ((SpellLine)skillrelated).Spec);
+                                    spin = usableSkills.FindIndex(sk => (sk.Item1 is Specialization) && ((Specialization)sk.Item1).KeyName == line.Spec);
 
                                     if (spin == -1)
                                     {
@@ -381,9 +375,8 @@ namespace DOL.GS.PacketHandler
                             pak.WriteShort(spell.InternalIconID > 0 ? spell.InternalIconID : spell.Icon); // icon
                             pak.WritePascalString(spell.Name);
                         }
-                        else if (skill is Style)
+                        else if (skill is Style style)
                         {
-                            Style style = (Style)skill;
                             pak.WriteByte((byte)style.SpecLevelRequirement);
                             pak.WriteByte((byte)style.SkillType);
 
@@ -419,7 +412,7 @@ namespace DOL.GS.PacketHandler
 
                             pak.WriteShort((ushort)pre);
                             pak.WriteByte(GlobalConstants.GetSpecToInternalIndex(style.Spec)); // index specialization in bonus...
-                            pak.WriteShort((ushort)style.Icon);
+                            pak.WriteShort(style.Icon);
                             pak.WritePascalString(style.Name);
                         }
 
@@ -439,20 +432,18 @@ namespace DOL.GS.PacketHandler
 
                     if (!sent)
                     {
-                        pak.WriteByte((byte)99);
+                        pak.WriteByte(99);
                     }
 
                     SendTCP(pak);
                 }
-
-                packetCount++;
             }
 
             // Send List Cast Spells...
             SendNonHybridSpellLines();
 
             // reset trainer cache
-            m_gameClient.TrainerSkillCache = null;
+            GameClient.TrainerSkillCache = null;
         }
     }
 }

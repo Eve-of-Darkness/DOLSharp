@@ -27,7 +27,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            int pid = packet.ReadShort();
+            packet.ReadShort(); // pid
             int housenumber = packet.ReadShort();
             int enter = packet.ReadByte();
 
@@ -88,7 +88,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     case 1:
                         if (!player.IsWithinRadius(_house, WorldMgr.VISIBILITY_DISTANCE) || (player.CurrentRegionID != _house.RegionID))
                         {
-                            ChatUtil.SendSystemMessage(player, string.Format("You are too far away to enter house {0}.", _house.HouseNumber));
+                            ChatUtil.SendSystemMessage(player, $"You are too far away to enter house {_house.HouseNumber}.");
                             return;
                         }
 
@@ -101,8 +101,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
                         else
                         {
-                            ChatUtil.SendSystemMessage(player, string.Format("You can't enter house {0}.", _house.HouseNumber));
-                            return;
+                            ChatUtil.SendSystemMessage(player, $"You can't enter house {_house.HouseNumber}.");
                         }
 
                         break;

@@ -27,11 +27,11 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            int unk1 = packet.ReadByte();
+            packet.ReadByte(); // unk1
             int position = packet.ReadByte();
             ushort housenumber = packet.ReadShort();
             ushort angle = packet.ReadShort();
-            ushort unk2 = packet.ReadShort();
+            packet.ReadShort(); // unk2
 
             // rotation only works for inside items
             if (!client.Player.InHouse)
@@ -85,9 +85,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             // save item
             GameServer.Database.SaveObject(iitem.DatabaseItem);
 
-            ChatUtil.SendSystemMessage(
-                client,
-                                       string.Format("Interior decoration rotated from {0} degrees to {1}", old, iitem.Rotation));
+            ChatUtil.SendSystemMessage(client, $"Interior decoration rotated from {old} degrees to {iitem.Rotation}");
 
             // update all players in the house.
             foreach (GamePlayer plr in house.GetAllPlayersInHouse())

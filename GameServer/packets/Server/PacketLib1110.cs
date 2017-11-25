@@ -18,22 +18,18 @@
 */
 #define NOENCRYPTION
 using System.IO;
-using System.Reflection;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using DOL.GS.Effects;
 using DOL.GS.RealmAbilities;
 using DOL.GS.Styles;
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(1110, GameClient.eClientVersion.Version1110)]
     public class PacketLib1110 : PacketLib1109
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Constructs a new PacketLib for Client Version 1.110
         /// </summary>
@@ -47,9 +43,7 @@ namespace DOL.GS.PacketHandler
         /// Property to enable "forced" Tooltip send when Update are made to player skills, or player effects.
         /// This can be controlled through server propertiers !
         /// </summary>
-        public virtual bool ForceTooltipUpdate {
-            get { return ServerProperties.Properties.USE_NEW_TOOLTIP_FORCEDUPDATE; }
-        }
+        public virtual bool ForceTooltipUpdate => ServerProperties.Properties.USE_NEW_TOOLTIP_FORCEDUPDATE;
 
         /// <summary>
         /// New system in v1.110+ for delve info. delve is cached by client in extra file, stored locally.
@@ -67,7 +61,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendUpdateIcons(IList changedEffects, ref int lastUpdateEffectsCount)
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
@@ -86,7 +80,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteByte(Icons); // unknown
                 pak.WriteByte(0); // unknown
 
-                foreach (IGameEffect effect in m_gameClient.Player.EffectList)
+                foreach (IGameEffect effect in GameClient.Player.EffectList)
                 {
                     if (effect.Icon != 0)
                     {
@@ -107,23 +101,22 @@ namespace DOL.GS.PacketHandler
                         pak.WriteByte((byte)(fxcount - 1)); // icon index
                         pak.WriteByte((effect is GameSpellEffect || effect.Icon > 5000) ? (byte)(fxcount - 1) : (byte)0xff);
 
-                        byte ImmunByte = 0;
-                        var gsp = effect as GameSpellEffect;
-                        if (gsp != null && gsp.IsDisabled)
+                        byte immunByte = 0;
+                        if (effect is GameSpellEffect gsp && gsp.IsDisabled)
                         {
-                            ImmunByte = 1;
+                            immunByte = 1;
                         }
 
-                        pak.WriteByte(ImmunByte); // new in 1.73; if non zero says "protected by" on right click
+                        pak.WriteByte(immunByte); // new in 1.73; if non zero says "protected by" on right click
 
                         // bit 0x08 adds "more..." to right click info
                         pak.WriteShort(effect.Icon);
 
                         // pak.WriteShort(effect.IsFading ? (ushort)1 : (ushort)(effect.RemainingTime / 1000));
                         pak.WriteShort((ushort)(effect.RemainingTime / 1000));
-                        if (effect is GameSpellEffect)
+                        if (effect is GameSpellEffect spellEffect)
                         {
-                            pak.WriteShort((ushort)((GameSpellEffect)effect).Spell.InternalID); // v1.110+ send the spell ID for delve info in active icon
+                            pak.WriteShort((ushort)spellEffect.Spell.InternalID); // v1.110+ send the spell ID for delve info in active icon
                         }
                         else
                         {
@@ -131,9 +124,9 @@ namespace DOL.GS.PacketHandler
                         }
 
                         byte flagNegativeEffect = 0;
-                        if (effect is StaticEffect)
+                        if (effect is StaticEffect staticEffect)
                         {
-                            if (((StaticEffect)effect).HasNegativeEffect)
+                            if (staticEffect.HasNegativeEffect)
                             {
                                 flagNegativeEffect = 1;
                             }
@@ -165,10 +158,7 @@ namespace DOL.GS.PacketHandler
                     // log.DebugFormat("adding [{0}] (empty)", fxcount-1);
                 }
 
-                if (changedEffects != null)
-                {
-                    changedEffects.Clear();
-                }
+                changedEffects?.Clear();
 
                 if (entriesCount == 0)
                 {
@@ -185,9 +175,9 @@ namespace DOL.GS.PacketHandler
             // force tooltips update
             foreach (int entry in tooltipids)
             {
-                if (m_gameClient.CanSendTooltip(24, entry))
+                if (GameClient.CanSendTooltip(24, entry))
                 {
-                    SendDelveInfo(DOL.GS.PacketHandler.Client.v168.DetailDisplayHandler.DelveSpell(m_gameClient, entry));
+                    SendDelveInfo(Client.v168.DetailDisplayHandler.DelveSpell(GameClient, entry));
                 }
             }
         }
@@ -200,9 +190,9 @@ namespace DOL.GS.PacketHandler
             base.SendTrainerWindow();
 
             // Send tooltips
-            if (ForceTooltipUpdate && m_gameClient.TrainerSkillCache != null)
+            if (ForceTooltipUpdate && GameClient.TrainerSkillCache != null)
             {
-                SendForceTooltipUpdate(m_gameClient.TrainerSkillCache.SelectMany(e => e.Item2).Select(e => e.Item3));
+                SendForceTooltipUpdate(GameClient.TrainerSkillCache.SelectMany(e => e.Item2).Select(e => e.Item3));
             }
         }
 
@@ -221,38 +211,38 @@ namespace DOL.GS.PacketHandler
 
                 if (t is RealmAbility)
                 {
-                    if (m_gameClient.CanSendTooltip(27, t.InternalID))
+                    if (GameClient.CanSendTooltip(27, t.InternalID))
                     {
-                        SendDelveInfo(DOL.GS.PacketHandler.Client.v168.DetailDisplayHandler.DelveRealmAbility(m_gameClient, t.InternalID));
+                        SendDelveInfo(Client.v168.DetailDisplayHandler.DelveRealmAbility(GameClient, t.InternalID));
                     }
                 }
                 else if (t is Ability)
                 {
-                    if (m_gameClient.CanSendTooltip(28, t.InternalID))
+                    if (GameClient.CanSendTooltip(28, t.InternalID))
                     {
-                        SendDelveInfo(DOL.GS.PacketHandler.Client.v168.DetailDisplayHandler.DelveAbility(m_gameClient, t.InternalID));
+                        SendDelveInfo(Client.v168.DetailDisplayHandler.DelveAbility(GameClient, t.InternalID));
                     }
                 }
                 else if (t is Style)
                 {
-                    if (m_gameClient.CanSendTooltip(25, t.InternalID))
+                    if (GameClient.CanSendTooltip(25, t.InternalID))
                     {
-                        SendDelveInfo(DOL.GS.PacketHandler.Client.v168.DetailDisplayHandler.DelveStyle(m_gameClient, t.InternalID));
+                        SendDelveInfo(Client.v168.DetailDisplayHandler.DelveStyle(GameClient, t.InternalID));
                     }
                 }
                 else if (t is Spell)
                 {
-                    if (t is Song || (t is Spell && ((Spell)t).NeedInstrument))
+                    if (t is Song || (((Spell)t).NeedInstrument))
                     {
-                        if (m_gameClient.CanSendTooltip(26, ((Spell)t).InternalID))
+                        if (GameClient.CanSendTooltip(26, ((Spell)t).InternalID))
                         {
-                            SendDelveInfo(DOL.GS.PacketHandler.Client.v168.DetailDisplayHandler.DelveSong(m_gameClient, ((Spell)t).InternalID));
+                            SendDelveInfo(Client.v168.DetailDisplayHandler.DelveSong(GameClient, ((Spell)t).InternalID));
                         }
                     }
 
-                    if (m_gameClient.CanSendTooltip(24, ((Spell)t).InternalID))
+                    if (GameClient.CanSendTooltip(24, ((Spell)t).InternalID))
                     {
-                        SendDelveInfo(DOL.GS.PacketHandler.Client.v168.DetailDisplayHandler.DelveSpell(m_gameClient, ((Spell)t).InternalID));
+                        SendDelveInfo(Client.v168.DetailDisplayHandler.DelveSpell(GameClient, ((Spell)t).InternalID));
                     }
                 }
             }

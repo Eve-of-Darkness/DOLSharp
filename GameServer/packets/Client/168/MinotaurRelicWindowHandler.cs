@@ -16,19 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System.Reflection;
-using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.MinotaurRelicWindow, "Handles Relic window commands", eClientStatus.PlayerInGame)]
     public class MinotaurRelicWindowHandler : IPacketHandler
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             // todo

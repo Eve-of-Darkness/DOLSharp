@@ -44,7 +44,7 @@ namespace DOL.GS.PacketHandler
                 return;
             }
 
-            pak.WriteShort((ushort)0); // item uniqueID
+            pak.WriteShort(0); // item uniqueID
             pak.WriteByte((byte)item.Level);
 
             int value1; // some object types use this field to display count
@@ -121,7 +121,7 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte((byte)item.Bonus); // % bonus
             pak.WriteByte((byte)item.BonusLevel); // 1.109
             pak.WriteShort((ushort)item.Model);
-            pak.WriteByte((byte)item.Extension);
+            pak.WriteByte(item.Extension);
             int flag = 0;
             int emblem = item.Emblem;
             int color = item.Color;
@@ -137,16 +137,16 @@ namespace DOL.GS.PacketHandler
 
             // flag |= 0x01; // newGuildEmblem
             flag |= 0x02; // enable salvage button
-            AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(m_gameClient.Player.CraftingPrimarySkill);
-            if (skill != null && skill is AdvancedCraftingSkill/* && ((AdvancedCraftingSkill)skill).IsAllowedToCombine(m_gameClient.Player, item)*/)
+            AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(GameClient.Player.CraftingPrimarySkill);
+            if (skill is AdvancedCraftingSkill)
             {
                 flag |= 0x04; // enable craft button
             }
 
             ushort icon1 = 0;
             ushort icon2 = 0;
-            string spell_name1 = string.Empty;
-            string spell_name2 = string.Empty;
+            string spellName1 = string.Empty;
+            string spellName2 = string.Empty;
             if (item.Object_Type != (int)eObjectType.AlchemyTincture)
             {
                 if (item.SpellID > 0/* && item.Charges > 0*/)
@@ -161,7 +161,7 @@ namespace DOL.GS.PacketHandler
                             {
                                 flag |= 0x08;
                                 icon1 = spl.Icon;
-                                spell_name1 = spl.Name; // or best spl.Name ?
+                                spellName1 = spl.Name; // or best spl.Name ?
                                 break;
                             }
                         }
@@ -180,7 +180,7 @@ namespace DOL.GS.PacketHandler
                             {
                                 flag |= 0x10;
                                 icon2 = spl.Icon;
-                                spell_name2 = spl.Name; // or best spl.Name ?
+                                spellName2 = spl.Name; // or best spl.Name ?
                                 break;
                             }
                         }
@@ -191,14 +191,14 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte((byte)flag);
             if ((flag & 0x08) == 0x08)
             {
-                pak.WriteShort((ushort)icon1);
-                pak.WritePascalString(spell_name1);
+                pak.WriteShort(icon1);
+                pak.WritePascalString(spellName1);
             }
 
             if ((flag & 0x10) == 0x10)
             {
-                pak.WriteShort((ushort)icon2);
-                pak.WritePascalString(spell_name2);
+                pak.WriteShort(icon2);
+                pak.WritePascalString(spellName2);
             }
 
             pak.WriteShort((ushort)item.Effect); // item effect changed to short
@@ -212,11 +212,11 @@ namespace DOL.GS.PacketHandler
             {
                 if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                 {
-                    name += "[" + item.SellPrice.ToString() + " BP]";
+                    name += $"[{item.SellPrice} BP]";
                 }
                 else
                 {
-                    name += "[" + Money.GetString(item.SellPrice) + "]";
+                    name += $"[{Money.GetString(item.SellPrice)}]";
                 }
             }
 

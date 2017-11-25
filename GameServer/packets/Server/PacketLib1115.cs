@@ -17,21 +17,15 @@
 *
 */
 #define NOENCRYPTION
-using System.Reflection;
 using System.Collections.Generic;
-
 using DOL.Database;
 using DOL.GS.Keeps;
-
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(1115, GameClient.eClientVersion.Version1115)]
     public class PacketLib1115 : PacketLib1114
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Constructs a new PacketLib for Client Version 1.115
         /// </summary>
@@ -50,13 +44,13 @@ namespace DOL.GS.PacketHandler
             // Construct the new packet
             using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CryptKey)))
             {
-                pak.WriteByte((byte)m_gameClient.ClientType);
+                pak.WriteByte((byte)GameClient.ClientType);
 
                 // Disable encryption (1110+ always encrypt)
                 pak.WriteByte(0x00);
 
                 // Reply with current version
-                pak.WriteString((((int)m_gameClient.Version) / 1000) + "." + (((int)m_gameClient.Version) - 1000), 5);
+                pak.WriteString($"{(int) GameClient.Version / 1000}.{(int) GameClient.Version - 1000}", 5);
 
                 // revision, last seen (c) 0x63
                 pak.WriteByte(0x00);
@@ -72,7 +66,7 @@ namespace DOL.GS.PacketHandler
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.LoginGranted)))
             {
-                pak.WritePascalString(m_gameClient.Account.Name);
+                pak.WritePascalString(GameClient.Account.Name);
                 pak.WritePascalString(GameServer.Instance.Configuration.ServerNameShort); // server name
                 pak.WriteByte(0x29); // Server ID
                 pak.WriteByte(0x07); // test value...
@@ -96,7 +90,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Unknown
-            pak.WriteShort((ushort)0);
+            pak.WriteShort(0);
             base.WriteItemData(pak, item);
         }
 
@@ -115,7 +109,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Unknown
-            pak.WriteShort((ushort)0);
+            pak.WriteShort(0);
             base.WriteTemplateData(pak, template, count);
         }
 
@@ -125,20 +119,20 @@ namespace DOL.GS.PacketHandler
         /// <param name="keep"></param>
         public override void SendKeepInfo(IGameKeep keep)
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.KeepInfo)))
             {
-                pak.WriteShort((ushort)keep.KeepID);
+                pak.WriteShort(keep.KeepID);
                 pak.WriteShort(0);
                 pak.WriteInt((uint)keep.X);
                 pak.WriteInt((uint)keep.Y);
-                pak.WriteShort((ushort)keep.Heading);
+                pak.WriteShort(keep.Heading);
                 pak.WriteByte((byte)keep.Realm);
-                pak.WriteByte((byte)keep.Level);// level
+                pak.WriteByte(keep.Level);// level
                 pak.WriteShort(0);// unk
                 pak.WriteByte(0xF7);// model
                 pak.WriteByte(0);// unk
@@ -149,31 +143,32 @@ namespace DOL.GS.PacketHandler
 
         public override void SendWarmapUpdate(ICollection<IGameKeep> list)
         {
-            if (m_gameClient.Player == null)
+            if (GameClient.Player == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.WarMapClaimedKeeps)))
             {
-                int KeepCount = 0;
-                int TowerCount = 0;
-                foreach (AbstractGameKeep keep in list)
+                int keepCount = 0;
+                int towerCount = 0;
+                foreach (var gameKeep in list)
                 {
+                    var keep = (AbstractGameKeep) gameKeep;
                     // New Agramon tower are counted as keep
                     if (keep is GameKeep || (keep.KeepID & 0xFF) > 150)
                     {
-                        KeepCount++;
+                        keepCount++;
                     }
                     else
                     {
-                        TowerCount++;
+                        towerCount++;
                     }
                 }
 
                 pak.WriteShort(0x0F00);
-                pak.WriteByte((byte)KeepCount);
-                pak.WriteByte((byte)TowerCount);
+                pak.WriteByte((byte)keepCount);
+                pak.WriteByte((byte)towerCount);
                 byte albStr = 0;
                 byte hibStr = 0;
                 byte midStr = 0;
@@ -229,18 +224,10 @@ namespace DOL.GS.PacketHandler
                 pak.WriteByte(albMagic);
                 pak.WriteByte(midMagic);
                 pak.WriteByte(hibMagic);
-                foreach (AbstractGameKeep keep in list)
+                foreach (var gameKeep in list)
                 {
+                    var keep = (AbstractGameKeep) gameKeep;
                     int keepId = keep.KeepID;
-
-                    /*if (ServerProperties.Properties.USE_NEW_KEEPS == 1 || ServerProperties.Properties.USE_NEW_KEEPS == 2)
-                    {
-                        keepId -= 12;
-                        if ((keep.KeepID > 74 && keep.KeepID < 114) || (keep.KeepID > 330 && keep.KeepID < 370) || (keep.KeepID > 586 && keep.KeepID < 626)
-                            || (keep.KeepID > 842 && keep.KeepID < 882) || (keep.KeepID > 1098 && keep.KeepID < 1138))
-                            keepId += 5;
-                    }*/
-
                     int id = keepId & 0xFF;
                     int tower = keep.KeepID >> 8;
                     int map = (id / 25) - 1;
@@ -266,16 +253,15 @@ namespace DOL.GS.PacketHandler
                     }
 
                     // Teleport
-                    if (m_gameClient.Account.PrivLevel > (int)ePrivLevel.Player)
+                    if (GameClient.Account.PrivLevel > (int)ePrivLevel.Player)
                     {
                         flag |= (byte)eRealmWarmapKeepFlags.Teleportable;
                     }
                     else
                     {
-                        if (GameServer.KeepManager.FrontierRegionsList.Contains(m_gameClient.Player.CurrentRegionID) && m_gameClient.Player.Realm == keep.Realm)
+                        if (GameServer.KeepManager.FrontierRegionsList.Contains(GameClient.Player.CurrentRegionID) && GameClient.Player.Realm == keep.Realm)
                         {
-                            GameKeep theKeep = keep as GameKeep;
-                            if (theKeep != null)
+                            if (keep is GameKeep theKeep)
                             {
                                 if (theKeep.OwnsAllTowers && !theKeep.InCombat)
                                 {

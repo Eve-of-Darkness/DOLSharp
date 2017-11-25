@@ -27,8 +27,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PlayerPickupHouseItem, "Handle Housing Pick Up Request.", eClientStatus.PlayerInGame)]
     public class HousingPickupItemHandler : IPacketHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         #region IPacketHandler Members
 
         /// <summary>
@@ -39,7 +37,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <returns></returns>
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            int unknown = packet.ReadByte();
+            packet.ReadByte(); // unknown
             int position = packet.ReadByte();
             int housenumber = packet.ReadShort();
             int method = packet.ReadByte();
@@ -82,7 +80,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         var invitem = GameInventoryItem.Create(house.OutdoorItems[i].BaseItem);
                         if (client.Player.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, invitem))
                         {
-                            InventoryLogging.LogInventoryAction("(HOUSE;" + house.HouseNumber + ")", client.Player, eInventoryActionType.Other, invitem.Template, invitem.Count);
+                            InventoryLogging.LogInventoryAction($"(HOUSE;{house.HouseNumber})", client.Player, eInventoryActionType.Other, invitem.Template, invitem.Count);
                         }
 
                         house.OutdoorItems.Remove(i);
@@ -91,12 +89,12 @@ namespace DOL.GS.PacketHandler.Client.v168
                         client.Out.SendGarden(house);
 
                         ChatUtil.SendSystemMessage(client, "Garden object removed.");
-                        ChatUtil.SendSystemMessage(client, string.Format("You get {0} and put it in your backpack.", invitem.Name));
+                        ChatUtil.SendSystemMessage(client, $"You get {invitem.Name} and put it in your backpack.");
                         return;
                     }
 
                     // no object @ position
-                    ChatUtil.SendSystemMessage(client, "There is no Garden Tile at slot " + position + "!");
+                    ChatUtil.SendSystemMessage(client, $"There is no Garden Tile at slot {position}!");
                     break;
 
                 case 2:
@@ -126,11 +124,10 @@ namespace DOL.GS.PacketHandler.Client.v168
                         {
                             if (client.Player.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, item))
                             {
-                                string removalMsg = string.Format("The {0} is cleared from the {1}.", item.Name,
-                                                                  method == 2 ? "wall surface" : "floor");
+                                string removalMsg = $"The {item.Name} is cleared from the {(method == 2 ? "wall surface" : "floor")}.";
 
                                 ChatUtil.SendSystemMessage(client, removalMsg);
-                                InventoryLogging.LogInventoryAction("(HOUSE;" + house.HouseNumber + ")", client.Player, eInventoryActionType.Other, item.Template, item.Count);
+                                InventoryLogging.LogInventoryAction($"(HOUSE;{house.HouseNumber})", client.Player, eInventoryActionType.Other, item.Template, item.Count);
                             }
                             else
                             {
@@ -140,41 +137,40 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
                         else
                         {
-                            ChatUtil.SendSystemMessage(client, "The " + item.Name + " is cleared from the wall surface.");
+                            ChatUtil.SendSystemMessage(client, $"The {item.Name} is cleared from the wall surface.");
                         }
                     }
                     else if (iitem.DatabaseItem.BaseItemID.Contains("GuildBanner"))
                     {
                         var it = new ItemTemplate
-                                    {
-                                        Id_nb = iitem.DatabaseItem.BaseItemID,
-                                        CanDropAsLoot = false,
-                                        IsDropable = true,
-                                        IsPickable = true,
-                                        IsTradable = true,
-                                        Item_Type = 41,
-                                        Level = 1,
-                                        MaxCharges = 1,
-                                        MaxCount = 1,
-                                        Model = iitem.DatabaseItem.Model,
-                                        Emblem = iitem.DatabaseItem.Emblem,
-                                        Object_Type = (int)eObjectType.HouseWallObject,
-                                        Realm = 0,
-                                        Quality = 100
-                                    };
+                        {
+                            Id_nb = iitem.DatabaseItem.BaseItemID,
+                            CanDropAsLoot = false,
+                            IsDropable = true,
+                            IsPickable = true,
+                            IsTradable = true,
+                            Item_Type = 41,
+                            Level = 1,
+                            MaxCharges = 1,
+                            MaxCount = 1,
+                            Model = iitem.DatabaseItem.Model,
+                            Emblem = iitem.DatabaseItem.Emblem,
+                            Object_Type = (int) eObjectType.HouseWallObject,
+                            Realm = 0,
+                            Quality = 100
+                        };
 
                         string[] idnb = iitem.DatabaseItem.BaseItemID.Split('_');
-                        it.Name = idnb[1] + "'s Banner";
+                        it.Name = $"{idnb[1]}\'s Banner";
 
                         // TODO: Once again with guild banners, templates are memory only and will not load correctly once player logs out - tolakram
                         var inv = GameInventoryItem.Create(it);
                         if (client.Player.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, inv))
                         {
-                            string invMsg = string.Format("The {0} is cleared from the {1}.", inv.Name,
-                                                          method == 2 ? "wall surface" : "floor");
+                            string invMsg = $"The {inv.Name} is cleared from the {(method == 2 ? "wall surface" : "floor")}.";
 
                             ChatUtil.SendSystemMessage(client, invMsg);
-                            InventoryLogging.LogInventoryAction("(HOUSE;" + house.HouseNumber + ")", client.Player, eInventoryActionType.Other, inv.Template, inv.Count);
+                            InventoryLogging.LogInventoryAction($"(HOUSE;{house.HouseNumber})", client.Player, eInventoryActionType.Other, inv.Template, inv.Count);
                         }
                         else
                         {

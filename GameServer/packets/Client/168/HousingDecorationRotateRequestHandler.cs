@@ -29,7 +29,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         {
             ushort housenumber = packet.ReadShort();
             var index = (byte)packet.ReadByte();
-            var unk1 = (byte)packet.ReadByte();
+            packet.ReadByte(); // unk1
 
             // house is null, return
             var house = HouseMgr.GetHouse(housenumber);

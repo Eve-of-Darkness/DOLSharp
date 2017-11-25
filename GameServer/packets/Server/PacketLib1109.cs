@@ -17,19 +17,14 @@
 *
 */
 #define NOENCRYPTION
-using System;
-using System.Reflection;
 using DOL.Database;
 using System.Collections;
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(1109, GameClient.eClientVersion.Version1109)]
     public class PacketLib1109 : PacketLib1108
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Constructs a new PacketLib for Client Version 1.109
         /// </summary>
@@ -41,43 +36,38 @@ namespace DOL.GS.PacketHandler
 
         public override void SendTradeWindow()
         {
-            if (m_gameClient.Player == null)
-            {
-                return;
-            }
-
-            if (m_gameClient.Player.TradeWindow == null)
+            if (GameClient.Player?.TradeWindow == null)
             {
                 return;
             }
 
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.TradeWindow)))
             {
-                lock (m_gameClient.Player.TradeWindow.Sync)
+                lock (GameClient.Player.TradeWindow.Sync)
                 {
-                    foreach (InventoryItem item in m_gameClient.Player.TradeWindow.TradeItems)
+                    foreach (InventoryItem item in GameClient.Player.TradeWindow.TradeItems)
                     {
                         pak.WriteByte((byte)item.SlotPosition);
                     }
 
-                    pak.Fill(0x00, 10 - m_gameClient.Player.TradeWindow.TradeItems.Count);
+                    pak.Fill(0x00, 10 - GameClient.Player.TradeWindow.TradeItems.Count);
 
                     pak.WriteShort(0x0000);
-                    pak.WriteShort((ushort)Money.GetMithril(m_gameClient.Player.TradeWindow.TradeMoney));
-                    pak.WriteShort((ushort)Money.GetPlatinum(m_gameClient.Player.TradeWindow.TradeMoney));
-                    pak.WriteShort((ushort)Money.GetGold(m_gameClient.Player.TradeWindow.TradeMoney));
-                    pak.WriteShort((ushort)Money.GetSilver(m_gameClient.Player.TradeWindow.TradeMoney));
-                    pak.WriteShort((ushort)Money.GetCopper(m_gameClient.Player.TradeWindow.TradeMoney));
+                    pak.WriteShort((ushort)Money.GetMithril(GameClient.Player.TradeWindow.TradeMoney));
+                    pak.WriteShort((ushort)Money.GetPlatinum(GameClient.Player.TradeWindow.TradeMoney));
+                    pak.WriteShort((ushort)Money.GetGold(GameClient.Player.TradeWindow.TradeMoney));
+                    pak.WriteShort((ushort)Money.GetSilver(GameClient.Player.TradeWindow.TradeMoney));
+                    pak.WriteShort((ushort)Money.GetCopper(GameClient.Player.TradeWindow.TradeMoney));
 
                     pak.WriteShort(0x0000);
-                    pak.WriteShort((ushort)Money.GetMithril(m_gameClient.Player.TradeWindow.PartnerTradeMoney));
-                    pak.WriteShort((ushort)Money.GetPlatinum(m_gameClient.Player.TradeWindow.PartnerTradeMoney));
-                    pak.WriteShort((ushort)Money.GetGold(m_gameClient.Player.TradeWindow.PartnerTradeMoney));
-                    pak.WriteShort((ushort)Money.GetSilver(m_gameClient.Player.TradeWindow.PartnerTradeMoney));
-                    pak.WriteShort((ushort)Money.GetCopper(m_gameClient.Player.TradeWindow.PartnerTradeMoney));
+                    pak.WriteShort((ushort)Money.GetMithril(GameClient.Player.TradeWindow.PartnerTradeMoney));
+                    pak.WriteShort((ushort)Money.GetPlatinum(GameClient.Player.TradeWindow.PartnerTradeMoney));
+                    pak.WriteShort((ushort)Money.GetGold(GameClient.Player.TradeWindow.PartnerTradeMoney));
+                    pak.WriteShort((ushort)Money.GetSilver(GameClient.Player.TradeWindow.PartnerTradeMoney));
+                    pak.WriteShort((ushort)Money.GetCopper(GameClient.Player.TradeWindow.PartnerTradeMoney));
 
                     pak.WriteShort(0x0000);
-                    ArrayList items = m_gameClient.Player.TradeWindow.PartnerTradeItems;
+                    ArrayList items = GameClient.Player.TradeWindow.PartnerTradeItems;
                     if (items != null)
                     {
                         pak.WriteByte((byte)items.Count);
@@ -88,8 +78,8 @@ namespace DOL.GS.PacketHandler
                         pak.WriteShort(0x0000);
                     }
 
-                    pak.WriteByte((byte)(m_gameClient.Player.TradeWindow.Repairing ? 0x01 : 0x00));
-                    pak.WriteByte((byte)(m_gameClient.Player.TradeWindow.Combine ? 0x01 : 0x00));
+                    pak.WriteByte((byte)(GameClient.Player.TradeWindow.Repairing ? 0x01 : 0x00));
+                    pak.WriteByte((byte)(GameClient.Player.TradeWindow.Combine ? 0x01 : 0x00));
                     if (items != null)
                     {
                         foreach (InventoryItem item in items)
@@ -99,14 +89,9 @@ namespace DOL.GS.PacketHandler
                         }
                     }
 
-                    if (m_gameClient.Player.TradeWindow.Partner != null)
-                    {
-                        pak.WritePascalString("Trading with " + m_gameClient.Player.GetName(m_gameClient.Player.TradeWindow.Partner)); // transaction with ...
-                    }
-                    else
-                    {
-                        pak.WritePascalString("Selfcrafting"); // transaction with ...
-                    }
+                    pak.WritePascalString(GameClient.Player.TradeWindow.Partner != null
+                        ? $"Trading with {GameClient.Player.GetName(GameClient.Player.TradeWindow.Partner)}"
+                        : "Selfcrafting");
 
                     SendTCP(pak);
                 }
@@ -206,7 +191,7 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte((byte)item.Quality); // % of qua
             pak.WriteByte((byte)item.Bonus); // % bonus
             pak.WriteShort((ushort)item.Model);
-            pak.WriteByte((byte)item.Extension);
+            pak.WriteByte(item.Extension);
             int flag = 0;
             if (item.Emblem != 0)
             {
@@ -220,41 +205,41 @@ namespace DOL.GS.PacketHandler
 
             // flag |= 0x01; // newGuildEmblem
             flag |= 0x02; // enable salvage button
-            AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(m_gameClient.Player.CraftingPrimarySkill);
-            if (skill != null && skill is AdvancedCraftingSkill/* && ((AdvancedCraftingSkill)skill).IsAllowedToCombine(m_gameClient.Player, item)*/)
+            AbstractCraftingSkill skill = CraftingMgr.getSkillbyEnum(GameClient.Player.CraftingPrimarySkill);
+            if (skill is AdvancedCraftingSkill)
             {
                 flag |= 0x04; // enable craft button
             }
 
             ushort icon1 = 0;
             ushort icon2 = 0;
-            string spell_name1 = string.Empty;
-            string spell_name2 = string.Empty;
+            string spellName1 = string.Empty;
+            string spellName2 = string.Empty;
             if (item.Object_Type != (int)eObjectType.AlchemyTincture)
             {
                 SpellLine chargeEffectsLine = SkillBase.GetSpellLine(GlobalSpellsLines.Item_Effects);
 
                 if (chargeEffectsLine != null)
                 {
-                    if (item.SpellID > 0/* && item.Charges > 0*/)
+                    if (item.SpellID > 0)
                     {
                         Spell spell = SkillBase.FindSpell(item.SpellID, chargeEffectsLine);
                         if (spell != null)
                         {
                             flag |= 0x08;
                             icon1 = spell.Icon;
-                            spell_name1 = spell.Name; // or best spl.Name ?
+                            spellName1 = spell.Name; // or best spl.Name ?
                         }
                     }
 
-                    if (item.SpellID1 > 0/* && item.Charges > 0*/)
+                    if (item.SpellID1 > 0)
                     {
                         Spell spell = SkillBase.FindSpell(item.SpellID1, chargeEffectsLine);
                         if (spell != null)
                         {
                             flag |= 0x10;
                             icon2 = spell.Icon;
-                            spell_name2 = spell.Name; // or best spl.Name ?
+                            spellName2 = spell.Name; // or best spl.Name ?
                         }
                     }
                 }
@@ -263,38 +248,38 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte((byte)flag);
             if ((flag & 0x08) == 0x08)
             {
-                pak.WriteShort((ushort)icon1);
-                pak.WritePascalString(spell_name1);
+                pak.WriteShort(icon1);
+                pak.WritePascalString(spellName1);
             }
 
             if ((flag & 0x10) == 0x10)
             {
-                pak.WriteShort((ushort)icon2);
-                pak.WritePascalString(spell_name2);
+                pak.WriteShort(icon2);
+                pak.WritePascalString(spellName2);
             }
 
             pak.WriteByte((byte)item.Effect);
             string name = item.Name;
             if (item.Count > 1)
             {
-                name = item.Count + " " + name;
+                name = $"{item.Count} {name}";
             }
 
             if (item.SellPrice > 0)
             {
                 if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                 {
-                    name += "[" + item.SellPrice.ToString() + " BP]";
+                    name += $"[{item.SellPrice} BP]";
                 }
                 else
                 {
-                    name += "[" + Money.GetShortString(item.SellPrice) + "]";
+                    name += $"[{Money.GetShortString(item.SellPrice)}]";
                 }
             }
 
-            if (name.Length > MAX_NAME_LENGTH)
+            if (name.Length > MaxNameLength)
             {
-                name = name.Substring(0, MAX_NAME_LENGTH);
+                name = name.Substring(0, MaxNameLength);
             }
 
             pak.WritePascalString(name);
@@ -381,7 +366,7 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte((byte)template.Quality);
             pak.WriteByte((byte)template.Bonus);
             pak.WriteShort((ushort)template.Model);
-            pak.WriteByte((byte)template.Extension);
+            pak.WriteByte(template.Extension);
             if (template.Emblem != 0)
             {
                 pak.WriteShort((ushort)template.Emblem);
@@ -391,16 +376,9 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort((ushort)template.Color);
             }
 
-            pak.WriteByte((byte)0); // Flag
+            pak.WriteByte(0); // Flag
             pak.WriteByte((byte)template.Effect);
-            if (count > 1)
-            {
-                pak.WritePascalString(string.Format("{0} {1}", count, template.Name));
-            }
-            else
-            {
-                pak.WritePascalString(template.Name);
-            }
+            pak.WritePascalString(count > 1 ? $"{count} {template.Name}" : template.Name);
         }
     }
 }

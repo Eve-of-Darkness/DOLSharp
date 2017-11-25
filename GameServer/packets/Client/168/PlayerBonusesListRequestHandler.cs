@@ -29,7 +29,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
@@ -41,17 +41,19 @@ namespace DOL.GS.PacketHandler.Client.v168
             int code = packet.ReadByte();
             if (code != 0)
             {
-                if (log.IsWarnEnabled)
+                if (Log.IsWarnEnabled)
                 {
-                    log.WarnFormat("bonuses button: code is other than zero ({0})", code);
+                    Log.Warn($"bonuses button: code is other than zero ({code})");
                 }
             }
 
             new RegionTimerAction<GamePlayer>(
-                client.Player,
-                                              p => p.Out.SendCustomTextWindow(
-                                                  LanguageMgr.GetTranslation(client.Account.Language, "PlayerBonusesListRequestHandler.HandlePacket.Bonuses")
-                                                                              , new List<string>(client.Player.GetBonuses()))).Start(1);
+                    client.Player,
+                    p => p.Out.SendCustomTextWindow(
+                        LanguageMgr.GetTranslation(client.Account.Language,
+                            "PlayerBonusesListRequestHandler.HandlePacket.Bonuses"),
+                        new List<string>(client.Player.GetBonuses())))
+                .Start(1);
         }
     }
 }

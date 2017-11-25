@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 using System.Reflection;
-using DOL.Database;
 using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
@@ -27,37 +26,11 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             client.ClientState = GameClient.eClientState.CharScreen;
-            if (client.Player != null)
-            {
-                try
-                {
-                    // find the cached character and force it to update with the latest saved character
-                    DOLCharacters cachedCharacter = null;
-                    foreach (DOLCharacters accountChar in client.Account.Characters)
-                    {
-                        if (accountChar.ObjectId == client.Player.InternalID)
-                        {
-                            cachedCharacter = accountChar;
-                            break;
-                        }
-                    }
-
-                    if (cachedCharacter != null)
-                    {
-                        cachedCharacter = client.Player.DBCharacter;
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    log.ErrorFormat("Error attempting to update cached player. {0}", ex.Message);
-                }
-            }
-
             client.Player = null;
 
             // reset realm if no characters
@@ -109,9 +82,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
                     else
                     {
-                        if (log.IsErrorEnabled)
+                        if (Log.IsErrorEnabled)
                         {
-                            log.Error("User has chosen unknown realm: " + accountName + "; account=" + client.Account.Name);
+                            Log.Error($"User has chosen unknown realm: {accountName}; account={client.Account.Name}");
                         }
 
                         client.Out.SendRealm(eRealm.None);

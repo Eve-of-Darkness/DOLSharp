@@ -17,19 +17,12 @@
 *
 */
 #define NOENCRYPTION
-using System.Reflection;
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
     [PacketLib(193, GameClient.eClientVersion.Version193)]
     public class PacketLib193 : PacketLib192
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         /// Constructs a new PacketLib for Version 1.93 clients
         /// </summary>
@@ -43,12 +36,12 @@ namespace DOL.GS.PacketHandler
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VisualEffect)))
             {
-                GamePlayer player = base.m_gameClient.Player;
+                GamePlayer player = GameClient.Player;
 
                 pak.WriteShort((ushort)player.ObjectID);
-                pak.WriteByte((byte)8);
-                pak.WriteByte((byte)flag);
-                pak.WriteByte((byte)0);
+                pak.WriteByte(8);
+                pak.WriteByte(flag);
+                pak.WriteByte(0);
 
                 SendTCP(pak);
             }

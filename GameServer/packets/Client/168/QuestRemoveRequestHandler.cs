@@ -26,10 +26,10 @@ namespace DOL.GS.PacketHandler.Client.v168
     {
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            ushort unk1 = packet.ReadShort();
+            packet.ReadShort(); // unk
             ushort questIndex = packet.ReadShort();
-            ushort unk2 = packet.ReadShort();
-            ushort unk3 = packet.ReadShort();
+            packet.ReadShort(); // unk
+            packet.ReadShort(); // unk
 
             AbstractQuest quest = null;
 
@@ -54,10 +54,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
 
-            if (quest != null)
-            {
-                quest.AbortQuest();
-            }
+            quest?.AbortQuest();
         }
     }
 }
