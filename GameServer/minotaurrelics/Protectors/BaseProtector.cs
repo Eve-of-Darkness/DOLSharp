@@ -31,34 +31,19 @@ namespace DOL.GS
 {
     public class BaseProtector : GameNPC
     {
-        private static MinotaurRelic m_relic;
-        private static GameNPC m_lockedEffect;
+        public static MinotaurRelic Relic { get; set; }
 
-        public static MinotaurRelic Relic
-        {
-            get { return m_relic; }
-            set { m_relic = value; }
-        }
-
-        public static GameNPC LockedEffect
-        {
-            get { return m_lockedEffect; }
-            set { m_lockedEffect = value; }
-        }
+        public static GameNPC LockedEffect { get; set; }
 
         public static void UnlockRelic()
         {
-            if (LockedEffect != null)
-            {
-                LockedEffect.RemoveFromWorld();
-            }
+            LockedEffect?.RemoveFromWorld();
         }
 
         // Never save the mob into the database either
         // or you will get double spawns on server start!
         public override void SaveIntoDatabase()
         {
-            return;
         }
 
         public static bool LockRelic()
@@ -69,25 +54,24 @@ namespace DOL.GS
                 return false;
             }
 
-            LockedEffect = new GameNPC();
-            LockedEffect.Model = 1583;
-            LockedEffect.Name = "LOCKED_RELIC";
-            LockedEffect.X = Relic.X;
-            LockedEffect.Y = Relic.Y;
-            LockedEffect.Z = Relic.Z;
-            LockedEffect.Heading = Relic.Heading;
-            LockedEffect.CurrentRegionID = Relic.CurrentRegionID;
-            LockedEffect.Flags = GameNPC.eFlags.CANTTARGET;
+            LockedEffect = new GameNPC
+            {
+                Model = 1583,
+                Name = "LOCKED_RELIC",
+                X = Relic.X,
+                Y = Relic.Y,
+                Z = Relic.Z,
+                Heading = Relic.Heading,
+                CurrentRegionID = Relic.CurrentRegionID,
+                Flags = eFlags.CANTTARGET
+            };
             LockedEffect.AddToWorld();
 
             return true;
         }
 
         // these mobs should NEVER respawn.
-        public override int RespawnInterval
-        {
-            get { return 0; }
-        }
+        public override int RespawnInterval => 0;
 
         public override void Die(GameObject killer)
         {

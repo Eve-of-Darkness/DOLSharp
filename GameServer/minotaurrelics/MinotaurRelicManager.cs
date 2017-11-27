@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-
 using DOL.Events;
 using DOL.Database;
 using log4net;
@@ -29,38 +28,38 @@ namespace DOL.GS
 {
     public sealed class MinotaurRelicManager
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// table of all relics, InternalID as key
         /// </summary>
-        public static readonly Dictionary<string, MinotaurRelic> m_minotaurrelics = new Dictionary<string, MinotaurRelic>();
+        public static readonly Dictionary<string, MinotaurRelic> Minotaurrelics = new Dictionary<string, MinotaurRelic>();
 
         /// <summary>
         /// Holds the maximum XP of Minotaur Relics
         /// </summary>
-        public const double MAX_RELIC_EXP = 3750;
+        public const double MaxRelicExp = 3750;
         /// <summary>
         /// Holds the minimum respawntime
         /// </summary>
-        public const int MIN_RESPAWN_TIMER = 300000;
+        public const int MinRespawnTimer = 300000;
         /// <summary>
         /// Holds the maximum respawntime
         /// </summary>
-        public const int MAX_RESPAWN_TIMER = 1800000;
+        public const int MaxRespawnTimer = 1800000;
         /// <summary>
         /// Holds the Value which is removed from the XP per tick
         /// </summary>
-        public const double XP_LOSS_PER_TICK = 10;
+        public const double XpLossPerTick = 10;
 
         [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
         {
             if (ServerProperties.Properties.ENABLE_MINOTAUR_RELICS)
             {
-                if (log.IsDebugEnabled)
+                if (Log.IsDebugEnabled)
                 {
-                    log.Debug("Minotaur Relics manager initialized");
+                    Log.Debug("Minotaur Relics manager initialized");
                 }
 
                 Init();
@@ -72,13 +71,13 @@ namespace DOL.GS
         /// </summary>
         public static bool Init()
         {
-            foreach (MinotaurRelic relic in m_minotaurrelics.Values)
+            foreach (MinotaurRelic relic in Minotaurrelics.Values)
             {
                 relic.SaveIntoDatabase();
                 relic.RemoveFromWorld();
             }
 
-            m_minotaurrelics.Clear();
+            Minotaurrelics.Clear();
 
             try
             {
@@ -87,47 +86,44 @@ namespace DOL.GS
                 {
                     if (WorldMgr.GetRegion((ushort)dbrelic.SpawnRegion) == null)
                     {
-                        log.Warn("DBMinotaurRelic: Could not load " + dbrelic.ObjectId + ": Region missmatch.");
+                        Log.Warn($"DBMinotaurRelic: Could not load {dbrelic.ObjectId}: Region missmatch.");
                         continue;
                     }
 
                     MinotaurRelic relic = new MinotaurRelic(dbrelic);
 
-                    m_minotaurrelics.Add(relic.InternalID, relic);
+                    Minotaurrelics.Add(relic.InternalID, relic);
 
                     relic.AddToWorld();
                 }
 
                 InitMapUpdate();
-                log.Info("Minotaur Relics properly loaded");
+                Log.Info("Minotaur Relics properly loaded");
                 return true;
             }
             catch (Exception e)
             {
-                log.Error("Error loading Minotaur Relics", e);
+                Log.Error("Error loading Minotaur Relics", e);
                 return false;
             }
         }
 
-        static Timer m_mapUpdateTimer;
+        private static Timer _mapUpdateTimer;
 
         public static void InitMapUpdate()
         {
-            m_mapUpdateTimer = new Timer(new TimerCallback(MapUpdate), null, 0, 30 * 1000); // 30sec Lifeflight change this to 15 seconds
+            _mapUpdateTimer = new Timer(MapUpdate, null, 0, 30 * 1000); // 30sec Lifeflight change this to 15 seconds
         }
 
         public static void StopMapUpdate()
         {
-            if (m_mapUpdateTimer != null)
-            {
-                m_mapUpdateTimer.Dispose();
-            }
+            _mapUpdateTimer?.Dispose();
         }
 
         private static void MapUpdate(object nullValue)
         {
             Dictionary<ushort, IList<MinotaurRelic>> relics = new Dictionary<ushort, IList<MinotaurRelic>>();
-            foreach (MinotaurRelic relic in MinotaurRelicManager.GetAllRelics())
+            foreach (MinotaurRelic relic in GetAllRelics())
             {
                 if (!relics.ContainsKey(relic.CurrentRegionID))
                 {
@@ -139,7 +135,7 @@ namespace DOL.GS
 
             foreach (GameClient clt in WorldMgr.GetAllPlayingClients())
             {
-                if (clt == null || clt.Player == null)
+                if (clt?.Player == null)
                 {
                     continue;
                 }
@@ -148,7 +144,7 @@ namespace DOL.GS
                 {
                     foreach (MinotaurRelic relic in relics[clt.Player.CurrentRegionID])
                     {
-                        clt.Player.Out.SendMinotaurRelicMapUpdate((byte)relic.RelicID, relic.CurrentRegionID, relic.X, relic.Y, relic.Z);
+                        clt.Player.Out.SendMinotaurRelicMapUpdate((byte)relic.RelicId, relic.CurrentRegionID, relic.X, relic.Y, relic.Z);
                     }
                 }
             }
@@ -160,14 +156,14 @@ namespace DOL.GS
         /// <param name="relic">The Relic you want to add</param>
         public static bool AddRelic(MinotaurRelic relic)
         {
-            if (m_minotaurrelics.ContainsValue(relic))
+            if (Minotaurrelics.ContainsValue(relic))
             {
                 return false;
             }
 
-            lock (m_minotaurrelics)
+            lock (Minotaurrelics)
             {
-                m_minotaurrelics.Add(relic.InternalID, relic);
+                Minotaurrelics.Add(relic.InternalID, relic);
             }
 
             return true;
@@ -180,14 +176,14 @@ namespace DOL.GS
         /// <param name="relic">The Relic you want to remove</param>
         public static bool RemoveRelic(MinotaurRelic relic)
         {
-            if (!m_minotaurrelics.ContainsValue(relic))
+            if (!Minotaurrelics.ContainsValue(relic))
             {
                 return false;
             }
 
-            lock (m_minotaurrelics)
+            lock (Minotaurrelics)
             {
-                m_minotaurrelics.Remove(relic.InternalID);
+                Minotaurrelics.Remove(relic.InternalID);
             }
 
             return true;
@@ -195,18 +191,18 @@ namespace DOL.GS
 
         public static int GetRelicCount()
         {
-            return m_minotaurrelics.Count;
+            return Minotaurrelics.Count;
         }
 
         public static IList<MinotaurRelic> GetAllRelics()
         {
             IList<MinotaurRelic> relics = new List<MinotaurRelic>();
 
-            lock (m_minotaurrelics)
+            lock (Minotaurrelics)
             {
-                foreach (string id in m_minotaurrelics.Keys)
+                foreach (string id in Minotaurrelics.Keys)
                 {
-                    relics.Add(m_minotaurrelics[id]);
+                    relics.Add(Minotaurrelics[id]);
                 }
             }
 
@@ -216,27 +212,27 @@ namespace DOL.GS
         /// <summary>
         /// Returns the Relic with the given ID
         /// </summary>
-        /// <param name="ID">The Internal ID of the Relic</param>
-        public static MinotaurRelic GetRelic(string ID)
+        /// <param name="id">The Internal ID of the Relic</param>
+        public static MinotaurRelic GetRelic(string id)
         {
-            lock (m_minotaurrelics)
+            lock (Minotaurrelics)
             {
-                if (!m_minotaurrelics.ContainsKey(ID))
+                if (!Minotaurrelics.ContainsKey(id))
                 {
                     return null;
                 }
 
-                return m_minotaurrelics[ID] as MinotaurRelic;
+                return Minotaurrelics[id];
             }
         }
 
-        public static MinotaurRelic GetRelic(int ID)
+        public static MinotaurRelic GetRelic(int id)
         {
-            lock (m_minotaurrelics)
+            lock (Minotaurrelics)
             {
-                foreach (MinotaurRelic relic in m_minotaurrelics.Values)
+                foreach (MinotaurRelic relic in Minotaurrelics.Values)
                 {
-                    if (relic.RelicID == ID)
+                    if (relic.RelicId == id)
                     {
                         return relic;
                     }

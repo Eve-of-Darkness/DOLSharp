@@ -648,36 +648,13 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             con168[17] = (byte)((con168[17] & 0x80) | client.Player.HealthPercent);
 
-            // zone ID has changed in 1.72, fix bytes 11 and 12
-            byte[] con172 = (byte[])con168.Clone();
-            // client sent v172 pos update packet, fix 168 version
-            con168[10] = con172[11];
-            con168[11] = 0;
-
-            GSUDPPacketOut outpak168 = new GSUDPPacketOut(client.Out.GetPacketCode(eServerPackets.PlayerPosition));
-
-            // Now copy the whole content of the packet
-            outpak168.Write(con168, 0, 18/*con168.Length*/);
-            outpak168.WritePacketLength();
-
-            GSUDPPacketOut outpak172 = new GSUDPPacketOut(client.Out.GetPacketCode(eServerPackets.PlayerPosition));
-
-            // Now copy the whole content of the packet
-            outpak172.Write(con172, 0, 18/*con172.Length*/);
-            outpak172.WritePacketLength();
-
-            // byte[] pak168 = outpak168.GetBuffer();
-            //          byte[] pak172 = outpak172.GetBuffer();
-            //          outpak168 = null;
-            //          outpak172 = null;
             GSUDPPacketOut outpak190 = null;
-
             GSUDPPacketOut outpak1112 = new GSUDPPacketOut(client.Out.GetPacketCode(eServerPackets.PlayerPosition));
-            outpak1112.Write(con172, 0, 18/*con172.Length*/);
+            outpak1112.Write(con168, 0, 18);
             outpak1112.WriteByte(client.Player.ManaPercent);
             outpak1112.WriteByte(client.Player.EndurancePercent);
             outpak1112.WriteByte((byte)(client.Player.RPFlag ? 1 : 0));
-            outpak1112.WriteByte(0); // outpak1112.WriteByte((con168.Length == 22) ? con168[21] : (byte)0);
+            outpak1112.WriteByte(0);
             outpak1112.WritePacketLength();
 
             foreach (GamePlayer player in client.Player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
@@ -726,7 +703,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         if (outpak190 == null)
                         {
                             outpak190 = new GSUDPPacketOut(client.Out.GetPacketCode(eServerPackets.PlayerPosition));
-                            outpak190.Write(con172, 0, 18/*con172.Length*/);
+                            outpak190.Write(con168, 0, 18);
                             outpak190.WriteByte(client.Player.ManaPercent);
                             outpak190.WriteByte(client.Player.EndurancePercent);
                             outpak190.FillString(client.Player.CharacterClass.Name, 32);
