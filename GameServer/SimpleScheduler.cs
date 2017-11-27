@@ -242,7 +242,6 @@ namespace DOL.GS.Scheduler
             Timer.Interval = Math.Min(int.MaxValue, Math.Max(1, value - Ticks));
         }
 
-        #region Scheduler API
         /// <summary>
         /// Trigger a Scheduled Method to be run withing given delay
         /// </summary>
@@ -290,7 +289,6 @@ namespace DOL.GS.Scheduler
                 task.Item2.Wait();
             }
         }
-        #endregion
     }
 
     /// <summary>

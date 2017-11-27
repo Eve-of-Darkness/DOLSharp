@@ -136,8 +136,6 @@ namespace DOL.GS.Commands
         }
     }
 
-    #region reportbug
-
     // handles /reportbug command that is issued from the client /appeal function.
     [Cmd(
     "&reportbug",
@@ -182,9 +180,6 @@ namespace DOL.GS.Commands
             return;
         }
     }
-
-    #endregion reportbug
-    #region reportharass
 
     // handles /reportharass command that is issued from the client /appeal function.
     [Cmd(
@@ -234,9 +229,6 @@ namespace DOL.GS.Commands
             return;
         }
     }
-
-    #endregion reportharass
-    #region reporttos
 
     // handles /reporttos command that is issued from the client /appeal function.
     [Cmd(
@@ -318,9 +310,6 @@ namespace DOL.GS.Commands
         }
     }
 
-    #endregion reporttos
-    #region reportstuck
-
     // handles /reportharass command that is issued from the client /appeal function.
     [Cmd(
     "&reportstuck",
@@ -370,9 +359,6 @@ namespace DOL.GS.Commands
         }
     }
 
-    #endregion reportstuck
-    #region emergency
-
     // handles /appea command that is issued from the client /appeal function (emergency appeal).
     [Cmd(
     "&appea",
@@ -421,5 +407,4 @@ namespace DOL.GS.Commands
             return;
         }
     }
-    #endregion emergency
 }

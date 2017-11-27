@@ -143,8 +143,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Master Gerol", eRealm.Albion);
             if (npcs.Length == 0)
             {
@@ -182,10 +180,6 @@ namespace DOL.GS.Quests.Albion
                 masterGerol = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             boarCarcass = GameServer.Database.FindObjectByKey<ItemTemplate>("huge_boar_carcass");
             if (boarCarcass == null)
             {
@@ -204,8 +198,6 @@ namespace DOL.GS.Quests.Albion
                 boarCarcass.IsPickable = false;
                 GameServer.Database.AddObject(boarCarcass);
             }
-
-            #endregion
 
             /* Now we add some hooks to the Sir Quait we found.
                 * Actually, we want to know when a player interacts with him.

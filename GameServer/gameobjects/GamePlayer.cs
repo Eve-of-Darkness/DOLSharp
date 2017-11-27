@@ -56,8 +56,6 @@ namespace DOL.GS
 
         private readonly object m_LockObject = new object();
 
-        #region Client/Character/VariousFlags
-
         /// <summary>
         /// This is our gameclient!
         /// </summary>
@@ -280,7 +278,6 @@ namespace DOL.GS
             set { m_statsAnon = value; }
         }
 
-        #region DoorCache
         protected Dictionary<int, eDoorState> m_doorUpdateList = null;
 
         protected ushort m_doorUpdateRegionID;
@@ -309,9 +306,6 @@ namespace DOL.GS
 
             Out.SendObjectUpdate(door as GameObject);
         }
-        #endregion
-
-        #region Database Accessor
 
         /// <summary>
         /// Gets or sets the Database ObjectId for this player
@@ -774,11 +768,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #endregion
-
-        #region Player Quitting
         /// <summary>
         /// quit timer
         /// </summary>
@@ -876,9 +865,6 @@ namespace DOL.GS
             { }
         }
 
-        #endregion
-
-        #region Player Linking Dead
         /// <summary>
         /// Callback method, called when the player went linkdead and now he is
         /// allowed to be disconnected
@@ -1213,9 +1199,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-
-        #region Combat timer
         /// <summary>
         /// gets the DamageRvR Memory of this player
         /// </summary>
@@ -1292,10 +1275,7 @@ namespace DOL.GS
                 m_CombatTimer.Start(CombatTimerInterval);
             }
         }
-        #endregion
 
-        #region release/bind/pray
-        #region Binding
         /// <summary>
         /// Property that holds tick when the player bind last time
         /// </summary>
@@ -1448,9 +1428,7 @@ namespace DOL.GS
                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.Bind.CantHere"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
-        #endregion
 
-        #region Releasing
         /// <summary>
         /// tick when player is died
         /// </summary>
@@ -2091,9 +2069,7 @@ namespace DOL.GS
         /// Property that saves condition lost on last death
         /// </summary>
         public const string DEATH_CONSTITUTION_LOSS_PROPERTY = "death_con_loss";
-        #endregion
 
-        #region Praying
         /// <summary>
         /// The timer that will be started when the player wants to pray
         /// </summary>
@@ -2196,11 +2172,6 @@ namespace DOL.GS
             m_prayAction.Stop();
             m_prayAction = null;
         }
-        #endregion
-
-        #endregion
-
-        #region Name/LastName/GuildName/Model
 
         /// <summary>
         /// The lastname of this player
@@ -2409,10 +2380,6 @@ namespace DOL.GS
                 }
             }
         }
-
-        #endregion
-
-        #region Stats
 
         /// <summary>
         /// Holds if the player can gain a FreeLevel
@@ -2630,10 +2597,6 @@ namespace DOL.GS
             return GameServer.ServerRules.FormatPlayerStatistics(this);
         }
 
-        #endregion
-
-        #region Health/Mana/Endurance/Regeneration
-
         /// <summary>
         /// Starts the health regeneration.
         /// Overriden. No lazy timers for GamePlayers.
@@ -2753,28 +2716,19 @@ namespace DOL.GS
                 ChangeHealth(this, eHealthChangeType.Regenerate, GetModified(eProperty.HealthRegenerationRate));
             }
 
-            #region PVP DAMAGE
-
             if (DamageRvRMemory > 0)
             {
                 DamageRvRMemory -= (long)Math.Max(GetModified(eProperty.HealthRegenerationRate), 0);
             }
 
-            #endregion PVP DAMAGE
-
             // If we are fully healed, we stop the timer
             if (Health >= MaxHealth)
             {
-
-                #region PVP DAMAGE
-
                 // Fully Regenerated, Set DamageRvRMemory to 0
                 if (DamageRvRMemory > 0)
                 {
                     DamageRvRMemory = 0;
                 }
-
-                #endregion PVP DAMAGE
 
                 // We clean all damagedealers if we are fully healed,
                 // no special XP calculations need to be done
@@ -3135,8 +3089,6 @@ namespace DOL.GS
             get { return GetModified(eProperty.MaxConcentration); }
         }
 
-        #region Calculate Fall Damage
-
         /// <summary>
         /// Calculates fall damage taking fall damage reduction bonuses into account
         /// </summary>
@@ -3202,12 +3154,6 @@ namespace DOL.GS
 
             return;
         }
-
-        #endregion
-
-        #endregion
-
-        #region Class/Race
 
         /// <summary>
         /// Gets/sets the player's race name
@@ -3290,10 +3236,6 @@ namespace DOL.GS
         {
             return m_customFaceAttributes[(int)part];
         }
-
-        #endregion
-
-        #region Spells/Skills/Abilities/Effects
 
         /// <summary>
         /// Holds the player choosen list of Realm Abilities.
@@ -3831,8 +3773,6 @@ namespace DOL.GS
             }
         }
 
-        #region Abilities
-
         /// <summary>
         /// Adds a new Ability to the player
         /// </summary>
@@ -3874,8 +3814,6 @@ namespace DOL.GS
 
             RefreshSpecDependantSkills(true);
         }
-
-        #endregion Abilities
 
         public virtual void RemoveAllAbilities()
         {
@@ -4653,10 +4591,6 @@ namespace DOL.GS
             return new GameEffectPlayerList(this);
         }
 
-        #endregion
-
-        #region Realm-/Region-/Bount-/Skillpoints...
-
         /// <summary>
         /// Gets/sets player bounty points
         /// (delegate to PlayerCharacter)
@@ -5335,10 +5269,6 @@ namespace DOL.GS
                 return 3 * prcRestore[Level < GamePlayer.prcRestore.Length ? Level : GamePlayer.prcRestore.Length - 1];
             }
         }
-
-        #endregion
-
-        #region Level/Experience
 
         /// <summary>
         /// What is the maximum level a player can achieve?
@@ -6048,9 +5978,7 @@ namespace DOL.GS
 
             return 0;
         }
-        #endregion
 
-        #region Combat
         /// <summary>
         /// The time someone can hold a ranged attack before tiring
         /// </summary>
@@ -7490,8 +7418,6 @@ break;
                             break;
                         }
 
-                        #region Messages
-
                         string hitLocName = null;
                         switch (ad.ArmorHitLocation)
                         {
@@ -7557,8 +7483,6 @@ break;
                                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.Attack.HitsYouCritical", ad.Attacker.GetName(0, true), ad.CriticalDamage), eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
                             }
                         }
-
-                        #endregion
 
                         // decrease condition of hitted armor piece
                         if (ad.ArmorHitLocation != eArmorSlot.NOTSET)
@@ -7710,9 +7634,6 @@ break;
 
         public override void TakeDamage(GameObject source, eDamageType damageType, int damageAmount, int criticalAmount)
         {
-
-            #region PVP DAMAGE
-
             if (source is GamePlayer || (source is GameNPC && (source as GameNPC).Brain is IControlledBrain && ((source as GameNPC).Brain as IControlledBrain).GetPlayerOwner() != null))
             {
                 if (Realm != source.Realm && source.Realm != 0)
@@ -7720,8 +7641,6 @@ break;
                     DamageRvRMemory += (long)(damageAmount + criticalAmount);
                 }
             }
-
-            #endregion PVP DAMAGE
 
             base.TakeDamage(source, damageType, damageAmount, criticalAmount);
             if (HasAbility(Abilities.DefensiveCombatPowerRegeneration))
@@ -8949,9 +8868,6 @@ break;
             return (int)((res + classResist) - 0.01 * secondResist * (res + classResist) + secondResist);
         }
 
-        #endregion
-
-        #region Duel
         /// <summary>
         /// Gets the duel target of this player
         /// </summary>
@@ -8990,9 +8906,6 @@ break;
             Duel.Stop();
             Duel = null;
         }
-        #endregion
-
-        #region Spell cast
 
         /// <summary>
         /// The time someone can not cast
@@ -9546,9 +9459,6 @@ break;
             return ticks;
         }
 
-        #endregion
-
-        #region Realm Abilities
         /// <summary>
         /// This is the timer used to count time when a player casts a RA
         /// </summary>
@@ -9570,9 +9480,6 @@ break;
         {
             get { return m_realmAbilityCastTimer != null && m_realmAbilityCastTimer.IsAlive; }
         }
-        #endregion
-
-        #region Vault/Money/Items/Trading/UseSlot/ApplyPoison
 
         private IGameInventoryObject m_activeInventoryObject;
 
@@ -9709,8 +9616,6 @@ break;
                 }
             }
         }
-
-        #region Money
 
         /// <summary>
         /// Player Mithril Amount
@@ -9853,7 +9758,6 @@ break;
 
             return true;
         }
-        #endregion
 
         private InventoryItem m_useItem;
 
@@ -9923,8 +9827,6 @@ break;
                 {
                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.UseSlot.AttemptToUse", useItem.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
-
-                #region Non-backpack/vault slots
 
                 switch (slot)
                 {
@@ -10089,8 +9991,6 @@ break;
                         case Slot.THIRDQUIVER: SwitchQuiver(eActiveQuiverSlot.Third, false); break;
                         case Slot.FOURTHQUIVER: SwitchQuiver(eActiveQuiverSlot.Fourth, false); break;
                 }
-
-                #endregion
 
                 if (useItem.SpellID != 0 || useItem.SpellID1 != 0 || useItem.PoisonSpellID != 0) // don't return without firing events
                 {
@@ -10733,10 +10633,6 @@ break;
             return true;
         }
 
-        #endregion
-
-        #region Send/Say/Yell/Whisper/Messages
-
         public bool IsIgnoring(GameLiving source)
         {
             if (source is GamePlayer)
@@ -11094,10 +10990,6 @@ break;
             Out.SendMessage(message, chatType, chatLocation);
         }
 
-        #endregion
-
-        #region Steed
-
         /// <summary>
         /// Holds the GameLiving that is the steed of this player as weakreference
         /// </summary>
@@ -11277,10 +11169,6 @@ break;
                 player.Out.SendRiding(this, steed, false);
             }
         }
-
-        #endregion
-
-        #region Add/Move/Remove
 
         /// <summary>
         /// Called to create an player in the world and send the other
@@ -11710,10 +11598,6 @@ break;
             return false;
         }
 
-        #endregion
-
-        #region Group/Friendlist/guild
-
         private Guild m_guild;
         private DBRank m_guildRank;
 
@@ -11887,10 +11771,6 @@ break;
                 }
             }
         }
-
-        #endregion
-
-        #region X/Y/Z/Region/Realm/Position...
 
         /// <summary>
         /// Holds all areas this player is currently within
@@ -12686,9 +12566,6 @@ break;
         {
             Out.SendStatusUpdate();
         }
-        #endregion
-
-        #region Equipment/Encumberance
 
         /// <summary>
         /// Gets the total possible Encumberance
@@ -13531,9 +13408,6 @@ break;
             }
         }
 
-        #endregion
-
-        #region ReceiveItem/DropItem/PickupObject
         /// <summary>
         /// Receive an item from another living
         /// </summary>
@@ -13984,10 +13858,6 @@ break;
             return player.IsWithinRadius(obj, WorldMgr.VISIBILITY_DISTANCE);
         }
 
-        #endregion
-
-        #region Database
-
         /// <summary>
         /// Subtracts the current time from the last time the character was saved
         /// and adds it in the form of seconds to player.PlayedTime
@@ -14126,8 +13996,6 @@ break;
                 return; // no character => exit
             }
 
-            #region load class spec
-
             // first load spec's career
             LoadClassSpecializations(false);
 
@@ -14223,10 +14091,6 @@ break;
             // Load dependent skills
             RefreshSpecDependantSkills(false);
 
-            #endregion
-
-            #region disable ability
-
             // Since we added all the abilities that this character has, let's now disable the disabled ones!
             tmpStr = character.DisabledAbilities;
             if (tmpStr != null && tmpStr.Length > 0)
@@ -14249,8 +14113,6 @@ break;
                     }
                 }
             }
-
-            #endregion
 
             // Load the disabled spells
             tmpStr = character.DisabledSpells;
@@ -14429,8 +14291,6 @@ break;
             m_customFaceAttributes[(int)eCharFacePart.HairStyle] = DBCharacter.HairStyle;
             m_customFaceAttributes[(int)eCharFacePart.MoodType] = DBCharacter.MoodType;
 
-            #region guild handling
-
             // TODO: overwork guild handling (VaNaTiC)
             m_guildId = DBCharacter.GuildID;
             if (m_guildId != null)
@@ -14461,9 +14321,7 @@ break;
                 m_guildName = m_guild.Name;
                 m_guild.AddOnlineMember(this);
             }
-            #endregion
 
-            #region setting world-init-position (delegate to PlayerCharacter dont make sense)
             X = DBCharacter.Xpos;
             Y = DBCharacter.Ypos;
             Z = DBCharacter.Zpos;
@@ -14486,7 +14344,6 @@ break;
             {
                 m_lastUniqueLocations[i] = new GameLocation(null, CurrentRegionID, X, Y, Z);
             }
-            #endregion
 
             // stats first
             m_charStat[eStat.STR - eStat._First] = (short)DBCharacter.Strength;
@@ -14670,10 +14527,6 @@ break;
             }
         }
 
-        #endregion
-
-        #region CustomDialog
-
         /// <summary>
         /// Holds the delegates that calls
         /// </summary>
@@ -14687,10 +14540,6 @@ break;
             get { return m_customDialogCallback; }
             set { m_customDialogCallback = value; }
         }
-
-        #endregion
-
-        #region GetPronoun/GetExamineMessages
 
         /// <summary>
         /// Pronoun of this player in case you need to refer it in 3rd person
@@ -14872,10 +14721,6 @@ break;
             list.Add(message);
             return list;
         }
-
-        #endregion
-
-        #region Stealth / Wireframe
 
         bool m_isWireframe = false;
 
@@ -15391,10 +15236,6 @@ break;
             return IsWithinRadius(enemy, range);
         }
 
-        #endregion
-
-        #region Task
-
         /// <summary>
         /// Holding tasks of player
         /// </summary>
@@ -15408,10 +15249,6 @@ break;
             get { return m_task; }
             set { m_task = value; }
         }
-
-        #endregion
-
-        #region Mission
 
         private AbstractMission m_mission = null;
 
@@ -15432,10 +15269,6 @@ break;
                 }
             }
         }
-
-        #endregion
-
-        #region Quest
 
         /// <summary>
         /// Get the player ID used for quests.  Usually InternalID, provided for customization
@@ -15666,9 +15499,6 @@ break;
             return null;
         }
 
-        #endregion
-
-        #region Notify
         public override void Notify(DOLEvent e, object sender, EventArgs args)
         {
             CharacterClass.Notify(e, sender, args);
@@ -15717,9 +15547,6 @@ break;
         {
             Notify(e, null, args);
         }
-        #endregion
-
-        #region Crafting
 
         public object CraftingLock = new object();
 
@@ -16153,10 +15980,6 @@ break;
             Repair.BeginWork(this, item);
         }
 
-        #endregion
-
-        #region Housing
-
         /// <summary>
         /// Jumps the player out of the house he is in
         /// </summary>
@@ -16174,10 +15997,6 @@ break;
 
             house.Exit(this, false);
         }
-
-        #endregion
-
-        #region Trade
 
         /// <summary>
         /// Holds the trade window object
@@ -16265,10 +16084,6 @@ break;
                 return true;
             }
         }
-
-        #endregion
-
-        #region ControlledNpc
 
         /// <summary>
         /// Sets the controlled object for this player
@@ -16482,9 +16297,6 @@ break;
             Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.CommandNpcAttack.Denfensive", npc.Body.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             npc.SetAggressionState(eAggressionState.Defensive);
         }
-        #endregion
-
-        #region Shade
 
         protected ShadeEffect m_ShadeEffect = null;
 
@@ -16582,9 +16394,7 @@ break;
         {
             CharacterClass.Shade(state);
         }
-        #endregion
 
-        #region Siege Weapon
         private GameSiegeWeapon m_siegeWeapon;
 
         public GameSiegeWeapon SiegeWeapon
@@ -16597,9 +16407,6 @@ break;
         {
             Salvage.BeginWork(this, siegeWeapon);
         }
-        #endregion
-
-        #region Invulnerability
 
         /// <summary>
         /// The delegate for invulnerability expire callbacks
@@ -16709,10 +16516,6 @@ break;
                 }
             }
         }
-
-        #endregion
-
-        #region Player Titles
 
         /// <summary>
         /// Holds all players titles.
@@ -16834,10 +16637,6 @@ break;
                 Out.SendUpdatePlayer();
             }
         }
-
-        #endregion
-
-        #region Statistics
 
         /// <summary>
         /// Gets or sets the count of albion players killed.
@@ -17140,9 +16939,6 @@ break;
                 Notify(GamePlayerEvent.KillsEpicBossChanged, this);
             }
         }
-        #endregion
-
-        #region Controlled Mount
 
         protected RegionTimer m_whistleMountTimer;
         protected ControlledHorse m_controlledHorse;
@@ -17439,9 +17235,7 @@ break;
                 }
             }
         }
-        #endregion
 
-        #region GuildBanner
         protected GuildBanner m_guildBanner = null;
 
         /// <summary>
@@ -17494,9 +17288,6 @@ break;
             }
         }
 
-        #endregion
-
-        #region Champion Levels
         /// <summary>
         /// The maximum champion level a player can reach
         /// </summary>
@@ -17776,10 +17567,6 @@ break;
             Out.SendUpdatePoints();
             UpdatePlayerStatus();
         }
-
-        #endregion
-
-        #region Master levels
 
         /// <summary>
         /// The maximum ML level a player can reach
@@ -18066,9 +17853,6 @@ break;
             }
         }
 
-        #endregion
-
-        #region Minotaur Relics
         protected MinotaurRelic m_minoRelic = null;
 
         /// <summary>
@@ -18079,9 +17863,6 @@ break;
             get { return m_minoRelic; }
             set { m_minoRelic = value; }
         }
-        #endregion
-
-        #region Artifacts
 
         /// <summary>
         /// Checks if the player's class has at least one version of the artifact specified available to them.
@@ -18100,9 +17881,6 @@ break;
             return true;
         }
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Returns the string representation of the GamePlayer
         /// </summary>
@@ -18163,9 +17941,7 @@ break;
         {
             m_inventory = new GamePlayerInventory(this);
         }
-        #endregion
 
-        #region Delving
         /// <summary>
         /// Player is delving an item
         /// </summary>
@@ -18227,9 +18003,7 @@ break;
         {
             return this.GetBonusesInfo();
         }
-        #endregion
 
-        #region Combat Calc (unused ?)
         public virtual double GetEvadeChance()
         {
             double evadeChance = 0;
@@ -18344,9 +18118,7 @@ break;
 
             return Math.Round(parryChance * 10000) / 100;
         }
-        #endregion
 
-        #region Bodyguard
         /// <summary>
         /// True, if the player has been standing still for at least 3 seconds,
         /// else false.
@@ -18389,6 +18161,5 @@ break;
                     : null;
             }
         }
-        #endregion
     }
 }

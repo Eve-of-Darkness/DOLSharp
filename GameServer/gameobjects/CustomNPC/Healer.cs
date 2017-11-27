@@ -46,8 +46,6 @@ namespace DOL.GS
         {
         }
 
-        #region Examine/Interact Message
-
         /// <summary>
         /// Adds messages to ArrayList which are sent when object is targeted
         /// </summary>
@@ -134,6 +132,5 @@ namespace DOL.GS
 
             return;
         }
-        #endregion Examine/Interact Message
     }
 }

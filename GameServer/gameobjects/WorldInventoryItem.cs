@@ -218,7 +218,6 @@ namespace DOL.GS
             base.Delete();
         }
 
-        #region PickUpTimer
         private RegionTimer m_pickup;
 
         /// <summary>
@@ -269,7 +268,6 @@ namespace DOL.GS
                 return m_pickup.TimeUntilElapsed;
             }
         }
-        #endregion
 
         /// <summary>
         /// Gets the InventoryItem contained within this class

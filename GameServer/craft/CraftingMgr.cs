@@ -103,8 +103,6 @@ namespace DOL.GS
             return true;
         }
 
-        #region Global craft functions
-
         /// <summary>
         /// Return the crafting skill needed to work on the item
         /// </summary>
@@ -231,8 +229,5 @@ namespace DOL.GS
                     return 0;
             }
         }
-
-        #endregion
-
     }
 }

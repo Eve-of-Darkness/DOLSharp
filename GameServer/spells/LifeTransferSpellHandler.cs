@@ -147,8 +147,6 @@ namespace DOL.GS.Spells
 
             int heal = target.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, amount);
 
-            #region PVP DAMAGE
-
             long healedrp = 0;
 
             if (((Caster as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || Caster is GamePlayer)
@@ -184,8 +182,6 @@ namespace DOL.GS.Spells
                     joueur_a_considerer.Out.SendMessage($"Vous gagnez {Bonus_RP_Soin} points de royaume pour avoir soigné un membre de votre royaume.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
             }
-
-            #endregion PVP DAMAGE
 
             if (heal == 0)
             {

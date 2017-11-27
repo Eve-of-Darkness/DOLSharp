@@ -39,13 +39,11 @@ namespace DOL.GS.DatabaseUpdate
         "Usage: /unloadxmldb [FULL|TableName]")]
     public class UnloadXMLCommandHandler : AbstractCommandHandler, ICommandHandler
     {
-        #region ServerProperties
         /// <summary>
         /// Set Default Path for Unloading XML Package Directory
         /// </summary>
         [ServerProperty("xmlautoload", "xml_unload_db_directory", "Enforce directory path where the XML Packages are Unloaded From Database (Relative to Scripts or Absolute...)", "dbupdater/unload")]
         public static string XML_UNLOAD_DB_DIRECTORY { get; set; }
-        #endregion
 
         /// <summary>
         /// Defines a logger for this class.

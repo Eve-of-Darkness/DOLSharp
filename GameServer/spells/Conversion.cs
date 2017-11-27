@@ -96,8 +96,6 @@ namespace DOL.GS.Spells
                 MessageToCaster($"You convert {damageConverted} damage into health.", eChatType.CT_Spell);
                 Caster.Health = Caster.Health + damageConverted;
 
-                #region PVP DAMAGE
-
                 if (((ad.Target as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || ad.Target is GamePlayer)
                 {
                     if (ad.Target.DamageRvRMemory > 0)
@@ -105,9 +103,6 @@ namespace DOL.GS.Spells
                         ad.Target.DamageRvRMemory -= Math.Max(damageConverted, 0);
                     }
                 }
-
-                #endregion PVP DAMAGE
-
             }
             else
             {

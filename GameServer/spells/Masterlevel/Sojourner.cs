@@ -8,16 +8,13 @@ namespace DOL.GS.Spells
 {
     // http://www.camelotherald.com/masterlevels/ma.php?ml=Sojourner
     // no shared timer
-    #region Sojourner-1
     // Gameplayer - MaxEncumbrance
-    #endregion
 
     // ML2 Unending Breath - already handled in another area
 
     // ML3 Reveal Crystalseed - already handled in another area
 
     // no shared timer
-    #region Sojourner-4
     [SpellHandler("UnmakeCrystalseed")]
     public class UnmakeCrystalseedSpellHandler : SpellHandler
     {
@@ -52,10 +49,8 @@ namespace DOL.GS.Spells
 
         public UnmakeCrystalseedSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // no shared timer
-    #region Sojourner-5
     [SpellHandler("AncientTransmuter")]
     public class AncientTransmuterSpellHandler : SpellHandler
     {
@@ -115,10 +110,8 @@ namespace DOL.GS.Spells
             }
         }
     }
-    #endregion
 
     // no shared timer
-    #region Sojourner-6
     [SpellHandler("Port")]
     public class Port : MasterlevelHandling
     {
@@ -147,10 +140,8 @@ namespace DOL.GS.Spells
             }
         }
     }
-    #endregion
 
     // no shared timer
-    #region Sojourner-7
     [SpellHandler("EssenceResist")]
     public class EssenceResistHandler : AbstractResistBuff
     {
@@ -160,10 +151,8 @@ namespace DOL.GS.Spells
 
         public EssenceResistHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion Sojourner-7
 
     // no shared timer
-    #region Sojourner-8
     [SpellHandler("Zephyr")]
     public class FZSpellHandler : MasterlevelHandling
     {
@@ -359,10 +348,8 @@ namespace DOL.GS.Spells
 
         public FZSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // no shared timer
-    #region Sojourner-9
     [SpellHandler("Phaseshift")]
     public class PhaseshiftHandler : MasterlevelHandling
     {
@@ -426,10 +413,8 @@ namespace DOL.GS.Spells
         // constructor
         public PhaseshiftHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // no shared timer
-    #region Sojourner-10
     [SpellHandler("Groupport")]
     public class Groupport : MasterlevelHandling
     {
@@ -488,5 +473,4 @@ namespace DOL.GS.Spells
             }
         }
     }
-    #endregion
 }

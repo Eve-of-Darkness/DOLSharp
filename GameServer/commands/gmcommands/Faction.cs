@@ -49,7 +49,6 @@ namespace DOL.GS.Commands
             Faction myfaction = (Faction)client.Player.TempProperties.getProperty<object>(TEMP_FACTION_LAST, null);
             switch (args[1])
             {
-                #region Create
                 case "create":
                     {
                         if (args.Length < 4)
@@ -102,8 +101,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion Create
-                #region Assign
+
                 case "assign":
                     {
                         if (myfaction == null)
@@ -124,8 +122,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion Assign
-                #region AddFriend
+
                 case "addfriend":
                     {
                         if (myfaction == null)
@@ -167,8 +164,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion AddFriend
-                #region AddEnemy
+
                 case "addenemy":
                     {
                         if (myfaction == null)
@@ -210,8 +206,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion AddEnemy
-                #region List
+
                 case "list":
                     {
                         foreach (Faction faction in FactionMgr.Factions.Values)
@@ -221,8 +216,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion List
-                #region Select
+
                 case "select":
                     {
                         if (args.Length < 3)
@@ -253,14 +247,12 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion Select
-                #region Default
+
                 default:
                     {
                         DisplaySyntax(client);
                         return;
                     }
-                #endregion Default
             }
         }
     }

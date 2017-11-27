@@ -56,7 +56,6 @@ namespace DOL.GS.ServerProperties
 
         // Properties: feel free to improve the SPs in the
         // categories below, or extend the category list.
-        #region SYSTEM / DEBUG
 
         /// <summary>
         /// Enable Debug mode - used to alter some features during server startup to make debugging easier
@@ -308,9 +307,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("system", "use_npcguildscripts", "Use the NPC Guild Scripts", true)]
         public static bool USE_NPCGUILDSCRIPTS { get; set; }
 
-        #endregion
-
-        #region LOGGING
         /// <summary>
         /// Turn on logging of player vs player kills
         /// </summary>
@@ -376,9 +372,6 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("log", "log_inventory_other", "Enable other logging in inventory log (log_inventory must be enabled)", true)]
         public static bool LOG_INVENTORY_OTHER { get; set; }
-        #endregion
-
-        #region SERVER
 
         /// <summary>
         /// Disable quit timers for players?
@@ -548,9 +541,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("server", "use_new_tooltip_forcedupdate", "Set to true if you wish to enable the new 1.110+ Tooltip Forced update each time the server send a skill to a new client.", true)]
         public static bool USE_NEW_TOOLTIP_FORCEDUPDATE { get; set; }
 
-        #endregion
-
-        #region WORLD
         /// <summary>
         /// Epic encounters strength: 100 is 100% base strength
         /// </summary>
@@ -773,9 +763,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("world", "losmgr_contamination_zfactor", "Line of Sight (LoS) Manager Contamination will use this to lower or raise the Z checks when updating LoS checks. 0 = Z must be exact, 1 = Z range is radius.", 0.5)]
         public static double LOSMGR_CONTAMINATION_ZFACTOR { get; set; }
 
-        #endregion
-
-        #region RATES
         /// <summary>
         /// Xp Cap for a player.  Given in percent of level.  Default is 125%
         /// </summary>
@@ -974,9 +961,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("rates", "relic_owning_bonus", "Relic Owning Bonus in percent per relic (default 10%) in effect when owning enemy relic", (short)10)]
         public static short RELIC_OWNING_BONUS { get; set; }
 
-        #endregion
-
-        #region NPCs
         /// <summary>
         /// Base Value to use when auto-setting STR stat.
         /// </summary>
@@ -1154,9 +1138,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("npc", "gamenpc_chances_to_cast", "Change the chance to cast a spell for a mob or a pet", 25)]
         public static int GAMENPC_CHANCES_TO_CAST { get; set; }
 
-        #endregion
-
-        #region PVP / RVR
         /// <summary>
         /// Grace period in minutes to allow relog near enemy structure after link death
         /// </summary>
@@ -1246,9 +1227,7 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("pvp", "pvp_death_con_loss", "Loose con on pvp death on PvP servertype", true)]
         public static bool PVP_DEATH_CON_LOSS { get; set; }
-        #endregion
 
-        #region KEEPS
         /// <summary>
         /// Number of seconds between allowed LOS checks for keep guards
         /// </summary>
@@ -1483,9 +1462,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("keeps", "allow_tower_climb", "Do you allowed player to climb towers? Set True for yes, False for not.", false)]
         public static bool ALLOW_TOWER_CLIMB { get; set; }
 
-        #endregion
-
-        #region PVE / TOA
         /// <summary>
         /// Adjustment to missrate per number of attackers
         /// </summary>
@@ -1595,9 +1571,7 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("pve", "lootgenerator_dreadedseals_named_chance", "Increase chance of Dreaded Seals Loot Generator drop for Named mobs. (count * lootgenerator_dreadedseals_named_chance)", 1.5)]
         public static double LOOTGENERATOR_DREADEDSEALS_NAMED_CHANCE { get; set; }
-        #endregion
 
-        #region HOUSING
         /// <summary>
         /// Maximum number of houses supported on this server.  Limits the size of the housing array used for updates
         /// </summary>
@@ -1706,10 +1680,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("housing", "market_search_limit", "How many items can the market search return?", 300)]
         public static int MARKET_SEARCH_LIMIT { get; set; }
 
-        #endregion
-
-        #region CLASSES
-
         /// <summary>
         /// Disable some classes from being created
         /// </summary>
@@ -1797,10 +1767,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("classes", "allow_old_archery", "Should we allow archers to be able to use arrows from their quiver?", false)]
         public static bool ALLOW_OLD_ARCHERY { get; set; }
 
-        #endregion
-
-        #region SPELLS
-
         /// <summary>
         /// Spells-related properties
         /// </summary>
@@ -1819,9 +1785,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("spells", "spell_charm_named_check", "Prevents charm spell to work on Named Mobs, 0 = disable, 1 = enable", 1)]
         public static int SPELL_CHARM_NAMED_CHECK { get; set; }
 
-        #endregion
-
-        #region GUILDS / ALLIANCES
         /// <summary>
         /// The max number of guilds in an alliance
         /// </summary>
@@ -1900,9 +1863,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("guild", "guild_banner_lost_time", "When a banner is lost to the enemy how many minutes is the wait before purchase is allowed?", (ushort)1440)]
         public static ushort GUILD_BANNER_LOST_TIME { get; set; }
 
-        #endregion
-
-        #region CRAFT / SALVAGE
         /// <summary>
         /// The crafting speed modifier
         /// </summary>
@@ -1939,9 +1899,6 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("salvage", "use_new_salvage", "Enable to use a new system calcul of salvage count based on object_type.", false)]
         public static bool USE_NEW_SALVAGE { get; set; }
 
-        #endregion
-
-        #region ACCOUNT
         /// <summary>
         /// Allow auto-account creation  This is also set in serverconfig.xml and must be enabled for this property to work.
         /// </summary>
@@ -1971,8 +1928,6 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("account", "backup_deleted_characters", "Should we backup deleted characters and not delete associated content?", true)]
         public static bool BACKUP_DELETED_CHARACTERS { get; set; }
-
-        #endregion
 
         public static IDictionary<string, object> AllCurrentProperties
         {

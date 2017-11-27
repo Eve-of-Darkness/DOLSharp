@@ -58,8 +58,6 @@ namespace DOL.GS
             get { return HousingConstants.VaultSize; }
         }
 
-        #region IHouseHookpointItem Members
-
         /// <summary>
         /// Template ID for this vault.
         /// </summary>
@@ -162,8 +160,6 @@ namespace DOL.GS
 
             return true;
         }
-
-        #endregion
 
         public override string GetOwner(GamePlayer player = null)
         {

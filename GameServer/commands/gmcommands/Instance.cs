@@ -71,14 +71,12 @@ namespace DOL.GS.Commands
 
             switch (args[1].ToLower())
             {
-                #region SetInstanceID
                 case "key":
                     string newKey = string.Join(" ", args, 2, args.Length - 2);
                     client.Player.TempProperties.setProperty(INSTANCE_KEY, newKey);
                     SendMessage(client, "Instance key set to " + newKey);
                     break;
-                #endregion
-                #region Create Entry
+
                 case "entry":
                     {
                         try
@@ -196,8 +194,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion
-                #region remove
+
                 case "remove":
                     {
                         GameObject obj = client.Player.TargetObject;
@@ -225,8 +222,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion
-                #region create
+
                 case "create":
                     {
                         if (player.CurrentRegion.IsInstance)
@@ -272,8 +268,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion
-                #region close
+
                 case "close":
                     {
                         Instance newInstance = player.TempProperties.getProperty<object>(key, null) as Instance;
@@ -298,8 +293,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion
-                #region test
+
                 case "test":
                     {
                         if (player.CurrentRegion.IsInstance)
@@ -357,8 +351,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion
-                #region exit
+
                 case "exit":
                     {
                         if (!player.CurrentRegion.IsInstance)
@@ -385,7 +378,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion
             }
 
             return;

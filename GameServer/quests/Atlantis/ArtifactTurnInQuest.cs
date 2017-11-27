@@ -33,8 +33,6 @@ namespace DOL.GS.Quests.Atlantis
     // Serialize string: <dmgtype>;<weptype>;<stat>
     public class ArtifactTurnInQuest : ArtifactQuest
     {
-        #region Member/Static variables
-
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
@@ -70,8 +68,6 @@ namespace DOL.GS.Quests.Atlantis
         /// The current types to pick from
         /// </summary>
         public List<string> CurrentTypes { get; private set; }
-
-        #endregion
 
         public ArtifactTurnInQuest()
         { }
@@ -137,8 +133,6 @@ namespace DOL.GS.Quests.Atlantis
             return options;
         }
 
-        #region Load/Check
-
         public static void Init()
         {
             if (!ServerProperties.Properties.LOAD_QUESTS)
@@ -150,8 +144,6 @@ namespace DOL.GS.Quests.Atlantis
             {
                 Log.Info("Quest \"" + QuestTitle + "\" initializing ...");
             }
-
-            #region defineNPCs
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>($"{LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "ArtifactTurnInQuest.Init.ArtifactScholarFemale")} Alaria", eRealm.Midgard);
             if (npcs.Length == 0)
@@ -247,8 +239,6 @@ namespace DOL.GS.Quests.Atlantis
                 _scholarElmer = npcs[0] as ArtifactScholar;
             }
 
-            #endregion
-
             _scholarAlaria?.AddQuestToGive(typeof(ArtifactTurnInQuest));
             _scholarJarron?.AddQuestToGive(typeof(ArtifactTurnInQuest));
             _scholarElmer?.AddQuestToGive(typeof(ArtifactTurnInQuest));
@@ -283,10 +273,6 @@ namespace DOL.GS.Quests.Atlantis
                     player.IsDoingQuest(GetType()) == null &&
                     artCheck;
         }
-
-        #endregion
-
-        #region TalkTo/Receive Item
 
         /// <summary>
         /// Handle an item given to the scholar.
@@ -583,8 +569,6 @@ namespace DOL.GS.Quests.Atlantis
                 ChosenTypes = string.Empty;
             }
         }
-
-        #endregion
 
         public override void FinishQuest()
         {

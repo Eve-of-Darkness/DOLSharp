@@ -167,8 +167,6 @@ namespace DOL.GS.Keeps
             }
         }
 
-        #region Teleporter Effect
-
         protected TeleporterEffect sfx;
 
         public override bool AddToWorld()
@@ -208,6 +206,5 @@ namespace DOL.GS.Keeps
 
             return true;
         }
-        #endregion
     }
 }

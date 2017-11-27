@@ -25,8 +25,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.UseSlot, "Handle Player Use Slot Request.", eClientStatus.PlayerInGame)]
     public class UseSlotHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int flagSpeedData = packet.ReadShort();
@@ -35,10 +33,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             new UseSlotAction(client.Player, flagSpeedData, slot, type).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: UseSlotAction
 
         /// <summary>
         /// Handles player use slot actions
@@ -95,7 +89,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 player.UseSlot(_slot, _useType);
             }
         }
-
-        #endregion
     }
 }

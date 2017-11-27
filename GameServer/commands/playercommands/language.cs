@@ -49,15 +49,12 @@ namespace DOL.GS.Commands
 
             switch (args[1].ToLower())
             {
-                #region current
                 case "current":
                     {
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Players.Language.Current"), client.Account.Language);
                         return;
                     }
-                #endregion current
 
-                #region set
                 case "set":
                     {
                         if (args.Length < 3)
@@ -77,9 +74,7 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Players.Language.Set", args[2].ToUpper()));
                         return;
                     }
-                #endregion set
 
-                #region show
                 case "show":
                     {
                         string languages = string.Empty;
@@ -103,7 +98,6 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Players.Language.AvailableLanguages", languages));
                         return;
                     }
-                #endregion show
 
                 default:
                     {

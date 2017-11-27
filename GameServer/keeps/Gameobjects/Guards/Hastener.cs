@@ -30,8 +30,6 @@ namespace DOL.GS.Keeps
             get { return eFlags.PEACE; }
         }
 
-        #region Examine/Interact Message
-
         /// <summary>
         /// Adds messages to ArrayList which are sent when object is targeted
         /// </summary>
@@ -55,6 +53,5 @@ namespace DOL.GS.Keeps
             GameNPCHelper.CastSpellOnOwnerAndPets(this, player, SkillBase.GetSpellByID(GameHastener.SPEEDOFTHEREALMID), SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells), false);
             return true;
         }
-        #endregion Examine/Interact Message
     }
 }

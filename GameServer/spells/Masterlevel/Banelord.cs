@@ -6,7 +6,6 @@ namespace DOL.GS.Spells
 {
     // http://www.camelotherald.com/masterlevels/ma.php?ml=Banelord
     // shared timer 1
-    #region Banelord-1
     [SpellHandler("CastingSpeedDebuff")]
     public class CastingSpeedDebuff : MasterlevelDebuffHandling
     {
@@ -21,10 +20,8 @@ namespace DOL.GS.Spells
         // constructor
         public CastingSpeedDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 5 for ml2 - shared timer 3 for ml8
-    #region Banelord-2/8
     [SpellHandler("PBAEDamage")]
     public class PBAEDamage : MasterlevelHandling
     {
@@ -115,10 +112,8 @@ namespace DOL.GS.Spells
             return 25;
         }
     }
-    #endregion
 
     // shared timer 3
-    #region Banelord-3
     [SpellHandler("Oppression")]
     public class OppressionSpellHandler : MasterlevelHandling
     {
@@ -169,10 +164,8 @@ namespace DOL.GS.Spells
 
         public OppressionSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 1
-    #region Banelord-4
     [SpellHandler("MLFatDebuff")]
     public class MLFatDebuffHandler : MasterlevelDebuffHandling
     {
@@ -204,10 +197,8 @@ namespace DOL.GS.Spells
         // constructor
         public MLFatDebuffHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
     }
-    #endregion
 
     // shared timer 5
-    #region Banelord-5
     [SpellHandler("MissHit")]
     public class MissHit : MasterlevelBuffHandling
     {
@@ -216,11 +207,9 @@ namespace DOL.GS.Spells
         // constructor
         public MissHit(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 1
-    #region Banelord-6
-    #region ML6Snare
+
     [SpellHandler("MLUnbreakableSnare")]
     public class MLUnbreakableSnare : BanelordSnare
     {
@@ -250,8 +239,6 @@ namespace DOL.GS.Spells
         }
     }
 
-    #endregion
-    #region ML6Stun
     [SpellHandler("UnrresistableNonImunityStun")]
     public class UnrresistableNonImunityStun : MasterlevelHandling
     {
@@ -356,11 +343,8 @@ namespace DOL.GS.Spells
         {
         }
     }
-    #endregion
-    #endregion
 
     // shared timer 3
-    #region Banelord-7
     [SpellHandler("BLToHit")]
     public class BLToHit : MasterlevelBuffHandling
     {
@@ -369,10 +353,8 @@ namespace DOL.GS.Spells
         // constructor
         public BLToHit(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 5
-    #region Banelord-9
     [SpellHandler("EffectivenessDebuff")]
     public class EffectivenessDeBuff : MasterlevelHandling
     {
@@ -421,10 +403,8 @@ namespace DOL.GS.Spells
 
         public EffectivenessDeBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // no shared timer
-    #region Banelord-10
     [SpellHandler("Banespike")]
     public class BanespikeHandler : MasterlevelBuffHandling
     {
@@ -433,10 +413,7 @@ namespace DOL.GS.Spells
 
         public BanespikeHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 }
-
-#region MisshitCalc
 
 namespace DOL.GS.PropertyCalc
 {
@@ -461,5 +438,3 @@ namespace DOL.GS.PropertyCalc
         }
     }
 }
-
-#endregion

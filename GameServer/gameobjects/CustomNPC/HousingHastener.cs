@@ -42,8 +42,6 @@ namespace DOL.GS
 
         public const int SPEEDOFTHEREALMID = 2430;
 
-        #region Examine/Interact Message
-
         /// <summary>
         /// Adds messages to ArrayList which are sent when object is targeted
         /// </summary>
@@ -79,6 +77,5 @@ namespace DOL.GS
 
             return true;
         }
-        #endregion Examine/Interact Message
     }
 }

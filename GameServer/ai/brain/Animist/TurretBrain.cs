@@ -270,8 +270,6 @@ namespace DOL.AI.Brain
             return base.Stop();
         }
 
-        #region AI
-
         public override void FollowOwner()
         {
         }
@@ -295,7 +293,5 @@ namespace DOL.AI.Brain
         public override void Stay()
         {
         }
-
-        #endregion
     }
 }

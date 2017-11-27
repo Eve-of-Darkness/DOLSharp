@@ -108,8 +108,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.TheBirthdayGift.NPCBarkeepNognar"), (eRealm)2);
 
@@ -208,10 +207,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 BarkeepPrugar = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
         rattlingskeletonpendant = GameServer.Database.FindObjectByKey<ItemTemplate>("rattlingskeletonpendant");
             if (rattlingskeletonpendant == null)
@@ -359,14 +354,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(giftandnoteforprugar);
                 }
 
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
-
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(thebirthdaygift));
             QuestBehaviour a;
             a = builder.CreateBehaviour(BarkeepNognar,-1);
@@ -462,9 +449,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.FinishQuest,typeof(DOL.GS.Quests.Midgard.thebirthdaygift),null);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             if (BarkeepNognar != null) {

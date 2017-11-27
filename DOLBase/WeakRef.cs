@@ -64,14 +64,10 @@ namespace DOL
             set { base.Target = value ?? Null; }
         }
 
-        #region Nested type: NullValue
-
         private class NullValue
         {
         } 
 
 ;
-
-        #endregion
     }
 }

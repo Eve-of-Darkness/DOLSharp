@@ -208,8 +208,6 @@ namespace DOL.GS
             return abilityGained;
         }
 
-        #region Delve
-
         /// <summary>
         /// Artifact delve information.
         /// </summary>
@@ -844,7 +842,5 @@ namespace DOL.GS
 
             return false;
         }
-
-        #endregion
     }
 }

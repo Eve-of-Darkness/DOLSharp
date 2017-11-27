@@ -119,8 +119,6 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Danica", eRealm.Midgard);
 
             if (npcs.Length == 0)
@@ -188,9 +186,6 @@ namespace DOL.GS.Quests.Midgard
             }
 
             // end npc
-            #endregion
-
-            #region defineItems
 
             kelics_totem = GameServer.Database.FindObjectByKey<ItemTemplate>("kelics_totem");
             if (kelics_totem == null)
@@ -1036,7 +1031,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(BonedancerEpicArms);
                 }
             }
-            #region Warlock
             WarlockEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("WarlockEpicBoots");
             if (WarlockEpicBoots == null)
             {
@@ -1350,10 +1344,8 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(WarlockEpicArms);
                 }
             }
-            #endregion
 
             // Item Descriptions End
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
@@ -1714,8 +1706,6 @@ namespace DOL.GS.Quests.Midgard
             }
         }
 
-        #region Allakhazam Epic Source
-
         /*
         *#25 talk to Inaksha
         *#26 seek out Loken in Raumarik Loc 47k, 25k, 4k, and kill him purp and 2 blue adds
@@ -1747,7 +1737,5 @@ Raven-Boned Pants
 Raven-Boned Sleeves
 Bone-rune Vest
         */
-
-        #endregion
     }
 }

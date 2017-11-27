@@ -47,20 +47,12 @@ namespace DOL.GS.Quests
 
         private const string NumberOfExecutions = "quest.numberOfExecutions";
 
-        #region Variables
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Type of quest this questpart belnogs to
         /// </summary>
         public Type QuestType { get; set; }
 
         public int MaxNumberOfExecutions { get; }
-
-        #endregion
 
         /// <summary>
         /// Creates a QuestPart for the given questtype with the default npc.

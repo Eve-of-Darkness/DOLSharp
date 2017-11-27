@@ -49,8 +49,6 @@ namespace DOL.GS
             m_itemToCombine.Add(item);
         }
 
-        #region Fields
-
         /// <summary>
         /// Holds a list of items used to combine with
         /// </summary>
@@ -71,10 +69,6 @@ namespace DOL.GS
         /// Stores the begin changes count
         /// </summary>
         protected int m_changesCount;
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Returns the array of items used to combine with
@@ -175,10 +169,6 @@ namespace DOL.GS
                 m_owner.Out.SendMessage("Combine flag is autoset while self-crafting!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
         }
-
-        #endregion
-
-        #region Add/Remove/Update
 
         /// <summary>
         /// The max amount of items that can be added to tradewindow
@@ -317,10 +307,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region AcceptTrade/CloseTrade
-
         /// <summary>
         /// Called each time a player push the accept button to accept the trade
         /// </summary>
@@ -384,6 +370,5 @@ namespace DOL.GS
                 m_owner.TradeWindow = null;
             }
         }
-        #endregion
     }
 }

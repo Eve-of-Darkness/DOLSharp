@@ -71,8 +71,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
-
             // item db check
             RecruitsQuiltedVest = GameServer.Database.FindObjectByKey<ItemTemplate>("k109_recruits_quilted_vest");
             if (RecruitsQuiltedVest == null)
@@ -208,7 +206,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(RecruitsStuddedVest);
             }
-            #endregion
 
             // Skeleton Skull
             ItemTemplate skeletonskull = new ItemTemplate();
@@ -251,8 +248,6 @@ namespace DOL.GS.Quests.Albion
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Cemmeth Budgwold", eRealm.Albion);
 
@@ -301,8 +296,6 @@ namespace DOL.GS.Quests.Albion
             {
                 CemmethBudgwold = npcs[0];
             }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

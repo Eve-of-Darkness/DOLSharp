@@ -289,8 +289,6 @@ namespace DOL.Database.Tests
         public TestTablePrecachedPrimaryKey() { }
     }
 
-    #region Custom Tables
-
     /// <summary>
     /// Test table handling Custom Params
     /// </summary>
@@ -336,5 +334,4 @@ namespace DOL.Database.Tests
     {
         public TableNotRegistered() { }
     }
-    #endregion
 }

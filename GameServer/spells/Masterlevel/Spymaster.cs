@@ -27,11 +27,8 @@ using DOL.Database;
 namespace DOL.GS.Spells
 {
     // http://www.camelotherald.com/masterlevels/ma.php?ml=Spymaster
-    #region Spymaster-1
     // AbstractServerRules OnPlayerKilled
-    #endregion
 
-    #region Spymaster-2
     [SpellHandler("Decoy")]
     public class DecoySpellHandler : SpellHandler
     {
@@ -143,14 +140,9 @@ namespace DOL.GS.Spells
             decoy.GuildName = string.Empty;
         }
     }
-    #endregion
-
-    #region Spymaster-3
 
     // Gameliving - StartWeaponMagicalEffect
-    #endregion
 
-    #region Spymaster-4
     [SpellHandler("Sabotage")]
     public class SabotageSpellHandler : SpellHandler
     {
@@ -167,10 +159,8 @@ namespace DOL.GS.Spells
 
         public SabotageSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 1
-    #region Spymaster-5
     [SpellHandler("TangleSnare")]
     public class TangleSnareSpellHandler : MineSpellHandler
     {
@@ -222,10 +212,8 @@ namespace DOL.GS.Spells
             trap = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
-    #endregion
 
     // shared timer 1
-    #region Spymaster-6
     [SpellHandler("PoisonSpike")]
     public class PoisonSpikeSpellHandler : MineSpellHandler
     {
@@ -278,7 +266,6 @@ namespace DOL.GS.Spells
         }
     }
 
-    #region Subspell
     [SpellHandler("PoisonspikeDot")]
     public class Spymaster6DotHandler : DoTSpellHandler
     {
@@ -292,10 +279,7 @@ namespace DOL.GS.Spells
             return new GameSpellEffect(this, Spell.Duration, SpellLine.IsBaseLine ? 5000 : 4000, effectiveness);
         }
     }
-    #endregion
-    #endregion
 
-    #region Spymaster-7
     [SpellHandler("Loockout")]
     public class LoockoutSpellHandler : SpellHandler
     {
@@ -360,10 +344,8 @@ namespace DOL.GS.Spells
 
         public LoockoutSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 1
-    #region Spymaster-8
     [SpellHandler("SiegeWrecker")]
     public class SiegeWreckerSpellHandler : MineSpellHandler
     {
@@ -445,9 +427,7 @@ namespace DOL.GS.Spells
             trap = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
-    #endregion
 
-    #region Spymaster-9
     [SpellHandler("EssenceFlare")]
     public class EssenceFlareSpellHandler : SummonItemSpellHandler
     {
@@ -469,10 +449,8 @@ namespace DOL.GS.Spells
             }
             }
         }
-    #endregion
 
-        #region Spymaster-10
-        [SpellHandler("BlanketOfCamouflage")]
+    [SpellHandler("BlanketOfCamouflage")]
         public class GroupstealthHandler : MasterlevelHandling
         {
             public GroupstealthHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -570,8 +548,7 @@ namespace DOL.GS.Spells
                 }
             }
         }
-        #endregion
-    }
+}
 
     // to show an Icon & informations to the caster
     namespace DOL.GS.Effects

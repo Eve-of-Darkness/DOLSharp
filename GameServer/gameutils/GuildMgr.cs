@@ -652,8 +652,6 @@ namespace DOL.GS
         /// </summary>
         public class GuildMemberDisplay
         {
-            #region Members
-
             string m_internalID;
 
             public string InternalID
@@ -715,8 +713,6 @@ namespace DOL.GS
                 get { return m_guildNote; }
                 set { m_guildNote = value; }
             }
-
-            #endregion
 
             public string this[eSocialWindowSortColumn i]
             {

@@ -21,18 +21,12 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PlayerSitRequest, "Handles Player Sit Request.", eClientStatus.PlayerInGame)]
     public class PlayerSitRequestHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             var status = (byte)packet.ReadByte();
 
             new SitRequestHandler(client.Player, status != 0x00).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: SitRequestHandler
 
         /// <summary>
         /// Handles player sit requests
@@ -64,7 +58,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 player.Sit(_sit);
             }
         }
-
-        #endregion
     }
 }

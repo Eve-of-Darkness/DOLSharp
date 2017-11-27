@@ -131,8 +131,6 @@ namespace DOL.GS
             }
         }
 
-        #region Properties
-
         private int m_locked;
         /// <summary>
         /// door open = 0 / lock = 1
@@ -212,8 +210,6 @@ namespace DOL.GS
                 }
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Call this function to open the door

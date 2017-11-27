@@ -73,7 +73,6 @@ namespace DOL.GS.Spells
             }
         }
 
-        #region Moon Mace
         private ItemTemplate Mace
         {
             get
@@ -235,9 +234,7 @@ namespace DOL.GS.Spells
                 return m_MoonMace;
             }
         }
-        #endregion End of Moon Mace
 
-        #region Moon Staff
         private ItemTemplate Staff
         {
             get
@@ -291,7 +288,6 @@ namespace DOL.GS.Spells
                 return m_MoonStaff;
             }
         }
-        #endregion End of Moon Staff
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {

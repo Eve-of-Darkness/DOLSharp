@@ -21,7 +21,6 @@ namespace DOL.GS
         public const string PLAYER_CARRY_RELIC_WEAK = "IAmCarryingARelic";
         protected const int RelicEffectInterval = 4000;
 
-        #region declarations
         InventoryItem m_item;
         GamePlayer m_currentCarrier = null;
         GameRelicPad m_currentRelicPad = null;
@@ -124,9 +123,6 @@ namespace DOL.GS
             return player.TempProperties.getProperty<object>(PLAYER_CARRY_RELIC_WEAK, null) != null;
         }
 
-        #endregion
-
-        #region constructor
         public GameRelic() : base() { m_saveInDB = true; }
 
         public GameRelic(DBRelic obj)
@@ -134,9 +130,7 @@ namespace DOL.GS
         {
             LoadFromDatabase(obj);
         }
-        #endregion
 
-        #region behavior
         /// <summary>
         /// This method is called whenever a player tries to interact with this object
         /// </summary>
@@ -186,8 +180,6 @@ namespace DOL.GS
             SaveIntoDatabase();
             AddToWorld();
         }
-
-        #region protected stuff
 
         protected virtual void Update()
         {
@@ -476,10 +468,6 @@ namespace DOL.GS
             PlayerLoosesRelic(true);
         }
 
-        #endregion
-
-        #endregion
-
         public override IList GetExamineMessages(GamePlayer player)
         {
 
@@ -488,7 +476,6 @@ namespace DOL.GS
             return messages;
         }
 
-        #region database load/save
         /// <summary>
         /// Loads the GameRelic from Database
         /// </summary>
@@ -562,9 +549,6 @@ namespace DOL.GS
                 GameServer.Database.SaveObject(m_dbRelic);
             }
         }
-        #endregion
-
-        #region utils
 
         /// <summary>
         /// Returns a Template for Name and Model for the relic
@@ -630,7 +614,5 @@ namespace DOL.GS
 
             return m_template;
         }
-        #endregion
-
     }
 }

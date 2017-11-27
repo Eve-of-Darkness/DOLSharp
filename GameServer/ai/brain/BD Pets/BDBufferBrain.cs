@@ -38,8 +38,6 @@ namespace DOL.AI.Brain
         /// <param name="owner"></param>
         public BDBufferBrain(GameLiving owner) : base(owner) { }
 
-        #region AI
-
         /// <summary>
         /// Checks the Abilities
         /// </summary>
@@ -56,7 +54,6 @@ namespace DOL.AI.Brain
             GameLiving owner = null;
             switch (spell.SpellType)
             {
-                #region Buffs
                 case "CombatSpeedBuff":
                 case "DamageShield":
                 case "Bladeturn":
@@ -116,7 +113,6 @@ namespace DOL.AI.Brain
 
                         break;
                     }
-                #endregion
             }
 
             if (Body.TargetObject != null)
@@ -140,7 +136,5 @@ namespace DOL.AI.Brain
         /// Checks Instant Spells.  Handles Taunts, shouts, stuns, etc.
         /// </summary>
         protected override bool CheckInstantSpells(Spell spell) { return false; }
-
-        #endregion
     }
 }

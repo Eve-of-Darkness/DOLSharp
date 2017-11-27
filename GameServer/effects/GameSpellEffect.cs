@@ -34,8 +34,6 @@ namespace DOL.GS.Effects
     /// </summary>
     public class GameSpellEffect : IGameEffect, IConcentrationEffect
     {
-        #region private internal
-
         /// <summary>
         /// Lock object for thread access
         /// </summary>
@@ -45,10 +43,6 @@ namespace DOL.GS.Effects
         /// Defines a logger for this class.
         /// </summary>
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        #endregion
-
-        #region Protected / Getters
 
         /// <summary>
         /// The spell handler of this effect
@@ -159,9 +153,6 @@ namespace DOL.GS.Effects
         /// The timer for pulsing effects
         /// </summary>
         protected PulsingEffectTimer m_timer;
-        #endregion
-
-        #region public Getters
 
         /// <summary>
         /// Name of the effect
@@ -272,9 +263,6 @@ namespace DOL.GS.Effects
             get { return IsExpired && m_timer != null && m_timer.IsAlive; }
         }
 
-        #endregion
-
-        #region Constructor
         /// <summary>
         /// Creates a new game spell effect
         /// </summary>
@@ -301,9 +289,6 @@ namespace DOL.GS.Effects
             m_expired = true; // not started = expired
             m_disabled = true; // not enabled
         }
-        #endregion
-
-        #region effect enable/disable
 
         /// <summary>
         /// Enable Effect on Target Without Adding
@@ -516,9 +501,6 @@ namespace DOL.GS.Effects
                 }
             }
         }
-        #endregion
-
-        #region effects methods
 
         /// <summary>
         /// Starts the effect
@@ -752,7 +734,6 @@ namespace DOL.GS.Effects
                 SpellHandler.OnEffectPulse(this);
             }
         }
-        #endregion
 
         /// <summary>
         /// Delve information
@@ -838,7 +819,6 @@ namespace DOL.GS.Effects
             UpdateEffect();
         }
 
-        #region timer subclass
         /// <summary>
         /// Handles effect pulses
         /// </summary>
@@ -927,6 +907,5 @@ namespace DOL.GS.Effects
                 return string.Format(" effect: ({0})", m_effect);
             }
         }
-        #endregion
     }
 }

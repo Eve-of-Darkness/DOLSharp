@@ -44,8 +44,6 @@ namespace DOL.GS
 
         public Dictionary<string, List<string>> CustomParamsDictionary { get; set; }
 
-        #region member access properties
-        #region warlocks
         public bool IsPrimary { get; }
 
         public bool IsSecondary { get; }
@@ -58,7 +56,6 @@ namespace DOL.GS
 
         public int OverrideRange { get; set; }
 
-        #endregion
         public ushort ClientEffect { get; }
 
         public string Description { get; } = string.Empty;
@@ -176,8 +173,6 @@ namespace DOL.GS
                 return target == "enemy" || target == "area" || target == "cone";
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Returns the string representation of the Spell
@@ -363,8 +358,6 @@ namespace DOL.GS
             delve.Add($"Target: {target}");
         }
 
-        #region Spell Helpers
-
         /// <summary>
         /// Whether or not the spell is instant cast.
         /// </summary>
@@ -425,9 +418,6 @@ namespace DOL.GS
         /// </summary>
         public bool IsPulsingEffect => Frequency > 0 && !IsPulsing;
 
-        #endregion
-        #region utils
-
         public ushort InternalIconID => this.GetParamValue<ushort>("InternalIconID");
 
         public IList<int> MultipleSubSpells
@@ -439,7 +429,5 @@ namespace DOL.GS
         }
 
         public bool AllowCoexisting => this.GetParamValue<bool>("AllowCoexisting");
-
-        #endregion
     }
 }

@@ -21,8 +21,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.ObjectInteractRequest, "Handles Client Interact Request", eClientStatus.PlayerInGame)]
     public class ObjectInteractRequestHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             packet.ReadInt(); //playerX
@@ -33,10 +31,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             // TODO: utilize these client-sent coordinates to possibly check for exploits which are spoofing position packets but not spoofing them everywhere
             new InteractActionHandler(client.Player, targetOid).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: InteractActionHandler
 
         /// <summary>
         /// Handles player interact actions
@@ -70,7 +64,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 obj?.Interact(player);
             }
         }
-
-        #endregion
     }
 }

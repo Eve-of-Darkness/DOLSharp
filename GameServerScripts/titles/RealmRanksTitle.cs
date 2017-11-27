@@ -24,7 +24,6 @@ using DOL.Events;
 
 namespace GameServerScripts.Titles
 {
-    #region base class
     /// <summary>
     /// Generic Realm Rank Title Base Class
     /// </summary>
@@ -98,9 +97,6 @@ namespace GameServerScripts.Titles
             return "Realm Rank";
         }
     }
-    #endregion
-
-    #region Albion
 
     public abstract class AlbionRealmGenericEventPlayerTitle : RealmGenericEventPlayerTitle
     {
@@ -156,9 +152,7 @@ namespace GameServerScripts.Titles
     {
         protected override int RRLevel { get { return 13; } }
     }
-    #endregion
 
-    #region Midgard
     public abstract class MidgardRealmGenericEventPlayerTitle : RealmGenericEventPlayerTitle
     {
         protected override eRealm Realm { get { return eRealm.Midgard; } }
@@ -213,9 +207,7 @@ namespace GameServerScripts.Titles
     {
         protected override int RRLevel { get { return 13; } }
     }
-    #endregion
 
-    #region Hibernia
     public abstract class HiberniaRealmGenericEventPlayerTitle : RealmGenericEventPlayerTitle
     {
         protected override eRealm Realm { get { return eRealm.Hibernia; } }
@@ -270,6 +262,4 @@ namespace GameServerScripts.Titles
     {
         protected override int RRLevel { get { return 13; } }
     }
-    #endregion
-
 }

@@ -38,7 +38,6 @@ namespace DOL.GS.DatabaseUpdate
             RemoveACLKUNLS();
         }
 
-        #region RemoveACLKUNLS
         /// <summary>
         /// Removes the no longer used 'allowed_custom_language_keys' and 'use_new_language_system' entries.
         /// </summary>
@@ -77,6 +76,5 @@ namespace DOL.GS.DatabaseUpdate
 
             log.Info("ServerProperty table update complete!");
         }
-        #endregion RemoveACLKUNLS
     }
 }

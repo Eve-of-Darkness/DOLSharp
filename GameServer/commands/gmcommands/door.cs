@@ -55,8 +55,6 @@ namespace DOL.GS.Commands
         private string Realmname;
         private string statut;
 
-        #region ICommandHandler Members
-
         public void OnCommand(GameClient client, string[] args)
         {
             GameDoor targetDoor = null;
@@ -159,8 +157,6 @@ namespace DOL.GS.Commands
                     return;
             }
         }
-
-        #endregion
 
         private void add(GameClient client, GameDoor targetDoor)
         {

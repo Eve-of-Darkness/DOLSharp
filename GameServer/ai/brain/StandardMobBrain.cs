@@ -80,8 +80,6 @@ namespace DOL.AI.Brain
             return false;
         }
 
-        #region AI
-
         /// <summary>
         /// Do the mob AI
         /// </summary>
@@ -370,10 +368,6 @@ namespace DOL.AI.Brain
         {
             // See CNPC
         }
-
-        #endregion
-
-        #region Aggro
 
         /// <summary>
         /// Max Aggro range in that this npc searches for enemies
@@ -1022,10 +1016,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
-
-        #region Bring a Friend
-
         /// <summary>
         /// Mobs within this range will be called upon to add on a group
         /// of players inside of a dungeon.
@@ -1191,10 +1181,6 @@ namespace DOL.AI.Brain
             return (GamePlayer)attackersInRange[Util.Random(1, attackersInRange.Count) - 1];
         }
 
-        #endregion
-
-        #region Spells
-
         public enum eCheckSpellType
         {
             Offensive,
@@ -1350,7 +1336,6 @@ namespace DOL.AI.Brain
             Body.TargetObject = null;
             switch (spell.SpellType)
             {
-                    #region Buffs
                 case "StrengthConstitutionBuff":
                 case "DexterityQuicknessBuff":
                 case "StrengthBuff":
@@ -1397,9 +1382,7 @@ namespace DOL.AI.Brain
 
                         break;
                     }
-                    #endregion Buffs
 
-                    #region Disease Cure/Poison Cure/Summon
                 case "CureDisease":
                     if (Body.IsDiseased)
                     {
@@ -1461,9 +1444,7 @@ namespace DOL.AI.Brain
 
                     Body.TargetObject = Body;
                     break;
-                    #endregion Disease Cure/Poison Cure/Summon
 
-                    #region Heals
                 case "Heal":
                     if (spell.Target.ToLower() == "self")
                     {
@@ -1491,9 +1472,8 @@ namespace DOL.AI.Brain
                     }
 
                     break;
-                    #endregion
 
-                    // case "SummonAnimistFnF":
+                // case "SummonAnimistFnF":
                     // case "SummonAnimistPet":
                 case "SummonCommander":
                 case "SummonDruidPet":
@@ -1574,7 +1554,6 @@ namespace DOL.AI.Brain
 
             switch (spell.SpellType)
             {
-                    #region Enemy Spells
                 case "DirectDamage":
                 case "Lifedrain":
                 case "DexterityDebuff":
@@ -1595,9 +1574,7 @@ namespace DOL.AI.Brain
                     }
 
                     break;
-                    #endregion
 
-                    #region Combat Spells
                 case "CombatHeal":
                 case "DamageAdd":
                 case "ArmorFactorBuff":
@@ -1613,7 +1590,6 @@ namespace DOL.AI.Brain
                     }
 
                     break;
-                    #endregion
             }
 
             if (Body.TargetObject != null)
@@ -1710,9 +1686,6 @@ namespace DOL.AI.Brain
             return false;
         }
 
-        #endregion
-
-        #region Random Walk
         public virtual bool CanRandomWalk
         {
             get
@@ -1766,8 +1739,6 @@ namespace DOL.AI.Brain
             return new Point3D((int)targetX, (int)targetY, Body.SpawnPoint.Z);
         }
 
-        #endregion
-        #region DetectDoor
         public virtual void DetectDoor()
         {
             ushort range = (ushort)((ThinkInterval / 800) * Body.CurrentWayPoint.MaxSpeed);
@@ -1796,6 +1767,5 @@ namespace DOL.AI.Brain
 
             return;
         }
-        #endregion
     }
 }

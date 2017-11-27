@@ -105,8 +105,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.MaulerInvasion.NPCKreimhilde"), (eRealm)2);
 
@@ -153,10 +152,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 VikingKreimhilde = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
         blackmaulercubpelt = GameServer.Database.FindObjectByKey<ItemTemplate>("blackmaulercubpelt");
             if (blackmaulercubpelt == null)
@@ -230,14 +225,6 @@ namespace DOL.GS.Quests.Midgard
 
                 GameServer.Database.AddObject(blackmaulercubpelt);
                 }
-
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
 
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(maulerinvasion));
             QuestBehaviour a;
@@ -346,9 +333,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.TakeItem,blackmaulercubpelt,null);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             VikingKreimhilde.AddQuestToGive(typeof(maulerinvasion));

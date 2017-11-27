@@ -74,27 +74,23 @@ namespace DOL.GS.Commands
         private static bool GuildFormCheck(GamePlayer leader)
         {
             Group group = leader.Group;
-            #region No group check - Ensure we still have a group
             if (group == null)
             {
                 leader.Out.SendMessage(LanguageMgr.GetTranslation(leader.Client.Account.Language, "Scripts.Player.Guild.FormNoGroup"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
-            #endregion
-            #region Enough members to form Check - Ensure our group still has enough players in to form
+
             if (group.MemberCount < Properties.GUILD_NUM)
             {
                 leader.Out.SendMessage(LanguageMgr.GetTranslation(leader.Client.Account.Language, "Scripts.Player.Guild.FormNoMembers" + Properties.GUILD_NUM), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
-            #endregion
 
             return true;
         }
 
         protected void CreateGuild(GamePlayer player, byte response)
         {
-            #region Player Declines
             if (response != 0x01)
             {
                 // remove all guild consider to enable re try
@@ -107,8 +103,7 @@ namespace DOL.GS.Commands
                 player.Group.SendMessageToGroupMembers(player, "Declines to form the guild", eChatType.CT_Group, eChatLoc.CL_ChatWindow);
                 return;
             }
-            #endregion
-            #region Player Accepts
+
             player.Group.SendMessageToGroupMembers(player, "Agrees to form the guild", eChatType.CT_Group, eChatLoc.CL_ChatWindow);
             player.TempProperties.setProperty("Guild_Consider", true);
             var guildname = player.Group.Leader.TempProperties.getProperty<string>("Guild_Name");
@@ -168,7 +163,6 @@ namespace DOL.GS.Commands
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Player.Guild.GuildCreated", guildname, player.Name), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                 }
             }
-            #endregion
         }
 
         /// <summary>
@@ -208,8 +202,7 @@ namespace DOL.GS.Commands
                 // log.Debug(debugArgs);
                 switch (args[1])
                 {
-                        #region Create
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // CREATE
                         // --------------------------------------------------------------------------------
                     case "create":
@@ -267,10 +260,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Purge
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // PURGE
                         // --------------------------------------------------------------------------------
                     case "purge":
@@ -300,10 +291,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Rename
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // RENAME
                         // --------------------------------------------------------------------------------
                     case "rename":
@@ -348,10 +337,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region AddPlayer
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // ADDPLAYER
                         // --------------------------------------------------------------------------------
                     case "addplayer":
@@ -384,10 +371,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region RemovePlayer
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // REMOVEPLAYER
                         // --------------------------------------------------------------------------------
                     case "removeplayer":
@@ -426,9 +411,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Invite
-                        /****************************************guild member command***********************************************/
+
+                    /****************************************guild member command***********************************************/
 
                         // --------------------------------------------------------------------------------
                         // INVITE
@@ -499,10 +483,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Remove
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // REMOVE
                         // --------------------------------------------------------------------------------
                     case "remove":
@@ -598,10 +580,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Remove account
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // REMOVE ACCOUNT (Patch 1.84)
                         // --------------------------------------------------------------------------------
                     case "removeaccount":
@@ -662,10 +642,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Info
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // INFO
                         // --------------------------------------------------------------------------------
                     case "info":
@@ -811,8 +789,7 @@ namespace DOL.GS.Commands
                             SendSocialWindowData(client, 1, 1, 2);
                             break;
                         }
-                        #endregion
-                        #region Buybanner
+
                     case "buybanner":
                         {
                             if (client.Player.Guild.GuildLevel < 7)
@@ -868,8 +845,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion
-                        #region Summon
+
                     case "summon":
                         {
                             if (client.Player.Guild == null)
@@ -926,10 +902,8 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion
-                        #region Buff
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // GUILD BUFF
                         // --------------------------------------------------------------------------------
                     case "buff":
@@ -1090,8 +1064,7 @@ namespace DOL.GS.Commands
 
                             return;
                         }
-                        #endregion
-                        #region Unsummon
+
                     case "unsummon":
                         {
                             if (client.Player.Guild == null)
@@ -1135,8 +1108,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion
-                        #region Ranks
+
                     case "ranks":
                         {
                             if (client.Player.Guild == null)
@@ -1166,8 +1138,7 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             break;
                         }
-                        #endregion
-                        #region Webpage
+
                     case "webpage":
                         {
                             if (client.Player.Guild == null)
@@ -1189,8 +1160,7 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             break;
                         }
-                        #endregion
-                        #region Email
+
                     case "email":
                         {
                             if (client.Player.Guild == null)
@@ -1212,10 +1182,8 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             break;
                         }
-                        #endregion
-                        #region List
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // LIST
                         // --------------------------------------------------------------------------------
                     case "list":
@@ -1236,10 +1204,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Edit
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // EDIT
                         // --------------------------------------------------------------------------------
                     case "edit":
@@ -1256,10 +1222,8 @@ namespace DOL.GS.Commands
 
                         client.Player.Guild.UpdateGuildWindow();
                         break;
-                        #endregion
-                        #region Form
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // FORM
                         // --------------------------------------------------------------------------------
                     case "form":
@@ -1270,35 +1234,29 @@ namespace DOL.GS.Commands
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Player.Guild.Help.GuildForm"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            #region Near Registrar
                             if (!IsNearRegistrar(client.Player))
                             {
                                 client.Out.SendMessage("You must be near a guild registrar to use this command!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            #endregion
-                            #region No group Check
+
                             if (group == null)
                             {
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Player.Guild.FormNoGroup"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            #endregion
-                            #region Groupleader Check
+
                             if (group != null && client.Player != client.Player.Group.Leader)
                             {
                                 client.Out.SendMessage("Only the group leader can create a guild", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            #endregion
-                            #region Enough members to form Check
+
                             if (group.MemberCount < Properties.GUILD_NUM)
                             {
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Player.Guild.FormNoMembers" + Properties.GUILD_NUM), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            #endregion
-                            #region Player already in guild check and Cross Realm Check
 
                             foreach (GamePlayer ply in group.GetPlayersInTheGroup())
                             {
@@ -1314,8 +1272,6 @@ namespace DOL.GS.Commands
                                     return;
                                 }
                             }
-                            #endregion
-                            #region Guild Length Naming Checks
 
                             // Check length of guild name.
                             string guildname = string.Join(" ", args, 2, args.Length - 2);
@@ -1324,29 +1280,25 @@ namespace DOL.GS.Commands
                                 client.Out.SendMessage("Sorry, your guild name is too long.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            #endregion
-                            #region Valid Characters Check
+
                             if (!IsValidGuildName(guildname))
                             {
                                 // Mannen doesn't know the live server message, so someone needs to enter it . ;-)
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Player.Guild.InvalidLetters"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            #endregion
-                            #region Guild Exist Checks
+
                             if (GuildMgr.DoesGuildExist(guildname))
                             {
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Player.Guild.GuildExists"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            #endregion
-                            #region Enoguh money to form Check
+
                             if (client.Player.Group.Leader.GetCurrentMoney() < GuildFormCost)
                             {
                                 client.Out.SendMessage("It cost 1 gold piece to create a guild", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            #endregion
 
                             client.Player.Group.Leader.TempProperties.setProperty("Guild_Name", guildname);
                             if (GuildFormCheck(client.Player))
@@ -1360,10 +1312,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                    #endregion
-                        #region Quit
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // QUIT
                         // --------------------------------------------------------------------------------
                     case "quit":
@@ -1379,10 +1329,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Promote
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // PROMOTE
                         // /gc promote <rank#> [name]' to promote player to a superior rank
                         // --------------------------------------------------------------------------------
@@ -1535,8 +1483,6 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                    #endregion
-                    #region Demote
 
                     // --------------------------------------------------------------------------------
                     // DEMOTE
@@ -1645,10 +1591,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Who
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // WHO
                         // --------------------------------------------------------------------------------
                     case "who":
@@ -1662,7 +1606,6 @@ namespace DOL.GS.Commands
                             int ind = 0;
                             int startInd = 0;
 
-                            #region Social Window
                             if (args.Length == 6 && args[2] == "window")
                             {
                                 int sortTemp;
@@ -1677,9 +1620,7 @@ namespace DOL.GS.Commands
 
                                 return;
                             }
-                            #endregion
 
-                            #region Alliance Who
                             else if (args.Length == 3)
                             {
                                 if (args[2] == "alliance" || args[2] == "a")
@@ -1708,9 +1649,7 @@ namespace DOL.GS.Commands
                                     int.TryParse(args[2], out startInd);
                                 }
                             }
-                            #endregion
 
-                            #region Who
                             IList<GamePlayer> onlineGuildMembers = client.Player.Guild.GetListOfOnlineMembers();
 
                             foreach (GamePlayer ply in onlineGuildMembers)
@@ -1756,12 +1695,9 @@ namespace DOL.GS.Commands
                             }
 
                             break;
-                            #endregion
                         }
-                        #endregion
-                        #region Leader
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // LEADER
                         // --------------------------------------------------------------------------------
                     case "leader":
@@ -1812,10 +1748,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Emblem
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // EMBLEM
                         // --------------------------------------------------------------------------------
                     case "emblem":
@@ -1855,8 +1789,7 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             break;
                         }
-                        #endregion
-                        #region Autoremove
+
                     case "autoremove":
                         {
                             if (client.Player.Guild == null)
@@ -1956,10 +1889,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region MOTD
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // MOTD
                         // --------------------------------------------------------------------------------
                     case "motd":
@@ -1983,10 +1914,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region AMOTD
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // AMOTD
                         // --------------------------------------------------------------------------------
                     case "amotd":
@@ -2017,10 +1946,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region OMOTD
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // OMOTD
                         // --------------------------------------------------------------------------------
                     case "omotd":
@@ -2044,10 +1971,8 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Alliance
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // ALLIANCE
                         // --------------------------------------------------------------------------------
                     case "alliance":
@@ -2093,10 +2018,8 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             return;
                         }
-                        #endregion
-                        #region Alliance Invite
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // AINVITE
                         // --------------------------------------------------------------------------------
                     case "ainvite":
@@ -2156,10 +2079,8 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             return;
                         }
-                        #endregion
-                        #region Alliance Invite Accept
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // AINVITE
                         // --------------------------------------------------------------------------------
                     case "aaccept":
@@ -2168,10 +2089,8 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             return;
                         }
-                        #endregion
-                        #region Alliance Invite Cancel
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // ACANCEL
                         // --------------------------------------------------------------------------------
                     case "acancel":
@@ -2205,10 +2124,8 @@ namespace DOL.GS.Commands
                             obj.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Player.Guild.AllianceAnsCancel"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                             return;
                         }
-                        #endregion
-                        #region Alliance Invite Decline
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // ADECLINE
                         // --------------------------------------------------------------------------------
                     case "adecline":
@@ -2231,10 +2148,8 @@ namespace DOL.GS.Commands
                             inviter.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Player.Guild.AllianceDeclinedOther"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                             return;
                         }
-                        #endregion
-                        #region Alliance Remove
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // AREMOVE
                         // --------------------------------------------------------------------------------
                     case "aremove":
@@ -2313,10 +2228,8 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             return;
                         }
-                        #endregion
-                        #region Alliance Leave
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // ALEAVE
                         // --------------------------------------------------------------------------------
                     case "aleave":
@@ -2343,10 +2256,8 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             return;
                         }
-                        #endregion
-                        #region Claim
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // ClAIM
                         // --------------------------------------------------------------------------------
                     case "claim":
@@ -2372,10 +2283,8 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             return;
                         }
-                        #endregion
-                        #region Release
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // RELEASE
                         // --------------------------------------------------------------------------------
                     case "release":
@@ -2422,10 +2331,8 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             return;
                         }
-                        #endregion
-                        #region Upgrade
 
-                        // --------------------------------------------------------------------------------
+                    // --------------------------------------------------------------------------------
                         // UPGRADE
                         // --------------------------------------------------------------------------------
                     case "upgrade":
@@ -2482,10 +2389,8 @@ namespace DOL.GS.Commands
                             return;
                              */
                         }
-                        #endregion
-                        #region Type
 
-                        // TYPE
+                    // TYPE
                         // --------------------------------------------------------------------------------
                     case "type":
                         {
@@ -2526,8 +2431,7 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             return;
                         }
-                        #endregion
-                        #region Noteself
+
                     case "noteself":
                     case "note":
                         {
@@ -2543,8 +2447,7 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             break;
                         }
-                        #endregion
-                        #region Dues
+
                     case "dues":
                         {
                             if (client.Player.Guild == null)
@@ -2600,8 +2503,7 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Deposit
+
                     case "deposit":
                         {
                             if (client.Player.Guild == null)
@@ -2627,8 +2529,7 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Withdraw
+
                     case "withdraw":
                         {
                             if (client.Player.Guild == null)
@@ -2661,8 +2562,7 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
-                        #region Logins
+
                     case "logins":
                         {
                             client.Player.ShowGuildLogins = !client.Player.ShowGuildLogins;
@@ -2679,8 +2579,7 @@ namespace DOL.GS.Commands
                             client.Player.Guild.UpdateGuildWindow();
                             break;
                         }
-                        #endregion
-                        #region Default
+
                     default:
                         {
                             client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Player.Guild.UnknownCommand", args[1]), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -2688,7 +2587,6 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion
                 }
             }
             catch (Exception e)
@@ -3272,7 +3170,6 @@ namespace DOL.GS.Commands
 
             GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Name;
 
-            #region Determine Sort
             switch (sortOrder)
             {
                 case GuildMgr.GuildMemberDisplay.eSocialWindowSort.ClassAsc:
@@ -3300,7 +3197,6 @@ namespace DOL.GS.Commands
                     sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.ZoneOrOnline;
                     break;
             }
-            #endregion
 
             if (showOffline == false) // show only a sorted list of online players
             {

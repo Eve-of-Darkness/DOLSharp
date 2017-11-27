@@ -132,8 +132,6 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Lynnleigh", eRealm.Midgard);
 
             if (npcs.Length == 0)
@@ -235,9 +233,6 @@ namespace DOL.GS.Quests.Midgard
             }
 
             // end npc
-            #endregion
-
-            #region defineItems
 
             tome_enchantments = GameServer.Database.FindObjectByKey<ItemTemplate>("tome_enchantments");
             if (tome_enchantments == null)
@@ -1663,7 +1658,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(SavageEpicArms);
                 }
             }
-            #region Valkyrie
             ValkyrieEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("ValkyrieEpicBoots");
             if (ValkyrieEpicBoots == null)
             {
@@ -1977,7 +1971,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(ValkyrieEpicArms);
                 }
             }
-            #endregion
 
             // Graveen: we assume items are existing in the DB
             // TODO: insert here creation of items if they do not exists
@@ -1989,7 +1982,6 @@ namespace DOL.GS.Quests.Midgard
             MaulerMidEpicArms = GameServer.Database.FindObjectByKey<ItemTemplate>("MaulerMidEpicArms");
 
 // Item Descriptions End
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

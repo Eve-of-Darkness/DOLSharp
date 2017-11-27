@@ -80,7 +80,6 @@ namespace DOL.GS
             m_championTrainerType = championTrainerType;
         }
 
-        #region GetExamineMessages
         /// <summary>
         /// Adds messages to ArrayList which are sent when object is targeted
         /// </summary>
@@ -141,7 +140,6 @@ namespace DOL.GS
             list.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.GetExamineMessages.RightClick"));
             return list;
         }
-        #endregion
 
         public virtual bool CanTrain(GamePlayer player)
         {

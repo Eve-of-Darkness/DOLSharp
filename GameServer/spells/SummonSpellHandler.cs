@@ -87,8 +87,6 @@ namespace DOL.GS.Spells
             }
         }
 
-        #region ApplyEffectOnTarget Gets
-
         protected virtual void GetPetLocation(out int x, out int y, out int z, out ushort heading, out Region region)
         {
             Point2D point = Caster.GetPointFromHeading(Caster.Heading, 64);
@@ -139,8 +137,6 @@ namespace DOL.GS.Spells
         {
             GameEventMgr.AddHandler(m_pet, GameLivingEvent.PetReleased, new DOLEventHandler(OnNpcReleaseCommand));
         }
-
-        #endregion
 
         /// <summary>
         /// Apply effect on target or do spell action if non duration spell

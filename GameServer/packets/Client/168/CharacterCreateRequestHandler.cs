@@ -160,7 +160,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
         }
 
-        #region caracter creation data
         class CreationCharacterData
         {
             public string CharName { get; }
@@ -289,9 +288,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 NewConstitution = packet.ReadByte(); // 0x9F
             }
         }
-        #endregion
 
-        #region Create Character
         private bool CreateCharacter(CreationCharacterData pdata, GameClient client, int accountSlot)
         {
             Account account = client.Account;
@@ -448,9 +445,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             return true;
         }
 
-        #endregion Create Character
-
-        #region Character Updates
         /// <summary>
         /// Check if a Character Needs update based to packet data
         /// </summary>
@@ -607,9 +601,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             return false;
         }
-        #endregion Character Updates
 
-        #region Delete Character
         public static bool CheckForDeletedCharacter(string accountName, GameClient client, int slot)
         {
             int charSlot = slot;
@@ -733,9 +725,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             return false;
         }
-        #endregion Delete Character
 
-        #region ValidateCharacter
         /// <summary>
         /// Check if Custom Creation Points Distribution is Valid.
         /// </summary>
@@ -895,6 +885,5 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             return valid;
         }
-        #endregion Validate Character
     }
 }

@@ -168,8 +168,6 @@ namespace DOL.GS.Quests.Midgard
    * Just examples, do anything you like and feel comfortable with :)
    */
 
-            #region defineNPCs
-
             dalikor = GetDalikor();
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Master Briedi", eRealm.Midgard);
@@ -321,10 +319,6 @@ namespace DOL.GS.Quests.Midgard
                     askefruerSorceress[i].AddToWorld();
                 }
             }
-
-            #endregion
-
-            #region defineItems
 
             coastalWolfBlood = GameServer.Database.FindObjectByKey<ItemTemplate>("coastal_wolf_blood");
             if (coastalWolfBlood == null)
@@ -647,8 +641,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(recruitsRing);
                 }
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

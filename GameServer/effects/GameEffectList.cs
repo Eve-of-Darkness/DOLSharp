@@ -480,8 +480,6 @@ namespace DOL.GS.Effects
             }
         }
 
-        #region IEnumerable Member
-
         /// <summary>
         /// Returns an enumerator for the effects
         /// </summary>
@@ -507,6 +505,5 @@ namespace DOL.GS.Effects
         {
             return GetEnumerator();
         }
-        #endregion
     }
 }

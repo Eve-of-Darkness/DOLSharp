@@ -37,8 +37,6 @@ namespace DOL.GS.Spells
 
         public override string DebuffTypeName => GlobalConstants.DamageTypeToName(Spell.DamageType);
 
-        #region LOS on Keeps
-
         private const string LOSEFFECTIVENESS = "LOS Effectivness";
 
         /// <summary>
@@ -222,7 +220,6 @@ namespace DOL.GS.Spells
         {
             base.OnSpellResisted(target);
         }
-        #endregion
 
         /// <summary>
         /// Delve Info

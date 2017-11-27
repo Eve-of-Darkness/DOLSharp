@@ -37,8 +37,6 @@ namespace DOL.GS
         {
         }
 
-        #region Examine Message
-
         /// <summary>
         /// Adds messages to ArrayList which are sent when object is targeted
         /// </summary>
@@ -52,10 +50,6 @@ namespace DOL.GS
             list.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "VaultKeeper.RightClick"));
             return list;
         }
-
-        #endregion Examine Message
-
-        #region Interact
 
         /// <summary>
         /// Called when a player right clicks on the vaultkeeper
@@ -81,7 +75,5 @@ namespace DOL.GS
             player.Out.SendInventoryItemsUpdate(eInventoryWindowType.PlayerVault, items.Count > 0 ? items : null);
             return true;
         }
-
-        #endregion examine message
     }
 }

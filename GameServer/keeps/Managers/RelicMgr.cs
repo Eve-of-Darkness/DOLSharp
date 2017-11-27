@@ -200,8 +200,6 @@ namespace DOL.GS
             return m_relics[id] as GameRelic;
         }
 
-        #region Helpers
-
         public static IList getNFRelics()
         {
             ArrayList myRelics = new ArrayList();
@@ -371,7 +369,6 @@ namespace DOL.GS
                 return (Hashtable)m_relics.Clone();
             }
         }
-        #endregion
 
         [ScriptLoadedEvent]
         private static void ScriptLoaded(DOLEvent e, object sender, EventArgs args)

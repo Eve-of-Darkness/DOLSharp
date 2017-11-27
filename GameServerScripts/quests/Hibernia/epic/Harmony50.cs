@@ -115,8 +115,6 @@ namespace DOL.GS.Quests.Hibernia
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region NPC Declarations
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Revelin", eRealm.Hibernia);
 
             if (npcs.Length == 0)
@@ -184,9 +182,6 @@ namespace DOL.GS.Quests.Hibernia
             }
 
             // end npc
-            #endregion
-
-            #region Item Declarations
 
             Horn = GameServer.Database.FindObjectByKey<ItemTemplate>("Horn");
             if (Horn == null)
@@ -1456,7 +1451,6 @@ namespace DOL.GS.Quests.Hibernia
                 ValewalkerEpicArms = i;
             }
 
-            #region Vampiir
             VampiirEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("VampiirEpicBoots");
             if (VampiirEpicBoots == null)
             {
@@ -1745,8 +1739,7 @@ namespace DOL.GS.Quests.Hibernia
 
                 VampiirEpicArms = i;
             }
-            #endregion
-            #region Bainshee
+
             BainsheeEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("BainsheeEpicBoots");
             if (BainsheeEpicBoots == null)
             {
@@ -2085,11 +2078,9 @@ namespace DOL.GS.Quests.Hibernia
 
                 BainsheeEpicArms = i;
             }
-            #endregion
 
             // Blademaster Epic Sleeves End
             // Item Descriptions End
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
@@ -2452,8 +2443,6 @@ namespace DOL.GS.Quests.Hibernia
             }
         }
 
-        #region Allakhazam Epic Source
-
         /*
         *#25 talk to Revelin
         *#26 seek out Loken in Raumarik Loc 47k, 25k, 4k, and kill him purp and 2 blue adds
@@ -2479,7 +2468,5 @@ namespace DOL.GS.Quests.Hibernia
             *Shadow Shrouded Legs
             *Shadow Shrouded Sleeves
         */
-
-        #endregion
     }
 }

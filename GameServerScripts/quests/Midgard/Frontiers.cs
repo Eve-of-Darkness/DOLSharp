@@ -161,8 +161,6 @@ namespace DOL.GS.Quests.Midgard
    * Just examples, do anything you like and feel comfortable with :)
    */
 
-            #region DefineNPCs
-
             dalikor = GetDalikor();
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Stor Gothi Annark", eRealm.Midgard);
@@ -429,10 +427,6 @@ namespace DOL.GS.Quests.Midgard
             Point2D vorgarloc = vorgar.GetPointFromHeading(vorgar.Heading, 30);
             locationVorgar = new GameLocation(vorgar.CurrentZone.Description, vorgar.CurrentRegionID, vorgarloc.X, vorgarloc.Y, vorgar.Z);
 
-            #endregion
-
-            #region DefineItems
-
             // item db check
             noteForNjiedi = GameServer.Database.FindObjectByKey<ItemTemplate>("njiedi_note");
             if (noteForNjiedi == null)
@@ -595,8 +589,6 @@ namespace DOL.GS.Quests.Midgard
 
                 GameServer.Database.AddObject(recruitsPants);
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

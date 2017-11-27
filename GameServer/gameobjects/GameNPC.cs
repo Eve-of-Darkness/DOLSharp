@@ -56,8 +56,6 @@ namespace DOL.GS
         /// </remarks>
         public const int CONST_WALKTOTOLERANCE = 25;
 
-        #region Formations/Spacing
-
         // Space/Offsets used in formations
         // Normal = 1
         // Big = 2
@@ -116,9 +114,6 @@ namespace DOL.GS
             set { m_formation = value; }
         }
 
-        #endregion
-
-        #region Sizes/Properties
         /// <summary>
         /// Holds the size of the NPC
         /// </summary>
@@ -500,9 +495,6 @@ namespace DOL.GS
             get { return m_houseNumber; }
             set { m_houseNumber = value; }
         }
-        #endregion
-
-        #region Stats
 
         /// <summary>
         /// Change a stat value
@@ -607,9 +599,7 @@ namespace DOL.GS
             get { return m_charStat[eStat.CHR - eStat._First]; }
             set { m_charStat[eStat.CHR - eStat._First] = value; }
         }
-        #endregion
 
-        #region Flags/Position/SpawnPosition/UpdateTick/Tether
         /// <summary>
         /// Various flags for this npc
         /// </summary>
@@ -993,9 +983,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Movement
         /// <summary>
         /// Timer to be set if an OnArriveAtTarget
         /// handler is set before calling the WalkTo function
@@ -1813,9 +1800,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Path (Movement)
         /// <summary>
         /// Gets sets the currentwaypoint that npc has to wander to
         /// </summary>
@@ -2037,9 +2021,7 @@ namespace DOL.GS
                 }
             }
         }
-        #endregion
 
-        #region Inventory/LoadfromDB
         private NpcTemplate m_npcTemplate;
         /// <summary>
         /// The NPC's template
@@ -2442,8 +2424,6 @@ namespace DOL.GS
             ExamineArticle = template.ExamineArticle;
             MessageArticle = template.MessageArticle;
 
-            #region Models, Sizes, Levels, Gender
-
             // Grav: this.Model/Size/Level accessors are triggering SendUpdate()
             // so i must use them, and not directly use private variables
             ushort choosenModel = 1;
@@ -2480,9 +2460,6 @@ namespace DOL.GS
             }
 
             Level = choosenLevel;
-            #endregion
-
-            #region Stats
 
             // Stats
             if (template.Strength == 0)
@@ -2500,9 +2477,7 @@ namespace DOL.GS
                 Empathy = (short)template.Empathy;
                 Charisma = (short)template.Charisma;
             }
-            #endregion
 
-            #region Misc Stats
             MaxDistance = template.MaxDistance;
             TetherRange = template.TetherRange;
             Race = (short)template.Race;
@@ -2514,9 +2489,6 @@ namespace DOL.GS
             EvadeChance = template.EvadeChance;
             BlockChance = template.BlockChance;
             LeftHandSwingChance = template.LeftHandSwingChance;
-            #endregion
-
-            #region Inventory
 
             // Ok lets start loading the npc equipment - only if there is a value!
             if (!Util.IsEmpty(template.Inventory))
@@ -2554,8 +2526,6 @@ namespace DOL.GS
                         equipHasItems = true;
                     }
                 }
-
-                #region Legacy Equipment Code
 
                 // Nope, nothing in the npcequipment table, lets do the crappy parsing
                 // This is legacy code
@@ -2601,7 +2571,6 @@ namespace DOL.GS
                         }
                     }
                 }
-                #endregion
 
                 // We added some items - let's make it the new inventory
                 if (equipHasItems)
@@ -2618,7 +2587,6 @@ namespace DOL.GS
                     VisibleActiveWeaponSlots = template.VisibleActiveWeaponSlot;
                 }
             }
-            #endregion
 
             if (template.Spells != null)
             {
@@ -2686,9 +2654,6 @@ namespace DOL.GS
             set { m_equipmentTemplateID = value; }
         }
 
-        #endregion
-
-        #region Quest
         /// <summary>
         /// Holds all the quests this npc can give to players
         /// </summary>
@@ -2971,10 +2936,6 @@ namespace DOL.GS
             return null;
         }
 
-        #endregion
-
-        #region Riding
-
         // NPC's can have riders :-)
         /// <summary>
         /// Holds the rider of this NPC as weak reference
@@ -3167,9 +3128,6 @@ namespace DOL.GS
                 return list.ToArray();
             }
         }
-        #endregion
-
-        #region Add/Remove/Create/Remove/Update
 
         /// <summary>
         /// Broadcasts the NPC Update to all players around
@@ -3516,10 +3474,6 @@ namespace DOL.GS
             base.Delete();
         }
 
-        #endregion
-
-        #region AI
-
         /// <summary>
         /// Holds the own NPC brain
         /// </summary>
@@ -3661,9 +3615,6 @@ namespace DOL.GS
                 return true;
             }
         }
-        #endregion
-
-        #region GetAggroLevelString
 
         /// <summary>
         /// How friendly this NPC is to player
@@ -4037,9 +3988,6 @@ namespace DOL.GS
                         case 2: if(firstLetterUppercase) return "It"; else return "it";
                     }
                 }*/
-        #endregion
-
-        #region Interact/WhisperReceive/SayTo
 
         /// <summary>
         /// The possible triggers for GameNPC ambient actions
@@ -4217,9 +4165,6 @@ namespace DOL.GS
                     break;
             }
         }
-        #endregion
-
-        #region Combat
 
         /// <summary>
         /// The property that holds charmed tick if any
@@ -5412,10 +5357,6 @@ namespace DOL.GS
             // DealDamage needs to be called after addxpgainer!
         }
 
-        #endregion
-
-        #region Spell
-
         /// <summary>
         /// Whether or not the NPC can cast harmful spells
         /// at the moment.
@@ -5772,10 +5713,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Notify
-
         /// <summary>
         /// Handle event notifications
         /// </summary>
@@ -5886,9 +5823,6 @@ namespace DOL.GS
 
             Say(text);
         }
-        #endregion
-
-        #region ControlledNPCs
 
         public override void SetControlledBrain(IControlledBrain controlledBrain)
         {
@@ -5943,8 +5877,6 @@ namespace DOL.GS
         {
             return true;
         }
-
-        #endregion
 
         /// <summary>
         /// Whether this NPC is available to add on a fight.

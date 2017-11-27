@@ -38,7 +38,7 @@ namespace DOL.GS
         {
             m_set = new HashSet<T>();
         }
-        #region Implementation of IEnumerable
+
         /// <summary>
         /// Returns an Enumerator on a Snapshot Collection
         /// </summary>
@@ -68,9 +68,6 @@ namespace DOL.GS
         {
             return GetEnumerator();
         }
-        #endregion
-
-        #region Implementation of ICollection<T>
 
         void ICollection<T>.Add(T item)
         {
@@ -172,10 +169,6 @@ namespace DOL.GS
                 return readOnly;
             }
         }
-
-        #endregion
-
-        #region Implementation of ISet<T>
 
         public bool Add(T item)
         {
@@ -340,6 +333,5 @@ namespace DOL.GS
 
             return retval;
         }
-        #endregion
     }
 }

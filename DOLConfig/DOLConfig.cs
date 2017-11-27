@@ -158,8 +158,6 @@ namespace DOLConfig
             }
         }
 
-        #region Load configuration
-
         /// <summary>
         /// Set all data to default button event
         /// </summary>
@@ -260,10 +258,6 @@ namespace DOLConfig
                 extra_options_datagrid.DataSource = extraOptions;
             }
         }
-
-        #endregion
-
-        #region Save configuration
 
         /// <summary>
         /// Save configuration button event
@@ -543,9 +537,7 @@ namespace DOLConfig
             wrong_data_error_handler.SetError(recipient, error);
             toolstripStatusLabelValue = error;
         }
-        #endregion
 
-        #region XML path select
         /// <summary>
         /// Select xml database path by dialog
         /// </summary>
@@ -562,9 +554,6 @@ namespace DOLConfig
                 xml_path_textbox.Text = Regex.Replace(currentConnString, "Data ?Source=([^;]+)(;?)", string.Format("Data Source={0}$2", xml_database_path_select_dialog.FileName));
             }
         }
-        #endregion
-
-        #region MySQL Testing feature
 
         /// <summary>
         /// MySQL connection test button event
@@ -656,10 +645,6 @@ namespace DOLConfig
             }
         }
 
-        #endregion
-
-        #region Extra properties section
-
         private void extra_options_datagrid_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             edit_property(e.RowIndex);
@@ -711,10 +696,6 @@ namespace DOLConfig
 
             DOLConfigParser.removeExtraOptionsRow(extraOptions, extra_options_datagrid.Rows[extra_options_datagrid.CurrentRow.Index].Cells["property"].Value);
         }
-
-        #endregion
-
-        #region Mouseover helpers
 
         private void reset_mouse_enter_toolstrip_values(object sender, EventArgs e)
         {
@@ -820,8 +801,5 @@ namespace DOLConfig
         {
             toolstripStatusLabelValue = "Add a new property.";
         }
-
-        #endregion
-
     }
 }

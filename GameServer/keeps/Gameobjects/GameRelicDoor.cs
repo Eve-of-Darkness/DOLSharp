@@ -28,8 +28,6 @@ namespace DOL.GS.Keeps
     /// </summary>
     public class GameRelicDoor : GameLiving, IDoor
     {
-        #region properties
-
         private int m_doorID;
         /// <summary>
         /// The door index which is unique
@@ -101,10 +99,6 @@ namespace DOL.GS.Keeps
                 return "Relic Gate";
             }
         }
-
-        #endregion
-
-        #region function override
 
         /// <summary>
         /// This methode is override to remove XP system
@@ -224,9 +218,6 @@ namespace DOL.GS.Keeps
         {
             return;
         }
-        #endregion
-
-        #region Save/load DB
 
         /// <summary>
         /// save the keep door object in DB
@@ -270,7 +261,6 @@ namespace DOL.GS.Keeps
             m_health = MaxHealth;
             StartHealthRegeneration();
         }
-        #endregion
 
         /// <summary>
         /// call when player try to open door

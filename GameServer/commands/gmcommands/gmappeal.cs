@@ -60,8 +60,6 @@ namespace DOL.GS.Commands
 
             switch (args[1])
             {
-
-                #region gmappeal assist
                 case "assist":
                     {
                         if (args.Length < 3)
@@ -113,8 +111,6 @@ namespace DOL.GS.Commands
                         AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Players.Appeal.DoesntHaveAppeal"));
                         break;
                     }
-                #endregion gmappeal assist
-                #region gmappeal view
 
                 case "view":
                     {
@@ -162,8 +158,7 @@ namespace DOL.GS.Commands
                         AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Players.Appeal.DoesntHaveAppeal"));
                         break;
                     }
-                #endregion gmappeal view
-                #region gmappeal release
+
                 case "release":
                     {
                         if (args.Length < 3)
@@ -212,8 +207,7 @@ namespace DOL.GS.Commands
                         AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Players.Appeal.DoesntHaveAppeal"));
                         return;
                     }
-                #endregion gmappeal release
-                #region gmappeal list
+
                 case "list":
                 case "listall":
                     {
@@ -318,8 +312,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion gmappeal list
-                #region gmappeal close
+
                 case "close":
                     {
                         if (args.Length < 3)
@@ -361,8 +354,6 @@ namespace DOL.GS.Commands
                         return;
                     }
 
-                #endregion gmappeal close
-                #region gmappeal closeoffline
                 case "closeoffline":
                     {
                         if (args.Length < 3)
@@ -412,8 +403,6 @@ namespace DOL.GS.Commands
                         return;
                     }
 
-                #endregion gmappeal closeoffline
-                #region gmappeal jumpto
                 case "jumpto":
                     {
                         try
@@ -454,8 +443,6 @@ namespace DOL.GS.Commands
                         break;
                     }
 
-                #endregion gmappeal jumpto
-                #region gmappeal mute
                 case "mute":
                     {
                         bool mute = client.Player.TempProperties.getProperty<bool>("AppealMute");
@@ -476,8 +463,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion gmappeal mute
-                #region gmappeal commands
+
                 case "commands":
                 case "cmds":
                 case "help":
@@ -496,7 +482,6 @@ namespace DOL.GS.Commands
                     helpmsg.Add("/gmappeal mute - Toggles receiving appeal notices, for yourself, for this session.");
                     client.Out.SendCustomTextWindow("/gmappeal commands list", helpmsg);
                     break;
-                #endregion gmappeal commands
                 default:
                     {
                         DisplaySyntax(client);

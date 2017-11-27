@@ -41,7 +41,6 @@ namespace DOL.AI.Brain
             return true;
         }
 
-        #region Think
         public override void Think()
         {
             GameLiving living = Body.TempProperties.getProperty<object>("bombertarget", null) as GameLiving;
@@ -60,7 +59,6 @@ namespace DOL.AI.Brain
         /// Don't follow owner
         /// </summary>
         public override void FollowOwner() { }
-        #endregion
 
         /// <summary>
         /// Updates the pet window

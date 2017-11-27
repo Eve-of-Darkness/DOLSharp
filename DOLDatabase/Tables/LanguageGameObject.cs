@@ -24,15 +24,12 @@ namespace DOL.Database
     [DataTable(TableName = "LanguageGameObject")]
     public class DBLanguageGameObject : LanguageDataObject
     {
-        #region Variables
         private string m_name = string.Empty;
         private string m_examineArticle = string.Empty;
-        #endregion Variables
 
         public DBLanguageGameObject()
             : base() { }
 
-        #region Properties
         public override eTranslationIdentifier TranslationIdentifier
         {
             get { return eTranslationIdentifier.eObject; }
@@ -71,6 +68,5 @@ namespace DOL.Database
                 m_examineArticle = value;
             }
         }
-        #endregion Properties
     }
 }

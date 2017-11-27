@@ -53,7 +53,6 @@ namespace DOL.GS
             m_owners = new ArrayList(1);
         }
 
-        #region Name/Model/GetName/GetExamineMessages
         /// <summary>
         /// gets or sets the model of this Item
         /// </summary>
@@ -200,7 +199,6 @@ namespace DOL.GS
             list.Insert(0, "You select " + GetName(0, false) + ".");
             return list;
         }
-        #endregion
 
         public override void LoadFromDatabase(DataObject obj)
         {

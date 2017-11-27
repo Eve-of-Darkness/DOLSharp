@@ -48,7 +48,6 @@ namespace DOL.GS
             m_list = new List<T>(collection);
         }
 
-        #region Implementation of IEnumerable
         /// <summary>
         /// Returns an Enumerator on a Snapshot Collection
         /// </summary>
@@ -78,9 +77,6 @@ namespace DOL.GS
         {
             return GetEnumerator();
         }
-        #endregion
-
-        #region Implementation of ICollection<T>
 
         public void Add(T item)
         {
@@ -191,10 +187,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Implementation of IList<T>
-
         public int IndexOf(T item)
         {
             int index = -1;
@@ -268,8 +260,6 @@ namespace DOL.GS
                 }
             }
         }
-
-        #endregion
 
         public bool AddOrReplace(T item)
         {

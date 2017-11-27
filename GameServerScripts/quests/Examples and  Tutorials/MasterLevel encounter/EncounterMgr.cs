@@ -14,7 +14,6 @@ namespace DOL.GS.Atlantis
     {
         public static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Grant Credit
         /// <summary>
         /// Grants credit for the encounter to the killer/player and
         /// optionally his group or battlegroup mates.
@@ -90,9 +89,7 @@ namespace DOL.GS.Atlantis
 
             return;
         }
-        #endregion Grant Credit
 
-        #region Broadcast Message
         /// <summary>
         /// Broadcasts a message to players within saydistance from this object
         /// </summary>
@@ -164,7 +161,5 @@ namespace DOL.GS.Atlantis
 
             return;
         }
-        #endregion Broadcast Message
-
     }
 }

@@ -81,7 +81,6 @@ namespace DOL.GS.RealmAbilities
                         default: return;
                 }
 
-            #region resist and det
             if (_caster.TargetObject is GameLiving target)
             {
                 int primaryResistModifier = target.GetResist(eDamageType.Spirit);
@@ -114,7 +113,6 @@ namespace DOL.GS.RealmAbilities
             {
                 _duration = 1;
             }
-            #endregion
 
             foreach (GamePlayer iPlayer in _caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
             {

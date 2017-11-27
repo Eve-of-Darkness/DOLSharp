@@ -143,8 +143,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCS
-
             masterFrederick = GetMasterFrederick();
 
             generalLocations[0] = new GameLocation(generalNames[0], 1, 568589, 501801, 2134, 23);
@@ -198,10 +196,6 @@ namespace DOL.GS.Quests.Albion
                     general[i].AddToWorld();
                 }
             }
-
-            #endregion
-
-            #region defineItems
 
             fairyGeneralWings = GameServer.Database.FindObjectByKey<ItemTemplate>("fairy_general_wings");
             if (fairyGeneralWings == null)
@@ -345,8 +339,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(recruitsSleeves);
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

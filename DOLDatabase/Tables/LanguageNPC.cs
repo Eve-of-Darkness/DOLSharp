@@ -24,18 +24,15 @@ namespace DOL.Database
     [DataTable(TableName = "LanguageNPC")]
     public class DBLanguageNPC : LanguageDataObject
     {
-        #region Variables
         private string m_name = string.Empty;
         private string m_suffix = string.Empty;
         private string m_guildName = string.Empty;
         private string m_examineArticle = string.Empty;
         private string m_messageArticle = string.Empty;
-        #endregion Variables
 
         public DBLanguageNPC()
             : base() { }
 
-        #region Properties
         public override eTranslationIdentifier TranslationIdentifier
         {
             get { return eTranslationIdentifier.eNPC; }
@@ -127,6 +124,5 @@ namespace DOL.Database
                 m_messageArticle = value;
             }
         }
-        #endregion Properties
     }
 }

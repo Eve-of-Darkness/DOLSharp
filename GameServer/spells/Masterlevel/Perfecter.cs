@@ -31,7 +31,6 @@ namespace DOL.GS.Spells
     // ML2 GRP Cure Disease - already handled in another area
 
     // shared timer 1
-    #region Perfecter-3
     [SpellHandler("FOH")]
     public class FOHSpellHandler : FontSpellHandler
     {
@@ -87,12 +86,10 @@ namespace DOL.GS.Spells
             heal = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
-    #endregion
 
     // ML4 Greatness - passive increases 20% concentration
 
     // shared timer 1
-    #region Perfecter-5
     [SpellHandler("FOP")]
     public class FOPSpellHandler : FontSpellHandler
     {
@@ -148,10 +145,8 @@ namespace DOL.GS.Spells
             heal = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
-    #endregion
 
     // shared timer 1
-    #region Perfecter-6
     [SpellHandler("FOR")]
     public class FORSpellHandler : FontSpellHandler
     {
@@ -204,13 +199,11 @@ namespace DOL.GS.Spells
             heal = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
-    #endregion
 
     // shared timer 2
     // ML7 Leaping Health - already handled in another area
 
     // no shared timer
-    #region Perfecter-8
     [SpellHandler("SickHeal")]
     public class SickHealSpellHandler : RemoveSpellEffectHandler
     {
@@ -221,10 +214,8 @@ namespace DOL.GS.Spells
             SpellTypesToRemove = new List<string> {"PveResurrectionIllness", "RvrResurrectionIllness"};
         }
     }
-    #endregion
 
     // shared timer 1
-    #region Perfecter-9
     [SpellHandler("FOD")]
     public class FODSpellHandler : FontSpellHandler
     {
@@ -276,11 +267,9 @@ namespace DOL.GS.Spells
             heal = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
-    #endregion
 
     // shared timer 2
     // ML10 Rampant Healing - already handled in another area
-    #region PoT
     [SpellHandler("PowerOverTime")]
     public class PoTSpellHandler : SpellHandler
     {
@@ -407,9 +396,7 @@ namespace DOL.GS.Spells
         // constructor
         public PoTSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
-    #region CCResist
     [SpellHandler("CCResist")]
     public class CCResistSpellHandler : MasterlevelHandling
     {
@@ -445,5 +432,4 @@ namespace DOL.GS.Spells
         // constructor
         public CCResistSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 }

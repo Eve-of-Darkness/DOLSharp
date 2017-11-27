@@ -28,8 +28,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.QuestRewardChosen, "Quest Reward Choosing Handler", eClientStatus.PlayerInGame)]
     public class QuestRewardChosenHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             var response = (byte)packet.ReadByte();
@@ -55,10 +53,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             new QuestRewardChosenAction(client.Player, countChosen, itemsChosen, questGiverId, questId).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: QuestRewardChosenAction
 
         /// <summary>
         /// Send dialog response via Notify().
@@ -98,7 +92,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                               new QuestRewardChosenEventArgs(_questGiverId, _questId, _countChosen, _itemsChosen));
             }
         }
-
-        #endregion
     }
 }

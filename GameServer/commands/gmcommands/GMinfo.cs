@@ -50,7 +50,6 @@ namespace DOL.GS.Commands
 
             if (client.Player.TargetObject != null)
             {
-                #region Mob
                 /********************* MOB ************************/
                 if (client.Player.TargetObject is GameNPC)
                 {
@@ -436,9 +435,6 @@ namespace DOL.GS.Commands
                     }
                 }
 
-                #endregion Mob
-
-                #region Player
                 /********************* PLAYER ************************/
                 if (client.Player.TargetObject is GamePlayer)
                 {
@@ -539,10 +535,6 @@ namespace DOL.GS.Commands
                     info.Add(" ");
                 }
 
-                #endregion Player
-
-                #region StaticItem
-
                 /********************* OBJECT ************************/
                 if (client.Player.TargetObject is GameStaticItem)
                 {
@@ -577,10 +569,6 @@ namespace DOL.GS.Commands
                     info.Add(" ");
                     info.Add(" Location: X= " + target.X + " ,Y= " + target.Y + " ,Z= " + target.Z);
                 }
-
-                #endregion StaticItem
-
-                #region Door
 
                 /********************* DOOR ************************/
                 if (client.Player.TargetObject is GameDoor)
@@ -643,10 +631,6 @@ namespace DOL.GS.Commands
                     info.Add(" + Z : " + target.Z);
                     info.Add(" + Heading : " + target.Heading);
                 }
-
-                #endregion Door
-
-                #region Keep
 
                 /********************* KEEP ************************/
                 if (client.Player.TargetObject is GameKeepComponent)
@@ -722,8 +706,6 @@ namespace DOL.GS.Commands
                     }
                 }
 
-                #endregion Keep
-
                 client.Out.SendCustomTextWindow("[ " + name + " ]", info);
                 return;
             }
@@ -733,8 +715,6 @@ namespace DOL.GS.Commands
                 /*********************** HOUSE *************************/
                 if (client.Player.InHouse)
                 {
-                    #region House
-
                     House house = client.Player.CurrentHouse as House;
 
                     name = house.Name;
@@ -797,8 +777,6 @@ namespace DOL.GS.Commands
                     info.Add(LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.RentalPrice", Money.GetString(HouseMgr.GetRentByModel(house.Model))));
                     info.Add(LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.MaxLockbox", Money.GetString(HouseMgr.GetRentByModel(house.Model) * ServerProperties.Properties.RENT_LOCKBOX_PAYMENTS)));
                     info.Add(LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.RentDueIn", due.Days, due.Hours));
-
-                    #endregion House
 
                     client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.HouseOwner", name), info);
                 }

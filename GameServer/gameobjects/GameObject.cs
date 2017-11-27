@@ -42,8 +42,6 @@ namespace DOL.GS
         /// </summary>
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region State/Random/Type
-
         /// <summary>
         /// Holds the current state of the object
         /// </summary>
@@ -92,10 +90,6 @@ namespace DOL.GS
                 m_ObjectState = value;
             }
         }
-
-        #endregion
-
-        #region Position
 
         /// <summary>
         /// The Object's current Region
@@ -526,10 +520,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-
-        #region Level/Name/Model/GetName/GetPronoun/GetExamineMessage
-
         /// <summary>
         /// The level of the Object
         /// </summary>
@@ -860,10 +850,6 @@ namespace DOL.GS
             return list;
         }
 
-        #endregion
-
-        #region IDs/Database
-
         /// <summary>
         /// True if this object is saved in the DB
         /// </summary>
@@ -944,10 +930,6 @@ namespace DOL.GS
                 boat.DeleteFromDatabase();
             }
         }
-
-        #endregion
-
-        #region Add-/Remove-/Create-/Move-
 
         /// <summary>
         /// Creates this object in the gameworld
@@ -1105,10 +1087,6 @@ namespace DOL.GS
             get { return m_spawnTick; }
         }
 
-        #endregion
-
-        #region Quests
-
         /// <summary>
         /// A cache of every DBDataQuest object
         /// </summary>
@@ -1225,10 +1203,6 @@ namespace DOL.GS
             get { return m_dataQuests; }
         }
 
-        #endregion Quests
-
-        #region Interact
-
         /// <summary>
         /// The distance this object can be interacted with
         /// </summary>
@@ -1263,10 +1237,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-
-        #region Combat
-
         /// <summary>
         /// This living takes damage
         /// </summary>
@@ -1288,10 +1258,6 @@ namespace DOL.GS
         {
             Notify(GameObjectEvent.TakeDamage, this, new TakeDamageEventArgs(source, damageType, damageAmount, criticalAmount));
         }
-
-        #endregion
-
-        #region ConLevel/DurLevel
 
         /// <summary>
         /// Calculate con-level against other object
@@ -1342,10 +1308,6 @@ namespace DOL.GS
             return Math.Max((int)0, (int)(level + constep * con));
         }
 
-        #endregion
-
-        #region Notify
-
         public virtual void Notify(DOLEvent e, object sender, EventArgs args)
         {
             GameEventMgr.Notify(e, sender, args);
@@ -1365,10 +1327,6 @@ namespace DOL.GS
         {
             Notify(e, null, args);
         }
-
-        #endregion
-
-        #region ObjectsInRadius
 
         /// <summary>
         /// Gets all players close to this object inside a certain radius
@@ -1585,9 +1543,6 @@ namespace DOL.GS
 
             return new Region.EmptyEnumerator();
         }
-        #endregion
-
-        #region Item/Money
 
         /// <summary>
         /// Called when the object is about to get an item from someone
@@ -1655,10 +1610,6 @@ namespace DOL.GS
             return false;
         }
 
-        #endregion
-
-        #region Spell Cast
-
         /// <summary>
         /// Returns true if the object has the spell effect,
         /// else false.
@@ -1680,8 +1631,6 @@ namespace DOL.GS
         {
             return false;
         }
-
-        #endregion
 
         /// <summary>
         /// Returns the string representation of the GameObject
@@ -1710,8 +1659,6 @@ namespace DOL.GS
             set { }
         }
 
-        #region Broadcast Utils
-
         /// <summary>
         /// Broadcasts the Object Update to all players around
         /// </summary>
@@ -1732,8 +1679,6 @@ namespace DOL.GS
                 player.Out.SendObjectUpdate(this);
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Constructs a new empty GameObject

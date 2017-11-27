@@ -258,7 +258,6 @@ namespace DOL.GS.Keeps
             return null;
         }
 
-        #region Spells and Spell Line
         private static SpellLine m_GuardSpellLine;
         /// <summary>
         /// Spell line used by guards
@@ -464,6 +463,5 @@ namespace DOL.GS.Keeps
         // private static Spell m_albGuardMezSpell;
         // private static Spell m_midGuardMezSpell;
         // private static Spell m_hibGuardMezSpell;
-        #endregion
     }
 }

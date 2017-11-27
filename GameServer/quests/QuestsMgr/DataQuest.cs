@@ -238,8 +238,6 @@ namespace DOL.GS.Quests
         private readonly List<string> _questDependencies = new List<string>();
         private readonly List<byte> _allowedClasses = new List<byte>();
 
-        #region Construction
-
         /// <summary>
         /// Create an empty Quest
         /// </summary>
@@ -313,10 +311,6 @@ namespace DOL.GS.Quests
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(RewardQuestNotify));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(RewardQuestNotify));
         }
-
-        #endregion Construction
-
-        #region Parse Quest Data
 
         /// <summary>
         /// Split the quest strings into individual step data
@@ -674,10 +668,6 @@ namespace DOL.GS.Quests
             }
         }
 
-        #endregion Parse Quest Data
-
-        #region Properties
-
         /// <summary>
         /// Name of this quest to show in quest log
         /// </summary>
@@ -869,10 +859,6 @@ namespace DOL.GS.Quests
         /// Additional data following ClassType
         /// </summary>
         public string AdditionalData { get; private set; } = string.Empty;
-
-        #endregion Properties
-
-        #region Utility
 
         /// <summary>
         /// Get or create the CharacterXDataQuest for this player
@@ -1685,10 +1671,6 @@ namespace DOL.GS.Quests
             return false;
         }
 
-        #endregion Utility
-
-        #region Notify
-
         /// <summary>
         /// Notify is sent to all quests in the players active quest list
         /// </summary>
@@ -1906,10 +1888,6 @@ namespace DOL.GS.Quests
                 }
             }
         }
-
-        #endregion Notify
-
-        #region Notification Handlers
 
         /// <summary>
         /// A player has interacted with an object that has a DataQuest.
@@ -2747,8 +2725,6 @@ namespace DOL.GS.Quests
                 CheckOfferQuest(player, null);
             }
         }
-
-        #endregion Notification Handlers
 
         public override void FinishQuest()
         {

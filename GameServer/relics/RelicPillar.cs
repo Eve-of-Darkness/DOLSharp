@@ -39,8 +39,6 @@ namespace DOL.GS.Relics
         /// </summary>
         private static readonly object Lock = new object();
 
-        #region IDoor Implementation
-
         /// <summary>
         /// ID for this pillar.
         /// </summary>
@@ -105,7 +103,5 @@ namespace DOL.GS.Relics
         public void NPCManipulateDoorRequest(GameNPC npc, bool open)
         {
         }
-
-        #endregion
     }
 }

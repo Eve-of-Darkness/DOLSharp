@@ -60,7 +60,6 @@ namespace DOL.GS.GameEvents
         protected static string UpdateUrl = UrlEncode("http://www.your-website-here.com/serverinfo.php?action=submit&totalclients=" + ClientCount);
 
         // !!!!!!!!!!!!!!!!!!!!DO NOT EDIT BELOW THIS LINE!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        #region Code
 
         /// <summary>
         /// The Script Version
@@ -280,6 +279,5 @@ namespace DOL.GS.GameEvents
             newUrl = Url.Replace(" ", "%20");
             return newUrl;
         }
-        #endregion
     }
 }

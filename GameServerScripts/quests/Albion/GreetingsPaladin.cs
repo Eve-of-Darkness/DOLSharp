@@ -57,8 +57,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
-
             ItemTemplate standardDagger = GameServer.Database.FindObjectByKey<ItemTemplate>("standard_dagger_alb");
             if (standardDagger == null)
             {
@@ -184,7 +182,6 @@ namespace DOL.GS.Quests.Albion
                 standardMattock.Model = 16;
                 GameServer.Database.AddObject(standardMattock);
             }
-            #endregion
 
             Level = 1;
             QuestGiver = sirStrain;

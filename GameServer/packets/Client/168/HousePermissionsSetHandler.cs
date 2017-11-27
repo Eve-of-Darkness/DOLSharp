@@ -24,8 +24,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.HousePermissionSet, "Handles housing permissions changes", eClientStatus.PlayerInGame)]
     public class HousePermissionsSetHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int level = packet.ReadByte();
@@ -79,7 +77,5 @@ namespace DOL.GS.PacketHandler.Client.v168
             // save the updated permission
             GameServer.Database.SaveObject(permission);
         }
-
-        #endregion
     }
 }

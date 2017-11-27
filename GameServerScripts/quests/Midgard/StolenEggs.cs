@@ -150,8 +150,6 @@ namespace DOL.GS.Quests.Midgard
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCs
-
             dalikor = GetDalikor();
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.StolenEggs.NPCVikingHyndla"), eRealm.Midgard);
@@ -283,10 +281,6 @@ namespace DOL.GS.Quests.Midgard
                 askefruerTrainer = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             trainerWhip = GameServer.Database.FindObjectByKey<ItemTemplate>("askefruer_whip");
             if (trainerWhip == null)
             {
@@ -400,8 +394,6 @@ namespace DOL.GS.Quests.Midgard
 
                 GameServer.Database.AddObject(recruitsQuiltedVest);
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

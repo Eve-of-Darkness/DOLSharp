@@ -43,8 +43,6 @@ namespace DOL.GS
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Region Variables
-
         /// <summary>
         /// This is the minimumsize for object array that is allocated when
         /// the first object is added to the region must be dividable by 32 (optimization)
@@ -149,10 +147,6 @@ namespace DOL.GS
         /// The Region Mob's Respawn Timer Collection
         /// </summary>
         protected readonly ConcurrentDictionary<GameNPC, int> m_mobsRespawning = new ConcurrentDictionary<GameNPC, int>();
-
-        #endregion
-
-        #region Constructor
 
         public RegionData RegionData { get; protected set; }
 
@@ -303,8 +297,6 @@ namespace DOL.GS
             GameEventMgr.RemoveAllHandlersForObject(this);
         }
 
-        #endregion
-
         /// <summary>
         /// Handles players leaving this region via a zonepoint
         /// </summary>
@@ -315,8 +307,6 @@ namespace DOL.GS
         {
             return true;
         }
-
-        #region Properties
 
         public virtual bool IsRvR
         {
@@ -598,10 +588,6 @@ namespace DOL.GS
         }
 
         public virtual ConcurrentDictionary<GameNPC, int> MobsRespawning => m_mobsRespawning;
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Starts the RegionMgr
@@ -1245,10 +1231,6 @@ namespace DOL.GS
             return regionId == 30 || regionId == 73 || regionId == 130;
         }
 
-        #endregion
-
-        #region Area
-
         /// <summary>
         /// Adds an area to the region and updates area-zone cache
         /// </summary>
@@ -1419,10 +1401,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Notify
-
         public virtual void Notify(DOLEvent e, object sender, EventArgs args)
         {
             GameEventMgr.Notify(e, sender, args);
@@ -1442,12 +1420,6 @@ namespace DOL.GS
         {
             Notify(e, null, args);
         }
-
-        #endregion
-
-        #region Object in Radius (Added by Konik & WitchKing)
-
-        #region New Get in radius
 
         /// <summary>
         /// Gets objects in a radius around a point
@@ -1615,12 +1587,6 @@ namespace DOL.GS
             return GetInRadius(Zone.eGameObjectType.DOOR, x, y, z, radius, withDistance, false);
         }
 
-        #endregion
-
-        #region Enumerators
-
-        #region EmptyEnumerator
-
         /// <summary>
         /// An empty enumerator returned when no objects are found
         /// close to a certain range
@@ -1659,10 +1625,6 @@ namespace DOL.GS
             {
             }
         }
-
-        #endregion
-
-        #region ObjectEnumerator
 
         /// <summary>
         /// An enumerator over GameObjects. Used to enumerate over
@@ -1736,10 +1698,6 @@ namespace DOL.GS
                 m_current = -1;
             }
         }
-
-        #endregion
-
-        #region XXXDistanceEnumerator
 
         public abstract class DistanceEnumerator : ObjectEnumerator
         {
@@ -1836,12 +1794,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #endregion
-
-        #region Automatic relocation
-
         public void Relocate()
         {
             foreach (var zone in m_zones)
@@ -1851,13 +1803,7 @@ namespace DOL.GS
 
             m_lastRelocationTime = DateTime.Now.Ticks / (10 * 1000);
         }
-
-        #endregion
-
-        #endregion
-
     }
-    #region Helpers classes
 
     /// <summary>
     /// Holds a Object and it's distance towards the center
@@ -1918,6 +1864,4 @@ namespace DOL.GS
         public IDoor Door;
         public int Distance;
     }
-
-    #endregion
 }

@@ -34,8 +34,6 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int flagSpeedData = packet.ReadShort();
@@ -72,10 +70,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             new UseSpellAction(client.Player, flagSpeedData, spellLevel, spellLineIndex).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: UseSpellAction
 
         /// <summary>
         /// Handles player use spell actions
@@ -189,7 +183,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
         }
-
-        #endregion
     }
 }

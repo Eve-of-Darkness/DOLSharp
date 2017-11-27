@@ -38,8 +38,6 @@ namespace DOL.GS
             get { return true; }
         }
 
-        #region Examine/Interact Message
-
         public override IList GetExamineMessages(GamePlayer player)
         {
             IList list = new ArrayList();
@@ -59,10 +57,6 @@ namespace DOL.GS
             SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.Interact"));
             return true;
         }
-
-        #endregion Examine/Interact Message
-
-        #region Receive item
 
         public override bool ReceiveItem(GameLiving source, InventoryItem item)
         {
@@ -168,7 +162,5 @@ namespace DOL.GS
             SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.RechargerDialogResponse.FullyCharged"));
             return;
         }
-
-        #endregion Receive item
     }
 }

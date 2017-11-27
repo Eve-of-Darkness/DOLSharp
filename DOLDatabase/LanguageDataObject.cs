@@ -23,7 +23,6 @@ namespace DOL.Database
 {
     public abstract class LanguageDataObject : DataObject
     {
-        #region Enums
         public enum eTranslationIdentifier
             : byte
         {
@@ -35,17 +34,13 @@ namespace DOL.Database
             eSystem = 5,
             eZone = 6
         }
-        #endregion Enums
 
-        #region Variables
         private string m_lng = string.Empty;
         private string m_tid = string.Empty;
         private string m_tag = string.Empty;
-        #endregion Variables
 
         public LanguageDataObject() { }
 
-        #region Properties
         public abstract eTranslationIdentifier TranslationIdentifier
         {
             get;
@@ -95,6 +90,5 @@ namespace DOL.Database
                 m_tag = value;
             }
         }
-        #endregion Properties
     }
 }

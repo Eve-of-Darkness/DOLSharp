@@ -108,8 +108,6 @@ namespace DOL.GS.Quests.Albion
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Master Ferowl", eRealm.Albion);
             if (npcs.Length == 0)
             {
@@ -254,9 +252,6 @@ namespace DOL.GS.Quests.Albion
             }
 
             // end npc
-            #endregion
-
-            #region Item Declarations
 
             sealed_pouch = GameServer.Database.FindObjectByKey<ItemTemplate>("sealed_pouch");
             if (sealed_pouch == null)
@@ -1088,7 +1083,6 @@ namespace DOL.GS.Quests.Albion
             }
 
             // Item Descriptions End
-            #endregion
 
             morganaArea = WorldMgr.GetRegion(Morgana.CurrentRegionID).AddArea(new Area.Circle(null, Morgana.X, Morgana.Y, 0, 1000));
             morganaArea.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterMorganaArea));
@@ -1506,8 +1500,6 @@ namespace DOL.GS.Quests.Albion
             }
         }
 
-        #region Allakhazam Epic Source
-
         /*
         * Return to Esmond in Cornwall Station once you reach level 50. If you had given him the dagger at the end of the level 48 epic, he will ask you if you want it back. If he asks, accept the knife back and continue. If not, make sure you have the ritual dagger with you.
         * Go to Lyonesse and find the tower, which is located at 20k, 39k. You can simply follow the Telamon road past the majority of the Danaoian Farmers, until you see a fallen tower with two large named demons (purple to 50) and Morgana sitting on top of the tower.
@@ -1518,7 +1510,5 @@ namespace DOL.GS.Quests.Albion
         * Your trainer in Camelot should give you your epic armor, with another congratulations.
         * The description of this quest was done by a Wizard. Other Academy classes might be slightly different. Also, this quest takes into consideration that you gave the knife to Esmond at the end of the 48 epic quest, which may or may not be a big deal.
         */
-
-        #endregion
     }
 }

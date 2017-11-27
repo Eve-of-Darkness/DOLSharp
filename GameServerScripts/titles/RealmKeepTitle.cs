@@ -23,7 +23,6 @@ using DOL.Events;
 
 namespace GameServerScripts.Titles
 {
-    #region keep
     /// <summary>
     /// "Frontier Challenger" title granted to everyone who captured 10+ keeps.
     /// </summary>
@@ -59,8 +58,7 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => player.CapturedKeeps >= 500; } }
     }
-    #endregion
-    #region tower
+
     /// <summary>
     /// "Stronghold Soldier" title granted to everyone who captured 100+ towers.
     /// </summary>
@@ -84,5 +82,4 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => player.CapturedKeeps >= 1000; } }
     }
-    #endregion
 }

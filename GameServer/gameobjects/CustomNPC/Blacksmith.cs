@@ -38,8 +38,6 @@ namespace DOL.GS
             get { return true; }
         }
 
-        #region Examine/Interact Message
-
         /// <summary>
         /// Adds messages to ArrayList which are sent when object is targeted
         /// </summary>
@@ -72,10 +70,6 @@ namespace DOL.GS
             SayTo(player, eChatLoc.CL_PopupWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Blacksmith.Say"));
             return true;
         }
-
-        #endregion Examine/Interact Message
-
-        #region Receive item
 
         public override bool ReceiveItem(GameLiving source, InventoryItem item)
         {
@@ -222,7 +216,5 @@ namespace DOL.GS
 
             return;
         }
-
-        #endregion
     }
 }

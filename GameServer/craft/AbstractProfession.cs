@@ -27,8 +27,6 @@ namespace DOL.GS
     /// </summary>
     public abstract class AbstractProfession : AbstractCraftingSkill
     {
-        #region Title
-
         protected abstract string Profession { get; }
 
         public static string GetTitleFormat(int skillLevel)
@@ -67,7 +65,5 @@ namespace DOL.GS
                 return "<you may want to check your Crafting.txt language file>";
             }
         }
-
-        #endregion
     }
 }

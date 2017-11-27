@@ -168,8 +168,6 @@ namespace DOL.GS.Keeps
 
         private bool m_changingPositions = false;
 
-        #region Combat
-
         /// <summary>
         /// Here we set the speeds we want our guards to have, this affects weapon damage
         /// </summary>
@@ -594,7 +592,6 @@ namespace DOL.GS.Keeps
             }
         }
 
-        #region Guard Spam
         /// <summary>
         /// Sends message to guild for guard death with enemy count in area
         /// </summary>
@@ -649,8 +646,6 @@ namespace DOL.GS.Keeps
             return inArea;
         }
 
-        #endregion
-
         /// <summary>
         /// Has the NPC been attacked recently.. currently 10 seconds
         /// </summary>
@@ -661,7 +656,6 @@ namespace DOL.GS.Keeps
                 return CurrentRegion.Time - LastAttackedByEnemyTick < 10 * 1000;
             }
         }
-        #endregion
 
         /// <summary>
         /// When we add a guard to the world, we also attach an AttackFinished handler
@@ -874,8 +868,6 @@ namespace DOL.GS.Keeps
             return s;
         }
 
-        #region Database
-
         string m_dataObjectID = string.Empty;
 
         /// <summary>
@@ -1017,7 +1009,6 @@ namespace DOL.GS.Keeps
                 MoveTo(CurrentRegionID, X, Y, Z, Heading);
             }
         }
-        #endregion
 
         /// <summary>
         /// Change guild of guard (emblem on equipment) when keep is claimed

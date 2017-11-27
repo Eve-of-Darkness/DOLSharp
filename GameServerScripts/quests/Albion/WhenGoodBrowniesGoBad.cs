@@ -70,8 +70,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
-
             // item db check
             lightredclothdye = GameServer.Database.FindObjectByKey<ItemTemplate>("light_red_cloth_dye");
             if (lightredclothdye == null)
@@ -171,7 +169,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(lightredenamel);
             }
-            #endregion
 
             ItemTemplate brownieBlood = new ItemTemplate();
             brownieBlood.Weight = 0;
@@ -204,8 +201,6 @@ namespace DOL.GS.Quests.Albion
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>(LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "Alb.WhenGoodBrowniesGoBad.ScriptLoaded.Text1"), eRealm.Albion);
 
@@ -249,8 +244,6 @@ namespace DOL.GS.Quests.Albion
             {
                 MasterKless = npcs[0];
             }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

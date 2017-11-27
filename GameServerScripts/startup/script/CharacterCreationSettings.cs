@@ -30,7 +30,6 @@ namespace DOL.GS.GameEvents
     /// </summary>
     public static class CharacterCreationSettings
     {
-        #region Properties
         /// <summary>
         /// The amount of Bounty Points a player starts with
         /// </summary>
@@ -54,7 +53,6 @@ namespace DOL.GS.GameEvents
         /// </summary>
         [ServerProperty("startup", "starting_level", "Starting Level - Edit this to set which levels experience a new player start the game with", 1)]
         public static int STARTING_LEVEL { get; set; }
-        #endregion
 
         /// <summary>
         /// Register Character Creation Events

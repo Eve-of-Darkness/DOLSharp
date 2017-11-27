@@ -62,7 +62,6 @@ namespace DOL.GS
             }
         }
 
-        #region IList
         public void AddGuild(Guild myguild)
         {
             lock (Guilds.SyncRoot)
@@ -144,8 +143,6 @@ namespace DOL.GS
                 return Guilds.Contains(myguild);
             }
         }
-
-        #endregion
 
         /// <summary>
         /// send message to all member of alliance

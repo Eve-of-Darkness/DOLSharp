@@ -28,7 +28,6 @@ namespace DOL.GS
     /// </summary>
     public static class CustomParamsExtensions
     {
-        #region getters
         /// <summary>
         /// Search Params Collection to Extract the Value identified by Key.
         /// From Dictionary&lt;stringKey, List&lt;stringValue&gt;&gt; (List&lt;stringValue&gt;.First() Casted to T)
@@ -94,9 +93,7 @@ namespace DOL.GS
 
             return new List<T>();
         }
-        #endregion
 
-        #region Setters
         /// <summary>
         /// Set or Replace Value in Params Collection with given Key
         /// </summary>
@@ -249,7 +246,6 @@ namespace DOL.GS
                 obj.CustomParamsDictionary.Select(kv => kv.Key == key ? new KeyValuePair<string, List<string>>(key, val) : kv)
                 .ToDictionary(kv => kv.Key, kv => kv.Value);
         }
-        #endregion
 
         /// <summary>
         /// Init Object Params Collection from Source Collection

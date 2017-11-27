@@ -34,16 +34,12 @@ namespace DOL.GS.Quests
     /// </summary>
     public sealed class QuestMgr
     {
-        #region Declaration
-
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly IDictionary QuestTypeMap = new HybridDictionary();
-
-        #endregion
 
         public static bool Init()
         {
@@ -85,8 +81,6 @@ namespace DOL.GS.Quests
 
             return true;
         }
-
-        #region Function
 
         /// <summary>
         /// Creates a new QuestBuilder with the given QuestType
@@ -432,8 +426,5 @@ namespace DOL.GS.Quests
 
             return source.GiveQuest(questType, player, 1);
         }
-
-        #endregion
-
     }
 }

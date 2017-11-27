@@ -25,8 +25,6 @@ namespace DOL.GS
 
     public static class GameNPCHelper
     {
-
-        #region GameNPC cast methods
         /// <summary>
         /// Cast a spell on player and its pets/subpets if available.
         /// </summary>
@@ -68,7 +66,6 @@ namespace DOL.GS
         {
             CastSpellOnOwnerAndPets(sourceNPC, player, spell, line, true);
         }
-        #endregion GameNPC cast methods
     }
 }
 

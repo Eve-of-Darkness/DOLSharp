@@ -90,8 +90,6 @@ namespace DOL.GS
             return eInventorySlot.Invalid;
         }
 
-        #region AddNPCEquipment/RemoveNPCEquipment/CloseTemplate/CloneTemplate
-
         /// <summary>
         /// Adds item to template reusing inventory item instances from other templates.
         /// </summary>
@@ -306,10 +304,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region LoadFromDatabase/SaveIntoDatabase
-
         /// <summary>
         /// Cache for fast loading of npc equipment
         /// </summary>
@@ -478,10 +472,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region methods not allowed in inventory template
-
         /// <summary>
         /// Overridden. Inventory template cannot be modified.
         /// </summary>
@@ -596,7 +586,5 @@ namespace DOL.GS
         {
             return false;
         }
-
-        #endregion
     }
 }

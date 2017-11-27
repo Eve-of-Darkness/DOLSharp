@@ -106,8 +106,7 @@ namespace DOL.GS.Quests.Albion
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Mistress Laws", (eRealm)1);
             if (npcs.Length == 0)
@@ -205,10 +204,6 @@ namespace DOL.GS.Quests.Albion
                 YlaineBarrett = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
         slimyswampgooskin = GameServer.Database.FindObjectByKey<ItemTemplate>("slimyswampgooskin");
             if (slimyswampgooskin == null)
             {
@@ -285,14 +280,6 @@ namespace DOL.GS.Quests.Albion
                     GameServer.Database.AddObject(slimyswampgooskin);
                 }
 
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
-
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(Cellarinfestation));
             QuestBehaviour a;
             a = builder.CreateBehaviour(MistressLaws,-1);
@@ -355,9 +342,7 @@ namespace DOL.GS.Quests.Albion
             a.AddAction(eActionType.FinishQuest,typeof(DOL.GS.Quests.Albion.Cellarinfestation),null);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             if (MistressLaws != null) {

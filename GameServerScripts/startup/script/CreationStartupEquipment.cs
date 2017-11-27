@@ -35,13 +35,11 @@ namespace DOL.GS.GameEvents
     /// </summary>
     public static class CreationStartupEquipment
     {
-        #region Properties
         /// <summary>
         /// Enable the Free Starter Equipment Gift.
         /// </summary>
         [ServerProperty("startup", "enable_free_starter_equipment", "Enable Startup Free Equipment gifts imported from StarterEquipment Table", true)]
         public static bool ENABLE_FREE_STARTER_EQUIPMENT { get; set; }
-        #endregion
 
         /// <summary>
         /// Declare a logger for this class.

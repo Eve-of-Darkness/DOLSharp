@@ -42,8 +42,6 @@ namespace DOL.GS.Housing
         private readonly Dictionary<int, DBHousePermissions> _permissionLevels;
         private GameConsignmentMerchant _consignmentMerchant;
 
-        #region Properties
-
         public int HouseNumber
         {
             get { return _databaseItem.HouseNumber; }
@@ -294,8 +292,6 @@ namespace DOL.GS.Housing
             get { return _databaseItem.Name; }
             set { _databaseItem.Name = value; }
         }
-
-        #endregion
 
         public House(DBHouse house)
         {
@@ -611,8 +607,6 @@ namespace DOL.GS.Housing
             return -1;
         }
 
-        #region Hookpoints
-
         public static bool AddNewOffset(HouseHookpointOffset o)
         {
             if (o.HookpointID <= HousingConstants.MaxHookpointLocations)
@@ -818,10 +812,6 @@ namespace DOL.GS.Housing
                 }
             }
         }
-
-        #endregion
-
-        #region Editing
 
         public bool AddPorch()
         {
@@ -1109,12 +1099,6 @@ namespace DOL.GS.Housing
             SendUpdate();
         }
 
-        #endregion
-
-        #region Permissions
-
-        #region Add/Remove/Edit
-
         public bool AddPermission(GamePlayer player, PermissionType permType, int permLevel)
         {
             // make sure player is not null
@@ -1229,10 +1213,6 @@ namespace DOL.GS.Housing
             // save the permission
             GameServer.Database.SaveObject(permission);
         }
-
-        #endregion
-
-        #region Get Permissions
 
         private DBHouseCharsXPerms GetPlayerPermissions(GamePlayer player)
         {
@@ -1398,10 +1378,6 @@ namespace DOL.GS.Housing
             // no character/account/guild match, not an owner
             return false;
         }
-
-        #endregion
-
-        #region Check Permissions
 
         public bool CanEmptyHookpoint(GamePlayer player)
         {
@@ -1570,12 +1546,6 @@ namespace DOL.GS.Housing
             return HasAccess(player, cp => cp.CanUseTools);
         }
 
-        #endregion
-
-        #endregion
-
-        #region Database
-
         /// <summary>
         /// Saves this house into the database
         /// </summary>
@@ -1636,7 +1606,5 @@ namespace DOL.GS.Housing
                 }
             }
         }
-
-        #endregion
     }
 }

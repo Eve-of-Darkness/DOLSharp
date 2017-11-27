@@ -104,7 +104,6 @@ namespace DOL.GS.Quests.Albion
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCS
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>(questGiverName, eRealm.Albion);
 
             if (npcs.Length == 0)
@@ -192,13 +191,9 @@ namespace DOL.GS.Quests.Albion
             {
                 questTarget = npcs[0];
             }
-            #endregion
 
-            #region defineAreas
             targetArea = WorldMgr.GetRegion(targetLocation.RegionID).AddArea(new Area.Circle(string.Empty, targetLocation.X, targetLocation.Y, targetLocation.Z, 200));
-            #endregion
 
-            #region defineBehaviours
             QuestBuilder builder = QuestMgr.GetBuilder(typeof(MovementAndInteraction));
             QuestBehaviour a = null;
             string message1 = "Welcome to " + zoneName + ", <Class>. Here you will learn the basic skills needed to defend yourself as you explore our realm and grow in power and wisdom. Now, without further delay, let's get you started on your [training].";
@@ -240,7 +235,6 @@ namespace DOL.GS.Quests.Albion
             a.AddRequirement(eRequirementType.QuestStep, typeof(MovementAndInteraction), 3, (eComparator)3);
             a.AddAction(eActionType.FinishQuest, typeof(MovementAndInteraction), null);
             AddBehaviour(a);
-            #endregion
 
             questGiver.AddQuestToGive(typeof(MovementAndInteraction));
 

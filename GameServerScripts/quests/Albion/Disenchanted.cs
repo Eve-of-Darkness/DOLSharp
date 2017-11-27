@@ -152,8 +152,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Palune", eRealm.Albion);
             if (npcs.Length == 0)
             {
@@ -227,10 +225,6 @@ namespace DOL.GS.Quests.Albion
                 guardCynon = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             enchantedHalberd = GameServer.Database.FindObjectByKey<ItemTemplate>("enchanted_halberd");
             if (enchantedHalberd == null)
             {
@@ -253,8 +247,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(enchantedHalberd);
             }
-
-            #endregion
 
             /* Now we add some hooks to the Sir Quait we found.
                 * Actually, we want to know when a player interacts with him.

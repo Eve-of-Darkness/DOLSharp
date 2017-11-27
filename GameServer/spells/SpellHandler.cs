@@ -159,8 +159,6 @@ namespace DOL.GS.Spells
                 .ToString();
         }
 
-        #region Pulsing Spells
-
         /// <summary>
         /// When spell pulses
         /// </summary>
@@ -306,8 +304,6 @@ namespace DOL.GS.Spells
                 pulsingSpells[pulsingSpells.Count - 1].Cancel(false);
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Cast a spell by using an item
@@ -627,8 +623,6 @@ namespace DOL.GS.Spells
 
             return false;
         }
-
-        #region begin & end cast check
 
         public virtual bool CheckBeginCast(GameLiving selectedTarget)
         {
@@ -1799,8 +1793,6 @@ namespace DOL.GS.Spells
             return true;
         }
 
-        #endregion
-
         /// <summary>
         /// Calculates the power to cast the spell
         /// </summary>
@@ -2092,8 +2084,6 @@ namespace DOL.GS.Spells
             return Caster.CalculateCastingTime(SpellLine, Spell);
         }
 
-        #region animations
-
         /// <summary>
         /// Sends the cast animation
         /// </summary>
@@ -2158,7 +2148,6 @@ namespace DOL.GS.Spells
                 player.Out.SendSpellEffectAnimation(Caster, target, clientEffect, boltDuration, noSound, success);
             }
         }
-        #endregion
 
         /// <summary>
         /// called after normal spell cast is completed and effect has to be started
@@ -2380,11 +2369,9 @@ namespace DOL.GS.Spells
                 }
             }
 
-            #region Process the targets
             switch (modifiedTarget)
             {
-                    #region GTAoE
-                    // GTAoE
+                // GTAoE
                 case "area":
                     // Dinberg - fix for animists turrets, where before a radius of zero meant that no targets were ever
                     // selected!
@@ -2440,8 +2427,7 @@ namespace DOL.GS.Spells
                     }
 
                     break;
-                    #endregion
-                    #region Corpse
+
                 case "corpse":
                     if (target != null && !target.IsAlive)
                     {
@@ -2449,8 +2435,7 @@ namespace DOL.GS.Spells
                     }
 
                     break;
-                    #endregion
-                    #region Pet
+
                 case "pet":
                     {
                         // Start-- [Ganrod] Nidel: Can cast Pet spell on our Minion/Turret pet without ControlledNpc
@@ -2518,8 +2503,7 @@ namespace DOL.GS.Spells
 
                     // End-- [Ganrod] Nidel: Can cast Pet spell on our Minion/Turret pet without ControlledNpc
                     break;
-                    #endregion
-                    #region Enemy
+
                 case "enemy":
                     if (modifiedRadius > 0)
                     {
@@ -2607,8 +2591,7 @@ namespace DOL.GS.Spells
                     }
 
                     break;
-                    #endregion
-                    #region Realm
+
                 case "realm":
                     if (modifiedRadius > 0)
                     {
@@ -2642,8 +2625,7 @@ namespace DOL.GS.Spells
                     }
 
                     break;
-                    #endregion
-                    #region Self
+
                 case "self":
                     {
                         if (modifiedRadius > 0)
@@ -2676,8 +2658,7 @@ namespace DOL.GS.Spells
 
                         break;
                     }
-                    #endregion
-                    #region Group
+
                 case "group":
                     {
                         Group group = Caster.Group;
@@ -2754,8 +2735,7 @@ namespace DOL.GS.Spells
 
                         break;
                     }
-                    #endregion
-                    #region Cone AoE
+
                 case "cone":
                     {
                         target = Caster;
@@ -2804,9 +2784,7 @@ namespace DOL.GS.Spells
 
                         break;
                     }
-                    #endregion
             }
-            #endregion
             return list;
         }
 
@@ -3579,8 +3557,6 @@ namespace DOL.GS.Spells
             }
         }
 
-        #region messages
-
         /// <summary>
         /// Sends a message to the caster, if the caster is a controlled
         /// creature, to the player instead (only spell hit and resisted
@@ -3671,7 +3647,6 @@ namespace DOL.GS.Spells
                 MessageToCaster("You move and interrupt your focus!", eChatType.CT_Important);
             }
         }
-        #endregion
 
         /// <summary>
         /// Ability to cast a spell
@@ -4026,8 +4001,6 @@ namespace DOL.GS.Spells
                 return null;
             }
         }
-
-        #region various helpers
 
         /// <summary>
         /// Level mod for effect between target and caster if there is any
@@ -4419,7 +4392,6 @@ namespace DOL.GS.Spells
 
             eDamageType damageType = DetermineSpellDamageType();
 
-            #region Resists
             eProperty property = target.GetResistTypeForDamage(damageType);
 
             // The Daoc resistsystem is since 1.65 a 2category system.
@@ -4429,7 +4401,6 @@ namespace DOL.GS.Spells
             // so calculation is (finaldamage * Category1Modification) * Category2Modification
             // -> Remark for the future: VampirResistBuff is Category2 too.
             // - avi
-            #region Primary Resists
             int primaryResistModifier = ad.Target.GetResist(damageType);
 
             /* Resist Pierce
@@ -4444,9 +4415,6 @@ namespace DOL.GS.Spells
                 // substract max ItemBonus of property of target, but atleast 0.
                 primaryResistModifier -= Math.Max(0, Math.Min(ad.Target.ItemBonus[(int)property], resiPierce));
             }
-            #endregion
-
-            #region Secondary Resists
 
             // Using the resist BuffBonusCategory2 - its unused in ResistCalculator
             int secondaryResistModifier = target.SpecBuffBonusCategory[(int)property];
@@ -4455,7 +4423,6 @@ namespace DOL.GS.Spells
             {
                 secondaryResistModifier = 80;
             }
-            #endregion
 
             int resistModifier = 0;
 
@@ -4467,8 +4434,6 @@ namespace DOL.GS.Spells
 
             // apply resists
             finalDamage += resistModifier;
-
-            #endregion
 
             // Apply damage cap (this can be raised by effectiveness)
             if (finalDamage > DamageCap(effectiveness))
@@ -4639,9 +4604,6 @@ namespace DOL.GS.Spells
             m_lastAttackData = ad;
         }
 
-        #endregion
-
-        #region saved effects
         public virtual PlayerXEffect GetSavedEffect(GameSpellEffect effect)
         {
             return null;
@@ -4654,9 +4616,7 @@ namespace DOL.GS.Spells
         {
             return 0;
         }
-        #endregion
 
-        #region tooltip handling
         /// <summary>
         /// Return the given Delve Writer with added keyvalue pairs.
         /// </summary>
@@ -4800,7 +4760,5 @@ namespace DOL.GS.Spells
 
             return 0;
         }
-        #endregion
-
     }
 }

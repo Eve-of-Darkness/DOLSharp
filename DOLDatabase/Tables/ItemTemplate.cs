@@ -59,8 +59,6 @@ namespace DOL.Database
         /// </summary>
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region members
-
         public const string m_blankItem = "Item_Template";
 
         protected string m_id_nb;
@@ -160,9 +158,7 @@ namespace DOL.Database
         protected string m_classType;
 
         protected int m_salvageYieldID;
-        #endregion
 
-        #region constructors
         public ItemTemplate()
         {
             AllowUpdate = false;
@@ -323,9 +319,7 @@ namespace DOL.Database
             ClassType = template.ClassType;
             SalvageYieldID = template.SalvageYieldID;
         }
-        #endregion
 
-        #region Data Fields
         [PrimaryKey]
         public virtual string Id_nb
         {
@@ -497,8 +491,6 @@ namespace DOL.Database
             set { Dirty = true; m_extension = value; }
         }
 
-        #region Bonuses
-
         [DataElement(AllowDbNull = true)]
         public int Bonus
         {
@@ -583,10 +575,6 @@ namespace DOL.Database
             set { Dirty = true; m_extrabonus = value; }
         }
 
-        #endregion
-
-        #region BonusTypes
-
         [DataElement(AllowDbNull = true)]
         public virtual int Bonus1Type
         {
@@ -664,18 +652,12 @@ namespace DOL.Database
             set { Dirty = true; m_extrabonusType = value; }
         }
 
-        #endregion
-
-        #region Charges
-
         [DataElement(AllowDbNull = false)]
         public int CanUseEvery
         {
             get { return m_canUseEvery; }
             set { Dirty = true; m_canUseEvery = value; }
         }
-
-        #region first charges
 
         /// <summary>
         /// Spell id for items with charge
@@ -707,9 +689,6 @@ namespace DOL.Database
             set { Dirty = true; m_maxCharges = value; }
         }
 
-        #endregion
-        #region second charges
-
         /// <summary>
         /// Spell id for items with charge
         /// </summary>
@@ -737,20 +716,12 @@ namespace DOL.Database
             set { Dirty = true; m_maxCharges1 = value; }
         }
 
-        #endregion
-
-        #endregion
-
-        #region Procs
-
         [DataElement(AllowDbNull = true)]
         public virtual byte ProcChance
         {
             get { return m_procChance; }
             set { Dirty = true; m_procChance = value; }
         }
-
-        #region first proc
 
         /// <summary>
         /// ProcSpell id for items
@@ -762,21 +733,12 @@ namespace DOL.Database
             set { Dirty = true; m_procSpellID = value; }
         }
 
-        #endregion
-        #region second proc
-
         [DataElement(AllowDbNull = true)]
         public virtual int ProcSpellID1
         {
             get { return m_procSpellID1; }
             set { Dirty = true; m_procSpellID1 = value; }
         }
-
-        #endregion
-
-        #endregion
-
-        #region Poison
 
         [DataElement(AllowDbNull = true)]
         public int PoisonSpellID
@@ -798,8 +760,6 @@ namespace DOL.Database
             get { return m_poisonMaxCharges; }
             set { Dirty = true; m_poisonMaxCharges = value; }
         }
-
-        #endregion
 
         [DataElement(AllowDbNull = true)]
         public bool IsPickable
@@ -936,9 +896,6 @@ namespace DOL.Database
             set { Dirty = true; m_salvageYieldID = value; }
         }
 
-        #endregion
-
-        #region various Methods
         public virtual byte BaseDurabilityPercent
         {
             get
@@ -1192,6 +1149,5 @@ namespace DOL.Database
                     break;
             }
         }
-        #endregion
     }
 }

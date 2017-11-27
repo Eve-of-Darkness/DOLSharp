@@ -110,7 +110,6 @@ namespace DOL.GS.Quests.Albion
                 log.Info("Quest \"" + questTitle + "\" (Alb) initializing ...");
             }
 
-            #region defineNPCs
             GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Charles", (eRealm)1);
@@ -153,10 +152,6 @@ namespace DOL.GS.Quests.Albion
             {
                 Charles = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             daringpaddedboots_alb = GameServer.Database.FindObjectByKey<ItemTemplate>("daringpaddedboots_alb");
             if (daringpaddedboots_alb == null)
@@ -1526,13 +1521,8 @@ namespace DOL.GS.Quests.Albion
                     GameServer.Database.AddObject(daringstuddedsleeves_alb);
             }
 
-            #endregion
-
-            #region defineAreas
             Albion_Statue_Area = WorldMgr.GetRegion(Albion_Statue.RegionID).AddArea(new Area.Circle(string.Empty, Albion_Statue.X, Albion_Statue.Y, Albion_Statue.Z, 500));
             Albion_Statue_Area.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterStatueArea));
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

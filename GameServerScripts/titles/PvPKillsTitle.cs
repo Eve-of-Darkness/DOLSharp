@@ -23,7 +23,6 @@ using DOL.Events;
 
 namespace GameServerScripts.Titles
 {
-    #region albion player killed
     /// <summary>
     /// "Bane of Albion" title granted to everyone who killed 2000+ alb players.
     /// </summary>
@@ -59,9 +58,7 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => player.KillsAlbionPlayers >= 100000; } }
     }
-    #endregion
 
-    #region midgard player killed
     /// <summary>
     /// "Bane of Midgard" title granted to everyone who killed 2000+ mid players.
     /// </summary>
@@ -97,9 +94,7 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => player.KillsMidgardPlayers >= 100000; } }
     }
-    #endregion
 
-    #region hibernia player killed
     /// <summary>
     /// "Bane of Hibernia" title granted to everyone who killed 2000+ hib players.
     /// </summary>
@@ -135,8 +130,7 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => player.KillsHiberniaPlayers >= 100000; } }
     }
-    #endregion
-    #region all player killed
+
     /// <summary>
     /// "Master Soldier" title granted to everyone who killed 2000+ players.
     /// </summary>
@@ -172,9 +166,7 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => (player.KillsHiberniaPlayers + player.KillsMidgardPlayers + player.KillsAlbionPlayers) >= 100000; } }
     }
-    #endregion
 
-    #region deathblows
     /// <summary>
     /// "Battle Enforcer" title granted to everyone who killed 2000+ players with death blow.
     /// </summary>
@@ -198,9 +190,7 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => (player.KillsAlbionDeathBlows + player.KillsMidgardDeathBlows + player.KillsHiberniaDeathBlows) >= 25000; } }
     }
-    #endregion
 
-    #region solo
     /// <summary>
     /// "Lone Enforcer" title granted to everyone who solo killed 2000+ players.
     /// </summary>
@@ -224,5 +214,4 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => (player.KillsAlbionSolo + player.KillsMidgardSolo + player.KillsHiberniaSolo) >= 25000; } }
     }
-    #endregion
 }

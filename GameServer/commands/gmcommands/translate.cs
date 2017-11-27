@@ -57,7 +57,6 @@ namespace DOL.GS.Commands
 
             switch (args[1].ToLower())
             {
-                #region add
                 case "add":
                     {
                         if (client.Account.PrivLevel != (uint)ePrivLevel.Player)
@@ -88,9 +87,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion add
 
-                #region debug
                 case "debug":
                     {
                         bool debug = client.Player.TempProperties.getProperty("LANGUAGEMGR-DEBUG", false);
@@ -99,9 +96,7 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, "[Language-Manager] Debug mode: " + (debug ? "ON" : "OFF"));
                         return;
                     }
-                #endregion debug
 
-                #region memadd
                 case "memadd":
                     {
                         // This sub command adds a new language object to your temp properties which will "pre save" the given translation id
@@ -142,9 +137,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion memadd
 
-                #region memclear
                 case "memclear":
                     {
                         // Removes the language object from your temp properties you've previously added with the "memadd" sub command.
@@ -162,9 +155,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion memclear
 
-                #region memsave
                 case "memsave":
                     {
                         // See "memadd" sub command for a description.
@@ -206,9 +197,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion memsave
 
-                #region memshow
                 case "memshow":
                     {
                         LanguageDataObject lngObj = (LanguageDataObject)client.Player.TempProperties.getProperty<object>(LANGUAGEMGR_MEM_LNG_OBJ, null);
@@ -224,9 +213,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion memshow
 
-                #region refresh
                 case "refresh":
                     {
                         if (args.Length < 5)
@@ -251,9 +238,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion refresh
 
-                #region select
                 case "select":
                     {
                         if (args.Length < 4)
@@ -289,9 +274,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion select
 
-                #region selectclear
                 case "selectclear":
                     {
                         // Removes the language object from your temp properties you've previously selected with the "select" sub command.
@@ -311,9 +294,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion selectclear
 
-                #region selectsave
                 case "selectsave":
                     {
                         if (args.Length < 3)
@@ -350,9 +331,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion selectsave
 
-                #region selectshow
                 case "selectshow":
                     {
                         LanguageDataObject lngObj = (LanguageDataObject)client.Player.TempProperties.getProperty<object>(LANGUAGEMGR_SEL_LNG_OBJ, null);
@@ -369,9 +348,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion selectshow
 
-                #region show
                 case "show":
                     {
                         if (args.Length < 4)
@@ -395,9 +372,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion show
 
-                #region showlist
                 /*
                  * The code works fine, but DAoC does not support a such huge list.
                  *
@@ -512,7 +487,6 @@ namespace DOL.GS.Commands
 
                         return;
                     }*/
-                #endregion showlist
 
                 default:
                     {

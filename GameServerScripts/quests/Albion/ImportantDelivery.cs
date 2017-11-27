@@ -143,8 +143,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCs
-
             masterFrederick = GetMasterFrederick();
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Apprentice Dunan", eRealm.Albion);
@@ -293,10 +291,6 @@ namespace DOL.GS.Quests.Albion
                 yaren = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             ticketToLudlow = CreateTicketTo("Ludlow", "hs_northcamelotgates_ludlow");
             ticketToBombard = CreateTicketTo("North Camelot Gates", "hs_ludlow_northcamelotgates");
 
@@ -393,8 +387,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(recruitsCloak);
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

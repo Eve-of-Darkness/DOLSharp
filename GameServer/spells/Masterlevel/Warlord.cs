@@ -24,12 +24,9 @@ using DOL.AI.Brain;
 namespace DOL.GS.Spells
 {
     // http://www.camelotherald.com/masterlevels/ma.php?ml=Warlord
-    #region Warlord-1
     // Gamesiegeweapon - getactiondelay
-    #endregion
 
     // shared timer 1 for 2 - shared timer 4 for 8
-    #region Warlord-2/8
     [SpellHandler("PBAEHeal")]
     public class PBAEHealHandler : MasterlevelHandling
     {
@@ -140,10 +137,8 @@ namespace DOL.GS.Spells
         // constructor
         public PBAEHealHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 2
-    #region Warlord-3
     [SpellHandler("CoweringBellow")]
     public class CoweringBellowSpellHandler : FearSpellHandler
     {
@@ -169,12 +164,10 @@ namespace DOL.GS.Spells
 
         public CoweringBellowSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // ML4~     //shared timer 3
 
     // shared timer 3
-    #region Warlord-5
     [SpellHandler("Critical")]
     public class CriticalDamageBuff : MasterlevelDualBuffHandling
     {
@@ -184,12 +177,10 @@ namespace DOL.GS.Spells
 
         public CriticalDamageBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // ML6~     //shared timer 4
 
     // shared timer 3
-    #region Warlord-7
     [SpellHandler("CleansingAura")]
     public class CleansingAurauraSpellHandler : SpellHandler
     {
@@ -200,10 +191,8 @@ namespace DOL.GS.Spells
 
         public CleansingAurauraSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 5
-    #region Warlord-9
     [SpellHandler("EffectivenessBuff")]
     public class EffectivenessBuff : MasterlevelHandling
     {
@@ -254,10 +243,8 @@ namespace DOL.GS.Spells
 
         public EffectivenessBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 5
-    #region Warlord-10
     [SpellHandler("MLABSBuff")]
     public class MLABSBuff : MasterlevelBuffHandling
     {
@@ -265,5 +252,4 @@ namespace DOL.GS.Spells
 
         public MLABSBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 }

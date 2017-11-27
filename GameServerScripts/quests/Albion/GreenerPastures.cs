@@ -142,8 +142,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCS
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Farmer Asma", eRealm.Albion);
             if (npcs.Length == 0)
             {
@@ -189,10 +187,6 @@ namespace DOL.GS.Quests.Albion
                 farmerAsma = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             // item db check
             farmerAsmasMap = GameServer.Database.FindObjectByKey<ItemTemplate>("farmer_asma_map");
             if (farmerAsmasMap == null)
@@ -225,8 +219,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(farmerAsmasMap);
             }
-
-            #endregion
 
             firstFieldArea = WorldMgr.GetRegion(firstField.RegionID).AddArea(new Area.Circle("First Vacant Field", firstField.X, firstField.Y, 0, 1450));
             firstFieldArea.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterFirstFieldArea));

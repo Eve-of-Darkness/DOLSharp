@@ -9,8 +9,6 @@ namespace DOL.GS.Atlantis
     /// </summary>
     public class BasicEncounterMob : GameNPC
     {
-        #region Immunity
-
         private bool m_immuneToMagic = false;
 
         /// <summary>
@@ -131,7 +129,6 @@ namespace DOL.GS.Atlantis
             get { return m_immuneToSpirit; }
             set { m_immuneToSpirit = value; }
         }
-        #endregion Immunity
 
         public override void SaveIntoDatabase() { }
 
@@ -159,7 +156,6 @@ namespace DOL.GS.Atlantis
         public override void TakeDamage(GameObject source, eDamageType damageType, int damageAmount, int criticalAmount)
         {
             // check for Immunity to Magic or Melee damage.
-            #region Immunity
             if (IsImmuneToMagic && (damageType == eDamageType.Body || damageType == eDamageType.Cold || damageType == eDamageType.Crush || damageType == eDamageType.Energy || damageType == eDamageType.Heat || damageType == eDamageType.Matter || damageType == eDamageType.Spirit))
             {
                 if (source is GamePlayer)
@@ -291,7 +287,6 @@ namespace DOL.GS.Atlantis
 
                 return;
             }
-            #endregion Immunity
 
             base.TakeDamage(source, damageType, damageAmount, criticalAmount);
         }

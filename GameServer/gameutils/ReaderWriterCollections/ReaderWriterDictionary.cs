@@ -49,7 +49,6 @@ namespace DOL.GS
             m_dictionary = new Dictionary<TKey, TValue>(collection);
         }
 
-        #region implementation of IEnumerator
         /// <summary>
         /// Get an enumerator over collection Snapshot.
         /// </summary>
@@ -79,9 +78,7 @@ namespace DOL.GS
         {
             return GetEnumerator();
         }
-        #endregion
 
-        #region implementation of ICollection<KeyValuePair<TKey, TValue>>
         public int Count
         {
             get
@@ -190,10 +187,6 @@ namespace DOL.GS
 
             return removed;
         }
-
-        #endregion
-
-        #region implementation of IDictionary<TKey, TValue>
 
         public TValue this[TKey key]
         {
@@ -325,7 +318,6 @@ namespace DOL.GS
 
             return found;
         }
-        #endregion
 
         public bool AddOrReplace(TKey key, TValue val)
         {

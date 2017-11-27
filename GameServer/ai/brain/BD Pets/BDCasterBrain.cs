@@ -38,8 +38,6 @@ namespace DOL.AI.Brain
         /// <param name="owner"></param>
         public BDCasterBrain(GameLiving owner) : base(owner) { }
 
-        #region AI
-
         /// <summary>
         /// Checks the Abilities
         /// </summary>
@@ -49,7 +47,5 @@ namespace DOL.AI.Brain
         /// Checks the Positive Spells.  Handles buffs, heals, etc.
         /// </summary>
         protected override bool CheckDefensiveSpells(Spell spell) { return false; }
-
-        #endregion
     }
 }

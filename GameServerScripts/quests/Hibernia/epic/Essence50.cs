@@ -115,8 +115,6 @@ namespace DOL.GS.Quests.Hibernia
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region NPC Declarations
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Brigit", eRealm.Hibernia);
 
             if (npcs.Length == 0)
@@ -183,9 +181,6 @@ namespace DOL.GS.Quests.Hibernia
             }
 
             // end npc
-            #endregion
-
-            #region Item Declarations
 
             Moonstone = GameServer.Database.FindObjectByKey<ItemTemplate>("Moonstone");
             if (Moonstone == null)
@@ -1322,7 +1317,6 @@ namespace DOL.GS.Quests.Hibernia
 
 // Champion Epic Sleeves End
 // Item Descriptions End
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
@@ -1639,8 +1633,6 @@ namespace DOL.GS.Quests.Hibernia
             }
         }
 
-        #region Allakhazam Epic Source
-
         /*
         *#25 talk to Brigit
         *#26 seek out Loken in Raumarik Loc 47k, 25k, 4k, and kill him purp and 2 blue adds
@@ -1666,7 +1658,5 @@ namespace DOL.GS.Quests.Hibernia
             *Shadow Shrouded Legs
             *Shadow Shrouded Sleeves
         */
-
-        #endregion
     }
 }

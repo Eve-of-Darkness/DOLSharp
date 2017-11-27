@@ -81,8 +81,6 @@ namespace DOL.GS
             }
         }
 
-        #region Crafting Tier
-
         public static void OnNextCraftingTierReached(DOLEvent e, object sender, EventArgs args)
         {
             NextCraftingTierReachedEventArgs cea = args as NextCraftingTierReachedEventArgs;
@@ -104,10 +102,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion Crafting Tier
-
-        #region NPC Kill
-
         public static void MeritForNPCKilled(GamePlayer player, GameNPC npc, int meritPoints)
         {
             if (player.IsEligibleToGiveMeritPoints)
@@ -116,10 +110,6 @@ namespace DOL.GS
                 player.Out.SendMessage("You have earned " + meritPoints + " merit points for your guild!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
         }
-
-        #endregion NPC Kill
-
-        #region LevelUp
 
         public static void LevelUp(DOLEvent e, object sender, EventArgs args)
         {
@@ -134,10 +124,6 @@ namespace DOL.GS
                 player.Out.SendMessage("You have earned " + meritPoints + " merit points for your guild!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
         }
-
-        #endregion LevelUp
-
-        #region RealmRankUp
 
         public static void RealmRankUp(DOLEvent e, object sender, EventArgs args)
         {
@@ -197,10 +183,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region XP Gain
-
         public static void XPGain(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = sender as GamePlayer;
@@ -220,10 +202,6 @@ namespace DOL.GS
                 player.Guild.UpdateGuildWindow();
             }
         }
-
-        #endregion
-
-        #region RealmPointsGain
 
         public static void RealmPointsGain(DOLEvent e, object sender, EventArgs args)
         {
@@ -258,10 +236,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Bounty Points Gained
-
         public static void BountyPointsGain(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = sender as GamePlayer;
@@ -289,10 +263,6 @@ namespace DOL.GS
                 player.Guild.UpdateGuildWindow();
             }
         }
-
-        #endregion
-
-        #region Guild Buff GameTimer Check
 
         public static void StartCheck(object timer)
         {
@@ -323,7 +293,5 @@ namespace DOL.GS
                 }
             }
         }
-
-        #endregion
     }
 }

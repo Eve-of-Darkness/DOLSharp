@@ -120,8 +120,6 @@ namespace DOL.GS
             }
         }
 
-        #region Stats
-
         /// <summary>
         /// Get modified bonuses for the pet; some bonuses come from the shade,
         /// some come from the pet.
@@ -345,10 +343,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Melee
-
         /// <summary>
         /// Whether or not pet can use left hand weapon.
         /// </summary>
@@ -419,10 +413,6 @@ namespace DOL.GS
                 new TauntEffect().Start(this);
             }
         }
-
-        #endregion
-
-        #region Spells
 
         /// <summary>
         /// Pet-only insta spells.
@@ -623,8 +613,6 @@ namespace DOL.GS
                 CastSpell(tauntSpell, chantsLine);
             }
         }
-
-        #endregion
 
         public override bool SayReceive(GameLiving source, string str)
         {

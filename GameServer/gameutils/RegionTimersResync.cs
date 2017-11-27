@@ -43,8 +43,6 @@ namespace DOL.GS.GameEvents
         public static Stopwatch watch;
         static Dictionary<GameTimer.TimeManager, long> old_time = new Dictionary<GameTimer.TimeManager, long>();
 
-        #region Initialization/Teardown
-
         [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
         {
@@ -82,8 +80,6 @@ namespace DOL.GS.GameEvents
                 m_timer.Dispose();
             }
         }
-
-        #endregion
 
         private static void Resynch(object nullValue)
         {

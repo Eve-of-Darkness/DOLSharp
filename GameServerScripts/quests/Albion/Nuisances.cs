@@ -142,13 +142,7 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCS
-
             masterFrederick = GetMasterFrederick();
-
-            #endregion
-
-            #region defineItems
 
             // item db check
             emptyMagicBox = GameServer.Database.FindObjectByKey<ItemTemplate>("empty_wodden_magic_box");
@@ -299,8 +293,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(recruitsStaff);
             }
-
-            #endregion
 
             fairyArea = WorldMgr.GetRegion(fairyLocation.RegionID).AddArea(new Area.Circle("Fairy contamined Area", fairyLocation.X, fairyLocation.Y, 0, 1500));
             fairyArea.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterFairyArea));

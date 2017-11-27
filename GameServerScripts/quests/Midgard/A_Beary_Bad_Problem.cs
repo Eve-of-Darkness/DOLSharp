@@ -106,8 +106,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Mid.ABearyBadProblem.NPCKreimhilde"), (eRealm)2);
             if (npcs.Length == 0)
@@ -153,10 +152,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 VikingKreimhilde = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
         silverringofhealth = GameServer.Database.FindObjectByKey<ItemTemplate>("silverringofhealth");
             if (silverringofhealth == null)
@@ -304,14 +299,6 @@ namespace DOL.GS.Quests.Midgard
                 GameServer.Database.AddObject(blackmaulercubpelt);
                 }
 
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
-
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(Abearybadproblem));
             QuestBehaviour a;
             a = builder.CreateBehaviour(VikingKreimhilde,-1);
@@ -349,9 +336,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.FinishQuest,typeof(DOL.GS.Quests.Midgard.Abearybadproblem),null);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             VikingKreimhilde.AddQuestToGive(typeof(Abearybadproblem));

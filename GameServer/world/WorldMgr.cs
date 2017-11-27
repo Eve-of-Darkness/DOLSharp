@@ -244,8 +244,6 @@ namespace DOL.GS
             m_regions.Clear();
             m_zones.Clear();
 
-            #region Instances
-
             // Dinberg: We now need to save regionData, indexed by regionID, for instances.
             // The information generated here is oddly ordered by number of mbos in the region,
             // so I'm contriving to generate this list myself.
@@ -254,8 +252,6 @@ namespace DOL.GS
             // We also will need to store zones, because we need at least one zone per region - hence
             // we will create zones inside our instances or the player gets banned by anti-telehack scripts.
             m_zonesData = new Dictionary<ushort, List<ZoneData>>();
-
-            #endregion
 
             log.Info(LoadTeleports());
 
@@ -1575,8 +1571,6 @@ namespace DOL.GS
             return savedCount;
         }
 
-        #region Instances
-
         // Dinberg: We must now store the region data here. This is incase admins wish to create instances
         // that require information from regions Data, like instance of underwater ToA areas as a prime
         // example!
@@ -1793,6 +1787,5 @@ namespace DOL.GS
             // Destroy the region once and for all.
             instance = null;
         }
-        #endregion
     }
 }

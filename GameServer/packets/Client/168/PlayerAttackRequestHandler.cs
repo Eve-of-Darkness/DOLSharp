@@ -22,8 +22,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PlayerAttackRequest, "Handles Player Attack Request", eClientStatus.PlayerInGame)]
     public class PlayerAttackRequestHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             var mode = (byte)packet.ReadByte();
@@ -32,10 +30,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                 // set to 0 if user pressed the button, set to 1 if client decided to stop attack
             new AttackRequestHandler(client.Player, mode != 0, userAction).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: AttackRequestHandler
 
         /// <summary>
         /// Handles change attack mode requests
@@ -98,7 +92,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
         }
-
-        #endregion
     }
 }

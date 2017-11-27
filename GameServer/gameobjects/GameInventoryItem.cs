@@ -116,8 +116,6 @@ namespace DOL.GS
             return GameServer.ServerRules.CheckAbilityToUseItem(player, Template);
         }
 
-        #region Create From Object Source
-
         /// <summary>
         /// This is used to create a PlayerInventoryItem
         /// ClassType will be checked and the approrpiate GameInventoryItem created
@@ -213,8 +211,6 @@ namespace DOL.GS
 
             return new GameInventoryItem(item);
         }
-
-        #endregion
 
         /// <summary>
         /// Player receives this item (added to players inventory)
@@ -641,7 +637,6 @@ namespace DOL.GS
                     return;
                 }
 
-                #region Proc1
                 if (ProcSpellID != 0)
                 {
                     string spellNote = string.Empty;
@@ -687,8 +682,7 @@ namespace DOL.GS
 
                     output.Add(" ");
                 }
-                #endregion
-                #region Proc2
+
                 if (ProcSpellID1 != 0)
                 {
                     string spellNote = string.Empty;
@@ -734,8 +728,7 @@ namespace DOL.GS
 
                     output.Add(" ");
                 }
-                #endregion
-                #region Charge1
+
                 if (SpellID != 0)
                 {
                     SpellLine chargeEffectsLine = SkillBase.GetSpellLine(GlobalSpellsLines.Item_Effects);
@@ -773,8 +766,7 @@ namespace DOL.GS
 
                     output.Add(" ");
                 }
-                #endregion
-                #region Charge2
+
                 if (SpellID1 != 0)
                 {
                     SpellLine chargeEffectsLine = SkillBase.GetSpellLine(GlobalSpellsLines.Item_Effects);
@@ -812,8 +804,7 @@ namespace DOL.GS
 
                     output.Add(" ");
                 }
-                #endregion
-                #region Poison
+
                 if (PoisonSpellID != 0)
                 {
                     if (GlobalConstants.IsWeapon(Object_Type)) // Poisoned Weapon
@@ -913,7 +904,6 @@ namespace DOL.GS
                         }
                     }
                 }
-                #endregion
             }
         }
 

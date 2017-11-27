@@ -97,8 +97,6 @@ namespace DOL.GS.Quests.Albion
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Roben Fraomar", eRealm.Albion);
 
             if (npcs.Length == 0)
@@ -166,9 +164,6 @@ namespace DOL.GS.Quests.Albion
             }
 
             // end npc
-            #endregion
-
-            #region defineItems
 
             statue_of_arawn = GameServer.Database.FindObjectByKey<ItemTemplate>("statue_of_arawn");
             if (statue_of_arawn == null)
@@ -779,8 +774,6 @@ namespace DOL.GS.Quests.Albion
                 PaladinEpicArms = i;
             }
 
-            #endregion
-
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
 
@@ -1106,8 +1099,6 @@ namespace DOL.GS.Quests.Albion
             }
         }
 
-        #region Allakhazam Epic Source
-
         /*
         *#25 talk to Roben
         *#26 seek out Loken in Raumarik Loc 47k, 25k, 4k, and kill him purp and 2 blue adds
@@ -1133,7 +1124,5 @@ namespace DOL.GS.Quests.Albion
             *Shadow Shrouded Legs
             *Shadow Shrouded Sleeves
         */
-
-        #endregion
     }
 }

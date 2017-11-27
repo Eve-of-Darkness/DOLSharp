@@ -28,8 +28,6 @@ namespace DOL.GS
     /// </summary>
     public abstract class AdvancedCraftingSkill : AbstractProfession
     {
-        #region Classic craft function
-
         /// <summary>
         /// Check if the player is near the needed tools (forge, lathe, etc)
         /// </summary>
@@ -59,12 +57,6 @@ namespace DOL.GS
             return false;
         }
 
-        #endregion
-
-        #region Advanced craft function
-
-        #region First call function
-
         /// <summary>
         /// Called when player accept to combine items
         /// </summary>
@@ -88,10 +80,6 @@ namespace DOL.GS
 
             return true;
         }
-
-        #endregion
-
-        #region Requirement check
 
         /// <summary>
         /// Check if the player can enchant the item
@@ -171,20 +159,11 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-
-        #region Apply magical effect
-
         /// <summary>
         /// Apply the magical bonus to the item
         /// </summary>
         /// <param name="player"></param>
         /// <param name="item"></param>
         protected abstract void ApplyMagicalEffect(GamePlayer player, InventoryItem item);
-
-        #endregion
-
-        #endregion
-
     }
 }

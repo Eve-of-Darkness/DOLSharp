@@ -202,7 +202,6 @@ namespace DOL.Database
             }
         }
 
-        #region PreCache Handling
         /// <summary>
         /// Set Pre-Cached Object
         /// </summary>
@@ -265,6 +264,5 @@ namespace DOL.Database
         {
             return _precache.Where(kv => whereClause(kv.Value)).Select(kv => kv.Value);
         }
-        #endregion
     }
 }

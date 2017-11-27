@@ -28,8 +28,6 @@ namespace DOL.GS
     /// <author>Aredhel</author>
     public class Cuuldurach : GameDragon
     {
-        #region Add Spawns
-
         private ArrayList m_messengerList = new ArrayList();
 
         /// <summary>
@@ -135,10 +133,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Glare
-
         /// <summary>
         /// The Glare spell.
         /// </summary>
@@ -169,10 +163,6 @@ namespace DOL.GS
                 return m_glareSpell;
             }
         }
-
-        #endregion
-
-        #region Breath
 
         /// <summary>
         /// The Breath spell.
@@ -241,10 +231,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Melee Debuff
-
         /// <summary>
         /// The melee debuff spell.
         /// </summary>
@@ -277,10 +263,6 @@ namespace DOL.GS
                 return m_meleeDebuffSpell;
             }
         }
-
-        #endregion
-
-        #region Ranged Debuff
 
         /// <summary>
         /// The ranged debuff spell.
@@ -316,7 +298,5 @@ namespace DOL.GS
                 return m_rangedDebuffSpell;
             }
         }
-
-        #endregion
     }
 }

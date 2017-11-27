@@ -27,8 +27,6 @@ namespace DOL.GS.Behaviour.Examples
                 return;
             }
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Sir Quait", eRealm.Albion);
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Sir Quait", (eRealm)1);
             GameNPC SirQuait = null;
@@ -67,10 +65,6 @@ namespace DOL.GS.Behaviour.Examples
                 SirQuait = npcs[0];
             }
 
-            #endregion
-
-            #region defineBehaviours
-
             BaseBehaviour b = new BaseBehaviour(SirQuait);
             MessageAction a = new MessageAction(SirQuait,"This is just a simple test bahaviour.",eTextType.Emote);
             b.AddAction(a);
@@ -79,8 +73,6 @@ namespace DOL.GS.Behaviour.Examples
 
             // store the behaviour in a list so it won't be garbage collected
             behaviours.Add(b);
-
-            #endregion
 
             log.Info("Simple Test Behaviour added");
         }

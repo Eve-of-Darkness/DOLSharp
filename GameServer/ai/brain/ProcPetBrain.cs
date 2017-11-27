@@ -86,7 +86,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #region IControlledBrain Members
         public eWalkState WalkState { get { return eWalkState.Stay; } }
 
         public eAggressionState AggressionState { get { return eAggressionState.Aggressive; } set { } }
@@ -110,6 +109,5 @@ namespace DOL.AI.Brain
         public GamePlayer GetPlayerOwner() { return m_owner as GamePlayer; }
 
         public bool IsMainPet { get { return false; } set { } }
-        #endregion
     }
 }

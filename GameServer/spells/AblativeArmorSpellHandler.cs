@@ -205,7 +205,6 @@ namespace DOL.GS.Spells
             return 0;
         }
 
-        #region Delve Info
         public override IList<string> DelveInfo
         {
             get
@@ -295,7 +294,6 @@ namespace DOL.GS.Spells
 
                 return list;
             }
-            #endregion
         }
 
         // for delve info

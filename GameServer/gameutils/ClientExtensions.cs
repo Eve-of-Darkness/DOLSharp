@@ -28,8 +28,6 @@ namespace DOL.GS
     /// </summary>
     public static class ClientExtensions
     {
-
-        #region Account Util
         public static void BanAccount(this GameClient client, string reason)
         {
             DBBannedAccount b = new DBBannedAccount();
@@ -43,6 +41,5 @@ namespace DOL.GS
             GameServer.Database.SaveObject(b);
             GameServer.Instance.LogCheatAction(string.Format("{1}. Client Account: {0}", client.Account.Name, b.Reason));
         }
-        #endregion
     }
 }

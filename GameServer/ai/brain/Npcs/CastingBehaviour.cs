@@ -20,8 +20,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #region IAttackBehaviour Members
-
         public void Attack(GameObject target)
         {
             foreach (Spell spell in Body.HarmfulSpells)
@@ -42,7 +40,5 @@ namespace DOL.AI.Brain
         public void Retreat()
         {
         }
-
-        #endregion
     }
 }

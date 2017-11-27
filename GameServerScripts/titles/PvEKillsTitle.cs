@@ -23,7 +23,6 @@ using DOL.Events;
 
 namespace GameServerScripts.Titles
 {
-    #region demon
     /// <summary>
     /// "Demon Slayer" title granted to everyone who kills Legion 10+ times.
     /// </summary>
@@ -71,9 +70,7 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => player.KillsLegion >= 1000; } }
     }
-    #endregion
 
-    #region dragon
     /// <summary>
     /// "Dragon Foe" title granted to everyone who kills the dragon 10+ times.
     /// </summary>
@@ -121,8 +118,7 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => player.KillsDragon >= 500; } }
     }
-    #endregion
-    #region epic
+
     /// <summary>
     /// "Epic Challenger" title granted to everyone who kills the Epic Dungeon Boss 10+ times.
     /// </summary>
@@ -146,5 +142,4 @@ namespace GameServerScripts.Titles
 
         protected override Func<DOL.GS.GamePlayer, bool> SuitableMethod { get { return player => player.KillsEpicBoss >= 50; } }
     }
-    #endregion
 }

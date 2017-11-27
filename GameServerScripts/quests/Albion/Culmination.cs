@@ -152,8 +152,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCs
-
             masterFrederick = GetMasterFrederick();
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Queen Tatiana", eRealm.None);
@@ -251,10 +249,6 @@ namespace DOL.GS.Quests.Albion
                     fairySorceress[i].AddToWorld();
                 }
             }
-
-            #endregion
-
-            #region defineItems
 
             queenTatianasHead = GameServer.Database.FindObjectByKey<ItemTemplate>("queen_tatianas_head");
             if (queenTatianasHead == null)
@@ -503,8 +497,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(recruitsBracer);
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

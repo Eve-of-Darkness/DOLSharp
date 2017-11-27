@@ -23,8 +23,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.HouseUserPermissionSet, "Handles housing Users permissions requests", eClientStatus.PlayerInGame)]
     public class HouseUsersPermissionsSetHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int permissionSlot = packet.ReadByte();
@@ -60,7 +58,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 house.AdjustPermissionSlot(permissionSlot, newPermissionLevel);
             }
         }
-
-        #endregion
     }
 }

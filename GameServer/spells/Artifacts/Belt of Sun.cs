@@ -55,7 +55,6 @@ namespace DOL.GS.Spells
 
             GamePlayer player = caster as GamePlayer;
 
-            #region Alb
             if (player.CharacterClass.ID == (int)eCharacterClass.Armsman)
             {
                 m_SunCrush = GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Crush") ?? Crush;
@@ -182,9 +181,7 @@ namespace DOL.GS.Spells
                 items.Add(GameInventoryItem.Create(m_SunMStaff));
                 return;
             }
-            #endregion Alb
 
-            #region Mid
             if (player.CharacterClass.ID == (int)eCharacterClass.Berserker)
             {
                 m_SunCrush = GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Crush") ?? CrushM; //
@@ -344,9 +341,6 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            #endregion Mid
-
-            #region Hib
             if (player.CharacterClass.ID == (int)eCharacterClass.Bard)
             {
                 m_SunCrush = GameServer.Database.FindObjectByKey<ItemTemplate>("Sun_Crush") ?? CrushH; // Blunt
@@ -465,9 +459,7 @@ namespace DOL.GS.Spells
                 player.Out.SendMessage(string.Empty + player.CharacterClass.Name + "'s cant Summon Light!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
-            #endregion Hib
 
-        #region Sun Albion Weapons
         private ItemTemplate Crush
         {
             get
@@ -997,9 +989,7 @@ namespace DOL.GS.Spells
                 return m_SunMFist;
             }
         }
-        #endregion Alb Weapons
 
-        #region Sun Midgard Weapons
         private ItemTemplate CrushM
         {
             get
@@ -1530,9 +1520,6 @@ namespace DOL.GS.Spells
             }
         }
 
-        #endregion Mid Weapons
-
-        #region Sun Hibernia Weapons
         private ItemTemplate CrushH
         {
             get
@@ -1903,8 +1890,6 @@ namespace DOL.GS.Spells
                 return m_SunBow;
             }
         }
-
-        #endregion Hib Weapons
 
         public override void OnDirectEffect(GameLiving target, double effectiveness)
         {

@@ -23,8 +23,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.HouseEnterLeave, "Housing Enter Leave Request.", eClientStatus.PlayerInGame)]
     public class HouseEnterLeaveHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             packet.ReadShort(); // pid
@@ -40,10 +38,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             new EnterLeaveHouseAction(client.Player, house, enter).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: EnterLeaveHouseAction
 
         /// <summary>
         /// Handles house enter/leave events
@@ -108,7 +102,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
         }
-
-        #endregion
     }
 }

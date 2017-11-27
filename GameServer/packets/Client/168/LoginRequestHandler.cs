@@ -43,8 +43,6 @@ namespace DOL.GS.PacketHandler.Client.v168
         private static DateTime _lastAccountCreateTime;
         private readonly Dictionary<string, LockCount> _locks = new Dictionary<string, LockCount>();
 
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             if (client == null)
@@ -447,8 +445,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
         }
 
-        #endregion
-
         public static string CryptPassword(string password)
         {
             MD5 md5 = new MD5CryptoServiceProvider();
@@ -549,8 +545,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             Monitor.Exit(lockObj);
         }
 
-        #region Nested type: LockCount
-
         /// <summary>
         /// This class is used as lock object. Contains the count of locks held.
         /// </summary>
@@ -561,7 +555,5 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// </summary>
             public int Count { get; set; }
         }
-
-        #endregion
     }
 }

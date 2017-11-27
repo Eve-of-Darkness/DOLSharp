@@ -51,7 +51,6 @@ namespace DOL.GS.Spells
             base.FinishSpellCast(target);
         }
 
-        #region LOS Checks for Keeps
         /// <summary>
         /// called when spell effect has to be started and applied to targets
         /// </summary>
@@ -111,7 +110,6 @@ namespace DOL.GS.Spells
             ArrowOnTargetAction arrow = new ArrowOnTargetAction(Caster, target, this);
             arrow.Start(1 + ticksToTarget);
         }
-        #endregion
 
         /// <summary>
         /// Delayed action when arrow reach the target

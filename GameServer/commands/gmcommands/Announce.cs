@@ -45,7 +45,6 @@ namespace DOL.GS.Commands
 
             switch (args.GetValue(1).ToString().ToLower())
             {
-                #region Log
                 case "log":
                     {
                         foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
@@ -58,8 +57,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Log
-                #region Window
+
                 case "window":
                     {
                         var messages = new List<string>();
@@ -75,8 +73,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Window
-                #region Send
+
                 case "send":
                     {
                         foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
@@ -89,8 +86,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Send
-                #region Center
+
                 case "center":
                     {
                         foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
@@ -103,8 +99,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Center
-                #region Confirm
+
                 case "confirm":
                     {
                         foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
@@ -117,14 +112,12 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Confirm
-                #region Default
+
                 default:
                     {
                         DisplaySyntax(client);
                         return;
                     }
-                #endregion Default
             }
         }
     }

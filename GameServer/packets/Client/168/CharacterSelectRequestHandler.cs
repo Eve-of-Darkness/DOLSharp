@@ -24,8 +24,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.CharacterSelectRequest, "Handles setting SessionID and the active character", eClientStatus.LoggedIn)]
     public class CharacterSelectRequestHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int packetVersion;
@@ -94,7 +92,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 client.Out.SendSessionID();
             }
         }
-
-        #endregion
     }
 }

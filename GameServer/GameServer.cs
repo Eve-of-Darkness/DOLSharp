@@ -56,8 +56,6 @@ namespace DOL.GS
         /// </summary>
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Variables
-
         /// <summary>
         /// Maximum UDP buffer size
         /// </summary>
@@ -140,10 +138,6 @@ namespace DOL.GS
         {
             get { return log; }
         }
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Returns the instance
@@ -282,9 +276,6 @@ namespace DOL.GS
             get { return Environment.TickCount - m_startTick; }
         }
 
-        #endregion
-
-        #region Initialization
         /// <summary>
         /// Creates the gameserver instance
         /// </summary>
@@ -318,9 +309,6 @@ namespace DOL.GS
             // Create the instance
             m_instance = new GameServer(config);
         }
-        #endregion
-
-        #region UDP
 
         /// <summary>
         /// Holds udp receive callback delegate
@@ -595,10 +583,6 @@ namespace DOL.GS
                 }
             }
         }
-
-        #endregion
-
-        #region Start
 
         /// <summary>
         /// Starts the server
@@ -1348,9 +1332,6 @@ namespace DOL.GS
 
             return componentInitState;
         }
-        #endregion
-
-        #region Stop
 
         public void Close()
         {
@@ -1451,10 +1432,6 @@ namespace DOL.GS
             LogManager.Shutdown();
         }
 
-        #endregion
-
-        #region Packet buffer pool
-
         /// <summary>
         /// The size of all packet buffers.
         /// </summary>
@@ -1554,10 +1531,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Client
-
         /// <summary>
         /// Creates a new client
         /// </summary>
@@ -1570,10 +1543,6 @@ namespace DOL.GS
 
             return client;
         }
-
-        #endregion
-
-        #region Logging
 
         /// <summary>
         /// Writes a line to the gm log file
@@ -1602,10 +1571,6 @@ namespace DOL.GS
         {
             m_inventoryLog.Logger.Log(typeof(GameServer), Level.Alert, text, null);
         }
-
-        #endregion
-
-        #region Database
 
         /// <summary>
         /// Initializes the database
@@ -1735,10 +1700,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Constructors
-
         /// <summary>
         /// Default game server constructor
         /// </summary>
@@ -1798,6 +1759,5 @@ namespace DOL.GS
                 throw new ApplicationException("Fatal Error: Could not initialize Game Server", e);
             }
         }
-        #endregion
     }
 }

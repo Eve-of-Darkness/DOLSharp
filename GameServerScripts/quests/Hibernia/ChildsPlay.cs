@@ -110,7 +110,6 @@ namespace DOL.GS.Quests.Hibernia
                 log.Info("Quest \"" + questTitle + "\" (Hib) initializing ...");
             }
 
-            #region defineNPCs
             GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Charles", (eRealm)3);
@@ -153,10 +152,6 @@ namespace DOL.GS.Quests.Hibernia
             {
                 Charles = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             daringpaddedboots_hib = GameServer.Database.FindObjectByKey<ItemTemplate>("daringpaddedboots_hib");
             if (daringpaddedboots_hib == null)
@@ -1526,13 +1521,8 @@ namespace DOL.GS.Quests.Hibernia
                     GameServer.Database.AddObject(daringstuddedsleeves_hib);
             }
 
-            #endregion
-
-            #region defineAreas
             Hib_Statue_Area = WorldMgr.GetRegion(Hib_Statue.RegionID).AddArea(new Area.Circle(string.Empty, Hib_Statue.X, Hib_Statue.Y, Hib_Statue.Z, 500));
             Hib_Statue_Area.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterStatueArea));
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

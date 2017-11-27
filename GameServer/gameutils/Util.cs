@@ -35,7 +35,6 @@ namespace DOL.GS
     /// </summary>
     public static class Util
     {
-        #region Random
         /// <summary>
         /// Holds the random number generator instance
         /// </summary>
@@ -219,9 +218,6 @@ namespace DOL.GS
             return chancePercent > RandomDouble();
         }
 
-        #endregion
-
-        #region stringMethod
         const char primarySeparator = ';';
         const char secondarySeparator = '-';
 
@@ -388,8 +384,6 @@ namespace DOL.GS
             return new List<string>();
         }
 
-        #endregion
-
         /// <summary>
         /// Gets the stacktrace of a thread
         /// </summary>
@@ -514,8 +508,6 @@ namespace DOL.GS
             return IsNearValue(xH, xC, tolerance) && IsNearValue(yH, yC, tolerance) && IsNearValue(zH, zC, tolerance);
         }
 
-        #region Collection Utils
-
         /// <summary>
         /// Implementation of a List Shuffle for Generics.
         /// This can help for Loot Randomizing.
@@ -559,7 +551,5 @@ namespace DOL.GS
                 action(cur);
             }
         }
-
-        #endregion
     }
 }

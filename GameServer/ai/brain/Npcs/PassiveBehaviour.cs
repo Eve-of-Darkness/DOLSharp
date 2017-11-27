@@ -4,8 +4,6 @@ namespace DOL.AI.Brain
 {
     public class PassiveBehaviour : IAttackBehaviour
     {
-        #region IAttackBehaviour Members
-
         public void Attack(GameObject target)
         {
         }
@@ -13,7 +11,5 @@ namespace DOL.AI.Brain
         public void Retreat()
         {
         }
-
-        #endregion
     }
 }

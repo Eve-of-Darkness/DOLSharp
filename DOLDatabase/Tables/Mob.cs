@@ -27,7 +27,6 @@ namespace DOL.Database
     [DataTable(TableName = "Mob")]
     public class Mob : DataObject
     {
-        #region Variables
         private string m_type;
         private string m_translationId = string.Empty;
         private string m_name;
@@ -75,7 +74,6 @@ namespace DOL.Database
         private byte m_visibleWeaponSlots;
 
         public static readonly string DEFAULT_NPC_CLASSTYPE = "DOL.GS.GameNPC";
-        #endregion Variables
 
         /// <summary>
         /// The Constructor
@@ -106,7 +104,6 @@ namespace DOL.Database
             m_gender = 0;
         }
 
-        #region Properties
         /// <summary>
         /// The Mob's ClassType
         /// </summary>
@@ -871,7 +868,6 @@ namespace DOL.Database
                 Dirty = true;
             }
         }
-        #endregion Properties
     }
 }
 

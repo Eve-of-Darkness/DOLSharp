@@ -64,8 +64,6 @@ namespace DOL.GS.Keeps
             NewSkinTower = 31,
         }
 
-        #region properties
-
         /// <summary>
         /// keep owner of component
         /// </summary>
@@ -249,8 +247,6 @@ namespace DOL.GS.Keeps
         }
 
         protected string m_CreateInfo = string.Empty;
-
-        #endregion
 
         public override int RealmPointsValue
         {

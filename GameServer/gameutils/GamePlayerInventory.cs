@@ -35,8 +35,6 @@ namespace DOL.GS
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Constructor/Declaration/LoadDatabase/SaveDatabase
-
         /// <summary>
         /// Holds the player that owns
         /// this inventory
@@ -311,10 +309,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion Constructor/Declaration/LoadDatabase/SaveDatabase
-
-        #region Add/Remove
-
         /// <summary>
         /// Adds an item to the inventory and DB
         /// </summary>
@@ -546,10 +540,6 @@ namespace DOL.GS
             return base.RemoveCountFromStack(item, count);
         }
 
-        #endregion Add/Remove
-
-        #region Get Inventory Informations
-
         /// <summary>
         /// Check if the slot is valid in this inventory
         /// </summary>
@@ -605,10 +595,6 @@ namespace DOL.GS
 
             return base.GetValidInventorySlot(slot);
         }
-
-        #endregion Get Inventory Informations
-
-        #region Move Item
 
         /// <summary>
         /// Moves an item from one slot to another
@@ -1294,10 +1280,6 @@ namespace DOL.GS
             return valid;
         }
 
-        #endregion Move Item
-
-        #region Combine/Exchange/Stack Items
-
         /// <summary>
         /// Combine 2 items together if possible
         /// </summary>
@@ -1498,10 +1480,6 @@ namespace DOL.GS
             return false;
         }
 
-        #endregion Combine/Exchange/Stack Items
-
-        #region Encumberance
-
         /// <summary>
         /// Gets the inventory weight
         /// </summary>
@@ -1527,10 +1505,6 @@ namespace DOL.GS
                 }
             }
         }
-
-        #endregion
-
-        #region Dyes
 
         protected virtual bool DyeItem(InventoryItem dye, InventoryItem objectToDye)
         {
@@ -1600,10 +1574,6 @@ namespace DOL.GS
             return canApply;
         }
 
-        #endregion
-
-        #region UpdateChangedSlots
-
         /// <summary>
         /// Updates changed slots, inventory is already locked.
         /// Inventory must be locked before invoking this method.
@@ -1655,7 +1625,5 @@ namespace DOL.GS
 
             base.UpdateChangedSlots();
         }
-
-        #endregion
     }
 }

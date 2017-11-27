@@ -108,8 +108,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Ambient Rat Statua", (eRealm)0);
             if (npcs.Length == 0)
@@ -199,10 +198,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 Ballach = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
         enchantedflask = GameServer.Database.FindObjectByKey<ItemTemplate>("enchantedflask");
             if (enchantedflask == null)
@@ -362,14 +357,6 @@ namespace DOL.GS.Quests.Midgard
                 }
             }
 
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
-
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(essenceoflife));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Ballach,-1);
@@ -417,9 +404,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.FinishQuest,typeof(DOL.GS.Quests.Midgard.essenceoflife),null);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             Ballach.AddQuestToGive(typeof(essenceoflife));

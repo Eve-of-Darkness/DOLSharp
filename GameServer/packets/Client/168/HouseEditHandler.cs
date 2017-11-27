@@ -23,8 +23,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.HouseEdit, "Change handler for outside/inside look (houses).", eClientStatus.PlayerInGame)]
     public class HouseEditHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             packet.ReadShort(); // playerID no use for that.
@@ -55,7 +53,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 house.Edit(client.Player, changes);
             }
         }
-
-        #endregion
     }
 }
