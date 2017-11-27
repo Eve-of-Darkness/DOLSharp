@@ -42,21 +42,18 @@ namespace DOL.GS
     // all classes should inherit from BaseProtector.
     public class ArrektosProtector : BaseProtector
     {
-        public const string ALREADY_GOT_HELP = "ALREADY_GOT_HELP";
+        private const string AlreadyGotHelp = "ALREADY_GOT_HELP";
 
         public override bool AddToWorld()
         {
             // foreman fogo doesn't leave the room.
             TetherRange = 1000;
-
             X = 49293;
             Y = 42208;
             Z = 27562;
             Heading = 2057;
             CurrentRegionID = 245;
-
             Flags = 0;
-
             Level = 56;
             Model = 2249; // undead Minotaur
             Name = "Forge Foreman Fogo";
@@ -66,7 +63,7 @@ namespace DOL.GS
             Relic = MinotaurRelicManager.GetRelic(1);
             LockRelic();
 
-            TempProperties.setProperty(ALREADY_GOT_HELP, false);
+            TempProperties.setProperty(AlreadyGotHelp, false);
 
             return base.AddToWorld();
         }
@@ -75,7 +72,7 @@ namespace DOL.GS
         {
             base.StartAttack(target);
 
-            if (!TempProperties.getProperty<bool>(ALREADY_GOT_HELP))
+            if (!TempProperties.getProperty<bool>(AlreadyGotHelp))
             {
                 foreach (GameNPC npc in GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
@@ -86,7 +83,7 @@ namespace DOL.GS
                     }
                 }
 
-                TempProperties.setProperty(ALREADY_GOT_HELP, true);
+                TempProperties.setProperty(AlreadyGotHelp, true);
             }
         }
 
@@ -94,7 +91,7 @@ namespace DOL.GS
         {
             base.Die(killer);
 
-            TempProperties.setProperty(ALREADY_GOT_HELP, false);
+            TempProperties.setProperty(AlreadyGotHelp, false);
 
             // when the protector is dead, the relic should be unlocked!
             UnlockRelic();

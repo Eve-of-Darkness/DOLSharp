@@ -176,7 +176,7 @@ namespace DOL.GS.Commands
 
                         try
                         {
-                            relic.RelicSpellID = Convert.ToInt32(args[2]);
+                            relic.RelicSpellId = Convert.ToInt32(args[2]);
                         }
                         catch (Exception)
                         {
@@ -229,8 +229,8 @@ namespace DOL.GS.Commands
                         info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.RelicInfo"));
                         info.Add("===========================");
                         info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.Name", relic.Name));
-                        info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.ID", relic.RelicID));
-                        info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.CurrentXP", relic.XP));
+                        info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.ID", relic.RelicId));
+                        info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.CurrentXP", relic.Xp));
                         info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.Level", relic.Level));
                         info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.Effect", relic.Effect));
                         info.Add("===========================");
@@ -247,7 +247,7 @@ namespace DOL.GS.Commands
                         info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.SpellID", relic.RelicSpell));
                         info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.SpellTarget", relic.RelicTarget));
 
-                        Spell spell = SkillBase.GetSpellByID(relic.RelicSpellID);
+                        Spell spell = SkillBase.GetSpellByID(relic.RelicSpellId);
                         if (spell != null)
                         {
                             info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Info.SpellName", spell.Name));
@@ -269,7 +269,7 @@ namespace DOL.GS.Commands
 
                         MinotaurRelic relic = client.Player.TargetObject as MinotaurRelic;
 
-                        relic.XP = 0;
+                        relic.Xp = 0;
                         relic.RemoveFromWorld();
                         relic.RelicDispose();
                         break;
@@ -297,26 +297,26 @@ namespace DOL.GS.Commands
                             else
                             {
 
-                                foreach (MinotaurRelic relic in MinotaurRelicManager.m_minotaurrelics.Values)
+                                foreach (MinotaurRelic relic in MinotaurRelicManager.Minotaurrelics.Values)
                                 {
                                     if (relic != null)
                                     {
-                                        if (relic.RelicID == minorelicID)
+                                        if (relic.RelicId == minorelicID)
                                         {
                                             // there is a match!
                                             // remove it from the world
                                             relic.RemoveFromWorld();
-                                            client.Player.Out.SendMessage("Relic " + relic.RelicID + " has been removed from the world", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                            client.Player.Out.SendMessage("Relic " + relic.RelicId + " has been removed from the world", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                                             // remove it from the hashtable
                                             MinotaurRelicManager.RemoveRelic(relic);
-                                            client.Player.Out.SendMessage("Relic " + relic.RelicID + " has been removed from the Minorelic Hash Table", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                            client.Player.Out.SendMessage("Relic " + relic.RelicId + " has been removed from the Minorelic Hash Table", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-                                            DataObject obj = GameServer.Database.FindObjectByKey<DBMinotaurRelic>(relic.RelicID);
+                                            DataObject obj = GameServer.Database.FindObjectByKey<DBMinotaurRelic>(relic.RelicId);
                                             if (obj != null)
                                             {
                                                 GameServer.Database.DeleteObject(obj);
-                                                client.Player.Out.SendMessage("Relic " + relic.RelicID + " has been removed from the database!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                                client.Player.Out.SendMessage("Relic " + relic.RelicId + " has been removed from the database!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                             }
 
                                             break;
@@ -336,17 +336,17 @@ namespace DOL.GS.Commands
                             MinotaurRelic relic = client.Player.TargetObject as MinotaurRelic;
 
                             relic.RemoveFromWorld();
-                            client.Player.Out.SendMessage("Relic " + relic.RelicID + " has been removed from the world", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            client.Player.Out.SendMessage("Relic " + relic.RelicId + " has been removed from the world", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                             // remove it from the hashtable
                             MinotaurRelicManager.RemoveRelic(relic);
-                            client.Player.Out.SendMessage("Relic " + relic.RelicID + " has been removed from the Minorelic Hash Table", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            client.Player.Out.SendMessage("Relic " + relic.RelicId + " has been removed from the Minorelic Hash Table", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-                            DataObject obj = GameServer.Database.FindObjectByKey<DBMinotaurRelic>(relic.RelicID);
+                            DataObject obj = GameServer.Database.FindObjectByKey<DBMinotaurRelic>(relic.RelicId);
                             if (obj != null)
                             {
                                 GameServer.Database.DeleteObject(obj);
-                                client.Player.Out.SendMessage("Relic " + relic.RelicID + " has been removed from the database!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                client.Player.Out.SendMessage("Relic " + relic.RelicId + " has been removed from the database!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             }
                         }
 
@@ -365,10 +365,10 @@ namespace DOL.GS.Commands
 
                         try
                         {
-                            relic.XP += Convert.ToInt32(args[2]);
+                            relic.Xp += Convert.ToInt32(args[2]);
                             if (relic.Owner != null)
                             {
-                                relic.Owner.Out.SendMinotaurRelicBarUpdate(relic.Owner, (int)relic.XP);
+                                relic.Owner.Out.SendMinotaurRelicBarUpdate(relic.Owner, (int)relic.Xp);
                             }
                         }
                         catch (Exception)
@@ -396,7 +396,7 @@ namespace DOL.GS.Commands
                                 return;
                             }
 
-                            foreach (MinotaurRelic relic in MinotaurRelicManager.m_minotaurrelics.Values)
+                            foreach (MinotaurRelic relic in MinotaurRelicManager.Minotaurrelics.Values)
                             {
                                 if (relic != null && relic.CurrentRegionID == region)
                                 {
@@ -412,7 +412,7 @@ namespace DOL.GS.Commands
                             return;
                         }
 
-                        foreach (MinotaurRelic relic in MinotaurRelicManager.m_minotaurrelics.Values)
+                        foreach (MinotaurRelic relic in MinotaurRelicManager.Minotaurrelics.Values)
                         {
                             if (relic != null)
                             {
@@ -421,7 +421,7 @@ namespace DOL.GS.Commands
                             }
                         }
 
-                        info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.ShowAll.Count", MinotaurRelicManager.m_minotaurrelics.Count));
+                        info.Add(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.ShowAll.Count", MinotaurRelicManager.Minotaurrelics.Count));
 
                         client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.ShowAll.Infos"), info);
 
@@ -444,7 +444,7 @@ namespace DOL.GS.Commands
                             return;
                         }
 
-                        if (relic.respawntimer == null)
+                        if (relic.Respawntimer == null)
                         {
                             DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.MinoRelic.Spawn.AlreadySpawned"));
                             return;
