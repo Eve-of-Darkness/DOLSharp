@@ -48,7 +48,7 @@ namespace DOL.Server.Tests
             Assert.IsNotNull(character);
 
             GameClient client = new GameClient(GameServer.Instance);
-            client.Version = GameClient.eClientVersion.Version1105;
+            client.Version = GameClient.eClientVersion.Version1109;
             client.Socket = new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
             client.Account = account;
             client.PacketProcessor = new DOL.GS.PacketHandler.PacketProcessor(client);

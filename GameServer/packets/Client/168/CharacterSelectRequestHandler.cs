@@ -26,27 +26,8 @@ namespace DOL.GS.PacketHandler.Client.v168
     {
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            int packetVersion;
-            switch (client.Version)
-            {
-                case GameClient.eClientVersion.Version168:
-                case GameClient.eClientVersion.Version169:
-                case GameClient.eClientVersion.Version170:
-                case GameClient.eClientVersion.Version171:
-                case GameClient.eClientVersion.Version172:
-                case GameClient.eClientVersion.Version173:
-                    packetVersion = 168;
-                    break;
-                default:
-                    packetVersion = 174;
-                    break;
-            }
-
             packet.Skip(4); // Skip the first 4 bytes
-            if (packetVersion == 174)
-            {
-                packet.Skip(1);
-            }
+            packet.Skip(1);
 
             string charName = packet.ReadString(28);
 

@@ -36,7 +36,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
 
             // hack fix new keep ids
-            if ((int)client.Version >= (int)GameClient.eClientVersion.Version190 && (int)client.Version < (int)GameClient.eClientVersion.Version1115)
+            if ((int)client.Version < (int)GameClient.eClientVersion.Version1115)
             {
                 if (keepId >= 82)
                 {

@@ -729,7 +729,7 @@ namespace DOL.GS.Keeps
         public override void Die(GameObject killer)
         {
             base.Die(killer);
-            if (AbstractKeep is GameKeepTower && ServerProperties.Properties.CLIENT_VERSION_MIN >= (int)GameClient.eClientVersion.Version175)
+            if (AbstractKeep is GameKeepTower)
             {
                 if (IsRaized == false)
                 {

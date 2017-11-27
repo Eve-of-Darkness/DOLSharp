@@ -1648,13 +1648,9 @@ namespace DOL.GS.PacketHandler
 
                 string add = string.Empty;
                 byte flags2 = 0x00;
-                IControlledBrain brain = npc.Brain as IControlledBrain;
-                if (GameClient.Version >= GameClient.eClientVersion.Version187)
+                if (npc.Brain is IControlledBrain)
                 {
-                    if (brain != null)
-                    {
-                        flags2 |= 0x80; // have Owner
-                    }
+                    flags2 |= 0x80; // have Owner
                 }
 
                 if ((npc.Flags & GameNPC.eFlags.CANTTARGET) != 0)

@@ -67,33 +67,12 @@ namespace DOL.GS.PacketHandler.Client.v168
                  packet.ReadByte(); // minor
                  packet.ReadByte(); // build
                 password = packet.ReadString(20);
-
-                bool v174;
-
-                // the logger detection we had is no longer working
-                // bool loggerUsing = false;
-                switch (client.Version)
-                {
-                    case GameClient.eClientVersion.Version168:
-                    case GameClient.eClientVersion.Version169:
-                    case GameClient.eClientVersion.Version170:
-                    case GameClient.eClientVersion.Version171:
-                    case GameClient.eClientVersion.Version172:
-                    case GameClient.eClientVersion.Version173:
-                        v174 = false;
-                        break;
-                    default:
-                        v174 = true;
-                        break;
-                }
-
-                packet.Skip(v174 ? 11 : 7);
-
+                packet.Skip(11);
                 packet.ReadInt(); // c2
                 packet.ReadInt(); // c3
                 packet.ReadInt(); // c4
 
-                packet.Skip(v174 ? 27 : 31);
+                packet.Skip(27);
 
                 userName = packet.ReadString(20);
             }

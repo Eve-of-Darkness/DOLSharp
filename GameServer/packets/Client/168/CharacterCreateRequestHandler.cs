@@ -92,7 +92,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
 
             // Client character count support
-            int charsCount = client.Version < GameClient.eClientVersion.Version173 ? 8 : 10;
+            int charsCount = 10;
             bool needRefresh = false;
 
             for (int i = 0; i < charsCount; i++)
@@ -220,10 +220,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             public CreationCharacterData(GSPacketIn packet, GameClient client)
             {
                 // unk - probably indicates customize or create (these are moved from 1.99 4 added bytes)
-                if (client.Version >= GameClient.eClientVersion.Version1104)
-                {
-                    packet.ReadIntLowEndian();
-                }
+                packet.ReadIntLowEndian();
 
                 CharName = packet.ReadString(24);
                 CustomMode = packet.ReadByte();
@@ -277,12 +274,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                 packet.ReadByte(); // 0x9C activeRightSlot
                 packet.ReadByte(); // 0x9D activeLeftSlot
                 packet.ReadByte(); // 0x9E siZone
-
-                // skip 4 bytes added in 1.99
-                if (client.Version >= GameClient.eClientVersion.Version199 && client.Version < GameClient.eClientVersion.Version1104)
-                {
-                    packet.Skip(4);
-                }
 
                 // New constitution must be read before skipping 4 bytes
                 NewConstitution = packet.ReadByte(); // 0x9F
@@ -469,7 +460,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     character.MoodType = (byte)pdata.MoodType;
                 }
 
-                if (pdata.CustomMode != 3 && client.Version >= GameClient.eClientVersion.Version189)
+                if (pdata.CustomMode != 3)
                 {
                     var stats = new Dictionary<eStat, int>
                     {

@@ -1408,15 +1408,8 @@ namespace DOL.GS
                         {
                             return;
                         }
-
-                        if ((int)player.Client.Version < (int)GameClient.eClientVersion.Version187)
-                        {
-                            player.Out.SendEmoteAnimation(this, eEmote.Bind);
-                        }
-                        else
-                        {
-                            player.Out.SendEmoteAnimation(this, bindEmote);
-                        }
+                        
+                        player.Out.SendEmoteAnimation(this, bindEmote);
                     }
                 }
 

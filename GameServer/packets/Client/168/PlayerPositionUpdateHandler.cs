@@ -51,7 +51,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
 
             int environmentTick = Environment.TickCount;
-            var packetVersion = client.Version > GameClient.eClientVersion.Version171 ? 172 : 168;
 
             // read the state of the player
             packet.Skip(2); // PID
@@ -78,16 +77,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             int realZ = packet.ReadShort();
             ushort xOffsetInZone = packet.ReadShort();
             ushort yOffsetInZone = packet.ReadShort();
-            ushort currentZoneId;
-            if (packetVersion == 168)
-            {
-                currentZoneId = (ushort)packet.ReadByte();
-                packet.Skip(1); // 0x00 padding for zoneID
-            }
-            else
-            {
-                currentZoneId = packet.ReadShort();
-            }
+            ushort currentZoneId = packet.ReadShort();
 
             // Dinberg - Instance considerations.
             // Now this gets complicated, so listen up! We have told the client a lie when it comes to the zoneID.
@@ -577,13 +567,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     int safeFallLevel = client.Player.GetAbilityLevel(Abilities.SafeFall);
                     int fallSpeed = (flyingflag & 0xFFF) - 100 * safeFallLevel; // 0x7FF fall speed and 0x800 bit = fall speed overcaped
-                    int fallMinSpeed = 400;
-                    int fallDivide = 6;
-                    if (client.Version >= GameClient.eClientVersion.Version188)
-                    {
-                        fallMinSpeed = 500;
-                        fallDivide = 15;
-                    }
+                    var fallMinSpeed = 500;
+                    var fallDivide = 15;
 
                     int fallPercent = Math.Min(99, (fallSpeed - (fallMinSpeed + 1)) / fallDivide);
 
@@ -665,18 +650,9 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             // zone ID has changed in 1.72, fix bytes 11 and 12
             byte[] con172 = (byte[])con168.Clone();
-            if (packetVersion == 168)
-            {
-                // client sent v168 pos update packet, fix 172 version
-                con172[10] = 0;
-                con172[11] = con168[10];
-            }
-            else
-            {
-                // client sent v172 pos update packet, fix 168 version
-                con168[10] = con172[11];
-                con168[11] = 0;
-            }
+            // client sent v172 pos update packet, fix 168 version
+            con168[10] = con172[11];
+            con168[11] = 0;
 
             GSUDPPacketOut outpak168 = new GSUDPPacketOut(client.Out.GetPacketCode(eServerPackets.PlayerPosition));
 
@@ -745,7 +721,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     {
                         player.Out.SendUDPRaw(outpak1112);
                     }
-                    else if (player.Client.Version >= GameClient.eClientVersion.Version190)
+                    else
                     {
                         if (outpak190 == null)
                         {
@@ -763,14 +739,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
 
                         player.Out.SendUDPRaw(outpak190);
-                    }
-                    else if (player.Client.Version >= GameClient.eClientVersion.Version172)
-                    {
-                        player.Out.SendUDPRaw(outpak172);
-                    }
-                    else
-                    {
-                        player.Out.SendUDPRaw(outpak168);
                     }
                 }
                 else

@@ -55,15 +55,11 @@ namespace DOL.GS.Commands
             {
                 return;
             }
-
-            // no longer used since 1.105, except if we explicitely want
-            if (client.Version >= GameClient.eClientVersion.Version1105)
+            
+            if (!ServerProperties.Properties.CUSTOM_TRAIN)
             {
-                if (!ServerProperties.Properties.CUSTOM_TRAIN)
-                {
-                    client.Out.SendTrainerWindow();
-                    return;
-                }
+                client.Out.SendTrainerWindow();
+                return;
             }
 
             GameTrainer trainer = client.Player.TargetObject as GameTrainer;

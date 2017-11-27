@@ -149,8 +149,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
 
                 // Is the "item" we want to move money? For Version 1.78+
-                if (client.Version >= GameClient.eClientVersion.Version178 &&
-                    fromClientSlot >= (int)eInventorySlot.Mithril178 &&
+                if (fromClientSlot >= (int)eInventorySlot.Mithril178 &&
                     fromClientSlot <= (int)eInventorySlot.Copper178)
                 {
                     fromClientSlot -= eInventorySlot.Mithril178 - eInventorySlot.Mithril;
@@ -162,11 +161,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     int[] money = new int[5];
                     money[fromClientSlot - (ushort)eInventorySlot.Mithril] = itemCount;
                     long flatMoney = Money.GetMoney(money[0], money[1], money[2], money[3], money[4]);
-
-                    if (client.Version >= GameClient.eClientVersion.Version178) // add it back for proper slot update...
-                    {
-                        fromClientSlot += eInventorySlot.Mithril178 - eInventorySlot.Mithril;
-                    }
+                    fromClientSlot += eInventorySlot.Mithril178 - eInventorySlot.Mithril;
 
                     if (!obj.IsWithinRadius(client.Player, WorldMgr.GIVE_ITEM_DISTANCE))
                     {

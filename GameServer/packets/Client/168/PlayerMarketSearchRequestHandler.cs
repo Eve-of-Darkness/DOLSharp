@@ -56,24 +56,21 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             packet.ReadByte(); // unk
             packet.ReadShort(); // unk
-
-            if (client.Version >= GameClient.eClientVersion.Version198)
-            {
-                // Dunnerholl 2009-07-28 Version 1.98 introduced new options to Market search. 12 Bytes were added, but only 7 are in usage so far in my findings.
-                // update this, when packets change and keep in mind, that this code reflects only the 1.98 changes
-                search.armorType = search.page; // page is now used for the armorType (still has to be logged, i just checked that 2 means leather, 0 = standard
-                search.damageType = (byte)packet.ReadByte(); // 1=crush, 2=slash, 3=thrust
-                packet.ReadByte(); // unk
-                packet.ReadByte(); // unk
-                packet.ReadByte(); // unk
-                search.playerCrafted = (byte)packet.ReadByte(); // 1 = show only Player crafted, 0 = all
-                // 3 bytes unused
-                packet.Skip(3);
-                search.page = (byte)packet.ReadByte(); // page is now sent here
-                packet.ReadByte(); // unk
-                packet.ReadByte(); // unk
-                packet.ReadByte(); // unk
-            }
+            
+            // Dunnerholl 2009-07-28 Version 1.98 introduced new options to Market search. 12 Bytes were added, but only 7 are in usage so far in my findings.
+            // update this, when packets change and keep in mind, that this code reflects only the 1.98 changes
+            search.armorType = search.page; // page is now used for the armorType (still has to be logged, i just checked that 2 means leather, 0 = standard
+            search.damageType = (byte)packet.ReadByte(); // 1=crush, 2=slash, 3=thrust
+            packet.ReadByte(); // unk
+            packet.ReadByte(); // unk
+            packet.ReadByte(); // unk
+            search.playerCrafted = (byte)packet.ReadByte(); // 1 = show only Player crafted, 0 = all
+            // 3 bytes unused
+            packet.Skip(3);
+            search.page = (byte)packet.ReadByte(); // page is now sent here
+            packet.ReadByte(); // unk
+            packet.ReadByte(); // unk
+            packet.ReadByte(); // unk
 
             search.clientVersion = client.Version.ToString();
 
