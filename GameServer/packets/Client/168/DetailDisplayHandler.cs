@@ -50,15 +50,8 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
 
             ushort objectType = packet.ReadShort();
-
-            uint extraId = 0;
-            if (client.Version >= GameClient.eClientVersion.Version186)
-            {
-                extraId = packet.ReadInt();
-            }
-
+            var extraId = packet.ReadInt();
             ushort objectId = packet.ReadShort();
-
             string caption = string.Empty;
             var objectInfo = new List<string>();
 

@@ -86,26 +86,19 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 if (player != null && player != client.Player)
                 {
-                    if (player.Client.Version >= GameClient.eClientVersion.Version190)
+                    if (outpak190 == null)
                     {
-                        if (outpak190 == null)
-                        {
-                            outpak190 = new GSUDPPacketOut(client.Out.GetPacketCode(eServerPackets.PlayerHeading));
-                            byte[] con190 = (byte[])con.Clone();
+                        outpak190 = new GSUDPPacketOut(client.Out.GetPacketCode(eServerPackets.PlayerHeading));
+                        byte[] con190 = (byte[])con.Clone();
 
-                            // Now copy the whole content of the packet
-                            outpak190.Write(con190, 0, /*con190.Lenght*/10);
-                            outpak190.WriteByte(client.Player.ManaPercent);
-                            outpak190.WriteByte(client.Player.EndurancePercent);
-                            outpak190.WritePacketLength();
-                        }
+                        // Now copy the whole content of the packet
+                        outpak190.Write(con190, 0, /*con190.Lenght*/10);
+                        outpak190.WriteByte(client.Player.ManaPercent);
+                        outpak190.WriteByte(client.Player.EndurancePercent);
+                        outpak190.WritePacketLength();
+                    }
 
-                        player.Out.SendUDPRaw(outpak190);
-                    }
-                    else
-                    {
-                        player.Out.SendUDPRaw(outpak);
-                    }
+                    player.Out.SendUDPRaw(outpak190);
                 }
             }
         }

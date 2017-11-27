@@ -38,29 +38,25 @@ namespace DOL.GS.PacketHandler.Client.v168
         {
             int flagSpeedData = packet.ReadShort();
             int heading = packet.ReadShort();
+            int xOffsetInZone = packet.ReadShort();
+            int yOffsetInZone = packet.ReadShort();
+            int currentZoneId = packet.ReadShort();
+            int realZ = packet.ReadShort();
 
-            if (client.Version > GameClient.eClientVersion.Version171)
+            Zone newZone = WorldMgr.GetZone((ushort)currentZoneId);
+            if (newZone == null)
             {
-                int xOffsetInZone = packet.ReadShort();
-                int yOffsetInZone = packet.ReadShort();
-                int currentZoneId = packet.ReadShort();
-                int realZ = packet.ReadShort();
-
-                Zone newZone = WorldMgr.GetZone((ushort)currentZoneId);
-                if (newZone == null)
+                if (Log.IsWarnEnabled)
                 {
-                    if (Log.IsWarnEnabled)
-                    {
-                        Log.Warn($"Unknown zone in UseSpellHandler: {currentZoneId} player: {client.Player.Name}");
-                    }
+                    Log.Warn($"Unknown zone in UseSpellHandler: {currentZoneId} player: {client.Player.Name}");
                 }
-                else
-                {
-                    client.Player.X = newZone.XOffset + xOffsetInZone;
-                    client.Player.Y = newZone.YOffset + yOffsetInZone;
-                    client.Player.Z = realZ;
-                    client.Player.MovementStartTick = Environment.TickCount;
-                }
+            }
+            else
+            {
+                client.Player.X = newZone.XOffset + xOffsetInZone;
+                client.Player.Y = newZone.YOffset + yOffsetInZone;
+                client.Player.Z = realZ;
+                client.Player.MovementStartTick = Environment.TickCount;
             }
 
             int spellLevel = packet.ReadByte();
