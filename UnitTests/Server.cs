@@ -52,7 +52,7 @@ namespace DOL.Server.Tests
             client.Socket = new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
             client.Account = account;
             client.PacketProcessor = new DOL.GS.PacketHandler.PacketProcessor(client);
-            client.Out = new DOL.GS.PacketHandler.PacketLib1105(client);
+            client.Out = new DOL.GS.PacketHandler.PacketLib1109(client);
             client.Player = new GamePlayer(client,character);
             Assert.IsNotNull(client.Player,"GamePlayer instance created");
 
