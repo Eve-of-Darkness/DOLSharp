@@ -72,8 +72,6 @@ namespace DOL.GS.Quests.Hibernia
 
         private void Init()
         {
-            #region defineItems
-
             // item db check
             RecruitsShortSword = GameServer.Database.FindObjectByKey<ItemTemplate>("recruits_short_sword_hib");
             if (RecruitsShortSword == null)
@@ -282,7 +280,6 @@ namespace DOL.GS.Quests.Hibernia
                     GameServer.Database.AddObject(RecruitsStaff);
                 }
             }
-            #endregion
 
             ItemTemplate nipperwing = new ItemTemplate();
             nipperwing.Weight = 0;
@@ -317,8 +314,6 @@ namespace DOL.GS.Quests.Hibernia
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Josson", eRealm.Hibernia);
 
@@ -365,8 +360,6 @@ namespace DOL.GS.Quests.Hibernia
             {
                 Josson = npcs[0];
             }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

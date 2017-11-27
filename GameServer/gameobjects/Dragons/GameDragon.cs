@@ -219,8 +219,6 @@ namespace DOL.GS
             }
         }
 
-        #region Damage & Heal Events
-
         /// <summary>
         /// Take some amount of damage inflicted by another GameObject.
         /// </summary>
@@ -249,10 +247,6 @@ namespace DOL.GS
             Brain.Notify(GameLivingEvent.EnemyHealed, this,
                 new EnemyHealedEventArgs(enemy, healSource, changeType, healAmount));
         }
-
-        #endregion
-
-        #region Tether
 
         /// <summary>
         /// Return to spawn point, dragon can't be attacked while it's
@@ -290,10 +284,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Health
-
         private int m_healthPercentOld = 100;
 
         /// <summary>
@@ -304,10 +294,6 @@ namespace DOL.GS
             get { return m_healthPercentOld; }
             protected set { m_healthPercentOld = value; }
         }
-
-        #endregion
-
-        #region Custom Methods
 
         /// <summary>
         /// Broadcast relevant messages to the raid.
@@ -359,10 +345,6 @@ namespace DOL.GS
 
             return count;
         }
-
-        #endregion
-
-        #region Add Spawns
 
         /// <summary>
         /// Spawn adds that will despawn again after some time has passed.
@@ -491,10 +473,6 @@ namespace DOL.GS
         {
         }
 
-        #endregion
-
-        #region Breath & Resist Debuff
-
         protected Spell m_breathSpell;
 
         /// <summary>
@@ -549,10 +527,6 @@ namespace DOL.GS
             CastSpell(ResistDebuff, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
             return 0;
         }
-
-        #endregion
-
-        #region Glare
 
         protected Spell m_glareSpell;
 
@@ -645,10 +619,6 @@ namespace DOL.GS
             return 0;
         }
 
-        #endregion
-
-        #region Melee Debuff
-
         protected Spell m_meleeDebuffSpell;
 
         /// <summary>
@@ -700,10 +670,6 @@ namespace DOL.GS
             CastSpell(MeleeDebuff, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
         }
 
-        #endregion
-
-        #region Ranged Debuff
-
         protected Spell m_rangedDebuffSpell;
 
         /// <summary>
@@ -754,10 +720,6 @@ namespace DOL.GS
         {
             CastSpell(RangedDebuff, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
         }
-
-        #endregion
-
-        #region Throw
 
         private const int m_throwChance = 5;
 
@@ -833,10 +795,6 @@ namespace DOL.GS
 
             return targetPoint;
         }
-
-        #endregion
-
-        #region Stun
 
         private Spell m_stun;
 
@@ -919,8 +877,6 @@ namespace DOL.GS
             CastSpell(Stun, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
             return 0;
         }
-
-        #endregion
     }
 }
 

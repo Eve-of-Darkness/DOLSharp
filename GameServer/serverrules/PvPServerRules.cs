@@ -314,8 +314,6 @@ namespace DOL.GS.ServerRules
                 return false;
             }
 
-            #region Keep Guards
-
             // guard vs guard / npc
             if (attacker is GameKeepGuard)
             {
@@ -348,7 +346,6 @@ namespace DOL.GS.ServerRules
             {
                 return false;
             }
-            #endregion
 
             return true;
         }
@@ -560,7 +557,6 @@ namespace DOL.GS.ServerRules
             var stat = new List<string>();
 
             int total;
-            #region Players Killed
 
             // only show if there is a kill [by Suncheck]
             if ((player.KillsAlbionPlayers + player.KillsMidgardPlayers + player.KillsHiberniaPlayers) > 0)
@@ -584,9 +580,7 @@ namespace DOL.GS.ServerRules
                 total = player.KillsMidgardPlayers + player.KillsAlbionPlayers + player.KillsHiberniaPlayers;
                 stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.TotalPlayers")}: {total:N0}");
             }
-            #endregion
             stat.Add(" ");
-            #region Players Deathblows
 
             // only show if there is a kill [by Suncheck]
             if ((player.KillsAlbionDeathBlows + player.KillsMidgardDeathBlows + player.KillsHiberniaDeathBlows) > 0)
@@ -609,9 +603,7 @@ namespace DOL.GS.ServerRules
                 total = player.KillsMidgardDeathBlows + player.KillsAlbionDeathBlows + player.KillsHiberniaDeathBlows;
                 stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.TotalPlayers")}: {total:N0}");
             }
-            #endregion
             stat.Add(" ");
-            #region Players Solo Kills
 
             // only show if there is a kill [by Suncheck]
             if ((player.KillsAlbionSolo + player.KillsMidgardSolo + player.KillsHiberniaSolo) > 0)
@@ -635,9 +627,7 @@ namespace DOL.GS.ServerRules
                 total = player.KillsMidgardSolo + player.KillsAlbionSolo + player.KillsHiberniaSolo;
                 stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.TotalPlayers")}: {total:N0}");
             }
-            #endregion
             stat.Add(" ");
-            #region Keeps
 
             // only show if there is a capture [by Suncheck]
             if ((player.CapturedKeeps + player.CapturedTowers) > 0)
@@ -654,9 +644,7 @@ namespace DOL.GS.ServerRules
                     stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Towers")}: {player.CapturedTowers:N0}");
                 }
             }
-            #endregion
             stat.Add(" ");
-            #region PvE
 
             // only show if there is a kill [by Suncheck]
             if ((player.KillsDragon + player.KillsEpicBoss + player.KillsLegion) > 0)
@@ -677,7 +665,6 @@ namespace DOL.GS.ServerRules
                     stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsLegion")}: {player.KillsLegion:N0}");
                 }
             }
-            #endregion
 
             return stat;
         }

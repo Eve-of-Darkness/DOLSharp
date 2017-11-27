@@ -141,8 +141,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCs
-
             masterFrederick = GetMasterFrederick();
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Lady Felin", eRealm.None);
@@ -177,10 +175,6 @@ namespace DOL.GS.Quests.Albion
             {
                 ladyFelin = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             // item db check
             necklaceOfDoppelganger = GameServer.Database.FindObjectByKey<ItemTemplate>("necklace_of_the_doppelganger");
@@ -342,8 +336,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(recruitsQuiltedBoots);
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

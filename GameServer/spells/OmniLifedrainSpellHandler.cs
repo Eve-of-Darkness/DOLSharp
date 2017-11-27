@@ -84,8 +84,6 @@ namespace DOL.GS.Spells
             {
                 MessageToCaster($"You steal {heal} hit point{(heal == 1 ? "." : "s.")}", eChatType.CT_Spell);
 
-                #region PVP DAMAGE
-
                 if (((Caster as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || Caster is GamePlayer)
                 {
                     if (Caster.DamageRvRMemory > 0)
@@ -93,15 +91,10 @@ namespace DOL.GS.Spells
                         Caster.DamageRvRMemory -= Math.Max(heal, 0);
                     }
                 }
-
-                #endregion PVP DAMAGE
-
             }
             else
             {
                 MessageToCaster("You cannot absorb any more life.", eChatType.CT_SpellResisted);
-
-                #region PVP DAMAGE
 
                 if (((Caster as NecromancerPet)?.Brain as IControlledBrain)?.GetPlayerOwner() != null || Caster is GamePlayer)
                 {
@@ -110,7 +103,6 @@ namespace DOL.GS.Spells
                         Caster.DamageRvRMemory = 0; // Remise a zéro compteur dommages/heal rps
                     }
                 }
-                #endregion PVP DAMAGE
             }
         }
 

@@ -40,8 +40,6 @@ namespace DOL.GS
     /// </summary>
     public class GameClient : BaseClient, ICustomParamsValuable
     {
-        #region eClientAddons enum
-
         /// <summary>
         /// The client addons enum
         /// </summary>
@@ -53,10 +51,6 @@ namespace DOL.GS
             Foundations = 0x40,
             NewFrontiers = 0x80,
         }
-
-        #endregion
-
-        #region eClientState enum
 
         /// <summary>
         /// Current state of the client
@@ -74,10 +68,6 @@ namespace DOL.GS
 
 ;
 
-        #endregion
-
-        #region eClientType enum
-
         /// <summary>
         /// The client software type enum
         /// </summary>
@@ -91,10 +81,6 @@ namespace DOL.GS
             DarknessRising = 5,
             LabyrinthOfTheMinotaur = 6,
         }
-
-        #endregion
-
-        #region eClientVersion enum
 
         /// <summary>
         /// the version enum
@@ -164,8 +150,6 @@ namespace DOL.GS
             Version1125 = 1125,
             _LastVersion = 1125,
         }
-
-        #endregion
 
         /// <summary>
         /// Defines a logger for this class.

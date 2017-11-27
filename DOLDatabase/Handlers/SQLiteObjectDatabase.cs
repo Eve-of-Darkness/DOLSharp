@@ -49,7 +49,6 @@ namespace DOL.Database.Handlers
         {
         }
 
-        #region SQLite Implementation
         /// <summary>
         /// Convert a Table ElementBinding to Database Type string (Upper)
         /// </summary>
@@ -245,9 +244,7 @@ namespace DOL.Database.Handlers
 
             return string.Format("`{0}` {1} {2}", bind.ColumnName, type, defaultDef);
         }
-        #endregion
 
-        #region Create / Alter Table
         /// <summary>
         /// Check for Table Existence, Create or Alter accordingly
         /// </summary>
@@ -681,16 +678,12 @@ namespace DOL.Database.Handlers
                 }
             }
         }
-        #endregion
 
-        #region Property implementation
         /// <summary>
         /// The connection type to DB (xml, mysql,...)
         /// </summary>
         public override ConnectionType ConnectionType { get { return ConnectionType.DATABASE_SQLITE; } }
-        #endregion
 
-        #region SQLObject Implementation
         /// <summary>
         /// Raw SQL Select Implementation with Parameters for Prepared Query
         /// </summary>
@@ -1017,7 +1010,7 @@ namespace DOL.Database.Handlers
 
             return obj.ToArray();
         }
-        #endregion
+
         /// <summary>
         /// Handle Non Fatal SQL Query Exception
         /// </summary>

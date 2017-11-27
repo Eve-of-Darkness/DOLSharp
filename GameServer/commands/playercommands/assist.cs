@@ -68,7 +68,6 @@ namespace DOL.GS.Commands
                     // Each server type handles the assist command on it's own way.
                     switch (GameServer.Instance.Configuration.ServerType)
                     {
-                            #region Normal rules
                         case eGameServerType.GST_Normal:
                             {
                                 // We cannot assist players of an enemy realm.
@@ -86,8 +85,7 @@ namespace DOL.GS.Commands
                                 YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
                                 return;
                             }
-                            #endregion
-                            #region PvE rules
+
                         case eGameServerType.GST_PvE:
                             {
                                 // We cannot assist our target when it has no target.
@@ -99,8 +97,7 @@ namespace DOL.GS.Commands
                                 YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
                                 return;
                             }
-                            #endregion
-                            #region PvP rules
+
                         case eGameServerType.GST_PvP:
                             {
                                 // Note:
@@ -187,7 +184,6 @@ namespace DOL.GS.Commands
                                 NoValidTarget(client, assistPlayer);
                                 return;
                             }
-                            #endregion
                     }
                 }
 
@@ -217,7 +213,6 @@ namespace DOL.GS.Commands
                     // Each server type handles the assist command on it's own way.
                     switch (GameServer.Instance.Configuration.ServerType)
                     {
-                        #region Normal rules
                         case eGameServerType.GST_Normal:
                         {
                             GameLiving targetLiving = (GameLiving)client.Player.TargetObject;
@@ -237,8 +232,7 @@ namespace DOL.GS.Commands
                                 YouAssist(client, client.Player.TargetObject.GetName(0, true), targetLiving.TargetObject);
                             return;
                         }
-                        #endregion
-                        #region PvE rules
+
                         case eGameServerType.GST_PvE:
                             {
                                 if (client.Player.TargetObject is GamePlayer)
@@ -274,8 +268,7 @@ namespace DOL.GS.Commands
                             } 
 
 break;
-                        #endregion
-                        #region PvP rules
+
                         case eGameServerType.GST_PvP:
                             {
                                 // Note:
@@ -539,7 +532,6 @@ break;
                             } 
 
 break;
-                            #endregion
                     }
                 }
             }
@@ -547,8 +539,6 @@ break;
             client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Players.Assist.SelectMember"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return;
         }
-
-        #region OnCommand member methods
 
         private bool HasTarget(GameClient client, GameLiving livingToCheck)
         {
@@ -601,7 +591,5 @@ break;
             client.Out.SendChangeTarget(assistTarget);
             return;
         }
-
-        #endregion
     }
 }

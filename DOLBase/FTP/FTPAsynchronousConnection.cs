@@ -184,15 +184,11 @@ namespace DOL.FTP
             base.RemoveDirectory(_removeDirQueue.Dequeue());
         }
 
-        #region Nested type: FileTransferStruct
-
         private struct FileTransferStruct
         {
             public string LocalFileName;
             public string RemoteFileName;
             public FTPFileTransferType Type;
         }
-
-        #endregion
     }
 }

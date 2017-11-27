@@ -57,7 +57,6 @@ namespace DOL.GS.Commands
 
             switch (args[1].ToLower())
             {
-                #region Create
                 case "create":
                     {
                         GameKeepGuard guard = null;
@@ -69,21 +68,18 @@ namespace DOL.GS.Commands
 
                         switch (args[2].ToLower())
                         {
-                            #region Lord
                             case "lord":
                                 {
                                     guard = new GuardLord();
                                     break;
                                 }
-                            #endregion Lord
-                            #region Fighter
+
                             case "fighter":
                                 {
                                     guard = new GuardFighter();
                                     break;
                                 }
-                            #endregion Fighter
-                            #region Archer
+
                             case "archer":
                                 {
                                     if (args.Length > 3)
@@ -97,22 +93,19 @@ namespace DOL.GS.Commands
 
                                     break;
                                 }
-                            #endregion Archer
-                            #region Healer
+
                             case "healer":
                                 {
                                     guard = new GuardHealer();
                                     break;
                                 }
-                            #endregion Healer
-                            #region Stealther
+
                             case "stealther":
                                 {
                                     guard = new GuardStealther();
                                     break;
                                 }
-                            #endregion Stealther
-                            #region Caster
+
                             case "caster":
                                 {
                                     if (args.Length > 3)
@@ -126,22 +119,19 @@ namespace DOL.GS.Commands
 
                                     break;
                                 }
-                            #endregion Caster
-                            #region Hastener
+
                             case "hastener":
                                 {
                                     guard = new FrontierHastener();
                                     break;
                                 }
-                            #endregion Hastener
-                            #region Mission
+
                             case "mission":
                                 {
                                     guard = new MissionMaster();
                                     break;
                                 }
-                            #endregion Mission
-                            #region Patrol
+
                             case "patrol":
                                 {
                                     if (args.Length < 4)
@@ -191,7 +181,6 @@ namespace DOL.GS.Commands
                                     DisplayMessage(client, "Patrol created for Keep Type " + Enum.GetName(typeof(AbstractGameKeep.eKeepType), keepType));
                                     return;
                                 }
-                            #endregion Patrol
                         }
 
                         if (guard == null)
@@ -260,13 +249,11 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.KeepGuard.Create.GuardAdded"));
                         break;
                     }
-                #endregion Create
-                #region Position
+
                 case "position":
                     {
                         switch (args[2].ToLower())
                         {
-                            #region Add
                             case "add":
                                 {
                                     if (!(client.Player.TargetObject is GameKeepGuard))
@@ -299,8 +286,7 @@ namespace DOL.GS.Commands
                                     DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.KeepGuard.Position.GuardPAdded"));
                                     break;
                                 }
-                            #endregion Add
-                            #region Remove
+
                             case "remove":
                                 {
                                     if (!(client.Player.TargetObject is GameKeepGuard))
@@ -336,25 +322,21 @@ namespace DOL.GS.Commands
                                     DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.KeepGuard.Position.GuardRemoved"));
                                     break;
                                 }
-                            #endregion Remove
-                            #region Default
+
                             default:
                                 {
                                     DisplaySyntax(client);
                                     return;
                                 }
-                            #endregion Default
                         }
 
                         break;
                     }
-                #endregion Position
-                #region Path
+
                 case "path":
                     {
                         switch (args[2].ToLower())
                         {
-                            #region Create
                             case "create":
                                 {
                                     RemoveAllTempPathObjects(client);
@@ -366,8 +348,7 @@ namespace DOL.GS.Commands
                                     CreateTempPathObject(client, startpoint, "TMP PP 1");
                                     break;
                                 }
-                            #endregion Create
-                            #region Add
+
                             case "add":
                                 {
                                     PathPoint path = (PathPoint)client.Player.TempProperties.getProperty<object>(TEMP_PATH_LAST, null);
@@ -409,8 +390,7 @@ namespace DOL.GS.Commands
                                     DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.KeepGuard.Path.PPAdded", len));
                                     break;
                                 }
-                            #endregion Add
-                            #region Save
+
                             case "save":
                                 {
                                     PathPoint path = (PathPoint)client.Player.TempProperties.getProperty<object>(TEMP_PATH_LAST, null);
@@ -439,26 +419,22 @@ namespace DOL.GS.Commands
 
                                     break;
                                 }
-                            #endregion Save
-                            #region Default
+
                             default:
                                 {
                                     DisplaySyntax(client);
                                     return;
                                 }
-                            #endregion Default
                         }
 
                         break;
                     }
-                #endregion Path
-                #region Default
+
                 default:
                     {
                         DisplaySyntax(client);
                         return;
                     }
-                #endregion Default
             }
         }
 

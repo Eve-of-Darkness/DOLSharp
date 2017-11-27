@@ -59,7 +59,6 @@ namespace DOL.GS.SkillHandler
                 return;
             }
 
-            #region precheck
             if (!player.IsAlive)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.CannotUseDead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -127,8 +126,6 @@ namespace DOL.GS.SkillHandler
                 return;
             }
 
-            #endregion
-
             GameLiving target = (GameLiving)player.TargetObject;
             int damage;
             int specc = player.CharacterClass is PlayerClass.ClassBlademaster
@@ -143,7 +140,6 @@ namespace DOL.GS.SkillHandler
             else
             { damage = (int)(target.MaxHealth / 100 * specc / 4.6); } // prev 3.6
 
-            #region Resists
             int primaryResistModifier = target.GetResist(eDamageType.Slash);
 
             // Using the resist BuffBonusCategory2 - its unused in ResistCalculator
@@ -159,8 +155,6 @@ namespace DOL.GS.SkillHandler
 
             // apply resists
             damage += resistModifier;
-
-            #endregion
 
             // flurry is slash damage
             target.TakeDamage(player, eDamageType.Slash, damage, 0);

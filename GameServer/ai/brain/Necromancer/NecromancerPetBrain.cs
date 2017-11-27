@@ -104,8 +104,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #region Events
-
         /// <summary>
         /// Process events.
         /// </summary>
@@ -307,10 +305,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
-
-        #region Spell Queue
-
         /// <summary>
         /// See if there are any spells queued up and if so, get the first one
         /// and cast it.
@@ -465,10 +459,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
-
-        #region Tether
-
         private const int m_softTether = 2000;    // TODO: Check on Pendragon
         private const int m_hardTether = 2500;
         private TetherTimer m_tetherTimer = null;
@@ -572,7 +562,5 @@ namespace DOL.AI.Brain
                 MessageToOwner(string.Format("[{0:00}:{1:00}.{2:000}] {3}", minutes % 60, seconds % 60, tick % 1000, message), eChatType.CT_Staff);
             }
         }
-
-        #endregion
     }
 }

@@ -99,7 +99,6 @@ namespace DOL.GS.Spells
             return false;
         }
 
-        #region Devle Info
         public override IList<string> DelveInfo
         {
             get
@@ -143,7 +142,6 @@ namespace DOL.GS.Spells
                 list.Add(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "DelveInfo.CastingTime", (Spell.CastTime * 0.001).ToString("0.0## sec;-0.0## sec;'instant'")));
                 return list;
             }
-        #endregion
         }
 
         // constructor

@@ -35,16 +35,10 @@ namespace DOL.GS
         /// </summary>
         protected static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Declaration
-
         /// <summary>
         /// The player currently crafting
         /// </summary>
         protected const string PLAYER_PARTNER = "PLAYER_PARTNER";
-
-        #endregion
-
-        #region First call function and callback
 
         /// <summary>
         /// Called when player try to use a secondary crafting skill
@@ -151,10 +145,6 @@ namespace DOL.GS
             return 0;
         }
 
-        #endregion
-
-        #region Requirement check
-
         /// <summary>
         /// Check if the player own can enchant the item
         /// </summary>
@@ -204,10 +194,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-
-        #region Calcul functions
-
         /// <summary>
         /// Calculate crafting time
         /// </summary>
@@ -239,12 +225,6 @@ namespace DOL.GS
 
             return chancePercent;
         }
-
-        #endregion
-
-        #region SiegeWeapon
-
-        #region First call function and callback
 
         /// <summary>
         /// Called when player try to use a secondary crafting skill
@@ -311,9 +291,6 @@ namespace DOL.GS
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Repair.Proceed.FullyRepaired1", siegeWeapon.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return 0;
         }
-        #endregion
-
-        #region Requirement check
 
         /// <summary>
         /// Check if the player own can enchant the item
@@ -345,10 +322,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-
-        #region Calcul functions
-
         /// <summary>
         /// Calculate crafting time
         /// </summary>
@@ -376,9 +349,5 @@ namespace DOL.GS
 
             return chancePercent;
         }
-
-        #endregion
-
-        #endregion
     }
 }

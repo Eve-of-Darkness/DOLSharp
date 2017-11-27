@@ -110,7 +110,6 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
             GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Torold Sterkkriger", (eRealm)2);
@@ -209,10 +208,6 @@ namespace DOL.GS.Quests.Midgard
                 JorundBruttstein = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             marinefungusroot = GameServer.Database.FindObjectByKey<ItemTemplate>("marinefungusroot");
             if (marinefungusroot == null)
             {
@@ -291,14 +286,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(marinefungusroot);
                 }
             }
-
-            #endregion
-
-            #region defineAreas
-
-            #endregion
-
-            #region defineQuestParts
 
             QuestBuilder builder = QuestMgr.GetBuilder(typeof(trialofstrength));
             QuestBehaviour a;
@@ -402,8 +389,6 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.GiveGold, 230, null);
             a.AddAction(eActionType.FinishQuest, typeof(DOL.GS.Quests.Midgard.trialofstrength), null);
             AddBehaviour(a);
-
-            #endregion
 
             // Custom Scriptloaded Code Begin
 

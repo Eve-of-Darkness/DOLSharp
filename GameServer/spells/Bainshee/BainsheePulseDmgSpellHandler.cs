@@ -87,8 +87,6 @@ namespace DOL.GS.Spells
             }
         }
 
-        #region LOS on Keeps
-
         private const string LOSEFFECTIVENESS = "LOS Effectivness";
 
         /// <summary>
@@ -236,7 +234,6 @@ namespace DOL.GS.Spells
         {
             base.OnSpellResisted(target);
         }
-        #endregion
 
         // constructor
         public BainsheePulseDmgSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }

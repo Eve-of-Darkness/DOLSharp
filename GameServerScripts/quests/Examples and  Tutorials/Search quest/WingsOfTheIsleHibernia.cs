@@ -287,8 +287,6 @@ namespace DOL.GS.Quests.Hibernia
             * Just examples, do anything you like and feel comfortable with :)
             */
 
-            #region defineNPCS
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Baeth", eRealm.Hibernia);
 
             /*  If the npcs array length is 0 then no npc exists in
@@ -364,10 +362,6 @@ namespace DOL.GS.Quests.Hibernia
                 npcJessica = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             // item db check
             reedFlute = GameServer.Database.FindObjectByKey<ItemTemplate>("quest_reed_flute");
             if (reedFlute == null)
@@ -415,8 +409,6 @@ namespace DOL.GS.Quests.Hibernia
             values ('quest_pet_dragonfly', 65001, 'Dragonfly', '', 819, 12, 250, 48, 1, '', 'NoveltyPets');
 
             */
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

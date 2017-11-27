@@ -52,7 +52,6 @@ namespace DOL.GS.Commands
 
             switch (args[1].ToLower())
             {
-                #region Create
                 case "create":
                     {
                         if (args.Length != 7 || (!args[4].ToLower().Equals("group") && !args[4].ToLower().Equals("self") && !args[4].ToLower().Equals("realm")))
@@ -95,8 +94,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Create
-                #region MoveHere
+
                 case "movehere":
                     {
                         if (!(client.Player.TargetObject is MinotaurRelic))
@@ -123,8 +121,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion MoveHere
-                #region Model
+
                 case "model":
                     {
                         if (args.Length != 3 || !(client.Player.TargetObject is MinotaurRelic))
@@ -149,8 +146,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Model
-                #region Name
+
                 case "name":
                     {
                         if (args.Length != 3 || !(client.Player.TargetObject is MinotaurRelic))
@@ -167,8 +163,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Name
-                #region Spell
+
                 case "spell":
                     {
                         if (args.Length != 3 || !(client.Player.TargetObject is MinotaurRelic))
@@ -193,8 +188,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Spell
-                #region Effect
+
                 case "effect":
                     {
                         if (args.Length != 3 || !(client.Player.TargetObject is MinotaurRelic))
@@ -219,8 +213,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Effect
-                #region Info
+
                 case "info":
                     {
                         if (!(client.Player.TargetObject is MinotaurRelic))
@@ -265,8 +258,7 @@ namespace DOL.GS.Commands
                         client.Out.SendCustomTextWindow("[ " + relic.Name + " ]", info);
                         break;
                     }
-                #endregion Info
-                #region DeSpawn
+
                 case "despawn":
                     {
                         if (!(client.Player.TargetObject is MinotaurRelic))
@@ -282,8 +274,7 @@ namespace DOL.GS.Commands
                         relic.RelicDispose();
                         break;
                     }
-                #endregion DeSpawn
-                #region Remove
+
                 case "remove":
                     {
                         // Lifeflight: Added the option to remove a minorelic by supplying an ID.
@@ -361,8 +352,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Remove
-                #region XP
+
                 case "xp":
                     {
                         if (args.Length != 3 || !(client.Player.TargetObject is MinotaurRelic))
@@ -389,8 +379,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion XP
-                #region ShowAll
+
                 case "showall":
                     {
                         var info = new List<string>();
@@ -438,8 +427,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion ShowAll
-                #region Spawn
+
                 case "spawn":
                     {
                         if (args.Length != 3)
@@ -466,7 +454,6 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Spawn
             }
         }
     }

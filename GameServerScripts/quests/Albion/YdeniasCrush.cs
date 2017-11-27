@@ -137,8 +137,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCS
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Ydenia Philpott", eRealm.Albion);
 
             /* Whops, if the npcs array length is 0 then no npc exists in
@@ -239,10 +237,6 @@ namespace DOL.GS.Quests.Albion
             {
                 elvarTambor = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             // item db check
             letterToElvar = GameServer.Database.FindObjectByKey<ItemTemplate>("letter_to_elvar_tambor");
@@ -350,8 +344,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(silverRingOfHealth);
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

@@ -52,7 +52,6 @@ namespace DOL.GS.Appeal
         public static List<GamePlayer> StaffList = new List<GamePlayer>();
         public static int TotalAppeals;
 
-        #region Initialisation/Unloading
         [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
         {
@@ -80,9 +79,6 @@ namespace DOL.GS.Appeal
                 RunTask(null);
             }
         }
-        #endregion
-
-        #region Methods
 
         private static void RunTask(object state)
         {
@@ -335,10 +331,6 @@ namespace DOL.GS.Appeal
             return;
         }
 
-        #endregion
-
-        #region Player enter
-
         public static void PlayerEnter(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = sender as GamePlayer;
@@ -377,9 +369,6 @@ namespace DOL.GS.Appeal
             NotifyStaff();
         }
 
-        #endregion
-
-        #region Player quit
         public static void PlayerQuit(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = sender as GamePlayer;
@@ -393,7 +382,5 @@ namespace DOL.GS.Appeal
                 StaffList.Remove(player);
             }
         }
-        #endregion Player quit
-
     }
 }

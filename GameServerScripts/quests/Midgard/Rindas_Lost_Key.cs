@@ -110,8 +110,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Dwarven Guard Rinda", (eRealm)2);
             if (npcs.Length == 0)
@@ -208,10 +207,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 hobgoblinsnakefinder = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
         rindaskey = GameServer.Database.FindObjectByKey<ItemTemplate>("rindaskey");
             if (rindaskey == null)
@@ -450,14 +445,6 @@ namespace DOL.GS.Quests.Midgard
                 }
             }
 
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
-
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(rindaslostkey));
             QuestBehaviour a;
             a = builder.CreateBehaviour(DwarvenGuardRinda,-1);
@@ -543,9 +530,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.GiveItem,silverringofhealth,DwarvenGuardRinda);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             if (DwarvenGuardRinda != null) {

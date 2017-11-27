@@ -108,8 +108,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Lycla", (eRealm)2);
             if (npcs.Length == 0)
@@ -246,10 +245,6 @@ namespace DOL.GS.Quests.Midgard
                 Kari = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
         snakevenom = GameServer.Database.FindObjectByKey<ItemTemplate>("snakevenom");
             if (snakevenom == null)
             {
@@ -328,14 +323,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(snakevenom);
                 }
             }
-
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
 
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(Amorasaidmistyc));
             QuestBehaviour a;
@@ -432,9 +419,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.FinishQuest,typeof(DOL.GS.Quests.Midgard.Amorasaidmistyc),null);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             Lycla.AddQuestToGive(typeof(Amorasaidmistyc));

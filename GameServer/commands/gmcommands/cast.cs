@@ -85,7 +85,6 @@ namespace DOL.GS.Commands
 
             switch (type)
             {
-                    #region Effect
                 case "effect":
                     {
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Cast.EffectExecuted", id.ToString()));
@@ -100,8 +99,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                    #endregion Effect
-                    #region Cast
+
                 case "cast":
                     {
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Cast.CastExecuted", id.ToString()));
@@ -112,8 +110,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                    #endregion Cast
-                    #region Spell
+
                 case "spell":
                     {
                         Spell spell = SkillBase.GetSpellByID(id);
@@ -143,8 +140,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                    #endregion Spell
-                    #region Style
+
                 case "style":
                     {
                         if (client.Player.AttackWeapon == null)
@@ -156,22 +152,19 @@ namespace DOL.GS.Commands
                         client.Player.Out.SendCombatAnimation(client.Player, null, (ushort)client.Player.AttackWeapon.Model, 0, id, 0, (byte)11, 100);
                         break;
                     }
-                    #endregion Style
-                    #region Sound
+
                 case "sound":
                     DisplayMessage(
                         client,
                                    LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Cast.SoundPlayed", id.ToString()));
                     client.Player.Out.SendSoundEffect((ushort)id, 0, 0, 0, 0, 0);
                     break;
-                    #endregion
-                    #region Default
+
                 default:
                     {
                         DisplaySyntax(client);
                         break;
                     }
-                    #endregion Default
             }
         }
     }

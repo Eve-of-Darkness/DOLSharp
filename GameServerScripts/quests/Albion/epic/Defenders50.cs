@@ -98,8 +98,6 @@ namespace DOL.GS.Quests.Albion
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Lidmann Halsey", eRealm.Albion);
 
             if (npcs.Length == 0)
@@ -168,9 +166,6 @@ namespace DOL.GS.Quests.Albion
             }
 
             // end npc
-            #endregion
-
-            #region defineItems
 
             sealed_pouch = GameServer.Database.FindObjectByKey<ItemTemplate>("sealed_pouch");
             if (sealed_pouch == null)
@@ -1223,7 +1218,6 @@ namespace DOL.GS.Quests.Albion
             MaulerAlbEpicArms = GameServer.Database.FindObjectByKey<ItemTemplate>("MaulerAlbEpicArms");
 
             // Item Descriptions End
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
@@ -1571,8 +1565,6 @@ namespace DOL.GS.Quests.Albion
             }
         }
 
-        #region Allakhazam Epic Source
-
         /*
         *#25 talk to Lidmann
         *#26 seek out Loken in Raumarik Loc 47k, 25k, 4k, and kill him purp and 2 blue adds
@@ -1598,7 +1590,5 @@ namespace DOL.GS.Quests.Albion
             *Shadow Shrouded Legs
             *Shadow Shrouded Sleeves
         */
-
-        #endregion
     }
 }

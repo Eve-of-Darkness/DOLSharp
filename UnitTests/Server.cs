@@ -64,8 +64,6 @@ namespace DOL.Server.Tests
             Console.WriteLine("GC: " + Directory.GetCurrentDirectory());
         }
 
-        #region Watch
-
         static long gametick;
 
         /// <summary>
@@ -90,7 +88,5 @@ namespace DOL.Server.Tests
             long elapsed = Environment.TickCount - gametick;
             Console.WriteLine(elapsed + " ticks(ms) elapsed");
         }
-
-        #endregion
     }
 }

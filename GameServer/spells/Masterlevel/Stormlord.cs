@@ -28,7 +28,6 @@ namespace DOL.GS.Spells
 {
     // http://www.camelotherald.com/masterlevels/ma.php?ml=Stormlord
     // shared timer 1
-    #region Stormlord-1
     [SpellHandler("DazzlingArray")]
     public class DazzlingArraySpellHandler : StormSpellHandler
     {
@@ -120,10 +119,8 @@ namespace DOL.GS.Spells
         // constructor
         public StormMissHit(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // no shared timer
-    #region Stormlord-2
     [SpellHandler("VacuumVortex")]
     public class VacuumVortexSpellHandler : SpellHandler
     {
@@ -186,10 +183,8 @@ namespace DOL.GS.Spells
 
         public VacuumVortexSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 2
-    #region Stormlord-3
     [SpellHandler("EnervatingGas")]
     public class EnervatingGasSpellHandler : StormSpellHandler
     {
@@ -286,10 +281,8 @@ namespace DOL.GS.Spells
             return 0;
         }
     }
-    #endregion
 
     // shared timer 1
-    #region Stormlord-4
     [SpellHandler("InebriatingFumes")]
     public class InebriatingFumesSpellHandler : StormSpellHandler
     {
@@ -386,10 +379,8 @@ namespace DOL.GS.Spells
         // constructor
         public StormDexQuickDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 2
-    #region Stormlord-5
     [SpellHandler("MentalSiphon")]
     public class MentalSiphonSpellHandler : StormSpellHandler
     {
@@ -509,10 +500,7 @@ namespace DOL.GS.Spells
         }
     }
 
-    #endregion
-
     // no shared timer
-    #region Stormlord-6
     [SpellHandler("FocusingWinds")]
     public class FocusingWindsSpellHandler : SpellHandler
     {
@@ -562,10 +550,8 @@ namespace DOL.GS.Spells
 
         public FocusingWindsSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 1
-    #region Stormlord-7
     [SpellHandler("ChokingVapors")]
     public class ChokingVaporsSpellHandler : StormSpellHandler
     {
@@ -662,10 +648,8 @@ namespace DOL.GS.Spells
         // constructor
         public StormStrConstDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 1
-    #region Stormlord-8
     [SpellHandler("SenseDullingCloud")]
     public class SenseDullingCloudSpellHandler : StormSpellHandler
     {
@@ -783,10 +767,8 @@ namespace DOL.GS.Spells
         // constructor
         public StormAcuityDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // no shared timer
-    #region Stormlord-9
     [SpellHandler("EnergyTempest")]
     public class EnergyTempestSpellHandler : StormSpellHandler
     {
@@ -916,7 +898,6 @@ namespace DOL.GS.Spells
         // constructor
         public StormEnergyTempest(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // ML 10 Arcing Power - already handled in another area
 }

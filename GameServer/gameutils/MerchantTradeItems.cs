@@ -59,8 +59,6 @@ namespace DOL.GS
         /// </summary>
         public const int MAX_PAGES_IN_TRADEWINDOWS = 5;
 
-        #region Constructor/Declaration
-
         // for client one page is 30 items, just need to use scrollbar to see them all
         // item30 will be on page 0
         // item31 will be on page 1
@@ -91,10 +89,6 @@ namespace DOL.GS
         /// Holds item template instances defined with script
         /// </summary>
         protected HybridDictionary m_usedItemsTemplates = new HybridDictionary();
-
-        #endregion
-
-        #region Add Trade Item
 
         /// <summary>
         /// Adds an item to the merchant item list
@@ -150,10 +144,6 @@ namespace DOL.GS
                 return true;
             }
         }
-
-        #endregion
-
-        #region Get Inventory Informations
 
         /// <summary>
         /// Get the list of all items in the specified page
@@ -349,7 +339,5 @@ namespace DOL.GS
 
             return slot;
         }
-
-        #endregion
     }
 }

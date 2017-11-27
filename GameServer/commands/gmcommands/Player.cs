@@ -82,8 +82,6 @@ namespace DOL.GS.Commands
 
             switch (args[1])
             {
-                #region articredit
-
                 case "articredit":
                     {
                         if (args.Length != 3)
@@ -101,10 +99,6 @@ namespace DOL.GS.Commands
                         ArtifactMgr.GrantArtifactCredit(player, args[2]);
                         break;
                     }
-
-                #endregion
-
-                #region name
 
                 case "name":
                     {
@@ -146,10 +140,6 @@ namespace DOL.GS.Commands
                         player.SaveIntoDatabase();
                         break;
                     }
-
-                #endregion
-
-                #region lastname
 
                 case "lastname":
                     {
@@ -195,10 +185,6 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-
-                #endregion
-
-                #region level / reset
 
                 case "reset":
                 case "level":
@@ -298,10 +284,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion
-
-                #region Start Champion
-
                 case "startchampion":
                     try
                     {
@@ -330,10 +312,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion Start Champion
-
-                #region Clear / Respec Champion
 
                 case "clearchampion":
 
@@ -380,10 +358,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion Clear / Respec Champion
-
-                #region Master Levels
 
                 case "startml":
 
@@ -549,10 +523,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion Master Levels
-
-                #region realm
-
                 case "realm":
                     {
                         try
@@ -599,10 +569,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion
-
-                #region model
 
                 case "model":
                     {
@@ -681,10 +647,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion
-
-                #region money
 
                 case "money":
                     {
@@ -783,10 +745,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion
-
-                #region points
 
                 case "rps":
                     {
@@ -995,10 +953,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion
-
-                #region stat
-
                 case "stat":
                     {
                         var player = client.Player.TargetObject as GamePlayer;
@@ -1176,10 +1130,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion
-
-                #region friend
-
                 case "friend":
                     {
                         var player = client.Player.TargetObject as GamePlayer;
@@ -1276,10 +1226,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion
-
-                #region respec
 
                 case "respec":
                     {
@@ -1385,10 +1331,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion
-
-                #region realm
-
                 case "purge":
                     {
                         var player = client.Player.TargetObject as GamePlayer;
@@ -1439,10 +1381,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion
-
-                #region save
 
                 case "save":
                     {
@@ -1498,10 +1436,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion
-
-                #region kick
 
                 case "kick":
                     {
@@ -1568,10 +1502,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion
-
-                #region rez kill
 
                 case "rez":
                     {
@@ -1894,10 +1824,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion
-
-                #region jump
-
                 case "jump":
                     {
                         if (args.Length < 4)
@@ -2040,10 +1966,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion
-
-                #region update
-
                 case "update":
                     {
                         var player = client.Player.TargetObject as GamePlayer;
@@ -2069,10 +1991,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion
-
-                #region Saddlebags
 
                 case "saddlebags":
                     {
@@ -2114,10 +2032,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion Saddlebags
-
-                #region info
-
                 case "info":
                     {
                         var player = client.Player.TargetObject as GamePlayer;
@@ -2138,10 +2052,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion
-
-                #region location
-
                 case "location":
                     {
                         var player = client.Player.TargetObject as GamePlayer;
@@ -2157,10 +2067,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-
-                #endregion
-
-                #region show group - effects
 
                 case "showgroup":
                     {
@@ -2221,10 +2127,6 @@ namespace DOL.GS.Commands
                         break;
                     }
 
-                #endregion
-
-                #region inventory
-
                 case "inventory":
                     {
                         var player = client.Player.TargetObject as GamePlayer;
@@ -2249,10 +2151,6 @@ namespace DOL.GS.Commands
                         DisplaySyntax(client);
                         break;
                     }
-
-                #endregion
-
-                #region allcharacters
 
                 case "allchars":
                     {
@@ -2287,9 +2185,6 @@ namespace DOL.GS.Commands
 
                     break;
 
-                #endregion allcharacters
-
-                #region class
                 case "class":
                     {
                         var targetPlayer = client.Player.TargetObject as GamePlayer;
@@ -2341,8 +2236,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion
-                #region areas
+
                 case "areas":
                     {
                         var targetPlayer = client.Player.TargetObject as GamePlayer;
@@ -2387,7 +2281,6 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion
             }
         }
 

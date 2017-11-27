@@ -50,7 +50,6 @@ namespace DOL.GS
 {
     public class BuffMerchant : GameMerchant
     {
-        #region BuffMerchant attrib/spells/casting
         public BuffMerchant()
             : base()
         {
@@ -120,8 +119,6 @@ namespace DOL.GS
             }
         }
 
-        #region SpellCasting
-
         private static SpellLine m_MerchBaseSpellLine;
         private static SpellLine m_MerchSpecSpellLine;
         private static SpellLine m_MerchOtherSpellLine;
@@ -185,15 +182,11 @@ namespace DOL.GS
         private static Spell m_casteracuity;
         private static Spell m_casterspecaf;
         private static Spell m_haste;
-        #region Non-live (commented out)
 
         // private static Spell m_powereg;
         // private static Spell m_dmgadd;
         // private static Spell m_hpRegen;
         // private static Spell m_heal;
-        #endregion None-live (commented out)
-
-        #region Spells
 
         /// <summary>
         /// Merch Base AF buff (VERIFIED)
@@ -738,7 +731,7 @@ namespace DOL.GS
                 return m_haste;
             }
         }
-        #region Non-live (commented out)
+
         /*
         /// <summary>
         /// Merch Power Reg buff
@@ -855,11 +848,6 @@ namespace DOL.GS
             }
         }
          */
-        #endregion Non-live (commented out)
-
-        #endregion Spells
-
-        #endregion SpellCasting
 
         private void SendReply(GamePlayer target, string msg)
         {
@@ -902,7 +890,6 @@ namespace DOL.GS
         {
             return eQuestIndicator.Lore ;
         }
-        #endregion
 
         private bool isBounty;
 
@@ -1080,7 +1067,6 @@ namespace DOL.GS
             return;
         }
 
-        #region GiveTokens
         public override bool ReceiveItem(GameLiving source, InventoryItem item)
         {
             GamePlayer t = source as GamePlayer;
@@ -1119,14 +1105,12 @@ namespace DOL.GS
                         BuffPlayer(t, MerchAcuityBuff, MerchSpecSpellLine);
                         BuffPlayer(t, MerchHasteBuff, MerchSpecSpellLine);
                     }
-                    #region Non-live (commented out)
 
                     // BuffPlayer(t, MerchPoweregBuff, MerchSpecSpellLine);
                     // BuffPlayer(t, MerchDmgaddBuff, MerchSpecSpellLine);
                     // BuffPlayer(t, MerchHPRegenBuff, MerchSpecSpellLine);
                     // BuffPlayer(t, MerchEndRegenBuff, MerchSpecSpellLine);
                     // BuffPlayer(t, MerchHealBuff, MerchSpecSpellLine);
-                    #endregion Non-live (commented out)
                     t.Out.SendMessage("Fight well, " + t.RaceName + ".", eChatType.CT_Say, eChatLoc.CL_PopupWindow);
                     t.Inventory.RemoveItem(item);
                     return true;
@@ -1311,7 +1295,6 @@ namespace DOL.GS
                     t.Inventory.RemoveItem(item);
                     return true;
                 }
-                #region Non-live (commented out)
                 /*
                 if (item.Id_nb == "PowerReg_Buff_Token")
                 {
@@ -1335,9 +1318,7 @@ namespace DOL.GS
                     return true;
                 }
                  */
-                #endregion Non-live (commented out)
             }
-            #region Non-live (commented out)
             /*if (item.Id_nb == "EnduReg_Buff_Token")
             {
                 BuffPlayer(t, MerchEndRegenBuff, MerchSpecSpellLine);
@@ -1365,14 +1346,11 @@ namespace DOL.GS
                 return true;
             }
              */
-            #endregion Non-live (commented out)
             return base.ReceiveItem(source, item);
         }
     }
 }
-#endregion
 
-#region Tokens
 namespace DOL.GS.Items
 {
     public class BuffTokens
@@ -1640,7 +1618,6 @@ namespace DOL.GS.Items
                     log.Debug("Added " + item.Id_nb);
                 }
             }
-            #region Non-live (commented out)
             /*
             item = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Otherline_Buffs_Token");
             if (item == null)
@@ -1756,7 +1733,6 @@ namespace DOL.GS.Items
                     log.Debug("Added " + item.Id_nb);
             }
              */
-            #endregion Non-live (commented out)
         }
     }
 
@@ -2025,7 +2001,6 @@ namespace DOL.GS.Items
                     log.Debug("Added " + item.Id_nb);
                 }
             }
-            #region Non-live (commented out)
             /*
             item = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>("Otherline_Buffs_Token");
             if (item == null)
@@ -2141,13 +2116,10 @@ namespace DOL.GS.Items
                     log.Debug("Added " + item.Id_nb);
             }
              */
-            #endregion Non-live (commented out)
         }
     }
 }
-#endregion
 
-#region MerchantList
 public class BuffTokensList
 {
 
@@ -2219,5 +2191,3 @@ public class BPBuffTokensList
         }
     }
 }
-#endregion
-

@@ -58,8 +58,6 @@ namespace DOL.GS
             return false;
         }
 
-        #region Overrides
-
         public override void OnEquipped(GamePlayer player)
         {
             if (Name.ToLower().Contains("ektaktos"))
@@ -81,7 +79,5 @@ namespace DOL.GS
 
             base.OnUnEquipped(player);
         }
-        #endregion
-
     }
 }

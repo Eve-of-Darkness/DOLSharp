@@ -34,7 +34,6 @@ namespace DOL.GS
     {
         protected static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Declaration
         /// <summary>
         /// the maximum possible range within a player has to be to a forge , lathe ect to craft an item
         /// </summary>
@@ -118,9 +117,6 @@ namespace DOL.GS
                 m_name = value;
             }
         }
-        #endregion
-
-        #region First call function and callback
 
         /// <summary>
         /// Called when player tries to begin crafting an item
@@ -254,10 +250,6 @@ namespace DOL.GS
 
             return 0;
         }
-
-        #endregion
-
-        #region Requirement check
 
         /// <summary>
         /// Check if the player is near the needed tools (forge, lathe, etc)
@@ -419,10 +411,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Gain points
-
         /// <summary>
         /// Gain a point in the appropriate skills for a recipe and materials
         /// </summary>
@@ -482,9 +470,6 @@ namespace DOL.GS
 
             player.Out.SendUpdateCraftingSkills();
         }
-        #endregion
-
-        #region Use materials and created crafted item
 
         /// <summary>
         /// Remove used raw material from player inventory
@@ -703,10 +688,6 @@ namespace DOL.GS
                 }
             }
         }
-
-        #endregion
-
-        #region Calcul functions
 
         /// <summary>
         /// Calculate chance to succes
@@ -986,6 +967,5 @@ namespace DOL.GS
                 return 3; // impossible
             }
         }
-        #endregion
     }
 }

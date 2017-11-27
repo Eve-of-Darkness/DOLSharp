@@ -45,7 +45,6 @@ namespace DOL.Database
         {
         }
 
-        #region ObjectDatabase Base Implementation for SQL
         /// <summary>
         /// Register Data Object Type if not already Registered
         /// </summary>
@@ -123,9 +122,7 @@ namespace DOL.Database
             rawInput = rawInput.Replace("'", "\\'");
             return rawInput.Replace("’", "\\’");
         }
-        #endregion
 
-        #region ObjectDatabase Objects Implementations
         /// <summary>
         /// Adds new DataObjects to the database.
         /// </summary>
@@ -370,9 +367,7 @@ namespace DOL.Database
 
             return success;
         }
-        #endregion
 
-        #region ObjectDatabase Select Implementation
         /// <summary>
         /// Retrieve a Collection of DataObjects from database based on their primary key values
         /// </summary>
@@ -603,24 +598,18 @@ namespace DOL.Database
                 }
             }
         }
-        #endregion
 
-        #region Abstract Properties
         /// <summary>
         /// The connection type to DB (xml, mysql,...)
         /// </summary>
         public abstract ConnectionType ConnectionType { get; }
-        #endregion
 
-        #region Table Implementation
         /// <summary>
         /// Check for Table Existence, Create or Alter accordingly
         /// </summary>
         /// <param name="table">Table Handler</param>
         public abstract void CheckOrCreateTableImpl(DataTableHandler table);
-        #endregion
 
-        #region Select Implementation
         /// <summary>
         /// Raw SQL Select Implementation
         /// </summary>
@@ -664,9 +653,7 @@ namespace DOL.Database
         /// <param name="Reader">Reader Method</param>
         /// <param name="Isolation">Transaction Isolation</param>
         protected abstract void ExecuteSelectImpl(string SQLCommand, IEnumerable<IEnumerable<QueryParameter>> parameters, Action<IDataReader> Reader, Transaction.IsolationLevel Isolation);
-        #endregion
 
-        #region Non Query Implementation
         /// <summary>
         /// Execute a Raw Non-Query on the Database
         /// </summary>
@@ -725,9 +712,7 @@ namespace DOL.Database
         /// <param name="parameters">Collection of Parameters for Single/Multiple Command</param>
         /// <returns>True foreach Command that succeeded</returns>
         protected abstract IEnumerable<int> ExecuteNonQueryImpl(string SQLCommand, IEnumerable<IEnumerable<QueryParameter>> parameters);
-        #endregion
 
-        #region Scalar Implementation
         /// <summary>
         /// Implementation of Scalar Query
         /// </summary>
@@ -771,9 +756,7 @@ namespace DOL.Database
         /// <param name="retrieveLastInsertID">Return Last Insert ID of each Command instead of Scalar</param>
         /// <returns>Objects Returned by Scalar</returns>
         protected abstract object[] ExecuteScalarImpl(string SQLCommand, IEnumerable<IEnumerable<QueryParameter>> parameters, bool retrieveLastInsertID);
-        #endregion
 
-        #region Specific
         protected virtual bool HandleException(Exception e)
         {
             bool ret = false;
@@ -814,6 +797,5 @@ namespace DOL.Database
 
             return ret;
         }
-        #endregion
     }
 }

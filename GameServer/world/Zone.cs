@@ -41,8 +41,6 @@ namespace DOL.GS
 
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region constants data
-
         private const ushort SUBZONE_NBR_ON_ZONE_SIDE = 32; // MUST BE A POWER OF 2 (current implementation limit is 128 inclusive)
 
         /// <summary>
@@ -57,10 +55,6 @@ namespace DOL.GS
         private static readonly ushort SUBZONE_ARRAY_Y_SHIFT = (ushort)Math.Round(Math.Log(SUBZONE_NBR_ON_ZONE_SIDE) / Math.Log(2));
 
         public const ushort MAX_REFRESH_INTERVAL = 2000; // in milliseconds
-
-        #endregion
-
-        #region Structures Definition
 
         /// <summary>
         /// Object Type is Item
@@ -116,10 +110,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region variables
-
         /// <summary>
         /// Contains the list of objects per subzone
         /// </summary>
@@ -136,10 +126,6 @@ namespace DOL.GS
         /// already initialized?
         /// </summary>
         private bool m_initialized = false;
-
-        #endregion
-
-        #region Constructor
 
         /// <summary>
         /// Creates a new Zone object
@@ -222,9 +208,6 @@ namespace DOL.GS
             m_initialized = true;
         }
 
-        #endregion
-
-        #region properties
         public virtual LanguageDataObject.eTranslationIdentifier TranslationIdentifier => LanguageDataObject.eTranslationIdentifier.eZone;
 
         public string TranslationId
@@ -340,10 +323,6 @@ namespace DOL.GS
         /// Returns the total number of objects held in the zone
         /// </summary>
         public int TotalNumberOfObjects => m_objectCount;
-
-        #endregion
-
-        #region New subzone Management function
 
         private short GetSubZoneOffset(int lineSubZoneIndex, int columnSubZoneIndex)
         {
@@ -707,8 +686,6 @@ namespace DOL.GS
             } while (currentElement != startElement);
         }
 
-        #region Relocation
-
         internal void Relocate(object state)
         {
             if (!m_initialized)
@@ -918,8 +895,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
         /// <summary>
         /// Checks that the square distance between two arbitary points in space is lower or equal to the given square distance
         /// </summary>
@@ -1021,10 +996,6 @@ namespace DOL.GS
             return distance <= squareRadius;
         }
 
-        #endregion
-
-        #region Area functions
-
         /// <summary>
         /// Convinientmethod for Region.GetAreasOfZone(),
         /// since zone.Region.getAreasOfZone(zone,x,y,z) is a bit confusing ...
@@ -1045,10 +1016,6 @@ namespace DOL.GS
         {
             return ZoneRegion.GetAreasOfZone(this, spot, checkZ);
         }
-
-        #endregion
-
-        #region Get random NPC
 
         /// <summary>
         /// Get's a random NPC based on a con level
@@ -1227,9 +1194,6 @@ namespace DOL.GS
             return list;
         }
 
-        #endregion
-
-        #region Zone Bonuses
         /// <summary>
         /// Bonus XP Gained (%)
         /// </summary>
@@ -1249,7 +1213,5 @@ namespace DOL.GS
         /// Bonus Money Gained (%)
         /// </summary>
         public int BonusCoin { get; set; } = 0;
-
-        #endregion
     }
 }

@@ -56,8 +56,6 @@ namespace DOL.AI.Brain
             return null;
         }
 
-        #region Think
-
         public override int ThinkInterval
         {
             get { return 5000; }
@@ -83,9 +81,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion Think
-
-        #region IControlledBrain Members
         public void SetAggressionState(eAggressionState state) { }
 
         public eWalkState WalkState { get { return eWalkState.Follow; } }
@@ -111,6 +106,5 @@ namespace DOL.AI.Brain
         public GamePlayer GetPlayerOwner() { return m_owner as GamePlayer; }
 
         public bool IsMainPet { get { return false; } set { } }
-        #endregion
     }
 }

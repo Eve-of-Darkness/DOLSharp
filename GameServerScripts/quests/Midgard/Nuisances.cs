@@ -141,13 +141,7 @@ namespace DOL.GS.Quests.Midgard
    * Just examples, do anything you like and feel comfortable with :)
    */
 
-            #region defineNPCs
-
             dalikor = GetDalikor();
-
-            #endregion
-
-            #region defineItems
 
             // item db check
             emptyMagicBox = GameServer.Database.FindObjectByKey<ItemTemplate>("empty_wodden_magic_box");
@@ -310,8 +304,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(recruitsStaff);
                 }
             }
-
-            #endregion
 
             askefruerArea = WorldMgr.GetRegion(askefruerLocation.RegionID).AddArea(new Area.Circle("Askefruer contamined Area", askefruerLocation.X, askefruerLocation.Y, 0, 1500));
             askefruerArea.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterAskefruerArea));

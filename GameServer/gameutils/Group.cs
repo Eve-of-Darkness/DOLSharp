@@ -29,7 +29,6 @@ namespace DOL.GS
     /// </summary>
     public class Group
     {
-        #region constructor and members
         /// <summary>
         /// Default Constructor with GamePlayer Leader.
         /// </summary>
@@ -53,9 +52,6 @@ namespace DOL.GS
         /// This holds all players inside the group
         /// </summary>
         protected readonly ReaderWriterList<GameLiving> m_groupMembers;
-        #endregion
-
-        #region Leader / Member
 
         /// <summary>
         /// Gets/sets the group Player leader
@@ -78,9 +74,7 @@ namespace DOL.GS
         {
             get { return (byte)m_groupMembers.Count; }
         }
-        #endregion
 
-        #region mission
         /// <summary>
         /// This Group Mission.
         /// </summary>
@@ -106,9 +100,7 @@ namespace DOL.GS
                 }
             }
         }
-        #endregion
 
-        #region autosplit
         /// <summary>
         /// Gets or sets the group's autosplit loot flag
         /// </summary>
@@ -136,9 +128,7 @@ namespace DOL.GS
             get { return m_autosplitCoins; }
             set { m_autosplitCoins = value; }
         }
-        #endregion
 
-        #region lfg status
         /// <summary>
         /// This holds the status of the group
         /// eg. looking for members etc ...
@@ -153,9 +143,7 @@ namespace DOL.GS
             get { return m_status; }
             set { m_status = value; }
         }
-        #endregion
 
-        #region managing members
         /// <summary>
         /// Gets all members of the group
         /// </summary>
@@ -347,9 +335,7 @@ namespace DOL.GS
 
             return allOk;
         }
-        #endregion
 
-        #region messaging
         /// <summary>
         /// Sends a message to all group members with an object from
         /// </summary>
@@ -385,9 +371,7 @@ namespace DOL.GS
                 player.Out.SendMessage(msg, type, loc);
             }
         }
-        #endregion
 
-        #region update group
         /// <summary>
         /// Updates a group member to all other living in the group
         /// </summary>
@@ -442,9 +426,7 @@ namespace DOL.GS
                 player.Out.SendGroupWindowUpdate();
             }
         }
-        #endregion
 
-        #region utils
         /// <summary>
         /// If at least one player is in combat group is in combat
         /// </summary>
@@ -463,7 +445,6 @@ namespace DOL.GS
         {
             return m_groupMembers.Contains(living);
         }
-        #endregion
 
         /// <summary>
         ///  This is NOT to be used outside of Battelgroup code.

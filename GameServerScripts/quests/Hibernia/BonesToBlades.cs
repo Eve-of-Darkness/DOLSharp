@@ -114,7 +114,6 @@ namespace DOL.GS.Quests.Hibernia
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCS
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>(questGiverName, eRealm.Hibernia);
             if (npcs.Length == 0)
             {
@@ -202,7 +201,6 @@ namespace DOL.GS.Quests.Hibernia
             {
                 questTarget = npcs[0];
             }
-            #endregion
 
             /*
             #region defineAreas
@@ -210,7 +208,6 @@ namespace DOL.GS.Quests.Hibernia
             #endregion
             */
 
-            #region defineItems
             armBone = GameServer.Database.FindObjectByKey<ItemTemplate>("BonesToBlades-armbone");
             if (armBone == null) {
                 armBone = new ItemTemplate();
@@ -361,9 +358,7 @@ namespace DOL.GS.Quests.Hibernia
                     GameServer.Database.AddObject(carvedBoneHilt);
                 }
             }
-            #endregion
 
-            #region defineBehaviours
             QuestBuilder builder = QuestMgr.GetBuilder(typeof(BonesToBlades));
             QuestBehaviour a = null;
             string message1 = "Oh, have you been standing there long, <Class>? If you have, I apologize for ignoring you. I find my mind is quite distracted these days after the meeting I had yesterday with a [new client].";
@@ -510,7 +505,6 @@ namespace DOL.GS.Quests.Hibernia
             a.AddAction(eActionType.GiveGold, 37, null);
             a.AddAction(eActionType.FinishQuest, typeof(BonesToBlades), null);
             AddBehaviour(a);
-            #endregion
 
             questGiver.AddQuestToGive(typeof(BonesToBlades));
 

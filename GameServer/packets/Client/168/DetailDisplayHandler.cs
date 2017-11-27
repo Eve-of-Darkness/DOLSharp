@@ -90,7 +90,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             switch (objectType)
             {
-                    #region Inventory Item
                 case 1: // Display Infos on inventory item
                 case 10: // market search
                     {
@@ -163,8 +162,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                             {
                                 break;
                             }
-
-                            #region Old Delve
 
                             if (invItem is InventoryArtifact)
                             {
@@ -301,11 +298,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
 
                         break;
-
-                        #endregion Old Delve
                     }
-                    #endregion
-                    #region Spell
+
                 case 2: // spell List
                     {
                         int lineId = objectId / 100;
@@ -390,8 +384,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         WriteSpellInfo(objectInfo, spell, spellLine, client);
                         break;
                     }
-                    #endregion
-                    #region Merchant / RewardQuest
+
                 case 4: // Display Infos on Merchant objects
                 case 19: // Display Info quest reward
                     {
@@ -524,8 +517,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                             break;
                         }
 
-                        #region Old Delve
-
                         // fallback to old delve
                         if (item.Item_Type == (int)eInventorySlot.Horse)
                         {
@@ -583,11 +574,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
 
                         break;
-
-                        #endregion Old Delve
                     }
-                    #endregion
-                    #region Effect
+
                 case 5: // icons on top (buffs/dots)
                     {
                         IGameEffect foundEffect = null;
@@ -635,8 +623,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         break;
                     }
-                    #endregion
-                    #region Style
+
                 case 6: // style
                     {
                         Style style = null;
@@ -657,8 +644,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         WriteStyleInfo(objectInfo, style, client);
                         break;
                     }
-                    #endregion
-                    #region Trade Window
+
                 case 7: // trade windows
                     {
                         ITradeWindow playerTradeWindow = client.Player.TradeWindow;
@@ -684,8 +670,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                         {
                             break;
                         }
-
-                        #region Old Delve
 
                         // fallback to old delve
                         if (invItem.Item_Type == (int)eInventorySlot.Horse)
@@ -747,11 +731,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
 
                         break;
-
-                        #endregion Old Delve
                     }
-                    #endregion
-                    #region Ability
+
                 case 8:// abilities
                     {
                         Ability abil = null;
@@ -780,8 +761,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         break;
                     }
-                    #endregion
-                    #region Trainer
+
                 case 9: // trainer window "info" button
                     {
                         Specialization spec = client.Player.GetSpecList().Where(e => e.Trainable).ElementAtOrDefault(objectId);
@@ -835,8 +815,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         break;
                     }
-                    #endregion
-                    #region Group
+
                 case 12: // Item info to Group Chat
                     {
                         invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
@@ -855,8 +834,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         client.Player.Group.SendMessageToGroupMembers(str, eChatType.CT_Group, eChatLoc.CL_ChatWindow);
                         return;
                     }
-                    #endregion
-                    #region Guild
+
                 case 13: // Item info to Guild Chat
                     {
                         invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
@@ -890,8 +868,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         return;
                     }
-                    #endregion
-                    #region ChatGroup
+
                 case 15: // Item info to Chat group
                     {
                         invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
@@ -921,10 +898,8 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         return;
                     }
-                    #endregion
-                    #region Trainer Window
 
-                    // styles
+                // styles
                 case 20:
                     {
                         Style style = null;
@@ -993,8 +968,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         break;
                     }
-                    #endregion
-                    #region Repair
+
                 case 100:// repair
                     {
                         invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
@@ -1009,8 +983,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         return;
                     }
-                    #endregion
-                    #region Self Craft
+
                 case 101:// selfcraft
                     {
                         invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
@@ -1025,8 +998,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         return;
                     }
-                    #endregion
-                    #region Salvage
+
                 case 102:// salvage
                     {
                         invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
@@ -1041,8 +1013,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         return;
                     }
-                    #endregion
-                    #region BattleGroup
+
                 case 103: // Item info to battle group
                     {
                         invItem = client.Player.Inventory.GetItem((eInventorySlot)objectId);
@@ -1072,8 +1043,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         return;
                     }
-                    #endregion
-                #region v1.110+
+
                 case 24:// SpellsNew
                     if (client.CanSendTooltip(24, objectId))
                     {
@@ -1110,8 +1080,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
 
                     break;
-                #endregion
-                #region ChampionAbilities delve from trainer window
+
                 default:
                     {
                         // Try retieving champion lines
@@ -1164,7 +1133,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         break;
                     }
-                    #endregion
             }
 
             if (objectInfo.Count > 0)
@@ -1660,7 +1628,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                     return;
                 }
 
-                #region Proc1
                 if (item.ProcSpellID != 0)
                 {
                     string spellNote = string.Empty;
@@ -1706,8 +1673,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     output.Add(" ");
                 }
-                #endregion
-                #region Proc2
+
                 if (item.ProcSpellID1 != 0)
                 {
                     string spellNote = string.Empty;
@@ -1753,8 +1719,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     output.Add(" ");
                 }
-                #endregion
-                #region Charge1
+
                 if (item.SpellID != 0)
                 {
                     SpellLine chargeEffectsLine = SkillBase.GetSpellLine(GlobalSpellsLines.Item_Effects);
@@ -1792,8 +1757,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     output.Add(" ");
                 }
-                #endregion
-                #region Charge2
+
                 if (item.SpellID1 != 0)
                 {
                     SpellLine chargeEffectsLine = SkillBase.GetSpellLine(GlobalSpellsLines.Item_Effects);
@@ -1831,8 +1795,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     output.Add(" ");
                 }
-                #endregion
-                #region Poison
+
                 if (item.PoisonSpellID != 0)
                 {
                     if (GlobalConstants.IsWeapon(item.Object_Type)) // Poisoned Weapon
@@ -1932,7 +1895,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
                     }
                 }
-                #endregion
             }
         }
 
@@ -2199,7 +2161,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
         }
 
-         #region v1.110+
         /** General info @ v1.110:
          *  - Examples can be found at http://dl.dropbox.com/u/48908369/delve.txt
          *  - 'Expires' can be left out
@@ -2388,7 +2349,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             return dw.ToString();
         }
 
-        #region style v1.110 methods
         /*
         public static int GetSpecialNumber(Style style)
         {
@@ -2449,8 +2409,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             return "";
         }*/
 
-        #endregion
-
         /// <summary>
         /// Delve the realm abilities for v1.110+ clients
         /// </summary>
@@ -2482,6 +2440,5 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             return dw.ToString();
         }
-        #endregion
     }
 }

@@ -65,8 +65,6 @@ namespace DOL.GS
             }
         }
 
-        #region Inheritance and Region
-
         /// <summary>
         /// The unique region ID of this region.
         /// </summary>
@@ -158,10 +156,6 @@ namespace DOL.GS
                 }
             }
         }
-
-        #endregion
-
-        #region Instance specific
 
         // I know there are commands I could use already for these, but I want to make a clear distinction
         // between instance and region. These two commands are called when AddToWorld() is invoked on a player,
@@ -374,10 +368,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Area
-
         /// <summary>
         /// Zone Mapping for Instances
         /// Update Leodagan : moved from Instance to BaseInstance to make Areas work !
@@ -484,10 +474,6 @@ namespace DOL.GS
             return areas;
         }
 
-        #endregion
-
-        #region mobcount
-
         /// <summary>
         /// Get an Enumerable of Mobs inside instance, Meant for mini-quest finished conditions.
         /// Can be used to update all mobs in area depending on player levels or other conditions.
@@ -506,7 +492,5 @@ namespace DOL.GS
                 return new List<GameNPC>(from regionObjects in Objects where (regionObjects is GameNPC) && ((((GameNPC)regionObjects).Flags & GameNPC.eFlags.PEACE) != GameNPC.eFlags.PEACE) select (GameNPC)regionObjects);
             }
         }
-
-        #endregion
     }
 }

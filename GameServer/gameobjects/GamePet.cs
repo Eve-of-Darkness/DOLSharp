@@ -63,8 +63,6 @@ namespace DOL.GS
             }
         }
 
-        #region Inventory
-
         /// <summary>
         /// Load equipment for the pet.
         /// </summary>
@@ -103,10 +101,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Shared Melee & Spells
-
         /// <summary>
         /// Multiplier for melee and magic.
         /// </summary>
@@ -144,10 +138,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Spells
-
         /// <summary>
         /// Called when spell has finished casting.
         /// </summary>
@@ -166,10 +156,6 @@ namespace DOL.GS
             get { return (Brain as IControlledBrain).GetLivingOwner().GetModified(eProperty.CriticalSpellHitChance); }
             set { }
         }
-
-        #endregion
-
-        #region Stats
 
         /// <summary>
         /// Pet strength is determined by using template stength as a percentage multiplier
@@ -259,10 +245,6 @@ namespace DOL.GS
                 return (int)(hp * hpPercent);
             }
         }
-
-        #endregion
-
-        #region Melee
 
         /// <summary>
         /// The type of damage the currently active weapon does.
@@ -403,8 +385,6 @@ namespace DOL.GS
         {
             return (weapon != null) ? Level : base.WeaponSpecLevel(weapon);
         }
-
-        #endregion
 
         public override void Die(GameObject killer)
         {

@@ -140,13 +140,7 @@ namespace DOL.GS.Quests.Hibernia
    * Just examples, do anything you like and feel comfortable with :)
    */
 
-            #region defineNPCs
-
             addrir = GetAddrir();
-
-            #endregion
-
-            #region defineItems
 
             // item db check
             emptyMagicBox = GameServer.Database.FindObjectByKey<ItemTemplate>("empty_wodden_magic_box");
@@ -312,8 +306,6 @@ namespace DOL.GS.Quests.Hibernia
                     GameServer.Database.AddObject(recruitsStaff);
                 }
             }
-
-            #endregion
 
             sluaghArea = WorldMgr.GetRegion(sluaghLocation.RegionID).AddArea(new Area.Circle("Sluagh contamined Area", sluaghLocation.X, sluaghLocation.Y, 0, 1500));
             sluaghArea.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterSluaghArea));

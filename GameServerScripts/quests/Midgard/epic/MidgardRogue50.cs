@@ -103,8 +103,6 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Masrim", eRealm.Midgard);
 
             if (npcs.Length == 0)
@@ -205,9 +203,6 @@ namespace DOL.GS.Quests.Midgard
             }
 
             // end npc
-            #endregion
-
-            #region defineItems
 
             oona_head = GameServer.Database.FindObjectByKey<ItemTemplate>("oona_head");
             if (oona_head == null)
@@ -817,7 +812,6 @@ namespace DOL.GS.Quests.Midgard
 
 // Shadowblade Epic Sleeves End
 // Item Descriptions End
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
@@ -1164,8 +1158,6 @@ namespace DOL.GS.Quests.Midgard
             }
         }
 
-        #region Allakhazam Epic Source
-
         /*
         *#25 talk to Masrim
         *#26 seek out Loken in Raumarik Loc 47k, 25k, 4k, and kill him purp and 2 blue adds
@@ -1191,7 +1183,5 @@ namespace DOL.GS.Quests.Midgard
             *Shadow Shrouded Legs
             *Shadow Shrouded Sleeves
         */
-
-        #endregion
     }
 }

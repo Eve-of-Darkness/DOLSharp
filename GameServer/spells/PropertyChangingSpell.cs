@@ -172,7 +172,6 @@ namespace DOL.GS.Spells
             ApplyBonus(effect.Owner, BonusCategory10, Property10, (int)(Spell.Value * effect.Effectiveness), false);
 
             // Xali: buffs/debuffs are now efficient on pets
-            #region Petbuffs
 
             if ((effect.Owner as GameNPC)?.Brain is ControlledNpcBrain)
             {
@@ -262,8 +261,6 @@ namespace DOL.GS.Spells
                     ((GameNPC) effect.Owner).AbilityBonus[(int)eProperty.MeleeSpeed] -= (int)(Spell.Value / 100 * Spell.Level / 6);
                 }
             }
-
-            #endregion
 
             SendUpdates(effect.Owner);
 

@@ -42,7 +42,6 @@ namespace DOL.GS.Commands
 
             switch (args[1].ToLower())
             {
-                    #region group
                 case "group":
                     {
                         if (target != null)
@@ -65,9 +64,7 @@ namespace DOL.GS.Commands
                         client.Player.Out.SendMessage("Target does not have a group so, ability and spell timers have been reset for you!", eChatType.CT_Spell, eChatLoc.CL_ChatWindow);
                         break;
                     }
-                    #endregion
 
-                    #region chatgrp
                 case "cg":
                     {
                         if (cg != null)
@@ -86,9 +83,7 @@ namespace DOL.GS.Commands
                         client.Player.Out.SendMessage("Target does not have a chatgroup so, ability and spell timers have been reset for you!", eChatType.CT_Spell, eChatLoc.CL_ChatWindow);
                         break;
                     }
-                    #endregion
 
-                    #region target
                 case "target":
                     {
                         if (target == null)
@@ -101,9 +96,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                    #endregion
 
-                    #region self
                 case "self":
                     {
                         client.Player.ResetDisabledSkills();
@@ -111,9 +104,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                    #endregion
 
-                    #region battlegroup
                 case "bg":
                     {
                         if (target != null)
@@ -135,7 +126,6 @@ namespace DOL.GS.Commands
                         client.Player.Out.SendMessage("Target does not have a battlegroup so, ability and spell timers have been reset for you!", eChatType.CT_Spell, eChatLoc.CL_ChatWindow);
                         break;
                     }
-                    #endregion
                 default:
                     {
                         client.Out.SendMessage("'" + args[1] + "' is not a valid arguement.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);

@@ -145,8 +145,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Marlin Thuler", eRealm.Albion);
 
             /* Whops, if the npcs array length is 0 then no Sir Quait exists in
@@ -189,10 +187,6 @@ namespace DOL.GS.Quests.Albion
                 marlinThuler = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             drum = GameServer.Database.FindObjectByKey<ItemTemplate>("finely_crafted_drum");
             if (drum == null)
             {
@@ -216,8 +210,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(drum);
             }
-
-            #endregion
 
             /* Now we add some hooks to the Sir Quait we found.
                 * Actually, we want to know when a player interacts with him.

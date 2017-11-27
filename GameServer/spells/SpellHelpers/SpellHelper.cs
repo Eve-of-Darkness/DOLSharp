@@ -29,8 +29,6 @@ namespace DOL.GS.Spells
     /// </summary>
     public static class SpellHelper
     {
-
-        #region FindEffect by Spell Object
         /// <summary>
         /// Find Game Spell Effect by spell object
         /// </summary>
@@ -77,9 +75,7 @@ namespace DOL.GS.Spells
             return target.EffectList.OfType<GameSpellEffect>().Where(fx => !(fx is GameSpellAndImmunityEffect && ((GameSpellAndImmunityEffect)fx).ImmunityState)
                                                                      && fx.Spell.ID == spell.ID);
         }
-        #endregion
 
-        #region Find Effect by Spell Type + Spell Name
         /// <summary>
         /// Find effect by spell type / spell name
         /// </summary>
@@ -129,9 +125,6 @@ namespace DOL.GS.Spells
             return target.EffectList.OfType<GameSpellEffect>().Where(fx => !(fx is GameSpellAndImmunityEffect && ((GameSpellAndImmunityEffect)fx).ImmunityState)
                                                                      && fx.Spell != null && fx.Spell.SpellType.Equals(spellType) && fx.Spell.Name.Equals(spellName));
         }
-        #endregion
-
-        #region Find Effect by Spell Type
 
         /// <summary>
         /// Find effect by spell type
@@ -180,9 +173,6 @@ namespace DOL.GS.Spells
                                                                      && fx.Spell != null && fx.Spell.SpellType.Equals(spellType));
         }
 
-        #endregion
-
-        #region Find Effect by SpellHandler Object Match
         /// <summary>
         /// Find effect by spell handler
         /// </summary>
@@ -229,9 +219,7 @@ namespace DOL.GS.Spells
             return target.EffectList.OfType<GameSpellEffect>().Where(fx => !(fx is GameSpellAndImmunityEffect && ((GameSpellAndImmunityEffect)fx).ImmunityState)
                                                                      && fx.SpellHandler == spellHandler);
         }
-        #endregion
 
-        #region Find Effect By SpellHandler Type Hierarchy
         /// <summary>
         /// Find effect by spell handler Object Type (Hierarchical)
         /// </summary>
@@ -278,9 +266,7 @@ namespace DOL.GS.Spells
             return target.EffectList.OfType<GameSpellEffect>().Where(fx => !(fx is GameSpellAndImmunityEffect && ((GameSpellAndImmunityEffect)fx).ImmunityState)
                                                                      && spellHandler.IsInstanceOfType(fx.SpellHandler));
         }
-        #endregion
 
-        #region Find Pulsing Spell Effect by Spell Object
         /// <summary>
         /// Find Pulsing Spell Effect by spell object
         /// </summary>
@@ -327,9 +313,6 @@ namespace DOL.GS.Spells
             return target.ConcentrationEffects.OfType<PulsingSpellEffect>().Where(pfx => pfx.SpellHandler?.Spell != null && pfx.SpellHandler.Spell.ID == spell.ID);
         }
 
-        #endregion
-
-        #region Find Pulsing Spell Effects by SpellHandler Object Match
         /// <summary>
         /// Find pulsing spell effect by spell handler
         /// </summary>
@@ -375,9 +358,7 @@ namespace DOL.GS.Spells
         {
             return target.ConcentrationEffects.OfType<PulsingSpellEffect>().Where(pfx => pfx.SpellHandler == handler);
         }
-        #endregion
 
-        #region Find Static Effect by Effect Type
         /// <summary>
         /// Find Static Effect by Effect Type
         /// </summary>
@@ -423,9 +404,7 @@ namespace DOL.GS.Spells
         {
             return target.EffectList.Where(fx => fx.GetType() == effectType);
         }
-        #endregion
 
-        #region Find Immunity Effect by SpellHandler Type
         /// <summary>
         /// Find Immunity Effect by spellHandler Type
         /// </summary>
@@ -472,6 +451,5 @@ namespace DOL.GS.Spells
             return target.EffectList.OfType<GameSpellEffect>().Where(fx => (fx is GameSpellAndImmunityEffect && ((GameSpellAndImmunityEffect)fx).ImmunityState)
                                                                      && fx.SpellHandler != null && fx.SpellHandler.GetType() == spellHandler);
         }
-        #endregion
     }
 }

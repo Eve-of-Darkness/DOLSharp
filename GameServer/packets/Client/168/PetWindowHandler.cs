@@ -30,8 +30,6 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             var aggroState = (byte)packet.ReadByte(); // 1-Aggressive, 2-Deffensive, 3-Passive
@@ -56,10 +54,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                 new HandlePetCommandAction(client.Player, aggroState, walkState, command).Start(1);
             }
         }
-
-        #endregion
-
-        #region Nested type: HandlePetCommandAction
 
         /// <summary>
         /// Handles pet command actions
@@ -170,7 +164,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
         }
-
-        #endregion
     }
 }

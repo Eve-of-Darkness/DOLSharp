@@ -56,7 +56,6 @@ namespace DOL.GS
             }
         }
 
-        #region Blood Rage Spell
         private static Spell _bloodRage;
 
         private static Spell Br
@@ -89,9 +88,7 @@ namespace DOL.GS
                 return _bloodRage;
             }
         }
-        #endregion
 
-        #region Heightened Awareness Spell
         private static Spell _heightenedAwareness;
 
         private static Spell Ha
@@ -124,9 +121,7 @@ namespace DOL.GS
                 return _heightenedAwareness;
             }
         }
-        #endregion
 
-        #region Subtle Kills Spell
         private static Spell _subtleKills;
 
         private static Spell Sk
@@ -158,6 +153,5 @@ namespace DOL.GS
                 return _subtleKills;
             }
         }
-        #endregion
     }
 }

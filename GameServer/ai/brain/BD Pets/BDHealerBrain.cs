@@ -44,8 +44,6 @@ namespace DOL.AI.Brain
             AggroRange = 0;
         }
 
-        #region Control
-
         /// <summary>
         /// Gets or sets the aggression state of the brain
         /// </summary>
@@ -60,10 +58,6 @@ namespace DOL.AI.Brain
         /// </summary>
         /// <param name="target"></param>
         public override void Attack(GameObject target) { }
-
-        #endregion
-
-        #region AI
 
         /// <summary>
         /// Checks the Abilities
@@ -81,7 +75,6 @@ namespace DOL.AI.Brain
             GameLiving owner = null;
             switch (spell.SpellType)
             {
-                #region Heals
                 case "Heal":
                     player = GetPlayerOwner();
                     if (player != null)
@@ -125,8 +118,7 @@ namespace DOL.AI.Brain
                     }
 
                     break;
-                #endregion
-                #region Buffs
+
                 case "HealthRegenBuff":
                     {
                         // Buff self
@@ -177,7 +169,6 @@ namespace DOL.AI.Brain
 
                         break;
                     }
-                #endregion
             }
 
             if (Body.TargetObject != null)
@@ -242,7 +233,5 @@ namespace DOL.AI.Brain
         /// <param name="sender"></param>
         /// <param name="arguments"></param>
         protected override void OnOwnerAttacked(DOLEvent e, object sender, EventArgs arguments) { }
-
-        #endregion
     }
 }

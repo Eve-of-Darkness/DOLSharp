@@ -134,8 +134,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCS
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Commander Burcrif", eRealm.Albion);
 
             /* Whops, if the npcs array length is 0 then no npc exists in
@@ -191,10 +189,6 @@ namespace DOL.GS.Quests.Albion
                 commanderBurcrif = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             // item db check
             slithsTail = GameServer.Database.FindObjectByKey<ItemTemplate>("sliths_tail");
             if (slithsTail == null)
@@ -231,8 +225,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(slithsTail);
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

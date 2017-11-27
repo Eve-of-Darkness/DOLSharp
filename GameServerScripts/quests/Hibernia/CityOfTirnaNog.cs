@@ -161,8 +161,6 @@ namespace DOL.GS.Quests.Hibernia
    * Just examples, do anything you like and feel comfortable with :)
    */
 
-            #region defineNPCs
-
             addrir = GetAddrir();
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Bhreagar Hylvian", eRealm.Hibernia);
@@ -276,10 +274,6 @@ namespace DOL.GS.Quests.Hibernia
             {
                 gweonry = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             ticketToTirnaNog = GameServer.Database.FindObjectByKey<ItemTemplate>("hs_ardee_northtirnanog");
             if (ticketToTirnaNog == null)
@@ -522,8 +516,6 @@ namespace DOL.GS.Quests.Hibernia
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(recruitsBracer);
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

@@ -14,14 +14,11 @@ namespace DOL.GS
         PadArea m_area = null;
         GameRelic m_mountedRelic = null;
 
-        #region constructor
         public GameRelicPad()
             : base()
         {
         }
-        #endregion
 
-        #region Add/remove from world
         /// <summary>
         /// add the relicpad to world
         /// </summary>
@@ -120,7 +117,6 @@ namespace DOL.GS
 
             return base.RemoveFromWorld();
         }
-        #endregion
 
         /// <summary>
         /// Checks if a GameRelic is mounted at this GameRelicPad

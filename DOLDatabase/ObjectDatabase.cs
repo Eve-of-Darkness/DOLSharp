@@ -91,7 +91,6 @@ namespace DOL.Database
             return TableDatasets.TryGetValue(tableName, out handler) ? handler : null;
         }
 
-        #region Public Add Objects Implementation
         /// <summary>
         /// Insert a new DataObject into the database and save it
         /// </summary>
@@ -189,8 +188,7 @@ namespace DOL.Database
 
             return success;
         }
-        #endregion
-        #region Public Save Objects Implementation
+
         /// <summary>
         /// Saves a DataObject to database if saving is allowed and object is dirty
         /// </summary>
@@ -268,8 +266,7 @@ namespace DOL.Database
 
             return success;
         }
-        #endregion
-        #region Public Delete Objects Implementation
+
         /// <summary>
         /// Delete a DataObject from database if deletion is allowed
         /// </summary>
@@ -367,8 +364,7 @@ namespace DOL.Database
 
             return success;
         }
-        #endregion
-        #region Relation Update Handling
+
         /// <summary>
         /// Save Relations Objects attached to DataObjects
         /// </summary>
@@ -558,8 +554,7 @@ namespace DOL.Database
 
             return success;
         }
-        #endregion
-        #region Relation Select/Fill Handling
+
         /// <summary>
         /// Populate or Refresh Objects Relations
         /// </summary>
@@ -751,8 +746,7 @@ namespace DOL.Database
             // Fill Sub Relations
             FillObjectRelations(resultByObjs.SelectMany(result => result.Results), false);
         }
-        #endregion
-        #region Public Object Select with Key API
+
         /// <summary>
         /// Retrieve a DataObject from database based on its primary key value.
         /// </summary>
@@ -802,9 +796,7 @@ namespace DOL.Database
         /// <param name="keys">Collection of Primary Key Values</param>
         /// <returns>Collection of DataObject with primary key matching values</returns>
         protected abstract IEnumerable<DataObject> FindObjectByKeyImpl(DataTableHandler tableHandler, IEnumerable<object> keys);
-        #endregion
 
-        #region Public Object Select API With Parameters
         /// <summary>
         /// Retrieve a Collection of DataObjects from database based on the Where Expression and Parameters Collection
         /// </summary>
@@ -870,9 +862,7 @@ namespace DOL.Database
 
             return SelectObjects<TObject>(whereExpression, new [] { new [] { param } }).First();
         }
-        #endregion
 
-        #region Public Object Select API Without Parameters
         /// <summary>
         /// Retrieve a Single DataObject from database based on Where Expression
         /// </summary>
@@ -918,9 +908,7 @@ namespace DOL.Database
         {
             return SelectObjects<TObject>(whereExpression, new [] { new QueryParameter[] { } }).First().ToArray();
         }
-        #endregion
 
-        #region Public Object Select All API
         /// <summary>
         /// Select all Objects From Table holding TObject Type
         /// </summary>
@@ -963,9 +951,7 @@ namespace DOL.Database
 
             return dataObjects;
         }
-        #endregion
 
-        #region Public API
         /// <summary>
         /// Gets the number of objects in a given table in the database.
         /// </summary>
@@ -1022,9 +1008,6 @@ namespace DOL.Database
             throw new NotImplementedException();
         }
 
-        #endregion
-
-        #region Implementation
         /// <summary>
         /// Adds new DataObjects to the database.
         /// </summary>
@@ -1067,9 +1050,7 @@ namespace DOL.Database
         /// <returns>a positive integer representing the number of objects that matched the given criteria; zero if no such objects existed</returns>
         protected abstract int GetObjectCountImpl<TObject>(string whereExpression)
             where TObject : DataObject;
-        #endregion
 
-        #region Cache
         /// <summary>
         /// Selects object from the database and updates or adds entry in the pre-cache.
         /// </summary>
@@ -1122,10 +1103,6 @@ namespace DOL.Database
             return success;
         }
 
-        #endregion
-
-        #region Factory
-
         public static IObjectDatabase GetObjectDatabase(ConnectionType connectionType, string connectionString)
         {
             if (connectionType == ConnectionType.DATABASE_MYSQL)
@@ -1140,7 +1117,5 @@ namespace DOL.Database
 
             return null;
         }
-
-        #endregion
     }
 }

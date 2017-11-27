@@ -31,8 +31,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     {
         public static int HandlerDoorId { get; set; }
 
-        #region IPacketHandler Members
-
         /// <summary>
         /// door index which is unique
         /// </summary>
@@ -170,8 +168,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
         }
 
-        #endregion
-
         public void AddingDoor(GamePlayer player, byte response)
         {
             if (response != 0x01)
@@ -209,8 +205,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                 DoorMgr.Init();
             }
         }
-
-        #region Nested type: ChangeDoorAction
 
         /// <summary>
         /// Handles the door state change actions
@@ -324,7 +318,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
         }
-
-        #endregion
     }
 }

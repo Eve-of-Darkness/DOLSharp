@@ -104,8 +104,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Aegan", (eRealm)2);
             if (npcs.Length == 0)
@@ -151,10 +150,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 Aegan = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
         clawofblackmauler = GameServer.Database.FindObjectByKey<ItemTemplate>("clawofblackmauler");
             if (clawofblackmauler == null)
@@ -235,14 +230,6 @@ namespace DOL.GS.Quests.Midgard
                 }
             }
 
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
-
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(Learnthehunt));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Aegan,-1);
@@ -292,9 +279,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.TakeItem,clawofblackmauler,5);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             Aegan.AddQuestToGive(typeof(Learnthehunt));

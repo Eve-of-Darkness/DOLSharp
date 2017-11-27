@@ -33,7 +33,6 @@ namespace DOL.Database
     [DataTable(TableName = "NpcTemplate")]
     public class DBNpcTemplate : DataObject
     {
-        #region Variables
         private int m_templateId;
         private string m_translationId = string.Empty;
         private string m_name = string.Empty;
@@ -75,7 +74,6 @@ namespace DOL.Database
         private byte m_visibleWeaponSlots = 0;
         private bool m_replaceMobValues = false;
         private string m_packageID = string.Empty;
-        #endregion Variables
 
         /// <summary>
         /// Constructor
@@ -84,7 +82,6 @@ namespace DOL.Database
         {
         }
 
-        #region Properties
         /// <summary>
         /// Template ID
         /// </summary>
@@ -681,6 +678,5 @@ namespace DOL.Database
                 m_packageID = value;
             }
         }
-        #endregion Properties
     }
 }

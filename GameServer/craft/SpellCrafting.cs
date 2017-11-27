@@ -102,8 +102,6 @@ namespace DOL.GS
             eSkill = eCraftingSkill.SpellCrafting;
         }
 
-        #region Classic craft functions
-
         /// <summary>
         /// Check if the player is near the needed tools (forge, lathe, etc)
         /// </summary>
@@ -134,10 +132,6 @@ namespace DOL.GS
                 player.Out.SendUpdateCraftingSkills();
             }
         }
-
-        #endregion
-
-        #region Requirement check
 
         /// <summary>
         /// This function is called when player accept the combine
@@ -247,10 +241,6 @@ namespace DOL.GS
 
             return true;
         }
-
-        #endregion
-
-        #region Apply magical effect
 
         /// <summary>
         /// Apply all needed magical bonus to the item
@@ -487,10 +477,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        # region Show informations to player
-
         /// <summary>
         /// Shaw to player all infos about the current spellcraft
         /// </summary>
@@ -564,10 +550,6 @@ namespace DOL.GS
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "SpellCrafting.ShowSpellCraftingInfos.Modified"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
-
-        # endregion
-
-        #region Calcul functions
 
         /// <summary>
         /// Get the sucess chance to overcharge the item
@@ -835,8 +817,5 @@ namespace DOL.GS
 
             return finalChances;
         }
-
-        #endregion
-
     }
 }

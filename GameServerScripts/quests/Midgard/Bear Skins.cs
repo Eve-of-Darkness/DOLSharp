@@ -104,8 +104,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Helen", (eRealm)2);
             if (npcs.Length == 0)
@@ -151,10 +150,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 Helen = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
         smallmaulerskin = GameServer.Database.FindObjectByKey<ItemTemplate>("smallmaulerskin");
             if (smallmaulerskin == null)
@@ -235,14 +230,6 @@ namespace DOL.GS.Quests.Midgard
                 }
             }
 
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
-
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(Bearskins));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Helen,-1);
@@ -291,9 +278,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.FinishQuest,typeof(DOL.GS.Quests.Midgard.Bearskins),null);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             Helen.AddQuestToGive(typeof(Bearskins));

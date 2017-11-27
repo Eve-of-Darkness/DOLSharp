@@ -21,8 +21,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PlayerGroundTarget, "Handles Player Ground Target Settings", eClientStatus.PlayerInGame)]
     public class PlayerGroundTargetHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             var groundX = (int)packet.ReadInt();
@@ -32,10 +30,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             
             new ChangeGroundTargetHandler(client.Player, groundX, groundY, groundZ, flag).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: ChangeGroundTargetHandler
 
         /// <summary>
         /// Handles ground target changes
@@ -122,7 +116,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
         }
-
-        #endregion
     }
 }

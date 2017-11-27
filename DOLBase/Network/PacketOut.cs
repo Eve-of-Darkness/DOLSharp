@@ -40,8 +40,6 @@ namespace DOL.Network
         {
         }
 
-        #region IPacket Members
-
         /// <summary>
         /// Generates a human-readable dump of the packet contents.
         /// </summary>
@@ -50,8 +48,6 @@ namespace DOL.Network
         {
             return Marshal.ToHexDump(ToString(), ToArray());
         }
-
-        #endregion
 
         /// <summary>
         /// Writes a 2 byte (short) value to the stream in network byte order

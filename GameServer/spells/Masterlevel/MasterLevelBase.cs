@@ -25,7 +25,6 @@ using DOL.Database;
 
 namespace DOL.GS.Spells
 {
-    #region MasterlevelBase
     /// <summary>
     /// Contains all common code for Banelord Spells
     /// </summary>
@@ -51,7 +50,6 @@ namespace DOL.GS.Spells
             return Spell.Duration;
         }
 
-        #region Targets
         /// <summary>
         /// Select all targets for this spell
         /// </summary>
@@ -212,7 +210,6 @@ namespace DOL.GS.Spells
 
             return list;
         }
-        #endregion
 
         /// <summary>
         /// Current depth of delve info
@@ -229,17 +226,13 @@ namespace DOL.GS.Spells
 
         public MasterlevelHandling(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
     }
-    #endregion
 
-    #region Stylhandler
     [SpellHandler("MLStyleHandler")]
     public class MLStyleHandler : MasterlevelHandling
     {
         public MLStyleHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
-    #region MasterlevelDebuff
     /// <summary>
     /// Contains all common code for Banelord Spells
     /// </summary>
@@ -268,7 +261,6 @@ namespace DOL.GS.Spells
             return Spell.Duration;
         }
 
-        #region Targets
         /// <summary>
         /// Select all targets for this spell
         /// </summary>
@@ -445,7 +437,6 @@ namespace DOL.GS.Spells
 
             return list;
         }
-        #endregion
 
         /// <summary>
         /// Current depth of delve info
@@ -462,9 +453,7 @@ namespace DOL.GS.Spells
 
         public MasterlevelDebuffHandling(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
     }
-    #endregion
 
-    #region MasterlevelBuff
     /// <summary>
     /// Contains all common code for Banelord Spells
     /// </summary>
@@ -489,7 +478,6 @@ namespace DOL.GS.Spells
             return Spell.Duration;
         }
 
-        #region Targets
         /// <summary>
         /// Select all targets for this spell
         /// This code is repeated how many times?  - Tolakram
@@ -667,7 +655,6 @@ namespace DOL.GS.Spells
 
             return list;
         }
-        #endregion
 
         /// <summary>
         /// Current depth of delve info
@@ -684,9 +671,7 @@ namespace DOL.GS.Spells
 
         protected MasterlevelBuffHandling(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
     }
-    #endregion
 
-    #region MasterlevelDualBuff
     /// <summary>
     /// Contains all common code for Banelord Spells
     /// </summary>
@@ -713,7 +698,6 @@ namespace DOL.GS.Spells
             return Spell.Duration;
         }
 
-        #region Targets
         /// <summary>
         /// Select all targets for this spell
         /// </summary>
@@ -890,7 +874,6 @@ namespace DOL.GS.Spells
 
             return list;
         }
-        #endregion
 
         /// <summary>
         /// Current depth of delve info
@@ -907,9 +890,7 @@ namespace DOL.GS.Spells
 
         protected MasterlevelDualBuffHandling(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
     }
-    #endregion
 
-    #region BanelordSnare
     /// <summary>
     /// Contains all common code for Banelord Spells
     /// </summary>
@@ -950,7 +931,6 @@ namespace DOL.GS.Spells
             return Spell.Duration;
         }
 
-        #region Targets
         /// <summary>
         /// Select all targets for this spell
         /// </summary>
@@ -1127,7 +1107,6 @@ namespace DOL.GS.Spells
 
             return list;
         }
-        #endregion
 
         /// <summary>
         /// Current depth of delve info
@@ -1144,9 +1123,7 @@ namespace DOL.GS.Spells
 
         public BanelordSnare(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
     }
-    #endregion
 
-    #region Fontbase
     public class FontSpellHandler : DoTSpellHandler
     {
         protected GameFont font;
@@ -1236,9 +1213,7 @@ namespace DOL.GS.Spells
         // constructor
         public FontSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
-    #region Trapbase
     public class MineSpellHandler : DoTSpellHandler
     {
         protected GameMine mine;
@@ -1318,9 +1293,7 @@ namespace DOL.GS.Spells
         // constructor
         public MineSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
-    #region Stormbase
     public class StormSpellHandler : SpellHandler
     {
         protected GameStorm storm;
@@ -1391,9 +1364,7 @@ namespace DOL.GS.Spells
         // constructor
         public StormSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
-    #region SummonItemBase
     public class SummonItemSpellHandler : MasterlevelHandling
     {
         protected IList<InventoryItem> items;
@@ -1446,9 +1417,7 @@ namespace DOL.GS.Spells
             items = new List<InventoryItem>();
         }
     }
-    #endregion
 
-    #region TargetModifier
     [SpellHandler("TargetModifier")]
     public class TargetModifierSpellHandler : MasterlevelHandling
     {
@@ -1456,9 +1425,7 @@ namespace DOL.GS.Spells
 
         public TargetModifierSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
-    #region Passive
     [SpellHandler("PassiveSpell")]
     public class PassiveSpellHandler : MasterlevelHandling
     {
@@ -1469,12 +1436,10 @@ namespace DOL.GS.Spells
 
         public PassiveSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 }
 
 namespace DOL.GS
 {
-    #region Decoy
     public class GameDecoy : GameNPC
     {
         public GameDecoy()
@@ -1493,9 +1458,7 @@ namespace DOL.GS
 
         public override int MaxHealth => 1;
     }
-    #endregion
 
-    #region Gamefont
     public class GameFont : GameMovingObject
     {
         public GameFont()
@@ -1551,9 +1514,7 @@ namespace DOL.GS
             Delete();
         }
     }
-    #endregion
 
-    #region Gametrap
     public class GameMine : GameMovingObject
     {
         public GameMine()
@@ -1598,9 +1559,7 @@ namespace DOL.GS
             }
         }
     }
-    #endregion
 
-    #region GameStorm
     public class GameStorm : GameMovingObject
     {
         public GameStorm()
@@ -1646,5 +1605,4 @@ namespace DOL.GS
         {
         }
     }
-    #endregion
 }

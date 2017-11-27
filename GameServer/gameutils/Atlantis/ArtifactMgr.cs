@@ -255,8 +255,6 @@ namespace DOL.GS
             return false;
         }
 
-        #region Experience/Level
-
         private static readonly long[] m_xpForLevel =
         {
             0,              // xp to level 0
@@ -464,10 +462,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Artifact Versions
-
         /// <summary>
         /// Get a list of all versions for this artifact.
         /// </summary>
@@ -551,10 +545,6 @@ namespace DOL.GS
 
             return classVersions;
         }
-
-        #endregion
-
-        #region Encounters & Quests
 
         /// <summary>
         /// Get the quest type from the quest type string.
@@ -688,10 +678,6 @@ namespace DOL.GS
             quest.FinishQuest();
             return true;
         }
-
-        #endregion
-
-        #region Scrolls & Books
 
         /// <summary>
         /// Find the matching artifact for this book.
@@ -1025,7 +1011,5 @@ namespace DOL.GS
 
             return null;
         }
-
-        #endregion
     }
 }

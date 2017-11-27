@@ -76,7 +76,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
             RecruitsIntelligentBelt = GameServer.Database.FindObjectByKey<ItemTemplate>("RecruitsIntelligentBelt");
             if (RecruitsIntelligentBelt == null)
             {
@@ -166,7 +165,6 @@ namespace DOL.GS.Quests.Albion
                 RecruitsPiousBelt.IsDropable = false;
                 GameServer.Database.AddObject(RecruitsPiousBelt);
             }
-            #endregion
 
             Level = 3;
             QuestGiver = LadyGrynoch;
@@ -192,8 +190,6 @@ namespace DOL.GS.Quests.Albion
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Lady Grynoch", eRealm.Albion);
 
@@ -236,11 +232,8 @@ namespace DOL.GS.Quests.Albion
                 LadyGrynoch = npcs[0];
             }
 
-            #endregion
-            #region defineAreas
             Demons_Breach_Area = WorldMgr.GetRegion(Demons_Breach.RegionID).AddArea(new Area.Circle(string.Empty, Demons_Breach.X, Demons_Breach.Y, Demons_Breach.Z, 200));
             Demons_Breach_Area.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterDemonBreachArea));
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

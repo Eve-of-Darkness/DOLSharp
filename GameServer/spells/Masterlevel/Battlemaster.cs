@@ -10,7 +10,6 @@ using DOL.Events;
 namespace DOL.GS.Spells
 {
     // http://www.camelotherald.com/masterlevels/ma.php?ml=Battlemaster
-    #region Battlemaster-1
     [SpellHandler("MLEndudrain")]
     public class MLEndudrain : MasterlevelHandling
     {
@@ -47,9 +46,7 @@ namespace DOL.GS.Spells
             target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
         }
     }
-    #endregion
 
-    #region Battlemaster-2
     [SpellHandler("KeepDamageBuff")]
     public class KeepDamageBuff : MasterlevelBuffHandling
     {
@@ -57,9 +54,7 @@ namespace DOL.GS.Spells
 
         public KeepDamageBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
-    #region Battlemaster-3
     [SpellHandler("MLManadrain")]
     public class MLManadrain : MasterlevelHandling
     {
@@ -90,9 +85,7 @@ namespace DOL.GS.Spells
             target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
         }
     }
-    #endregion
 
-    #region Battlemaster-4
     [SpellHandler("Grapple")]
     public class Grapple : MasterlevelHandling
     {
@@ -188,10 +181,8 @@ namespace DOL.GS.Spells
 
         public Grapple(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // ml5 in database Target shood be Group if PvP..Realm if RvR..Value = spell proc'd (a.k the 80value dd proc)
-    #region Battlemaster-5
     [SpellHandler("EssenceFlamesProc")]
     public class EssenceFlamesProcSpellHandler : OffensiveProcSpellHandler
     {
@@ -283,15 +274,11 @@ namespace DOL.GS.Spells
         // constructor
         public EssenceFlamesProcSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
-
-    #region Battlemaster-6
 
     // LifeFlight
     [SpellHandler("ThrowWeapon")]
     public class ThrowWeaponSpellHandler : DirectDamageSpellHandler
     {
-        #region Disarm Weapon
         protected static Spell Disarm_Weapon;
 
         public static Spell Disarmed
@@ -325,7 +312,6 @@ namespace DOL.GS.Spells
             }
         }
 
-        #endregion
         public const string DISABLE = "ThrowWeapon.Shortened.Disable.Timer";
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
@@ -708,10 +694,8 @@ namespace DOL.GS.Spells
 
         public ThrowWeaponSpellHandler(GameLiving caster,Spell spell,SpellLine line) : base(caster,spell,line) { }
     }
-    #endregion
 
     // essence debuff
-    #region Battlemaster-7
     [SpellHandler("EssenceSearHandler")]
     public class EssenceSearHandler : SpellHandler
     {
@@ -771,9 +755,7 @@ namespace DOL.GS.Spells
 
         public EssenceSearHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
-    #region Battlemaster-8
     [SpellHandler("BodyguardHandler")]
     public class BodyguardHandler : SpellHandler
     {
@@ -789,10 +771,8 @@ namespace DOL.GS.Spells
 
         public BodyguardHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // for ML9 in the database u have to add  EssenceDampenHandler  in type (its a new method customly made)
-    #region Battlemaster-9
     [SpellHandler("EssenceDampenHandler")]
     public class EssenceDampenHandler : SpellHandler
     {
@@ -857,12 +837,9 @@ namespace DOL.GS.Spells
 
         public EssenceDampenHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // ml10 in database Type shood be RandomBuffShear
 }
-
-#region KeepDamageCalc
 
 namespace DOL.GS.PropertyCalc
 {
@@ -887,5 +864,3 @@ namespace DOL.GS.PropertyCalc
         }
     }
 }
-
-#endregion

@@ -57,8 +57,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
-
             ItemTemplate intelligentBracer = GameServer.Database.FindObjectByKey<ItemTemplate>("recruits_intelligent_bracer");
             if (intelligentBracer == null)
             {
@@ -118,8 +116,6 @@ namespace DOL.GS.Quests.Albion
                 piousBracer.Bonus3Type = (int)eProperty.Resist_Slash;
                 GameServer.Database.AddObject(piousBracer);
             }
-
-            #endregion
 
             ItemTemplate banditCloak = GameServer.Database.FindObjectByKey<ItemTemplate>("quest_bandit_cloak");
             if (banditCloak == null)

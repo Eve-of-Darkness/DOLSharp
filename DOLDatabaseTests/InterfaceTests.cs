@@ -38,7 +38,6 @@ namespace DOL.Database.Tests
 
         protected SQLObjectDatabase Database { get; set; }
 
-        #region Test Add
         /// <summary>
         /// Test IObjectDatabase.Add(DataObject)
         /// </summary>
@@ -316,9 +315,7 @@ namespace DOL.Database.Tests
             Console.WriteLine("Bench Multiple TestTable Add Elapsed Total {0}ms", times);
             Console.WriteLine("Bench Multiple TestTableRelations Add Elapsed Total {0}ms", timesRelations);
         }
-        #endregion
 
-        #region Test Save
         /// <summary>
         /// Test IObjectDatabase.SaveObject(DataObject)
         /// </summary>
@@ -507,9 +504,7 @@ namespace DOL.Database.Tests
             Assert.IsFalse(dbo[0].Dirty, "Saving a Collection with non registered Object should not have Dirty Flag on registered Object...");
             Assert.IsTrue(dbo[1].Dirty, "Saving a Collection with non registered Object should have Dirty Flag on non-registered Object...");
         }
-        #endregion
 
-        #region Test Delete
         /// <summary>
         /// Test IObjectDatabase.DeleteObject(DataObject)
         /// </summary>
@@ -676,9 +671,6 @@ namespace DOL.Database.Tests
             Assert.IsFalse(dbo[1].IsDeleted, "Deleting a Collection with non registered Object should not set Deleted Flag non-registered Object...");
         }
 
-        #endregion
-
-        #region Find ObjectByKey
         /// <summary>
         /// Test IObjectDatabase.FindObjectByKey`TObject(object key)
         /// </summary>
@@ -911,9 +903,6 @@ namespace DOL.Database.Tests
             Assert.Throws(typeof(DatabaseException), () => Database.FindObjectByKey<TableNotRegistered>(new object[] { 1, 2 }), string.Empty);
         }
 
-        #endregion
-
-        #region Test Select Objects
         /// <summary>
         /// Test IObjectDatabase.SelectObjects`TObject(string, KeyValuePair`string, object)
         /// </summary>
@@ -1101,9 +1090,6 @@ namespace DOL.Database.Tests
             Assert.Throws(typeof(InvalidOperationException), () => Database.SelectObjects<TestTable>(null, new QueryParameter[][] { }), string.Empty);
         }
 
-        #endregion
-
-        #region Test Select All
         /// <summary>
         /// Test IObjectDatabase.SelectAll`TObject()
         /// </summary>
@@ -1146,9 +1132,7 @@ namespace DOL.Database.Tests
             Assert.Throws(typeof(DatabaseException), () => Database.SelectAllObjects<TableNotRegistered>(), "Trying to Query a Non Registered Table should throw a DatabaseException...");
             Assert.Throws(typeof(DatabaseException), () => Database.SelectAllObjects<TableNotRegistered>(DOL.Database.Transaction.IsolationLevel.DEFAULT), "Trying to Query a Non Registered Table should throw a DatabaseException...");
         }
-        #endregion
 
-        #region Test Count Objects
         /// <summary>
         /// Test IObjectDatabase.GetObjectCount`TObject
         /// </summary>
@@ -1214,9 +1198,7 @@ namespace DOL.Database.Tests
             Assert.Throws(typeof(DatabaseException), () => Database.GetObjectCount<TableNotRegistered>(), "Get Object Count should throw exception for unregistered tables...");
             Assert.Throws(typeof(DatabaseException), () => Database.GetObjectCount<TableNotRegistered>("1"), "Get Object Count should throw exception for unregistered tables...");
         }
-        #endregion
 
-        #region Test Escape
         /// <summary>
         /// Test IObjectDatabase.Escape(string)
         /// </summary>
@@ -1237,6 +1219,5 @@ namespace DOL.Database.Tests
         {
             Assert.Throws(typeof(NullReferenceException), () => Database.Escape(null), "SQL Escape string with Null value should throw Null Reference Exception...");
         }
-        #endregion
     }
 }

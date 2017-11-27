@@ -74,8 +74,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #region Behaviour
-
         private object m_syncBehaviour = new object();
 
         private IAttackBehaviour m_passiveBehaviour;
@@ -161,10 +159,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
-
-        #region Idle handler.
-
         /// <summary>
         /// The NPC has nothing to do.
         /// </summary>
@@ -214,10 +208,6 @@ namespace DOL.AI.Brain
                 ? AggressionLevel
                 : (ushort)0;
         }
-
-        #endregion
-
-        #region Aggression handler.
 
         /// <summary>
         /// Pick the next target.
@@ -370,10 +360,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
-
-        #region Notify handler.
-
         /// <summary>
         /// Process game events.
         /// </summary>
@@ -483,10 +469,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
-
-        #region Other handlers
-
         /// <summary>
         /// Living is low on health. This could be the body (decide to
         /// heal self, run away, go berserk...) or any other living in the
@@ -511,10 +493,6 @@ namespace DOL.AI.Brain
         protected virtual void OnDying(GameObject victim, GameObject killer)
         {
         }
-
-        #endregion
-
-        #region Aggression management
 
         private InternalAggression m_aggression;
 
@@ -756,7 +734,5 @@ namespace DOL.AI.Brain
                 }
             }
         }
-
-        #endregion
     }
 }

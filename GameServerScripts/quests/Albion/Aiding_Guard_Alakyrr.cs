@@ -92,8 +92,6 @@ namespace DOL.GS.Quests.Albion
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCS
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Guard Alakyrr", eRealm.None);
 
             if (npcs.Length == 0)
@@ -136,10 +134,6 @@ namespace DOL.GS.Quests.Albion
             {
                 GuardAlakyrr = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             enchantedtenebrousflask = GameServer.Database.FindObjectByKey<ItemTemplate>("enchantedtenebrousflask");
             if (enchantedtenebrousflask == null)
@@ -275,8 +269,6 @@ namespace DOL.GS.Quests.Albion
 
                  GameServer.Database.AddObject(fullflaskoftenebrousessence);
              }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
@@ -538,8 +530,6 @@ namespace DOL.GS.Quests.Albion
             get { return questTitle; }
         }
 
-        #region Steps
-
         public override string Description
         {
             get
@@ -583,12 +573,9 @@ namespace DOL.GS.Quests.Albion
                 return base.Description;
             }
         }
-        #endregion
 
         public override void Notify(DOLEvent e, object sender, EventArgs args)
         {
-            #region mobkilled
-
             GamePlayer player = sender as GamePlayer;
 
             if (player == null || player.IsDoingQuest(typeof(AidingGuardAlakyrr)) == null)
@@ -635,7 +622,6 @@ namespace DOL.GS.Quests.Albion
                     }
                 }
             }
-        #endregion
 
             if (player == null || player.IsDoingQuest(typeof(AidingGuardAlakyrr)) == null)
             {
@@ -660,7 +646,6 @@ namespace DOL.GS.Quests.Albion
             }
         }
 
-        #region useslot
         protected static void PlayerUseSlot(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = (GamePlayer)sender;
@@ -721,7 +706,6 @@ namespace DOL.GS.Quests.Albion
                 }
             }
         }
-        #endregion
 
         public override void AbortQuest()
         {

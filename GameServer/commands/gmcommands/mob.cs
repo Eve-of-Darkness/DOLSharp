@@ -561,8 +561,6 @@ namespace DOL.GS.Commands
             client.Out.SendMessage("Created " + number + " mobs", eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
-        #region auto increment/decrement model display
-
         // List of non-displayed models
         // used with modelinc and modeldec
         List<ushort> invmodel = new List<ushort>() { 3, 4, 604, 666, 1000, 1001, 1002, 1003, 1004, 1237, 1238, 1239, 1240, 1241, 1242, 1243, 1244, 1245, 1246,
@@ -652,7 +650,6 @@ namespace DOL.GS.Commands
                 return;
             }
         }
-        #endregion
 
         private void model(GameClient client, GameNPC targetMob, string[] args)
         {

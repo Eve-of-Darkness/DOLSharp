@@ -73,7 +73,6 @@ namespace DOL.GS.Effects
                 effectiveness = 0.5;
             }
 
-            #region Get new classdependend effect
             switch ((eCharacterClass)carrier.CharacterClass.ID) {
                 case eCharacterClass.Wizard:
                 case eCharacterClass.Theurgist:
@@ -123,11 +122,9 @@ namespace DOL.GS.Effects
                 case eCharacterClass.Bainshee:
                     return new BannerOfBesiegingEffect(effectiveness);
                 default: return null;
-            #endregion
             }
         }
 
-        #region Properties
         double m_effectiveness;
         /// <summary>
         /// Returns the effectiveness of this GuildBannerEffect to be compareable.
@@ -136,9 +133,7 @@ namespace DOL.GS.Effects
         {
             get { return m_effectiveness; }
         }
-        #endregion
 
-        #region Delve
         protected abstract string Description { get; }
 
         public override IList<string> DelveInfo
@@ -152,14 +147,11 @@ namespace DOL.GS.Effects
                 return list;
             }
         }
-        #endregion
 
-        #region ctor
         public GuildBannerEffect(double effectiveness) : base(duration)
         {
             m_effectiveness = effectiveness;
         }
-        #endregion
     }
 
     /// <summary>
@@ -168,7 +160,6 @@ namespace DOL.GS.Effects
     public class BannerOfWardingEffect : GuildBannerEffect
     {
         // - Spell Resist Banner - Banner of Warding: 10% bonus to all magic resistances. (Note: This stacks with other effects.)
-        #region visual overrides
         public override string Name
         {
             get
@@ -190,9 +181,7 @@ namespace DOL.GS.Effects
                 return 54;
             }
         }
-        #endregion
 
-        #region effect
         public override void Start(GameLiving m_owner)
         {
             int effValue = (int)(Effectiveness * 10);
@@ -218,11 +207,8 @@ namespace DOL.GS.Effects
             base.Stop();
             SendUpdates(m_owner);
         }
-        #endregion
 
-        #region ctor
         public BannerOfWardingEffect(double effectiveness) : base(effectiveness) { }
-        #endregion
     }
 
     /// <summary>
@@ -231,7 +217,6 @@ namespace DOL.GS.Effects
     public class BannerOfShieldingEffect : GuildBannerEffect
     {
         // - Melee Resist Banner - Banner of Shielding: 6% bonus to all melee resistances. (Note: This stacks with other effects.)
-        #region visual overrides
         public override string Name
         {
             get
@@ -253,9 +238,7 @@ namespace DOL.GS.Effects
                 return 49;
             }
         }
-        #endregion
 
-        #region effect
         public override void Start(GameLiving target)
         {
             base.Start(target);
@@ -275,11 +258,8 @@ namespace DOL.GS.Effects
             base.Stop();
             SendUpdates(m_owner);
         }
-        #endregion
 
-        #region ctor
         public BannerOfShieldingEffect(double effectiveness) : base(effectiveness) { }
-        #endregion
     }
 
     /// <summary>
@@ -288,7 +268,6 @@ namespace DOL.GS.Effects
     public class BannerOfFreedomEffect : GuildBannerEffect
     {
         // - Crowd Control Duration Banner - Banner of Freedom: -6% reduction to the time effect of all Crowd Control.
-        #region visual overrides
         public override string Name
         {
             get
@@ -310,9 +289,7 @@ namespace DOL.GS.Effects
                 return 2309;
             }
         }
-        #endregion
 
-        #region effect
         public override void Start(GameLiving target)
         {
             base.Start(target);
@@ -332,11 +309,8 @@ namespace DOL.GS.Effects
             base.Stop();
             SendUpdates(m_owner);
         }
-        #endregion
 
-        #region ctor
         public BannerOfFreedomEffect(double effectiveness) : base(effectiveness) { }
-        #endregion
     }
 
     /// <summary>
@@ -345,7 +319,6 @@ namespace DOL.GS.Effects
     public class BannerOfBesiegingEffect : GuildBannerEffect
     {
         // - Haste - Banner of Besieging: 20% reduction in siege firing speed. (Note that this effect does NOT stack with Warlord.)
-        #region visual overrides
         public override string Name
         {
             get
@@ -367,15 +340,9 @@ namespace DOL.GS.Effects
                 return 1419;
             }
         }
-        #endregion
-
-        #region effect
 
         // done in GameSiegeWeapon.GetActionDelay
-        #endregion
 
-        #region ctor
         public BannerOfBesiegingEffect(double effectiveness) : base(effectiveness) { }
-        #endregion
     }
 }

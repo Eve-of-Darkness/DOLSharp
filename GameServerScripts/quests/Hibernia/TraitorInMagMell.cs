@@ -141,8 +141,6 @@ namespace DOL.GS.Quests.Hibernia
    * Just examples, do anything you like and feel comfortable with :)
    */
 
-            #region defineNPCs
-
             addrir = GetAddrir();
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Lady Legada", eRealm.None);
@@ -177,10 +175,6 @@ namespace DOL.GS.Quests.Hibernia
             {
                 ladyLegada = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             // item db check
             necklaceOfDoppelganger = GameServer.Database.FindObjectByKey<ItemTemplate>("necklace_of_the_doppelganger");
@@ -350,8 +344,6 @@ namespace DOL.GS.Quests.Hibernia
                     GameServer.Database.AddObject(recruitsQuiltedBoots);
                 }
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

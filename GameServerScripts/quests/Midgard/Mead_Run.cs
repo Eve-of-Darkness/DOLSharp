@@ -108,8 +108,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Audun", (eRealm)2);
             if (npcs.Length == 0)
@@ -206,10 +205,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 GuardOlja = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
         emptybottle = GameServer.Database.FindObjectByKey<ItemTemplate>("emptybottle");
             if (emptybottle == null)
@@ -369,14 +364,6 @@ namespace DOL.GS.Quests.Midgard
                 }
             }
 
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
-
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(meadrun));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Audun,-1);
@@ -419,9 +406,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.FinishQuest,typeof(DOL.GS.Quests.Midgard.meadrun),null);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             if (Audun != null) {

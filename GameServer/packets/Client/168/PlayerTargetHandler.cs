@@ -27,8 +27,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PlayerTarget, "Handle Player Target Change.", eClientStatus.PlayerInGame)]
     public class PlayerTargetHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         /// <summary>
         /// Handles every received packet
         /// </summary>
@@ -49,10 +47,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             new ChangeTargetAction(client.Player, targetId, (flags & (0x4000 | 0x2000)) != 0, (flags & 0x8000) != 0).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: ChangeTargetAction
 
         /// <summary>
         /// Changes players target
@@ -136,7 +130,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 GameEventMgr.Notify(GamePlayerEvent.ChangeTarget, player, null);
             }
         }
-
-        #endregion
     }
 }

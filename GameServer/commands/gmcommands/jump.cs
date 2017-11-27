@@ -51,22 +51,19 @@ namespace DOL.GS.Commands
         {
             try
             {
-                #region Refresh
                 if (args.Length == 2 && args[1].ToLower() == "refresh")
                 {
                     client.Player.LeaveHouse();
                     client.Player.RefreshWorld();
                     return;
                 }
-                #endregion Refresh
-                #region Jump to GT
+
                 if (args.Length == 3 && args[1].ToLower() == "to" && args[2].ToLower() == "gt")
                 {
                     client.Player.MoveTo(client.Player.CurrentRegionID, client.Player.GroundTarget.X, client.Player.GroundTarget.Y, client.Player.GroundTarget.Z, client.Player.Heading);
                     return;
                 }
-                #endregion Jump to GT
-                #region Jump to house
+
                 else if (args.Length >= 3 && args[1].ToLower() == "to" && (args[2].ToLower() == "house" || args[2].ToLower() == "myhouse"))
                 {
                     House house = null;
@@ -90,15 +87,13 @@ namespace DOL.GS.Commands
 
                     return;
                 }
-                #endregion Jump to house
-                #region Jump t region #
+
                 if (args.Length == 4 && args[1] == "to" && args[2] == "region")
                 {
                     client.Player.MoveTo(Convert.ToUInt16(args[3]), client.Player.X, client.Player.Y, client.Player.Z, client.Player.Heading);
                     return;
                 }
-                #endregion Jump t region #
-                #region Jump to PlayerName or ClientID
+
                 if (args.Length == 3 && args[1] == "to")
                 {
                     GameClient clientc = null;
@@ -172,8 +167,7 @@ namespace DOL.GS.Commands
 
                     return;
                 }
-                #endregion Jump to PlayerName
-                #region Jump to Name Realm
+
                 else if (args.Length == 4 && args[1] == "to")
                 {
                     GameClient clientc;
@@ -231,15 +225,13 @@ namespace DOL.GS.Commands
 
                     return;
                 }
-                #endregion Jump to Name Realm
-                #region Jump to X Y Z
+
                 else if (args.Length == 5 && args[1] == "to")
                 {
                     client.Player.MoveTo(client.Player.CurrentRegionID, Convert.ToInt32(args[2]), Convert.ToInt32(args[3]), Convert.ToInt32(args[4]), client.Player.Heading);
                     return;
                 }
-                #endregion Jump to X Y Z
-                #region Jump rel +/-X +/-Y +/-Z
+
                 else if (args.Length == 5 && args[1] == "rel")
                 {
                     client.Player.MoveTo(
@@ -250,8 +242,7 @@ namespace DOL.GS.Commands
                                          client.Player.Heading);
                     return;
                 }
-                #endregion Jump rel +/-X +/-Y +/-Z
-                #region Jump to X Y Z RegionID
+
                 else if (args.Length == 6 && args[1] == "to")
                 {
                     if (CheckExpansion(client, client, (ushort)Convert.ToUInt16(args[5])))
@@ -262,8 +253,7 @@ namespace DOL.GS.Commands
 
                     return;
                 }
-                #endregion Jump to X Y Z RegionID
-                #region Jump PlayerName to X Y Z
+
                 else if (args.Length == 6 && args[2] == "to")
                 {
                     GameClient clientc;
@@ -277,8 +267,7 @@ namespace DOL.GS.Commands
                     clientc.Player.MoveTo(clientc.Player.CurrentRegionID, Convert.ToInt32(args[3]), Convert.ToInt32(args[4]), Convert.ToInt32(args[5]), clientc.Player.Heading);
                     return;
                 }
-                #endregion Jump PlayerName to X Y Z
-                #region Jump PlayerName to X Y Z RegionID
+
                 else if (args.Length == 7 && args[2] == "to")
                 {
                     GameClient clientc;
@@ -297,8 +286,7 @@ namespace DOL.GS.Commands
 
                     return;
                 }
-                #endregion Jump PlayerName to X Y Z RegionID
-                #region Jump PlayerName to PlayerCible
+
                 else if (args.Length == 4 && args[2] == "to")
                 {
                     GameClient clientc;
@@ -343,8 +331,7 @@ namespace DOL.GS.Commands
                         return;
                     }
                 }
-                #endregion Jump PlayerName to PlayerCible
-                #region push/pop
+
                 else if (args.Length > 1 && args[1] == "push")
                 {
                     Stack<GameLocation> locations;
@@ -392,14 +379,12 @@ namespace DOL.GS.Commands
 
                     client.Player.MoveTo(jumploc.RegionID, jumploc.X, jumploc.Y, jumploc.Z, jumploc.Heading);
                 }
-                #endregion push/pop
-                #region DisplaySyntax
+
                 else
                 {
                     DisplaySyntax(client);
                     return;
                 }
-                #endregion DisplaySyntax
             }
 
             catch (Exception ex)

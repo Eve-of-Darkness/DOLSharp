@@ -94,8 +94,6 @@ namespace DOL.GS.Quests.Albion
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCS
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Sir Dorian", eRealm.Albion);
 
             if (npcs.Length == 0)
@@ -140,8 +138,6 @@ namespace DOL.GS.Quests.Albion
             {
                 sirDorian = npcs[0];
             }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

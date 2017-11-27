@@ -58,7 +58,6 @@ namespace DOL.GS.Spells
                 SelectiveBlindnessEffect SelectiveBlindness = Caster.EffectList.GetOfType<SelectiveBlindnessEffect>();
                 var spellhandler = ScriptMgr.CreateSpellHandler(caster, chamber.PrimarySpell, chamber.PrimarySpellLine);
 
-                #region Pre-checks
                 int duration = caster.GetSkillDisabledDuration(Spell);
                 if (duration > 0)
                 {
@@ -170,7 +169,6 @@ namespace DOL.GS.Spells
                 }
 
                 spellhandler.CastSpell();
-                #endregion
 
                 if (chamber.SecondarySpell != null)
                 {
@@ -288,7 +286,6 @@ namespace DOL.GS.Spells
             return 0;
         }
 
-        #region Devle Info
         public override IList<string> DelveInfo
         {
             get
@@ -327,8 +324,6 @@ namespace DOL.GS.Spells
                 return list;
             }
         }
-
-        #endregion
 
         // constructor
         public ChamberSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }

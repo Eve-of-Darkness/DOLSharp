@@ -324,8 +324,6 @@ namespace DOL.GS.Quests
             player.Out.SendMessage(string.Format(LanguageMgr.GetTranslation(player.Client.Account.Language, "AbstractQuest.OnQuestAssigned.GetQuest", Name)), eChatType.CT_System, eChatLoc.CL_ChatWindow);
         }
 
-        #region Quest Commands
-
         private eQuestCommand _currentCommand = eQuestCommand.None;
 
         protected void AddSearchArea(QuestSearchArea searchArea)
@@ -472,10 +470,6 @@ namespace DOL.GS.Quests
             QuestPlayer.Out.SendMessage("Error, command completed handler not overriden for quest!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
         }
 
-        #endregion Quest Commands
-
-        #region Items
-
         protected static void RemoveItem(GamePlayer player, ItemTemplate itemTemplate)
         {
             RemoveItem(null, player, itemTemplate, true);
@@ -586,7 +580,6 @@ namespace DOL.GS.Quests
 
             return itemsRemoved;
         }
-        #endregion
 
         private static readonly Queue SayTimerQueue = new Queue();
         private static readonly Queue SayObjectQueue = new Queue();
@@ -754,8 +747,6 @@ namespace DOL.GS.Quests
             return ticket;
         }
 
-        #region Custom Properties
-
         /// <summary>
         /// This HybridDictionary holds all the custom properties of this quest
         /// </summary>
@@ -873,7 +864,5 @@ namespace DOL.GS.Quests
                 return (string)_customProperties[key];
             }
         }
-
-        #endregion
     }
 }

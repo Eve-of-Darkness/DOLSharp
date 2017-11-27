@@ -150,8 +150,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCS
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Kealan", eRealm.Albion);
 
             /* Whops, if the npcs array length is 0 then no Sir Quait exists in
@@ -233,10 +231,6 @@ namespace DOL.GS.Quests.Albion
             {
                 arachneida = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             spiderSilkenRobe = GameServer.Database.FindObjectByKey<ItemTemplate>("spider_silken_robe");
             if (spiderSilkenRobe == null)
@@ -520,8 +514,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(spiderChitin);
             }
-
-            #endregion
 
             /* Now we add some hooks to the Sir Quait we found.
                 * Actually, we want to know when a player interacts with him.

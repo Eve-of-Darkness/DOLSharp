@@ -77,8 +77,6 @@ namespace DOL.GS
             get { return (int)eInventorySlot.Consignment_Last; }
         }
 
-        #region Token return
-
         private static readonly Dictionary<string, GameLocation> _itemXdestination =
             new Dictionary<string, GameLocation>
                 {
@@ -150,8 +148,6 @@ namespace DOL.GS
 
             return base.ReceiveItem(source, item);
         }
-
-        #endregion Token return
 
         public virtual string GetOwner(GamePlayer player)
         {

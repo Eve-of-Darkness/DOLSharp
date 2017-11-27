@@ -73,8 +73,6 @@ namespace DOL.GS
         protected ushort m_RessurectionsPerformed = 0;
         protected DateTime m_LoginTime;
 
-        #region accessors
-
         public GamePlayer Player
         {
             get { return m_player; }
@@ -164,7 +162,6 @@ namespace DOL.GS
         {
             get { return m_LoginTime; }
         }
-        #endregion
 
         public PlayerStatistics(GamePlayer player)
         {
@@ -189,7 +186,6 @@ namespace DOL.GS
                 return;
             }
 
-            #region /stats top
             var chars = GameServer.Database.SelectObjects<DOLCharacters>("`RealmPoints` > @RealmPoints", new QueryParameter("@RealmPoints", 213881)).OrderByDescending(dc => dc.RealmPoints).Take(100).ToArray();
 
             // assuming we can get at least 20 players
@@ -220,7 +216,6 @@ namespace DOL.GS
             {
                 toplist.Add("None found!");
             }
-            #endregion /stats top
 
             List<StatToCount> allstatsrp = new List<StatToCount>();
             List<StatToCount> allstatslrp = new List<StatToCount>();

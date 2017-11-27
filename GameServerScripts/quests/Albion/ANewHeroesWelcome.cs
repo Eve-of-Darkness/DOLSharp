@@ -71,8 +71,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
-
             // item db check
             RecruitsCloak = GameServer.Database.FindObjectByKey<ItemTemplate>("k109_recruits_cloak");
             if (RecruitsCloak == null)
@@ -120,7 +118,6 @@ namespace DOL.GS.Quests.Albion
                 LetterToPompin.Id_nb = "letter_to_pompin";
                 GameServer.Database.AddObject(LetterToPompin);
             }
-            #endregion
 
             Level = 1;
             QuestGiver = MasterClaistan;
@@ -144,8 +141,6 @@ namespace DOL.GS.Quests.Albion
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>(LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "Alb.ANewHeroesWelcome.ScriptLoaded.Text1"), eRealm.Albion);
 
@@ -245,8 +240,6 @@ namespace DOL.GS.Quests.Albion
             {
                 PompinTheCrier = npcs[0];
             }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

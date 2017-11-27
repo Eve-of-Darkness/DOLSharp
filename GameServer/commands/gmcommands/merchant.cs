@@ -73,7 +73,6 @@ namespace DOL.GS.Commands
 
             switch (args[1].ToLower())
             {
-                #region Create
                 case "create":
                     {
                         string theType = "DOL.GS.GameMerchant";
@@ -128,8 +127,7 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Merchant.Create.Created", merchant.ObjectID));
                         break;
                     }
-                #endregion Create
-                #region Info
+
                 case "info":
                     {
                         if (args.Length == 2)
@@ -146,16 +144,14 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Info
-                #region Save
+
                 case "save":
                     {
                         targetMerchant.SaveIntoDatabase();
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Merchant.Save.SavedInDB"));
                         break;
                     }
-                #endregion Save
-                #region SaveList
+
                 case "savelist":
                     {
                         string currentID = targetMerchant.TradeItems.ItemsListID;
@@ -175,8 +171,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion SaveList
-                #region Remove
+
                 case "remove":
                     {
                         targetMerchant.DeleteFromDatabase();
@@ -184,13 +179,11 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Merchant.Remove.RemovedFromDB"));
                         break;
                     }
-                #endregion Remove
-                #region Sell
+
                 case "sell":
                     {
                         switch (args[2].ToLower())
                         {
-                            #region Add
                             case "add":
                                 {
                                     if (args.Length == 4)
@@ -211,8 +204,7 @@ namespace DOL.GS.Commands
 
                                     break;
                                 }
-                            #endregion Add
-                            #region Remove
+
                             case "remove":
                                 {
                                     if (args.Length == 3)
@@ -224,20 +216,17 @@ namespace DOL.GS.Commands
 
                                     break;
                                 }
-                            #endregion Remove
-                            #region Default
+
                             default:
                                 {
                                     DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Merchant.CommandOverview"));
                                     return;
                                 }
-                            #endregion Default
                         }
 
                         break;
                     }
-                #endregion Sell
-                #region Articles
+
                 case "articles":
                     {
                         if (args.Length < 3)
@@ -248,7 +237,6 @@ namespace DOL.GS.Commands
 
                         switch (args[2].ToLower())
                         {
-                            #region Add
                             case "add":
                                 {
                                     if (args.Length <= 6)
@@ -318,8 +306,7 @@ namespace DOL.GS.Commands
 
                                     break;
                                 }
-                            #endregion Add
-                            #region Remove
+
                             case "remove":
                                 {
                                     if (args.Length == 5)
@@ -372,8 +359,7 @@ namespace DOL.GS.Commands
 
                                     break;
                                 }
-                            #endregion Remove
-                            #region Delete
+
                             case "delete":
                                 {
                                     if (args.Length == 3)
@@ -405,20 +391,17 @@ namespace DOL.GS.Commands
 
                                     break;
                                 }
-                            #endregion Delete
-                            #region Default
+
                             default:
                                 {
                                     DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Merchant.CommandOverview"));
                                     return;
                                 }
-                            #endregion Default
                         }
 
                         break;
                     }
-                #endregion Articles
-                #region Type
+
                 case "type":
                     {
                         string theType = param;
@@ -478,7 +461,6 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Merchant.Type.Changed", param));
                         break;
                     }
-                #endregion Type
             }
         }
     }

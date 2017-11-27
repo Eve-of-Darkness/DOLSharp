@@ -72,8 +72,6 @@ namespace DOL.GS
         {
         }
 
-        #region IPoint2D Members
-
         /// <summary>
         /// X coord of this point
         /// </summary>
@@ -183,8 +181,6 @@ namespace DOL.GS
             X = 0;
             Y = 0;
         }
-
-        #endregion
 
         /// <summary>
         /// Creates the string representation of this point

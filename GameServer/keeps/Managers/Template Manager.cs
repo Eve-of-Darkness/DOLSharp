@@ -147,13 +147,10 @@ namespace DOL.GS.Keeps
             }
         }
 
-        #region Hastener Models
         public static ushort AlbionHastener = 244;
         public static ushort MidgardHastener = 22;
         public static ushort HiberniaHastener = 1910;
-        #endregion
 
-        #region AlbionClassModels
         public static ushort BritonMale = 32;
         public static ushort BritonFemale = 35;
         public static ushort HighlanderMale = 39;
@@ -167,8 +164,7 @@ namespace DOL.GS.Keeps
         public static ushort HalfOgreMale = 1008;
         public static ushort HalfOgreFemale = 1020;
         public static ushort MinotaurMaleAlb = 1395;
-        #endregion
-        #region MidgardClassModels
+
         public static ushort TrollMale = 137;
         public static ushort TrollFemale = 145;
         public static ushort NorseMale = 503;
@@ -182,8 +178,7 @@ namespace DOL.GS.Keeps
         public static ushort FrostalfMale = 1051;
         public static ushort FrostalfFemale = 1063;
         public static ushort MinotaurMaleMid = 1407;
-        #endregion
-        #region HiberniaClassModels
+
         public static ushort FirbolgMale = 286;
         public static ushort FirbolgFemale = 294;
         public static ushort CeltMale = 302;
@@ -197,7 +192,6 @@ namespace DOL.GS.Keeps
         public static ushort SylvianMale = 700;
         public static ushort SylvianFemale = 708;
         public static ushort MinotaurMaleHib = 1419;
-        #endregion
 
         /// <summary>
         /// Sets a guards model
@@ -243,10 +237,8 @@ namespace DOL.GS.Keeps
 
             switch (guard.ModelRealm)
             {
-                #region None
                 case eRealm.None:
-                #endregion
-                #region Albion
+
                 case eRealm.Albion:
                     {
                         if (guard is GuardArcher)
@@ -388,8 +380,7 @@ namespace DOL.GS.Keeps
 
                         break;
                     }
-                #endregion
-                #region Midgard
+
                 case eRealm.Midgard:
                     {
                         if (guard is GuardArcher)
@@ -535,8 +526,7 @@ namespace DOL.GS.Keeps
 
                         break;
                     }
-                #endregion
-                #region Hibernia
+
                 case eRealm.Hibernia:
                     {
                         if (guard is GuardArcher)
@@ -672,7 +662,6 @@ namespace DOL.GS.Keeps
 
                         break;
                     }
-                #endregion
             }
         }
 
@@ -753,7 +742,6 @@ namespace DOL.GS.Keeps
 
             switch (guard.ModelRealm)
             {
-                #region Albion / None
                 case eRealm.None:
                 case eRealm.Albion:
                     {
@@ -823,8 +811,7 @@ namespace DOL.GS.Keeps
 
                         break;
                     }
-                #endregion
-                #region Midgard
+
                 case eRealm.Midgard:
                     {
                         if (guard is GuardArcher)
@@ -879,8 +866,7 @@ namespace DOL.GS.Keeps
 
                         break;
                     }
-                #endregion
-                #region Hibernia
+
                 case eRealm.Hibernia:
                     {
                         if (guard is GuardArcher)
@@ -942,7 +928,6 @@ namespace DOL.GS.Keeps
 
                         break;
                     }
-                #endregion
             }
 
             if (guard.Realm == eRealm.None)

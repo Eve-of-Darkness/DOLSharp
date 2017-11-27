@@ -39,8 +39,6 @@ namespace DOL.GS
         /// </summary>
         protected static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Declaration
-
         /// <summary>
         /// The SalvageYield entry for the item being salvaged
         /// </summary>
@@ -50,10 +48,6 @@ namespace DOL.GS
         /// The item being salvaged
         /// </summary>
         protected const string SALVAGED_ITEM = "SALVAGED_ITEM";
-
-        #endregion
-
-        #region First call function and callback
 
         /// <summary>
         /// Begin salvaging an inventory item
@@ -350,10 +344,6 @@ namespace DOL.GS
             return 0;
         }
 
-        #endregion
-
-        #region Requirement check
-
         /// <summary>
         /// Check if the player can begin to salvage an item
         /// </summary>
@@ -409,10 +399,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-
-        #region Calcul functions
-
         /// <summary>
         /// Calculate the count per Object_Type
         /// </summary>
@@ -424,8 +410,6 @@ namespace DOL.GS
             {
                 return 0;
             }
-
-            #region Weapons
 
             switch ((eObjectType)item.Object_Type)
             {
@@ -520,10 +504,6 @@ namespace DOL.GS
 
                     break;
 
-                #endregion Weapons
-
-            #region Armor
-
                 case eObjectType.Cloth:
                 case eObjectType.Leather:
                 case eObjectType.Reinforced:
@@ -560,9 +540,6 @@ namespace DOL.GS
 
                     break;
             }
-        #endregion Armor
-
-            #region Modifications
 
             if (maxCount < 1)
             {
@@ -592,8 +569,6 @@ namespace DOL.GS
                 maxCount += toadd;
             }
 
-            #region SpecialFix MerchantList
-
             if (item.Bonus8 > 0)
             {
                 if (item.Bonus8Type == 0 || item.Bonus8Type.ToString() == string.Empty)
@@ -601,8 +576,6 @@ namespace DOL.GS
                     maxCount = item.Bonus8;
                 }
             }
-
-            #endregion SpecialFix MerchantList
 
             if (item.Condition != item.MaxCondition && item.Condition < item.MaxCondition)
             {
@@ -618,8 +591,6 @@ namespace DOL.GS
             {
                 maxCount = 500;
             }
-
-            #endregion Modifications
 
             return (int)maxCount;
         }
@@ -666,7 +637,5 @@ namespace DOL.GS
             salvageYield.Count = Util.Random(minCount, maxCount);
             return salvageYield.Count;
         }
-
-        #endregion
     }
 }

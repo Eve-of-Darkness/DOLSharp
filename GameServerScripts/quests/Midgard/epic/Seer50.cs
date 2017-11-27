@@ -104,8 +104,6 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Inaksha", eRealm.Midgard);
 
             if (npcs.Length == 0)
@@ -205,9 +203,6 @@ namespace DOL.GS.Quests.Midgard
             }
 
             // end npc
-            #endregion
-
-            #region defineItems
 
             ball_of_flame = GameServer.Database.FindObjectByKey<ItemTemplate>("ball_of_flame");
             if (ball_of_flame == null)
@@ -823,7 +818,6 @@ namespace DOL.GS.Quests.Midgard
 
 // Shaman Epic Sleeves End
 // Item Descriptions End
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
@@ -1181,8 +1175,6 @@ namespace DOL.GS.Quests.Midgard
             }
         }
 
-        #region Allakhazam Epic Source
-
         /*
         *#25 talk to Inaksha
         *#26 seek out Loken in Raumarik Loc 47k, 25k, 4k, and kill him purp and 2 blue adds
@@ -1208,7 +1200,5 @@ namespace DOL.GS.Quests.Midgard
             *Subterranean Legs
             *Subterranean Sleeves
         */
-
-        #endregion
     }
 }

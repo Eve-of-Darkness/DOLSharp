@@ -28,7 +28,6 @@ namespace DOL.GS.DatabaseUpdate
     [DatabaseUpdate]
     public class LanguageSystemUpdate : IDatabaseUpdater
     {
-        #region DBLanguage table structure
         private class language : DataObject
         {
             protected string m_translationid;
@@ -90,7 +89,6 @@ namespace DOL.GS.DatabaseUpdate
                 set { Dirty = true; m_packageID = value; }
             }
         }
-        #endregion DBLanguage table structure
 
         /// <summary>
         /// Defines a logger for this class.

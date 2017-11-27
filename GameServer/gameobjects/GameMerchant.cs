@@ -39,8 +39,6 @@ namespace DOL.GS
         {
         }
 
-        #region GetExamineMessages / Interact
-
         /// <summary>
         /// Adds messages to ArrayList which are sent when object is targeted
         /// </summary>
@@ -91,9 +89,6 @@ namespace DOL.GS
         {
             ((GamePlayer)state).Out.SendMerchantWindow(m_tradeItems, eMerchantWindowType.Normal);
         }
-        #endregion
-
-        #region Items List
 
         /// <summary>
         /// Items available for sale
@@ -108,10 +103,6 @@ namespace DOL.GS
             get { return m_tradeItems; }
             set { m_tradeItems = value; }
         }
-
-        #endregion
-
-        #region Buy / Sell / Apparaise
 
         /// <summary>
         /// Called when a player buys an item
@@ -347,9 +338,6 @@ namespace DOL.GS
             return val;
         }
 
-        #endregion
-
-        #region NPCTemplate
         public override void LoadTemplate(INpcTemplate template)
         {
             base.LoadTemplate(template);
@@ -359,9 +347,6 @@ namespace DOL.GS
                 TradeItems = new MerchantTradeItems(template.ItemsListTemplateID);
             }
         }
-        #endregion NPCTemplate
-
-        #region Database
 
         /// <summary>
         /// Loads a merchant from the DB
@@ -462,8 +447,6 @@ namespace DOL.GS
 
             InternalID = null;
         }
-
-        #endregion
     }
 
     /*

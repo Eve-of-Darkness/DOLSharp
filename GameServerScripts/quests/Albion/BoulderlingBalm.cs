@@ -145,8 +145,6 @@ namespace DOL.GS.Quests.Albion
 * Just examples, do anything you like and feel comfortable with :)
 */
 
-            #region defineNPCs
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Brother Maynard", eRealm.Albion);
 
             /* Whops, if the npcs array length is 0 then no Sir Quait exists in
@@ -189,10 +187,6 @@ namespace DOL.GS.Quests.Albion
                 brotherMaynard = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             boulderlingRemains = GameServer.Database.FindObjectByKey<ItemTemplate>("boulderling_remains");
             if (boulderlingRemains == null)
             {
@@ -212,8 +206,6 @@ namespace DOL.GS.Quests.Albion
                 boulderlingRemains.Weight = 4;
                 GameServer.Database.AddObject(boulderlingRemains);
             }
-
-            #endregion
 
             /* Now we add some hooks to the Sir Quait we found.
                 * Actually, we want to know when a player interacts with him.

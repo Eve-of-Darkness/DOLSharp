@@ -47,18 +47,12 @@ namespace DOL.GS
             log.Debug($"Instance destructor called for {Description}");
         }
 
-        #region Entrance
-
         protected GameLocation m_entranceLocation;
 
         /// <summary>
         /// Returns the entrance location into this instance.
         /// </summary>
         public GameLocation InstanceEntranceLocation => m_entranceLocation;
-
-        #endregion
-
-        #region LoadFromDatabase
 
         /// <summary>
         /// Loads elements relating to the given instance keyname from the database and populates the instance.
@@ -155,8 +149,6 @@ namespace DOL.GS
 
             log.Info($"Successfully loaded a db entry to {Description} - Region ID {ID}. Loaded Entities: {count}");
         }
-
-        #endregion
 
         /// <summary>
         /// This method returns an int representative of an average level for the instance.

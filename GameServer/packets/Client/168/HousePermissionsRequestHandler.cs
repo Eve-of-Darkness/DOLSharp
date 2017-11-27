@@ -23,8 +23,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.HousePermissionRequest, "Handles housing permissions requests from menu", eClientStatus.PlayerInGame)]
     public class HousePermissionsRequestHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             packet.ReadShort(); // pid
@@ -82,7 +80,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 client.Out.SendTCP(pak);
             }
         }
-
-        #endregion
     }
 }

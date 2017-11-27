@@ -37,8 +37,6 @@ namespace DOL.Database
 
         protected bool m_hasLoggedError = false;
 
-        #region Inventory fields
-
         protected string m_ownerID;         // owner id
 
         [DataElement(AllowDbNull = false, Index = true)]
@@ -306,7 +304,6 @@ namespace DOL.Database
                 m_item = value;
             }
         }
-        #endregion
 
         /// <summary>
         /// Without parameter, the inventoryitem 'll never be saved
@@ -461,8 +458,6 @@ namespace DOL.Database
                 base.Dirty = value;
             }
         }
-
-        #region ItemTemplate wrapper fields
 
         // ItemTemplate wrapper, should be removed
         // The proper use in the code must be (inventory).Template.Property, instead of (inventory).Property
@@ -854,8 +849,6 @@ namespace DOL.Database
             get { return Template.SalvageYieldID; }
             set { Template.SalvageYieldID = value; }
         }
-
-        #endregion
 
         // Wrapped methods/accessors from ItemTemplate
         public virtual byte DurabilityPercent

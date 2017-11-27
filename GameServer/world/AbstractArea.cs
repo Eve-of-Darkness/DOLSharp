@@ -103,8 +103,6 @@ namespace DOL.GS
         /// </summary>
         public byte Sound { get; set; }
 
-        #region Event handling
-
         public void UnRegisterPlayerEnter(DOLEventHandler callback)
         {
             GameEventMgr.RemoveHandler(this, AreaEvent.PlayerEnter, callback);
@@ -124,7 +122,6 @@ namespace DOL.GS
         {
             GameEventMgr.AddHandler(this, AreaEvent.PlayerLeave, callback);
         }
-        #endregion
 
         /// <summary>
         /// Checks wether area intersects with given zone

@@ -71,8 +71,6 @@ namespace DOL.GS.Quests.Hibernia
 
         private void Init()
         {
-            #region defineItems
-
             // item db check
             RecruitsCloak = GameServer.Database.FindObjectByKey<ItemTemplate>("k109_recruits_cloak");
             if (RecruitsCloak == null)
@@ -137,7 +135,6 @@ namespace DOL.GS.Quests.Hibernia
                     GameServer.Database.AddObject(LetterToEpona);
                 }
             }
-            #endregion
             Level = 1;
             QuestGiver = Blercyn;
             Rewards.Experience = 22;
@@ -160,8 +157,6 @@ namespace DOL.GS.Quests.Hibernia
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Blercyn", eRealm.Hibernia);
 
@@ -253,8 +248,6 @@ namespace DOL.GS.Quests.Hibernia
             {
                 Epona = npcs[0];
             }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

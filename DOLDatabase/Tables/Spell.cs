@@ -595,7 +595,6 @@ namespace DOL.Database
             }
         }
 
-        #region warlock
         [DataElement(AllowDbNull = true)]
         public bool IsPrimary
         {
@@ -655,7 +654,6 @@ namespace DOL.Database
                 Dirty = true;
             }
         }
-        #endregion
 
         [DataElement(AllowDbNull = false)]
         public ushort TooltipId

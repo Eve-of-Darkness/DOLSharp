@@ -49,8 +49,6 @@ namespace DOL.GS.Behaviour
 
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Variables
-
         private GameNPC npc;
 
         private List<IBehaviourRequirement> requirements;
@@ -60,10 +58,6 @@ namespace DOL.GS.Behaviour
         private DOLEventHandler eventHandler;
 
         private int id;
-
-        #endregion
-
-        #region Properties
 
         public int ID
         {
@@ -113,8 +107,6 @@ namespace DOL.GS.Behaviour
             set { eventHandler = value; }
         }
 
-        #endregion
-
         /// <summary>
         /// Creates a Behaviour for the given default npc.
         /// </summary>
@@ -124,8 +116,6 @@ namespace DOL.GS.Behaviour
             NPC = npc;
             NotifyHandler = new DOLEventHandler(Notify);
         }
-
-        #region Triggers
 
         /// <summary>
         /// Adds a trigger to the questpart for details about parameters look at documentation of used triggertype
@@ -211,9 +201,6 @@ namespace DOL.GS.Behaviour
 
             return false;
         }
-        #endregion
-
-        #region Actions
 
         /// <summary>
         /// Adds an Action to the QuestPart that will be performed once the QuestPart fires
@@ -263,10 +250,6 @@ namespace DOL.GS.Behaviour
 
             actions.Add(action);
         }
-
-        #endregion
-
-        #region Requirements
 
         /// <summary>
         /// Adds a new Requirement to the QuestPart.
@@ -365,8 +348,6 @@ namespace DOL.GS.Behaviour
 
             return true;
         }
-
-        #endregion
 
         /// <summary>
         /// This method is called by the BaseQuest whenever a event associated with the Quest accurs

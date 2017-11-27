@@ -22,8 +22,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.CheckLOSRequest, "Handles a LoS Check Response", eClientStatus.PlayerInGame)]
     public class CheckLOSResponseHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             ushort checkerOid = packet.ReadShort();
@@ -33,10 +31,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             new HandleCheckAction(client.Player, checkerOid, targetOid, response).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: HandleCheckAction
 
         /// <summary>
         /// Handles the LOS check response
@@ -100,7 +94,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
         }
-
-        #endregion
     }
 }

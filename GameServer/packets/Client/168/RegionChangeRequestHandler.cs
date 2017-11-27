@@ -42,8 +42,6 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// </summary>
         private readonly Hashtable _customJumpPointHandlers = new Hashtable();
 
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             ushort jumpSpotId = packet.ReadShort();
@@ -170,10 +168,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             new RegionChangeRequestHandler(client.Player, zonePoint, customHandler).Start(1);
         }
 
-        #endregion
-
-        #region Nested type: RegionChangeRequestHandler
-
         /// <summary>
         /// Handles player region change requests
         /// </summary>
@@ -258,7 +252,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 player.MoveTo(_zonePoint.TargetRegion, _zonePoint.TargetX, _zonePoint.TargetY, _zonePoint.TargetZ, _zonePoint.TargetHeading);
             }
         }
-
-        #endregion
     }
 }

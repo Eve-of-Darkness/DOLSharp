@@ -292,7 +292,6 @@ namespace DOL.GS.Spells
             }
         }
 
-        #region IEnumerable Members
         /// <summary>
         /// Gets the list enumerator
         /// </summary>
@@ -318,7 +317,5 @@ namespace DOL.GS.Spells
         {
             return GetEnumerator();
         }
-
-        #endregion
     }
 }

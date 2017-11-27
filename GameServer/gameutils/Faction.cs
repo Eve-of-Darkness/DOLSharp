@@ -44,7 +44,6 @@ namespace DOL.GS
             m_updatePlayer = new ArrayList(1);
         }
 
-        #region DB
         /// <summary>
         /// load faction from DB
         /// </summary>
@@ -86,9 +85,6 @@ namespace DOL.GS
                 GameServer.Database.SaveObject(dbfactionAggroLevel);
             }
         }
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// hold name of faction
@@ -164,9 +160,7 @@ namespace DOL.GS
         {
             get { return m_playerxFaction; }
         }
-        #endregion
 
-        #region Friend/enemy Faction
         /// <summary>
         /// add friend faction to this faction
         /// </summary>
@@ -214,9 +208,7 @@ namespace DOL.GS
                 m_enemyFactions.Remove(faction);
             }
         }
-        #endregion
 
-        #region changes for interactions with faction members
         /// <summary>
         /// called when a player kills a mob from the faction
         /// </summary>
@@ -311,6 +303,5 @@ namespace DOL.GS
                 return BaseAggroLevel;
             }
         }
-        #endregion
     }
 }

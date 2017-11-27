@@ -32,7 +32,6 @@ namespace DOL.Language
 {
     public static class LanguageMgr
     {
-        #region Variables
         private const string TRANSLATION_ID_EMPTY = "Empty translation id.";
         private const string TRANSLATION_NULL = "NULL";
 
@@ -67,9 +66,7 @@ namespace DOL.Language
         /// Give a way to change or relocate the lang files
         /// </summary>
         private static string LangPath = Path.Combine(GameServer.Instance.Configuration.RootDirectory, "languages");
-        #endregion Variables
 
-        #region Properties
         /// <summary>
         /// Returns the default language.
         /// </summary>
@@ -106,9 +103,7 @@ namespace DOL.Language
         {
             get { return m_translations; }
         }
-        #endregion Properties
 
-        #region Initialization
         /// <summary>
         /// Initial function
         /// </summary>
@@ -119,10 +114,8 @@ namespace DOL.Language
             return LoadTranslations();
         }
 
-        #region LoadTranslations
         private static bool LoadTranslations()
         {
-            #region Load system translations
             if (log.IsDebugEnabled)
             {
                 log.Info("[Language-Manager] Loading system sentences...");
@@ -310,9 +303,7 @@ namespace DOL.Language
             }
 
             fileSentences = null;
-            #endregion Load system translations
 
-            #region Load object translations
             if (log.IsDebugEnabled)
             {
                 log.Info("[Language-Manager] Loading object translations...");
@@ -330,12 +321,9 @@ namespace DOL.Language
             }
 
             lngObjs = null;
-            #endregion Load object translations
             return true;
         }
-        #endregion LoadTranslations
 
-        #region CountLanguageFiles
         /// <summary>
         /// Count files in a language directory
         /// </summary>
@@ -363,9 +351,7 @@ namespace DOL.Language
 
             return count;
         }
-        #endregion CountLanguageFiles
 
-        #region ReadLanguageDirectory
         private static ArrayList ReadLanguageDirectory(string path, string language)
         {
             ArrayList sentences = new ArrayList();
@@ -435,11 +421,7 @@ namespace DOL.Language
 
             return sentences;
         }
-        #endregion ReadLanguageDirectory
 
-        #endregion Initialization
-
-        #region GetLanguageDataObject
         public static LanguageDataObject GetLanguageDataObject(string language, string translationId, LanguageDataObject.eTranslationIdentifier translationIdentifier)
         {
             if (Util.IsEmpty(language) || Util.IsEmpty(translationId))
@@ -501,11 +483,7 @@ namespace DOL.Language
 
             return result;
         }
-        #endregion GetLanguageDataObject
 
-        #region GetTranslation / TryGetTranslation
-
-        #region GetTranslation
         public static LanguageDataObject GetTranslation(this GameClient client, ITranslatableObject obj)
         {
             LanguageDataObject translation;
@@ -538,9 +516,7 @@ namespace DOL.Language
             TryGetTranslation(out translation, language, translationId, args);
             return translation;
         }
-        #endregion GetTranslation
 
-        #region TryGetTranslation
         public static bool TryGetTranslation(out LanguageDataObject translation, GameClient client, ITranslatableObject obj)
         {
             if (client == null)
@@ -681,11 +657,6 @@ namespace DOL.Language
 
             return true;
         }
-        #endregion TryGetTranslation
-
-        #endregion GetTranslation / TryGetTranslation
-
-        #region utils
 
         /// <summary>
         /// Try Translating some Sentence into Player target Language or Default to given String.
@@ -724,11 +695,6 @@ namespace DOL.Language
             return missing;
         }
 
-        #endregion
-
-        #region RegisterLanguageDataObject / UnregisterLanguageDataObject
-
-        #region RegisterLanguageDataObject
         public static bool RegisterLanguageDataObject(LanguageDataObject obj)
         {
             if (obj != null)
@@ -783,9 +749,7 @@ namespace DOL.Language
 
             return false; // Object is 'NULL' or already in list.
         }
-        #endregion RegisterLanguageDataObject
 
-        #region UnregisterLanguageDataObject
         public static void UnregisterLanguageDataObject(LanguageDataObject obj)
         {
             lock (m_translations)
@@ -865,8 +829,5 @@ namespace DOL.Language
                 }
             }
         }
-        #endregion UnregisterLanguageDataObject
-
-        #endregion RegisterLanguageDataObject / UnregisterLanguageDataObject
     }
 }

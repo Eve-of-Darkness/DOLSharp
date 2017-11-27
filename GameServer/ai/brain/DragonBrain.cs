@@ -224,8 +224,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #region Tether
-
         /// <summary>
         /// Check whether dragon is out of tether range.
         /// </summary>
@@ -240,10 +238,6 @@ namespace DOL.AI.Brain
 
             return !dragon.IsWithinRadius(dragon.SpawnPoint, dragon.TetherRange);
         }
-
-        #endregion
-
-        #region Health Check
 
         private int m_stage = 10;
 
@@ -322,10 +316,6 @@ namespace DOL.AI.Brain
             return false;
         }
 
-        #endregion
-
-        #region Glare
-
         /// <summary>
         /// Try to find a potential target for Glare.
         /// </summary>
@@ -364,10 +354,6 @@ namespace DOL.AI.Brain
             return false;
         }
 
-        #endregion
-
-        #region Throw
-
         /// <summary>
         /// Pick a target to hurl into the air.
         /// </summary>
@@ -404,7 +390,5 @@ namespace DOL.AI.Brain
 
             return false;
         }
-
-        #endregion
     }
 }

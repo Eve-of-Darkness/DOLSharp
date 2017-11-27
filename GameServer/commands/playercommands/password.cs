@@ -23,8 +23,6 @@ namespace DOL.GS.Commands
     {
         private static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region ICommandHandler Members
-
         public void OnCommand(GameClient client, string[] args)
         {
             string usage = "Usage: /password <current_password> <new_password>";
@@ -64,8 +62,6 @@ namespace DOL.GS.Commands
                 client.Out.SendMessage(usage, eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
-
-        #endregion
 
         private void PasswordCheckCallback(GamePlayer player, byte response)
         {

@@ -1278,8 +1278,6 @@ namespace DOL.GS.ServerRules
             return false;
         }
 
-        #region GetCompatibleObjectTypes
-
         /// <summary>
         /// Holds arrays of compatible object types
         /// </summary>
@@ -1347,8 +1345,6 @@ namespace DOL.GS.ServerRules
             return res;
         }
 
-        #endregion
-
         /// <summary>
         /// Invoked on NPC death and deals out
         /// experience/realm points if needed
@@ -1359,7 +1355,6 @@ namespace DOL.GS.ServerRules
         {
             lock (killedNPC.XPGainers.SyncRoot)
             {
-                #region Worth no experience
                 // "This monster has been charmed recently and is worth no experience."
                 string message = "You gain no experience from this kill!";
                 if (killedNPC.CurrentRegion.Time - GameNPC.CHARMED_NOEXP_TIMEOUT < killedNPC.TempProperties.getProperty<long>(GameNPC.CHARMED_TICK_PROP))
@@ -1379,9 +1374,7 @@ namespace DOL.GS.ServerRules
 
                     return;
                 }
-                #endregion
 
-                #region Group/Total Damage
                 float totalDamage = 0;
                 Dictionary<Group, int> plrGrpExp = new Dictionary<Group, int>();
                 GamePlayer highestPlayer = null;
@@ -1423,7 +1416,6 @@ namespace DOL.GS.ServerRules
                         }
                     }
                 }
-                #endregion
 
                 long npcExpValue = killedNPC.ExperienceValue;
                 int npcRPValue = killedNPC.RealmPointsValue;
@@ -1458,8 +1450,6 @@ namespace DOL.GS.ServerRules
                     // Changed: people were getting penalized for their pets doing damage
                     double damagePercent = (float)de.Value / totalDamage;
 
-                    #region Realm Points
-
                     // realm points
                     int rpCap = living.RealmPointsValue * 2;
                     int realmPoints;
@@ -1491,10 +1481,6 @@ namespace DOL.GS.ServerRules
                         living.GainRealmPoints(realmPoints);
                     }
 
-                    #endregion
-
-                    #region Bounty Points
-
                     // bounty points
                     int bpCap = living.BountyPointsValue * 2;
                     int bountyPoints;
@@ -1518,8 +1504,6 @@ namespace DOL.GS.ServerRules
                     {
                         living.GainBountyPoints(bountyPoints);
                     }
-
-                    #endregion
 
                     // experience points
                     long xpReward;
@@ -1557,8 +1541,6 @@ namespace DOL.GS.ServerRules
                         }
                     }
 
-                    #region Challenge Code
-
                     // let's check the con, for example if a level 50 kills a green, we want our level 1 to get green xp too
                     /*
                      * http://www.camelotherald.com/more/110.shtml
@@ -1581,16 +1563,12 @@ namespace DOL.GS.ServerRules
                         expCap = GameServer.ServerRules.GetExperienceForLiving(GameObject.GetLevelFromCon(player.Level, highestConValue));
                     }
 
-                    #endregion
-
                     expCap = (long)(expCap * npcExceedXPCapAmount);
 
                     if (xpReward > expCap)
                     {
                         xpReward = expCap;
                     }
-
-                    #region Camp Bonus
 
                     // average max camp bonus is somewhere between 50 and 60%
                     double fullCampBonus = Properties.MAX_CAMP_BONUS;
@@ -1627,9 +1605,6 @@ namespace DOL.GS.ServerRules
                     }
 
                     var campBonus = (long)(xpReward * campBonusPerc);
-                    #endregion
-
-                    #region Outpost Bonus
 
                     // outpost XP
                     // 1.54 http://www.camelotherald.com/more/567.shtml
@@ -1667,7 +1642,6 @@ namespace DOL.GS.ServerRules
                             outpostXP += (xpReward / 100) * 3;
                         }
                     }
-                    #endregion
 
                     if (xpReward > 0)
                     {
@@ -2316,7 +2290,6 @@ namespace DOL.GS.ServerRules
             List<string> stat = new List<string>();
 
             int total = 0;
-            #region Players Killed
 
             // only show if there is a kill [by Suncheck]
             if ((player.KillsAlbionPlayers + player.KillsMidgardPlayers + player.KillsHiberniaPlayers) > 0)
@@ -2367,9 +2340,7 @@ namespace DOL.GS.ServerRules
 
                 stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.TotalPlayers")}: {total:N0}");
             }
-            #endregion
             stat.Add(" ");
-            #region Players Deathblows
 
             // only show if there is a kill [by Suncheck]
             if ((player.KillsAlbionDeathBlows + player.KillsMidgardDeathBlows + player.KillsHiberniaDeathBlows) > 0)
@@ -2420,9 +2391,7 @@ namespace DOL.GS.ServerRules
 
                 stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.TotalPlayers")}: {total:N0}");
             }
-            #endregion
             stat.Add(" ");
-            #region Players Solo Kills
 
             // only show if there is a kill [by Suncheck]
             if ((player.KillsAlbionSolo + player.KillsMidgardSolo + player.KillsHiberniaSolo) > 0)
@@ -2473,9 +2442,7 @@ namespace DOL.GS.ServerRules
 
                 stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Solo.TotalPlayers")}: {total:N0}");
             }
-            #endregion
             stat.Add(" ");
-            #region Keeps
 
             // only show if there is a capture [by Suncheck]
             if ((player.CapturedKeeps + player.CapturedTowers) > 0)
@@ -2492,9 +2459,7 @@ namespace DOL.GS.ServerRules
                     stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Capture.Towers")}: {player.CapturedTowers:N0}");
                 }
             }
-            #endregion
             stat.Add(" ");
-            #region PvE
 
             // only show if there is a kill [by Suncheck]
             if ((player.KillsDragon + player.KillsEpicBoss + player.KillsLegion) > 0)
@@ -2515,7 +2480,6 @@ namespace DOL.GS.ServerRules
                     stat.Add($"{LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.PvE.KillsLegion")}: {player.KillsLegion:N0}");
                 }
             }
-            #endregion
 
             return stat;
         }
@@ -2862,7 +2826,7 @@ namespace DOL.GS.ServerRules
         public virtual void OnPlayerLevelUp(GamePlayer player, int previousLevel)
         {
         }
-        #region MessageToLiving
+
         /// <summary>
         /// Send system text message to system window
         /// </summary>
@@ -2898,6 +2862,5 @@ namespace DOL.GS.ServerRules
                 ((GamePlayer)living).Out.SendMessage(message, type, loc);
             }
         }
-        #endregion
     }
 }

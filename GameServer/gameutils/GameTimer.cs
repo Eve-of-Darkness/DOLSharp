@@ -184,8 +184,6 @@ namespace DOL.GS
             return Stopwatch.GetTimestamp() / StopwatchFrequencyMilliseconds;
         }
 
-        #region TimeManager
-
         /// <summary>
         /// This class manages all the GameTimers. It is started from
         /// within the GameServer.Start() method and stopped from
@@ -389,8 +387,6 @@ namespace DOL.GS
                 return string.Format("time manager:'{0}' running:{1} currentTime:{2}", m_name, m_running, m_time);
             }
 
-            #region debug
-
 #if CollectStatistic
 			/// <summary>
 			/// Holds callback statistics
@@ -543,8 +539,6 @@ namespace DOL.GS
                     return Util.GetThreadStack(m_timeThread);
                 }
             }
-
-            #endregion
 
             /// <summary>
             /// Starts the time manager if not started already
@@ -1133,7 +1127,5 @@ namespace DOL.GS
                 log.InfoFormat("stopped timer thread {0} (ID:{1})", m_name, Thread.CurrentThread.ManagedThreadId);
             }
         }
-
-        #endregion
     }
 }

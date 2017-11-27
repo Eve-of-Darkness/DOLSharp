@@ -53,8 +53,6 @@ namespace DOL.GS
             m_sync = sync;
         }
 
-        #region Fields
-
         /// <summary>
         /// Holds a list of tradeitems we offer to the other player
         /// </summary>
@@ -95,10 +93,6 @@ namespace DOL.GS
         /// Stores the begin changes count
         /// </summary>
         protected int m_changesCount;
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Returns the array of items we offer for trade
@@ -340,10 +334,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Add/Remove/Update
-
         /// <summary>
         /// The max amount of items that can be added to tradewindow
         /// </summary>
@@ -446,10 +436,6 @@ namespace DOL.GS
                 m_partnerWindow.Owner.Out.SendTradeWindow();
             }
         }
-
-        #endregion
-
-        #region AcceptTrade/CloseTraide
 
         /// <summary>
         /// Called each time a player push the accept button to accept the trade
@@ -774,6 +760,5 @@ namespace DOL.GS
                 m_partnerWindow.Owner.TradeWindow = null;
             }
         }
-        #endregion
     }
 }

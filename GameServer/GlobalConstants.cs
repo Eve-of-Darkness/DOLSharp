@@ -529,7 +529,6 @@ namespace DOL.GS
         // Note, these are set in the ItemDB now.  Changing
         // any order will screw things up.
         // char stats
-        #region Stats
         Stat_First = 1,
         Strength = 1,
         Dexterity = 2,
@@ -543,9 +542,6 @@ namespace DOL.GS
 
         MaxMana = 9,
         MaxHealth = 10,
-        #endregion
-
-        #region Resists
 
         // resists
         Resist_First = 11,
@@ -559,9 +555,6 @@ namespace DOL.GS
         Resist_Spirit = 18,
         Resist_Thrust = 19,
         Resist_Last = 19,
-        #endregion
-
-        #region Skills
 
         // skills
         Skill_First = 20,
@@ -664,7 +657,6 @@ namespace DOL.GS
         Skill_SpectralGuard = 114,
         Skill_Archery = 115,
         Skill_Last = 115,
-        #endregion
 
         // 116 - 119 Available
         Focus_Darkness = 120,
@@ -738,8 +730,6 @@ namespace DOL.GS
         StyleCostReduction = 186,
         ToHitBonus = 187,
 
-        #region TOA
-
         // TOA
         ToABonus_First = 188,
         ArcherySpeed = 188,
@@ -756,9 +746,6 @@ namespace DOL.GS
         SpellDuration = 199,
         StyleDamage = 200,
         ToABonus_Last = 200,
-        #endregion
-
-        #region Cap Bonuses
 
         // Caps bonuses
         StatCapBonus_First = 201,
@@ -774,7 +761,6 @@ namespace DOL.GS
         MaxHealthCapBonus = 210,
         PowerPoolCapBonus = 211,
         StatCapBonus_Last = 211,
-        #endregion
 
         WeaponSkill = 212,
         AllSkills = 213,
@@ -785,8 +771,6 @@ namespace DOL.GS
         SpellLevel = 218,
         MissHit = 219,
         KeepDamage = 220,
-
-        #region Resist Cap Increases
 
         // Resist cap increases
         ResCapBonus_First = 221,
@@ -800,7 +784,6 @@ namespace DOL.GS
         SpiritResCapBonus = 228,
         ThrustResCapBonus = 229,
         ResCapBonus_Last = 229,
-        #endregion
 
         DPS = 230,
         MagicAbsorption = 231,
@@ -1922,7 +1905,6 @@ namespace DOL.GS
             craft = 0x08,
         }
 
-        #region AllowedClassesRaces
         /// <summary>
         /// All possible player races
         /// </summary>
@@ -2573,8 +2555,6 @@ namespace DOL.GS
 
             return string.Format("!{0} - {1}!", ((eRace)race).ToString("F"), gender.ToString("F"));
         }
-        #endregion
-
     }
 
     public static class GlobalSpells

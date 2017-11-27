@@ -24,15 +24,12 @@ namespace DOL.Database
     [DataTable(TableName = "LanguageZone")]
     public class DBLanguageZone : LanguageDataObject
     {
-        #region Variables
         private string m_description;
         private string m_screenDescription;
-        #endregion Variables
 
         public DBLanguageZone()
             : base() { }
 
-        #region Properties
         public override eTranslationIdentifier TranslationIdentifier
         {
             get { return eTranslationIdentifier.eZone; }
@@ -67,6 +64,5 @@ namespace DOL.Database
                 m_screenDescription = value;
             }
         }
-        #endregion Properties
     }
 }

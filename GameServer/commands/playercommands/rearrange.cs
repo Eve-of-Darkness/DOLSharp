@@ -127,7 +127,6 @@ namespace DOL.GS.Commands
             }
         }
 
-        #region Helpers
         private string GetRealmBySlotIndex(int slot)
         {
             string realm = string.Empty;
@@ -177,9 +176,7 @@ namespace DOL.GS.Commands
 
             return false;
         }
-        #endregion Helpers
 
-        #region Messages
         private void EmptySlot(GameClient client, int slot)
         {
             client.Out.SendMessage("The given source slot (" + slot + ") is empty.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -217,9 +214,7 @@ namespace DOL.GS.Commands
                 "The character slot for " + name + " has been successfully changed. (old slot = " + oldSlot +
                                    ", new slot = " + newSlot + ")", eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
-        #endregion Messages
 
-        #region SendCharacterListWindow
         private static readonly int[] m_firstCharacterSlotByRealm = new int[3] { 100, 200, 300 };
 
         private void SendCharacterListWindow(GameClient client)
@@ -291,9 +286,7 @@ namespace DOL.GS.Commands
 
             client.Out.SendCustomTextWindow("Character slots", data);
         }
-        #endregion SendCharacterListWindow
 
-        #region SetSlot
         private void SetSlot(GameClient client, int sourceSlot, int targetSlot)
         {
             DOLCharacters source = null;
@@ -373,6 +366,5 @@ namespace DOL.GS.Commands
 
             SlotChanged(client, source.Name, sourceSlot, source.AccountSlot);
         }
-        #endregion SetSlot
     }
 }

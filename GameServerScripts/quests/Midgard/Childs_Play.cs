@@ -111,7 +111,6 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" (Mid) initializing ...");
             }
 
-            #region defineNPCs
             GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Charles", (eRealm)2);
@@ -155,10 +154,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 Charles = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             daringpaddedboots = GameServer.Database.FindObjectByKey<ItemTemplate>("daringpaddedboots");
             if (daringpaddedboots == null)
@@ -1582,13 +1577,8 @@ namespace DOL.GS.Quests.Midgard
                 }
             }
 
-            #endregion
-
-            #region defineAreas
             Mid_Statue_Area = WorldMgr.GetRegion(Mid_Statue.RegionID).AddArea(new Area.Circle(string.Empty, Mid_Statue.X, Mid_Statue.Y, Mid_Statue.Z, 500));
             Mid_Statue_Area.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterStatueArea));
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

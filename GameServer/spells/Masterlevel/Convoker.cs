@@ -11,7 +11,6 @@ namespace DOL.GS.Spells
 {
     // http://www.camelotherald.com/masterlevels/ma.php?ml=Convoker
     // no shared timer
-    #region Convoker-1
     [SpellHandler("SummonWood")]
     public class SummonWoodSpellHandler : SummonItemSpellHandler
     {
@@ -33,10 +32,8 @@ namespace DOL.GS.Spells
             }
         }
     }
-    #endregion
 
     // no shared timer
-    #region Convoker-2
     [SpellHandler("PrescienceNode")]
     public class PrescienceNodeSpellHandler : FontSpellHandler
     {
@@ -103,10 +100,8 @@ namespace DOL.GS.Spells
 
         public PrescienceSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // no shared timer
-    #region Convoker-3
     [SpellHandler("PowerTrap")]
     public class PowerTrapSpellHandler : MineSpellHandler
     {
@@ -156,10 +151,8 @@ namespace DOL.GS.Spells
             trap = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
-    #endregion
 
     // no shared timer
-    #region Convoker-4
     [SpellHandler("SpeedWrapWard")]
     public class SpeedWrapWardSpellHandler : FontSpellHandler
     {
@@ -243,10 +236,8 @@ namespace DOL.GS.Spells
 
         public SpeedWrapSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
 
     // shared timer 1
-    #region Convoker-5
     [SpellHandler("SummonWarcrystal")]
     public class SummonWarcrystalSpellHandler : SummonItemSpellHandler
     {
@@ -279,10 +270,8 @@ namespace DOL.GS.Spells
             }
         }
     }
-    #endregion
 
     // shared timer 1
-    #region Convoker-6
     [SpellHandler("Battlewarder")]
     public class BattlewarderSpellHandler : SpellHandler
     {
@@ -421,10 +410,8 @@ namespace DOL.GS.Spells
             };
         }
     }
-    #endregion
 
     // no shared timer
-    #region Convoker-7
     [SpellHandler("DissonanceTrap")]
     public class DissonanceTrapSpellHandler : MineSpellHandler
     {
@@ -474,10 +461,8 @@ namespace DOL.GS.Spells
             trap = ScriptMgr.CreateSpellHandler(Caster, s, sl);
         }
     }
-    #endregion
 
     // no shared timer
-    #region Convoker-8
     [SpellHandler("BrittleGuard")]
     public class BrittleGuardSpellHandler : MasterlevelHandling
     {
@@ -575,10 +560,8 @@ namespace DOL.GS.Spells
             return base.OnEffectExpires(effect, noMessages);
         }
     }
-    #endregion
 
     // no shared timer
-    #region Convoker-9
     [SpellHandler("SummonMastery")]
     public class Convoker9Handler : MasterlevelHandling
 
@@ -637,10 +620,8 @@ namespace DOL.GS.Spells
             m_player = caster as GamePlayer;
         }
     }
-    #endregion
 
     // no shared timer
-    #region Convoker-10
     [SpellHandler("SummonTitan")]
     public class Convoker10SpellHandler : MasterlevelHandling
     {
@@ -793,9 +774,7 @@ namespace DOL.GS.Spells
             return 0;
         }
     }
-    #endregion
 
-    #region PowerRend
     [SpellHandler("PowerRend")]
     public class PowerRendSpellHandler : SpellHandler
     {
@@ -840,10 +819,8 @@ namespace DOL.GS.Spells
             }
         }
     }
-    #endregion
 }
 
-#region BrittleBrain
 namespace DOL.AI.Brain
 {
     public class BrittleBrain : ControlledNpcBrain
@@ -864,9 +841,6 @@ namespace DOL.AI.Brain
         }
     }
 }
-#endregion
-
-#region Titanbrain
 
 namespace DOL.AI.Brain
 {
@@ -880,8 +854,6 @@ namespace DOL.AI.Brain
         public override int ThinkInterval => 2000;
 
         public GameLiving Target { get; set; }
-
-        #region AI
 
         public override bool Start()
         {
@@ -977,12 +949,9 @@ namespace DOL.AI.Brain
                 }
             }
         }
-        #endregion
     }
 }
-#endregion
 
-#region MLBrain
 public class MLBrain : GuardBrain
 {
     public override int AggroRange => 400;
@@ -1027,4 +996,3 @@ public class MLBrain : GuardBrain
         }
     }
 }
-#endregion

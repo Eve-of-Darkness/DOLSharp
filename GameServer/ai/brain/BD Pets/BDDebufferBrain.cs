@@ -38,8 +38,6 @@ namespace DOL.AI.Brain
         /// <param name="owner"></param>
         public BDDebufferBrain(GameLiving owner) : base(owner) { }
 
-        #region AI
-
         /// <summary>
         /// Checks the Abilities
         /// </summary>
@@ -79,7 +77,5 @@ namespace DOL.AI.Brain
             Body.TargetObject = lastTarget;
             return false;
         }
-
-        #endregion
     }
 }

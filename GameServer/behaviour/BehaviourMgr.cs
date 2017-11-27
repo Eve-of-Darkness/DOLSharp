@@ -31,8 +31,6 @@ namespace DOL.GS.Behaviour
     /// </summary>
     public sealed class BehaviourMgr
     {
-        #region Declaration
-
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
@@ -41,8 +39,6 @@ namespace DOL.GS.Behaviour
         private static readonly IDictionary m_behaviourActionMap = new HybridDictionary();
         private static readonly IDictionary m_behaviourTriggerMap = new HybridDictionary();
         private static readonly IDictionary m_behaviourRequirementMap = new HybridDictionary();
-
-        #endregion
 
         public static bool Init()
         {

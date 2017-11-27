@@ -31,8 +31,6 @@ namespace DOL.GS.Keeps
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region properties
-
         protected int m_oldMaxHealth;
 
         protected byte m_oldHealthPercent;
@@ -288,10 +286,6 @@ namespace DOL.GS.Keeps
             get { return m_position; }
             set { m_position = value; }
         }
-
-        #endregion
-
-        #region function override
 
         /// <summary>
         /// Procs don't normally fire on game keep components
@@ -624,9 +618,6 @@ namespace DOL.GS.Keeps
                 m_repairTimer = null;
             }
         }
-        #endregion
-
-        #region Save/load DB
 
         /// <summary>
         /// save the keep door object in DB
@@ -758,7 +749,6 @@ namespace DOL.GS.Keeps
             id += doorIndex;
             return id;
         }
-        #endregion
 
         /// <summary>
         /// call when player try to open door

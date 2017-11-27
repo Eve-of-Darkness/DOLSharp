@@ -128,8 +128,6 @@ namespace DOL.AI.Brain
             get { return DOL.GS.ServerProperties.Properties.PET_THINK_INTERVAL; }
         }
 
-        #region Control
-
         /// <summary>
         /// Gets the controlling owner of the brain
         /// </summary>
@@ -391,10 +389,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
-
-        #region AI
-
         /// <summary>
         /// The attack target ordered by the owner
         /// </summary>
@@ -622,7 +616,6 @@ namespace DOL.AI.Brain
             // clear current target, set target based on spell type, cast spell, return target to original target
             switch (spell.SpellType)
             {
-                    #region Buffs
                 case "StrengthConstitutionBuff":
                 case "DexterityQuicknessBuff":
                 case "StrengthBuff":
@@ -717,9 +710,7 @@ namespace DOL.AI.Brain
                     }
 
                     break;
-                    #endregion Buffs
 
-                    #region Disease Cure/Poison Cure/Summon
                 case "CureDisease":
                     // Cure self
                     if (Body.IsDiseased)
@@ -787,9 +778,7 @@ namespace DOL.AI.Brain
                 case "Summon":
                     Body.TargetObject = Body;
                     break;
-                    #endregion
 
-                    #region Heals
                 case "Heal":
                     if (spell.Target.ToLower() == "self")
                     {
@@ -832,7 +821,6 @@ namespace DOL.AI.Brain
                     }
 
                     break;
-                    #endregion
             }
 
             if (Body.TargetObject != null)
@@ -1117,7 +1105,5 @@ namespace DOL.AI.Brain
         }
 
         public override bool CheckFormation(ref int x, ref int y, ref int z) { return false; }
-
-        #endregion
     }
 }

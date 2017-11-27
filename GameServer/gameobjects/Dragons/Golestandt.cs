@@ -27,8 +27,6 @@ namespace DOL.GS
     /// <author>Aredhel</author>
     public class Golestandt : GameDragon
     {
-        #region Add Spawns
-
         /// <summary>
         /// Spawn adds that will despawn again after 30 seconds.
         /// For Golestandt, these will be level 57-60 GameNPCs and
@@ -48,10 +46,6 @@ namespace DOL.GS
 
             return true;
         }
-
-        #endregion
-
-        #region Glare
 
         /// <summary>
         /// The Glare spell.
@@ -83,10 +77,6 @@ namespace DOL.GS
                 return m_glareSpell;
             }
         }
-
-        #endregion
-
-        #region Breath
 
         /// <summary>
         /// The Breath spell.
@@ -155,10 +145,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Melee Debuff
-
         /// <summary>
         /// The melee debuff spell.
         /// </summary>
@@ -192,10 +178,6 @@ namespace DOL.GS
                 return m_meleeDebuffSpell;
             }
         }
-
-        #endregion
-
-        #region Ranged Debuff
 
         /// <summary>
         /// The ranged debuff spell.
@@ -232,7 +214,5 @@ namespace DOL.GS
                 return m_rangedDebuffSpell;
             }
         }
-
-        #endregion
     }
 }

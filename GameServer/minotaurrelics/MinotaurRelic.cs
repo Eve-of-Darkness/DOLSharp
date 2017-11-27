@@ -33,7 +33,6 @@ namespace DOL.GS
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region constructor
         public MinotaurRelic() : base() { m_saveInDB = true; }
 
         public MinotaurRelic(DBMinotaurRelic obj)
@@ -41,9 +40,7 @@ namespace DOL.GS
         {
             LoadFromDatabase(obj);
         }
-        #endregion
 
-        #region Declarations
         DBMinotaurRelic m_dbRelic;
         Timer timer = null;
         public RegionTimer respawntimer = null;
@@ -163,9 +160,7 @@ namespace DOL.GS
             get { return m_effect; }
             set { m_effect = value; }
         }
-        #endregion
 
-        #region database load/save
         /// <summary>
         /// Loads the GameRelic from Database
         /// </summary>
@@ -235,9 +230,7 @@ namespace DOL.GS
                 GameServer.Database.SaveObject(m_dbRelic);
             }
         }
-        #endregion
 
-        #region Interact
         public override bool Interact(GamePlayer player)
         {
             if (!base.Interact(player))
@@ -292,9 +285,7 @@ namespace DOL.GS
             PlayerTakesRelic(player);
             return true;
         }
-        #endregion
 
-        #region Relic Actions
         /// <summary>
         /// Called when a Players picks up a Relic
         /// </summary>
@@ -663,9 +654,7 @@ namespace DOL.GS
                 }
             }
         }
-        #endregion
 
-        #region Events
         /// <summary>
         /// Called to set the Events to the Carrier
         /// </summary>
@@ -750,7 +739,6 @@ namespace DOL.GS
 
             PlayerLoosesRelic(player, false);
         }
-        #endregion
 
         public override bool AddToWorld()
         {

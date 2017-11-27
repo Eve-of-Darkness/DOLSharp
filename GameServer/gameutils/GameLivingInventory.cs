@@ -76,8 +76,6 @@ namespace DOL.GS
             eInventorySlot.ArmsArmor
         };
 
-        #region Constructor/Declaration/LoadDatabase/SaveDatabase
-
         /// <summary>
         /// The complete inventory of all living including
         /// for players the vault, the equipped items and the backpack
@@ -122,10 +120,6 @@ namespace DOL.GS
         {
             return false;
         }
-
-        #endregion
-
-        #region Get Inventory Informations
 
         /// <summary>
         /// Counts used/free slots between min and max
@@ -365,10 +359,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Find Item
-
         /// <summary>
         /// Get all the items in the specified range
         /// </summary>
@@ -541,10 +531,6 @@ namespace DOL.GS
 
             return null;
         }
-
-        #endregion
-
-        #region Add/Remove/Move/Get
 
         /// <summary>
         /// Adds an item to the inventory and DB
@@ -901,10 +887,6 @@ namespace DOL.GS
             get { return m_items.Values; }
         }
 
-        #endregion
-
-        #region AddTemplate/RemoveTemplate
-
         /// <summary>
         /// Adds needed amount of items to inventory if there
         /// is enough space else nothing is done
@@ -1236,10 +1218,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Combine/Exchange/Stack Items
-
         /// <summary>
         /// Combine 2 items together if possible
         /// </summary>
@@ -1310,10 +1288,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion Combine/Exchange/Stack Items
-
-        #region Encumberance
-
         /// <summary>
         /// Gets the inventory weight
         /// </summary>
@@ -1338,10 +1312,6 @@ namespace DOL.GS
                 return weight / 10;
             }
         }
-
-        #endregion
-
-        #region BeginChanges/CommitChanges/UpdateSlots
 
         /// <summary>
         /// Increments changes counter
@@ -1380,8 +1350,6 @@ namespace DOL.GS
         {
             m_changedSlots.Clear();
         }
-
-        #endregion
 
         // Defines all the slots that hold equipment
     }

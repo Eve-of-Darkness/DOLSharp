@@ -165,7 +165,6 @@ namespace DOL.GS.Quests
 
         // Dinberg: removed this void. Handled in TaskDungeonInstance
         // private static byte GetLevelFromPlayer(GamePlayer player)
-        #region Albion Task Instances
 
         // Burial Tomb
         private static readonly ushort[] BurialTombLong = { 295, 400, 402, 404 };
@@ -186,8 +185,6 @@ namespace DOL.GS.Quests
         // Sundered Tombs
         private static readonly ushort[] SunderedTombsLong = { 386, 387, 388, };
         private static readonly ushort[] SunderedTombsLaby = { 420, 421, 422, 423, 424 };
-        #endregion
-        #region Midgard Task Instances
 
         // Damp Cavern
         private static readonly ushort[] DampCavernLong = { 278, 279, 280, 301 };
@@ -208,8 +205,6 @@ namespace DOL.GS.Quests
         // Underground Tunnel
         private static readonly ushort[] UndergroundTunnelLong = { 290, 291, 292 };
         private static readonly ushort[] UndergroundTunnelLaby = { 320, 321, 322, 323, 324 };
-        #endregion
-        #region Hibernia Task Instances
 
         // The Cursed Barrow
         private static readonly ushort[] TheCursedBarrowLong = { 427, 428, 431, 454 };
@@ -230,7 +225,6 @@ namespace DOL.GS.Quests
         // Unused Mine
         private static readonly ushort[] UnusedMineLong = { 474, 482, 485, 486 };
         private static readonly ushort[] UnusedMineLaby = { 048, 471, 472, 473 };
-        #endregion
 
         private static ushort GetRegionFromLevel(byte level, eRealm realm, eDungeonType dungeonType)
         {

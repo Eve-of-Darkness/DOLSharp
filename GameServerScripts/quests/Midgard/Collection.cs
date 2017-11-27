@@ -146,8 +146,6 @@ namespace DOL.GS.Quests.Midgard
 
             dalikor = GetDalikor();
 
-            #region defineNPCs
-
             generalLocations[0] = new GameLocation(generalNames[0], 100, 100, 40124, 44594, 4712, 216);
             generalLocations[1] = new GameLocation(generalNames[1], 100, 100, 46821, 40884, 4972, 21);
             generalLocations[2] = new GameLocation(generalNames[2], 100, 100, 56104, 43865, 5460, 48);
@@ -197,9 +195,6 @@ namespace DOL.GS.Quests.Midgard
                 }
             }
 
-            #endregion
-
-            #region defineItems
             /*
              * TODO Model for Campfire doesn't work. Very Stange!
              */
@@ -395,8 +390,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(recruitsSleeves);
                 }
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

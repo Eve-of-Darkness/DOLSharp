@@ -32,8 +32,6 @@ namespace DOL.GS
     /// </summary>
     public class GameServerConfiguration : BaseServerConfiguration
     {
-        #region Server
-
         /// <summary>
         /// holds the server root directory
         /// </summary>
@@ -94,8 +92,6 @@ namespace DOL.GS
         /// </summary>
         protected IPEndPoint m_udpOutEndpoint;
 
-        #endregion
-        #region Logging
         /// <summary>
         /// The logger name where to log the gm+ commandos
         /// </summary>
@@ -110,9 +106,6 @@ namespace DOL.GS
         /// The file name of the invalid names file
         /// </summary>
         protected string m_invalidNamesFile = string.Empty;
-
-        #endregion
-        #region Database
 
         /// <summary>
         /// The path to the XML database folder
@@ -133,9 +126,6 @@ namespace DOL.GS
         /// The auto save interval in minutes
         /// </summary>
         protected int m_saveInterval;
-
-        #endregion
-        #region Load/Save
 
         /// <summary>
         /// Loads the config values from a specific config element
@@ -336,8 +326,7 @@ namespace DOL.GS
                 root["Server"]["UDPOutPort"].Set(m_udpOutEndpoint.Port.ToString());
             }
         }
-        #endregion
-        #region Constructors
+
         /// <summary>
         /// Constructs a server configuration with default values
         /// </summary>
@@ -394,8 +383,6 @@ namespace DOL.GS
 
             m_cpuUse = m_cpuCount;
         }
-
-        #endregion
 
         /// <summary>
         /// Gets or sets the root directory of the server

@@ -55,7 +55,6 @@ namespace DOL.GS.Commands
             string albStr = string.Empty, albPwr = string.Empty, midStr = string.Empty, midPwr = string.Empty, hibStr = string.Empty, hibPwr = string.Empty;
             var relicInfo = new List<string>();
 
-            #region Reformat Relics  '[Type]: [OwnerRealm]'
             foreach (GameRelic relic in RelicMgr.getNFRelics())
             {
                 switch (relic.OriginalRealm)
@@ -106,7 +105,6 @@ namespace DOL.GS.Commands
                         }
                 }
             }
-            #endregion
 
             relicInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Players.Relic.AlbRelics") + ":");
             relicInfo.Add(albStr);

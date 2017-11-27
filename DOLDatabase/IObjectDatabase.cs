@@ -26,7 +26,6 @@ namespace DOL.Database
     /// </summary>
     public interface IObjectDatabase
     {
-        #region Add Objects
         /// <summary>
         /// Insert a new DataObject into the database and save it
         /// </summary>
@@ -40,9 +39,7 @@ namespace DOL.Database
         /// <param name="dataObjects">DataObjects to Add into database</param>
         /// <returns>True if All DataObjects were added.</returns>
         bool AddObject(IEnumerable<DataObject> dataObjects);
-        #endregion
 
-        #region Save Objects
         /// <summary>
         /// Save a DataObject to database if saving is allowed and object is dirty
         /// </summary>
@@ -56,9 +53,7 @@ namespace DOL.Database
         /// <param name="dataObjects">DataObjects to Save in database</param>
         /// <returns>True if All DataObjects were saved.</returns>
         bool SaveObject(IEnumerable<DataObject> dataObjects);
-        #endregion
 
-        #region Delete Objects
         /// <summary>
         /// Delete a DataObject from database if deletion is allowed
         /// </summary>
@@ -72,9 +67,7 @@ namespace DOL.Database
         /// <param name="dataObjects">DataObjects to Delete from database</param>
         /// <returns>True if All DataObjects were deleted.</returns>
         bool DeleteObject(IEnumerable<DataObject> dataObjects);
-        #endregion
 
-        #region Select By Key
         /// <summary>
         /// Retrieve a DataObject from database based on its primary key value.
         /// </summary>
@@ -89,9 +82,7 @@ namespace DOL.Database
         /// <returns>Collection of DataObject with primary key matching values</returns>
         IList<TObject> FindObjectsByKey<TObject>(IEnumerable<object> keys)
             where TObject : DataObject;
-        #endregion
 
-        #region Select Where Clause With Parameters
         /// <summary>
         /// Retrieve a Collection of DataObjects from database based on the Where Expression and Parameters Collection
         /// </summary>
@@ -116,9 +107,7 @@ namespace DOL.Database
         /// <returns>Collection of Objects matching Parametrized Query</returns>
         IList<TObject> SelectObjects<TObject>(string whereExpression, QueryParameter param)
             where TObject : DataObject;
-        #endregion
 
-        #region Select Where Clause Without Parameter
         /// <summary>
         /// Retrieve a Single DataObject from database based on Where Expression
         /// </summary>
@@ -153,9 +142,7 @@ namespace DOL.Database
         [Obsolete("Use Parametrized Select Queries for best perfomances")]
         IList<TObject> SelectObjects<TObject>(string whereExpression, Transaction.IsolationLevel isolation)
             where TObject : DataObject;
-        #endregion
 
-        #region Select All Object
         /// <summary>
         /// Select all Objects From Table holding TObject Type
         /// </summary>
@@ -171,9 +158,7 @@ namespace DOL.Database
         /// <returns>Collection of all DataObject for this Type</returns>
         IList<TObject> SelectAllObjects<TObject>(Transaction.IsolationLevel isolation)
             where TObject : DataObject;
-        #endregion
 
-        #region Count Objects
         /// <summary>
         /// Gets the number of objects in a given table in the database.
         /// </summary>
@@ -190,9 +175,7 @@ namespace DOL.Database
         /// <returns>a positive integer representing the number of objects that matched the given criteria; zero if no such objects existed</returns>
         int GetObjectCount<TObject>(string whereExpression)
             where TObject : DataObject;
-        #endregion
 
-        #region Metadata Handlers
         /// <summary>
         /// Register Data Object Type if not already Registered
         /// </summary>
@@ -228,9 +211,7 @@ namespace DOL.Database
         /// </summary>
         /// <param name="dataObject">DataObject to Populate</param>
         void FillObjectRelations(IEnumerable<DataObject> dataObject);
-        #endregion
 
-        #region Utils
         /// <summary>
         /// Escape wrong characters from string for Database Insertion
         /// </summary>
@@ -245,6 +226,5 @@ namespace DOL.Database
         /// <returns>True if the Command succeeded</returns>
         [Obsolete("Raw Non-Query are SQL Only and don't use internal Object Database Implementations...")]
         bool ExecuteNonQuery(string rawQuery);
-        #endregion
     }
 }

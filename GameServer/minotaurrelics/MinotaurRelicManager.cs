@@ -154,7 +154,6 @@ namespace DOL.GS
             }
         }
 
-        #region Helpers
         /// <summary>
         /// Adds a Relic to the Hashtable
         /// </summary>
@@ -246,6 +245,5 @@ namespace DOL.GS
 
             return null;
         }
-        #endregion
     }
 }

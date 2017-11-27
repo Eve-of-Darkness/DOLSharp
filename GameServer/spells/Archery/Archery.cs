@@ -413,7 +413,6 @@ namespace DOL.GS.Spells
 
         public override int CalculateEnduranceCost()
         {
-            #region [Freya] Nidel: Arcane Syphon chance
             int syphon = Caster.GetModified(eProperty.ArcaneSyphon);
             if (syphon > 0)
             {
@@ -422,7 +421,6 @@ namespace DOL.GS.Spells
                     return 0;
                 }
             }
-            #endregion
             return (int)(Caster.MaxEndurance * (Spell.Power * .01));
         }
 

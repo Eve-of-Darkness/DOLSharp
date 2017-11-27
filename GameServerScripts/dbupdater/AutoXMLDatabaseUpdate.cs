@@ -40,7 +40,6 @@ namespace DOL.GS.DatabaseUpdate
     [DatabaseUpdate]
     public class AutoXMLDatabaseUpdate : IDatabaseUpdater
     {
-        #region ServerProperties
         /// <summary>
         /// Enable or Disable the Auto XML Database Update Script
         /// </summary>
@@ -58,7 +57,6 @@ namespace DOL.GS.DatabaseUpdate
         /// </summary>
         [ServerProperty("xmlautoload", "xml_load_replace_directory", "Enforce directory path to where the XML Replace Packages are Loaded To Database (Relative to Scripts or Absolute...)", "dbupdater/replace")]
         public static string XML_LOAD_REPLACE_DIRECTORY { get; set; }
-        #endregion
 
         /// <summary>
         /// Defines a logger for this class.

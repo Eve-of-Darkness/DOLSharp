@@ -23,8 +23,6 @@ namespace DOL.GS.GameEvents
     {
         private const string UpdateURL = "http://portal.dolserver.net/serverlist.php?action=submit";
 
-        #region Code
-
         /// <summary>
         /// The Script Version
         /// </summary>
@@ -263,6 +261,5 @@ namespace DOL.GS.GameEvents
             newUrl = Url.Replace(" ", "%20");
             return newUrl;
         }
-        #endregion
     }
 }

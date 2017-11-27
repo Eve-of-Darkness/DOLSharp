@@ -24,8 +24,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PlayerAppraiseItemRequest, "Player Appraise Item Request handler.", eClientStatus.PlayerInGame)]
     public class PlayerAppraiseItemRequestHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             packet.ReadInt(); // X
@@ -35,10 +33,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             new AppraiseActionHandler(client.Player, itemSlot).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: AppraiseActionHandler
 
         /// <summary>
         /// Handles item apprise actions
@@ -84,7 +78,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
         }
-
-        #endregion
     }
 }

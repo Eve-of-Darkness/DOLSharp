@@ -49,8 +49,6 @@ namespace DOL.GS
         private static ReaderWriterLockSlim m_syncLockUpdates = new ReaderWriterLockSlim();
         private static object m_loadingLock = new object();
 
-        #region caches and static indexes
-
         // Career Dictionary, Spec Attached to Character class ID, auto loaded on char creation !!
         protected static readonly Dictionary<int, IDictionary<string, int>> m_specsByClass = new Dictionary<int, IDictionary<string, int>>();
 
@@ -95,10 +93,6 @@ namespace DOL.GS
 
         // Spec Action Handler Dictionary Index, typename to instanciate ondemande
         protected static readonly Dictionary<string, Type> m_specActionHandler = new Dictionary<string, Type>();
-
-        #endregion
-
-        #region class initialize
 
         static SkillBase()
         {
@@ -1073,9 +1067,6 @@ namespace DOL.GS
                 m_syncLockUpdates.ExitWriteLock();
             }
         }
-        #endregion
-
-        #region Initialization Tables
 
         /// <summary>
         /// Holds object type to spec convertion table
@@ -1190,8 +1181,6 @@ namespace DOL.GS
         /// </summary>
         private static void InitializeSpecToSkill()
         {
-            #region Weapon Specs
-
             // Weapon specs
             // Alb
             m_specToSkill.Add(Specs.Thrust, eProperty.Skill_Thrusting);
@@ -1224,10 +1213,6 @@ namespace DOL.GS
             m_specToSkill.Add(Specs.Celtic_Spear, eProperty.Skill_Celtic_Spear);
             m_specToSkill.Add(Specs.RecurveBow, eProperty.Skill_RecurvedBow);
             m_specToSkill.Add(Specs.Scythe, eProperty.Skill_Scythe);
-
-            #endregion
-
-            #region Magic Specs
 
             // Magic specs
             // Alb
@@ -1292,10 +1277,6 @@ namespace DOL.GS
             m_specToSkill.Add(Specs.SpectralForce, eProperty.Skill_SpectralForce);
             m_specToSkill.Add(Specs.SpectralGuard, eProperty.Skill_SpectralGuard);
 
-            #endregion
-
-            #region Other
-
             // Other
             m_specToSkill.Add(Specs.Critical_Strike, eProperty.Skill_Critical_Strike);
             m_specToSkill.Add(Specs.Stealth, eProperty.Skill_Stealth);
@@ -1310,8 +1291,6 @@ namespace DOL.GS
             m_specToSkill.Add(Specs.Power_Strikes, eProperty.Skill_Power_Strikes);
 
             m_specToSkill.Add(Specs.Archery, eProperty.Skill_Archery);
-
-            #endregion
         }
 
         /// <summary>
@@ -1360,8 +1339,6 @@ namespace DOL.GS
         /// </summary>
         private static void InitPropertyTypes()
         {
-            #region Resist
-
             // resists
             m_propertyTypes[(int)eProperty.Resist_Natural] = ePropertyType.Resist;
             m_propertyTypes[(int)eProperty.Resist_Body] = ePropertyType.Resist;
@@ -1373,10 +1350,6 @@ namespace DOL.GS
             m_propertyTypes[(int)eProperty.Resist_Slash] = ePropertyType.Resist;
             m_propertyTypes[(int)eProperty.Resist_Spirit] = ePropertyType.Resist;
             m_propertyTypes[(int)eProperty.Resist_Thrust] = ePropertyType.Resist;
-
-            #endregion
-
-            #region Focus
 
             // focuses
             m_propertyTypes[(int)eProperty.Focus_Darkness] = ePropertyType.Focus;
@@ -1411,8 +1384,6 @@ namespace DOL.GS
             m_propertyTypes[(int)eProperty.Focus_Witchcraft] = ePropertyType.Focus;
             m_propertyTypes[(int)eProperty.AllFocusLevels] = ePropertyType.Focus;
 
-            #endregion
-
             /*
              * http://www.camelotherald.com/more/1036.shtml
              * "- ALL melee weapon skills - This bonus will increase your
@@ -1424,8 +1395,6 @@ namespace DOL.GS
              * can train in hammer, axe and sword, your item should give you
              * a +3 increase to all three."
              */
-
-            #region Melee Skills
 
             // skills
             m_propertyTypes[(int)eProperty.Skill_Two_Handed] = ePropertyType.Skill | ePropertyType.SkillMeleeWeapon;
@@ -1454,10 +1423,6 @@ namespace DOL.GS
             m_propertyTypes[(int)eProperty.Skill_Dual_Wield] = ePropertyType.Skill | ePropertyType.SkillDualWield;
             m_propertyTypes[(int)eProperty.Skill_Left_Axe] = ePropertyType.Skill | ePropertyType.SkillDualWield;
             m_propertyTypes[(int)eProperty.Skill_Celtic_Dual] = ePropertyType.Skill | ePropertyType.SkillDualWield;
-
-            #endregion
-
-            #region Magical Skills
 
             m_propertyTypes[(int)eProperty.Skill_Power_Strikes] = ePropertyType.Skill | ePropertyType.SkillMagical;
             m_propertyTypes[(int)eProperty.Skill_Magnetism] = ePropertyType.Skill | ePropertyType.SkillMagical;
@@ -1521,10 +1486,6 @@ namespace DOL.GS
             m_propertyTypes[(int)eProperty.Skill_Hexing] = ePropertyType.Skill | ePropertyType.SkillMagical;
             m_propertyTypes[(int)eProperty.Skill_Witchcraft] = ePropertyType.Skill | ePropertyType.SkillMagical;
 
-            #endregion
-
-            #region Other
-
             m_propertyTypes[(int)eProperty.Skill_Long_bows] = ePropertyType.Skill | ePropertyType.SkillArchery;
             m_propertyTypes[(int)eProperty.Skill_Composite] = ePropertyType.Skill | ePropertyType.SkillArchery;
             m_propertyTypes[(int)eProperty.Skill_RecurvedBow] = ePropertyType.Skill | ePropertyType.SkillArchery;
@@ -1537,8 +1498,6 @@ namespace DOL.GS
             m_propertyTypes[(int)eProperty.Skill_ShortBow] = ePropertyType.Skill;
             m_propertyTypes[(int)eProperty.Skill_Envenom] = ePropertyType.Skill;
             m_propertyTypes[(int)eProperty.Skill_Archery] = ePropertyType.Skill | ePropertyType.SkillArchery;
-
-            #endregion
         }
 
         /// <summary>
@@ -1593,7 +1552,6 @@ namespace DOL.GS
 
         private static void RegisterPropertyNames()
         {
-            #region register...
             m_propertyNames.Add(eProperty.Strength, LanguageMgr.GetTranslation(
                 ServerProperties.Properties.DB_LANGUAGE,
                                                                                "SkillBase.RegisterPropertyNames.Strength"));
@@ -2279,13 +2237,7 @@ namespace DOL.GS
             m_propertyNames.Add(eProperty.MythicalChaCapBonus, "Mythical Stat Cap (Charisma)");
             m_propertyNames.Add(eProperty.MythicalEmpCapBonus, "Mythical Stat Cap (Empathy)");
             m_propertyNames.Add(eProperty.MythicalAcuCapBonus, "Mythical Stat Cap (Acuity)");
-
-            #endregion
         }
-
-        #endregion
-
-        #region Armor resists
 
         // lookup table for armor resists
         private const int REALM_BITCOUNT = 2;
@@ -2416,8 +2368,6 @@ namespace DOL.GS
             m_armorResists[off + (eDamageType.Matter - eDamageType._FirstResist)] = matter;
             m_armorResists[off + (eDamageType.Energy - eDamageType._FirstResist)] = energy;
         }
-
-        #endregion
 
         /// <summary>
         /// Check if property belongs to all of specified types

@@ -43,8 +43,6 @@ namespace DOL.GS
             }
         }
 
-        #region Classic Crafting Overrides
-
         /// <summary>
         /// Check if the player is near the needed tools (forge, lathe, etc)
         /// </summary>
@@ -75,10 +73,6 @@ namespace DOL.GS
                 player.Out.SendUpdateCraftingSkills();
             }
         }
-
-        #endregion
-
-        #region Requirement check
 
         /// <summary>
         /// This function is called when player accept the combine
@@ -129,10 +123,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-
-        #region Apply magical effect
-
         /// <summary>
         /// Apply all needed magical bonus to the item
         /// </summary>
@@ -174,8 +164,6 @@ namespace DOL.GS
                 log.ErrorFormat("Alchemy crafting error: Item {0} was not an ItemUnique for player {1}, crafting changes not saved to DB!", item.Id_nb, player.Name);
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Get the maximum charge the item will have

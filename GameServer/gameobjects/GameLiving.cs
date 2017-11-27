@@ -46,7 +46,6 @@ namespace DOL.GS
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Combat
         /// <summary>
         /// Holds the AttackData object of last attack
         /// </summary>
@@ -69,8 +68,6 @@ namespace DOL.GS
         /// Holds the property for the result the last enemy
         /// </summary>
         public const string LAST_ENEMY_ATTACK_RESULT = "LastEnemyAttackResult";
-
-        #region enums
 
         /// <summary>
         /// The result of an attack
@@ -338,8 +335,6 @@ namespace DOL.GS
             GM,
             Other
         }
-
-        #endregion
 
         /// <summary>
         /// Can this living accept any item regardless of tradable or droppable?
@@ -1456,8 +1451,6 @@ namespace DOL.GS
             get { return 1.0; }
         }
 
-        #region XP array
-
         /// <summary>
         /// Holds pre calculated experience values of the living for special levels
         /// </summary>
@@ -1627,8 +1620,6 @@ namespace DOL.GS
             34,     // for level 49
             35,     // for level 50
         };
-
-        #endregion
 
         /// <summary>
         /// Checks whether object is grey con to this living
@@ -2120,7 +2111,6 @@ namespace DOL.GS
                     default: broadcast = false; break;
             }
 
-            #region Prevent Flight
             if (ad.Attacker is GamePlayer)
             {
                 GamePlayer attacker = ad.Attacker as GamePlayer;
@@ -2157,9 +2147,6 @@ namespace DOL.GS
                     }
                 }
             }
-            #endregion
-
-            #region controlled messages
 
             if (ad.Attacker is GameNPC)
             {
@@ -2268,8 +2255,6 @@ namespace DOL.GS
                     }
                 }
             }
-
-            #endregion
 
             // broadcast messages
             if (broadcast)
@@ -4491,8 +4476,6 @@ namespace DOL.GS
 
             double damageDealt = damageAmount + criticalAmount;
 
-            #region PVP DAMAGE
-
             // Is this a GamePlayer behind the source?
             if (source is GamePlayer || (source is GameNPC && (source as GameNPC).Brain is IControlledBrain && ((source as GameNPC).Brain as IControlledBrain).GetPlayerOwner() != null))
             {
@@ -4513,8 +4496,6 @@ namespace DOL.GS
                     }
                 }
             }
-
-            #endregion PVP DAMAGE
 
             if (source != null && source is GameNPC)
             {
@@ -5279,8 +5260,7 @@ namespace DOL.GS
             // pack active weapon slots value back
             m_visibleActiveWeaponSlots = (byte)(((leftHand & 0x0F) << 4) | (rightHand & 0x0F));
         }
-        #endregion
-        #region Property/Bonus/Buff/PropertyCalculator fields
+
         /// <summary>
         /// Array for property boni for abilities
         /// </summary>
@@ -5490,8 +5470,6 @@ namespace DOL.GS
             //          }
         }
 
-        #endregion
-        #region Stats, Resists
         /// <summary>
         /// The name of the states
         /// </summary>
@@ -5636,8 +5614,6 @@ namespace DOL.GS
             return Level;
         }
 
-        #endregion
-        #region Regeneration
         /// <summary>
         /// GameTimer used for restoring hp
         /// </summary>
@@ -5835,8 +5811,6 @@ namespace DOL.GS
                 ChangeHealth(this, eHealthChangeType.Regenerate, GetModified(eProperty.HealthRegenerationRate));
             }
 
-            #region PVP DAMAGE
-
             if (this is NecromancerPet)
             {
                 GamePlayer this_necro_pl = null;
@@ -5849,14 +5823,9 @@ namespace DOL.GS
                 }
             }
 
-            #endregion PVP DAMAGE
-
             // If we are fully healed, we stop the timer
             if (Health >= MaxHealth)
             {
-
-                #region PVP DAMAGE
-
                 if (this is NecromancerPet)
                 {
                     GamePlayer this_necro_pl = null;
@@ -5868,8 +5837,6 @@ namespace DOL.GS
                         DamageRvRMemory = 0;
                     }
                 }
-
-                #endregion PVP DAMAGE
 
                 // We clean all damagedealers if we are fully healed,
                 // no special XP calculations need to be done
@@ -5966,9 +5933,7 @@ namespace DOL.GS
 
             return 500 + Util.Random(EnduranceRegenerationPeriod);
         }
-        #endregion
 
-        #region Mana/Health/Endurance/Concentration/Delete
         /// <summary>
         /// Amount of mana
         /// </summary>
@@ -6182,8 +6147,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-        #region Speed/Heading/Target/GroundTarget/GuildName/SitState/Level
         /// <summary>
         /// The targetobject of this living
         /// This is a weak reference to a GameObject, which
@@ -6356,8 +6319,6 @@ namespace DOL.GS
             return skill.Level;
         }
 
-        #endregion
-        #region Movement
         /// <summary>
         /// The tick speed in X direction.
         /// </summary>
@@ -6520,9 +6481,6 @@ namespace DOL.GS
         {
             get { return false; }
         }
-
-        #endregion
-        #region Say/Yell/Whisper/Emote/Messages
 
         private bool m_isSilent = false;
 
@@ -6747,9 +6705,6 @@ namespace DOL.GS
             // ignore for livings
         }
 
-        #endregion
-        #region Item/Money
-
         /// <summary>
         /// Called when the living is about to get an item from someone
         /// else
@@ -6809,8 +6764,7 @@ namespace DOL.GS
             // call base
             return base.ReceiveMoney(source, money);
         }
-        #endregion
-        #region Inventory
+
         /// <summary>
         /// Represent the inventory of all living
         /// </summary>
@@ -6831,8 +6785,7 @@ namespace DOL.GS
                 m_inventory = value;
             }
         }
-        #endregion
-        #region Effects
+
         /// <summary>
         /// currently applied effects
         /// </summary>
@@ -6855,9 +6808,6 @@ namespace DOL.GS
         {
             return new GameEffectList(this);
         }
-
-        #endregion
-        #region Abilities
 
         /// <summary>
         /// Holds all abilities of the living (KeyName -> Ability)
@@ -7046,8 +6996,6 @@ namespace DOL.GS
             return list;
         }
 
-        #endregion Abilities
-
         /// <summary>
         /// Checks if living has ability to use items of this type
         /// </summary>
@@ -7174,8 +7122,6 @@ namespace DOL.GS
             }
         }
 
-        #region Broadcasting utils
-
         /// <summary>
         /// Broadcasts the living equipment to all players around
         /// </summary>
@@ -7196,10 +7142,6 @@ namespace DOL.GS
                 player.Out.SendLivingEquipmentUpdate(this);
             }
         }
-
-        #endregion
-
-        #region Region
 
         /// <summary>
         /// Creates the item in the world
@@ -7276,8 +7218,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-        #region Spell Cast
         /// <summary>
         /// Multiplier for melee and magic.
         /// </summary>
@@ -7450,8 +7390,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-        #region LoadCalculators
         /// <summary>
         /// Load the property calculations
         /// </summary>
@@ -7507,8 +7445,6 @@ namespace DOL.GS
                 return false;
             }
         }
-        #endregion
-        #region ControlledNpc
 
         private byte m_petCount = 0;
 
@@ -7587,8 +7523,6 @@ namespace DOL.GS
         {
         }
 
-        #endregion
-        #region Group
         /// <summary>
         /// Holds the group of this living
         /// </summary>
@@ -7615,7 +7549,6 @@ namespace DOL.GS
             get { return m_groupIndex; }
             set { m_groupIndex = value; }
         }
-        #endregion
 
         /// <summary>
         /// Handle event notifications.

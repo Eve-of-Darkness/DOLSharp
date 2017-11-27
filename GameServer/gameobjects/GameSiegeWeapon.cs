@@ -26,7 +26,6 @@ using DOL.GS.Keeps;
 
 namespace DOL.GS
 {
-    #region GameSiegeweapon
     /// <summary>
     /// Description résumée de GameSiegeWeapon.
     /// </summary>
@@ -57,7 +56,6 @@ namespace DOL.GS
         public const int TIME_TO_DECAY = 60 * 1000 * 3; // 3 min
         public const int DECAYPERIOD = 240000; // ms
 
-        #region enum
         public enum eState : byte
         {
             Inactive = 0x0,
@@ -78,8 +76,6 @@ namespace DOL.GS
             Release = 0x08,
         }
 
-        #endregion
-        #region properties
         private GameKeepHookPoint m_hookPoint;
 
         public GameKeepHookPoint HookPoint
@@ -201,8 +197,6 @@ namespace DOL.GS
             set { m_itemId = value; }
         }
 
-        #endregion
-        #region public methode
         public void TakeControl(GamePlayer player)
         {
             if (Owner != null && Owner != player)
@@ -467,8 +461,6 @@ namespace DOL.GS
             Owner.SalvageSiegeWeapon(this);
         }
 
-        #endregion
-        #region private methods
         private void BroadcastAnimation()
         {
             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
@@ -567,8 +559,6 @@ namespace DOL.GS
             BroadcastAnimation();
         }
 
-        #endregion
-        #region override function
         public override bool ReceiveItem(GameLiving source, DOL.Database.InventoryItem item)
         {
             // todo check if bullet
@@ -647,8 +637,6 @@ namespace DOL.GS
             return true;
         }
 
-        #endregion
-        #region decay
         public override void StartHealthRegeneration()
         {
             // don't regenerate health
@@ -697,8 +685,6 @@ namespace DOL.GS
             return DECAYPERIOD;
         }
 
-        #endregion
-
         private static SpellLine m_SiegeSpellLine;
 
         public static SpellLine SiegeSpellLine
@@ -715,8 +701,6 @@ namespace DOL.GS
         }
     }
 
-    #endregion
-    #region siegeTimer
     public class SiegeTimer : RegionAction
     {
         public enum eAction : byte
@@ -804,7 +788,6 @@ namespace DOL.GS
             }
         }
     }
-    #endregion
 }
 
 /* messages:

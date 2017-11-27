@@ -74,8 +74,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
-
             // item db check
             RecruitsQuiltedBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("k109_recruits_quilted_boots");
             if (RecruitsQuiltedBoots == null)
@@ -221,7 +219,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(RecruitsStuddedBoots);
             }
-            #endregion
 
             Level = 2;
             QuestGiver = LadyGrynoch;
@@ -247,8 +244,6 @@ namespace DOL.GS.Quests.Albion
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Lady Grynoch", eRealm.Albion);
 
@@ -291,11 +286,8 @@ namespace DOL.GS.Quests.Albion
                 LadyGrynoch = npcs[0];
             }
 
-            #endregion
-            #region defineAreas
             Burial_Tomb_Area = WorldMgr.GetRegion(Burial_Tomb.RegionID).AddArea(new Area.Circle(string.Empty, Burial_Tomb.X, Burial_Tomb.Y, Burial_Tomb.Z, 200));
             Burial_Tomb_Area.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterBurialTombArea));
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

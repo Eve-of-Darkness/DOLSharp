@@ -55,8 +55,6 @@ namespace DOL.GS.Commands
 
             switch (args[1])
             {
-
-                    #region checkappeal cancel
                 case "remove":
                 case "delete":
                 case "cancel":
@@ -93,8 +91,7 @@ namespace DOL.GS.Commands
                         AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client.Account.Language, "Scripts.Players.Appeal.DoNotHaveAppeal"));
                         break;
                     }
-                    #endregion checkappeal cancel
-                    #region checkappeal view
+
                 case "display":
                 case "show":
                 case "list":
@@ -139,8 +136,6 @@ namespace DOL.GS.Commands
                         DisplaySyntax(client);
                         return;
                     }
-                    #endregion checkappeal view
-
             }
         }
     }

@@ -105,7 +105,6 @@ namespace DOL.GS.Commands
             {
                 switch (args[1].ToLower())
                 {
-                        #region Blank
                     case "blank":
                         {
                             ItemTemplate newTemplate = new ItemTemplate();
@@ -124,8 +123,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion Blank
-                        #region Scroll
+
                     case "scroll":
                         {
                             WorldInventoryItem scroll = ArtifactMgr.CreateScroll(args[2], Convert.ToInt16(args[3]));
@@ -143,8 +141,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion Scroll
-                        #region Classes
+
                     case "classes":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -165,8 +162,7 @@ namespace DOL.GS.Commands
                             item.AllowedClasses = args[2].Trim();
                             break;
                         }
-                        #endregion
-                        #region Create
+
                     case "create":
                         {
                             ItemTemplate template = GameServer.Database.FindObjectByKey<ItemTemplate>(args[2]);
@@ -208,8 +204,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion Create
-                        #region Count
+
                     case "count":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -246,8 +241,7 @@ namespace DOL.GS.Commands
                             client.Player.UpdateEncumberance();
                             break;
                         }
-                        #endregion Count
-                        #region MaxCount
+
                     case "maxcount":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -273,8 +267,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion MaxCount
-                        #region PackSize
+
                     case "packsize":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -300,8 +293,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion PackSize
-                        #region Info
+
                     case "info":
                         {
                             ItemTemplate obj = GameServer.Database.FindObjectByKey<ItemTemplate>(args[2]);
@@ -317,8 +309,7 @@ namespace DOL.GS.Commands
                             client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Item.Info.Informations", obj.Id_nb), objectInfo);
                             break;
                         }
-                        #endregion Info
-                        #region Model
+
                     case "model":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -350,8 +341,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion Model
-                        #region Extension
+
                     case "extension":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -389,8 +379,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion Extension
-                        #region Color
+
                     case "color":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -428,8 +417,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion Color
-                        #region Effect
+
                     case "effect":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -461,8 +449,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion Effect
-                        #region Type
+
                     case "type":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -489,8 +476,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Type
-                        #region Object
+
                     case "object":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -517,8 +503,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Object
-                        #region Hand
+
                     case "hand":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -545,8 +530,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Hand
-                        #region DamageType
+
                     case "damagetype":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -573,8 +557,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion DamageType
-                        #region Name
+
                     case "name":
                         {
                             string name = args[2];
@@ -601,8 +584,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Name
-                        #region Description
+
                     case "description":
                         {
                             string desc = args[2];
@@ -629,8 +611,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Name
-                        #region CrafterName
+
                     case "craftername":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -658,8 +639,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion CrafterName
-                        #region Emblem
+
                     case "emblem":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -697,8 +677,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion Emblem
-                        #region Level
+
                     case "level":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -725,8 +704,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Level
-                        #region Price
+
                     case "price":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -753,8 +731,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Price
-                        #region Condition
+
                     case "condition":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -790,8 +767,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Condition
-                        #region Durability
+
                     case "durability":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -827,8 +803,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Durability
-                        #region Quality
+
                     case "quality":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -856,8 +831,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Quality
-                        #region Bonus
+
                     case "bonus":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -885,8 +859,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Bonus
-                        #region mBonus
+
                     case "mbonus":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1035,8 +1008,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion mBonus
-                        #region Weight
+
                     case "weight":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1063,8 +1035,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Weight
-                        #region DPS_AF - DPS - AF
+
                     case "dps_af":
                     case "dps":
                     case "af":
@@ -1093,8 +1064,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion DPS_AF - DPS - AF
-                        #region SPD_ABS - SPD - ABS
+
                     case "spd_abs":
                     case "spd":
                     case "abs":
@@ -1123,8 +1093,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion SPD_ABS - SPD - ABS
-                        #region IsDropable
+
                     case "isdropable":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1150,8 +1119,7 @@ namespace DOL.GS.Commands
                             item.IsDropable = Convert.ToBoolean(args[2]);
                             break;
                         }
-                        #endregion IsDropable
-                        #region IsPickable
+
                     case "ispickable":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1177,8 +1145,7 @@ namespace DOL.GS.Commands
                             item.IsPickable = Convert.ToBoolean(args[2]);
                             break;
                         }
-                        #endregion IsPickable
-                        #region IsNotLosingDur
+
                     case "isnotlosingdur":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1204,8 +1171,7 @@ namespace DOL.GS.Commands
                             item.IsNotLosingDur = Convert.ToBoolean(args[2]);
                             break;
                         }
-                        #endregion IsNotLosingDur
-                        #region IsIndestructible
+
                     case "isindestructible":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1231,8 +1197,7 @@ namespace DOL.GS.Commands
                             item.IsIndestructible = Convert.ToBoolean(args[2]);
                             break;
                         }
-                        #endregion IsIndestructible
-                        #region IsTradable
+
                     case "istradable":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1258,8 +1223,7 @@ namespace DOL.GS.Commands
                             item.IsTradable = Convert.ToBoolean(args[2]);
                             break;
                         }
-                        #endregion IsTradable
-                        #region CanDropAsLoot
+
                     case "candropasloot":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1285,8 +1249,7 @@ namespace DOL.GS.Commands
                             item.CanDropAsLoot = Convert.ToBoolean(args[2]);
                             break;
                         }
-                        #endregion CanDropAsLoot
-                        #region Spell
+
                     case "spell":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1324,8 +1287,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Spell
-                        #region Spell1
+
                     case "spell1":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1363,8 +1325,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Spell1
-                        #region Proc
+
                     case "proc":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1391,8 +1352,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Proc
-                        #region Proc1
+
                     case "proc1":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1419,8 +1379,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Proc1
-                        #region ProcChance
+
                     case "procchance":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1447,8 +1406,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion ProcChance
-                        #region Poison
+
                     case "poison":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1486,8 +1444,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Poison
-                        #region Realm
+
                     case "realm":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1513,8 +1470,7 @@ namespace DOL.GS.Commands
                             item.Realm = int.Parse(args[2]);
                             break;
                         }
-                        #endregion Realm
-                        #region Level Required
+
                     case "levelrequired":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1542,8 +1498,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Level Required
-                        #region Bonus Level
+
                     case "bonuslevel":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1571,8 +1526,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Bonus Level
-                        #region ClassType
+
                     case "classtype":
                         {
                             string classType = args[2];
@@ -1594,8 +1548,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion ClassType
-                        #region PackageID
+
                     case "packageid":
                         {
                             string packageID = args[2];
@@ -1617,8 +1570,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion PackageID
-                        #region Flags
+
                     case "flags":
                         {
                             int flags = Convert.ToInt32(args[2]);
@@ -1640,8 +1592,7 @@ namespace DOL.GS.Commands
                             client.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
                             break;
                         }
-                        #endregion Flags
-                        #region Salvage
+
                     case "salvageid":
                         {
                             int salvageID = Convert.ToInt32(args[2]);
@@ -1775,8 +1726,7 @@ namespace DOL.GS.Commands
                             client.Out.SendCustomTextWindow("Salvage info for " + item.Name, list);
                             break;
                         }
-                        #endregion Flags
-                        #region Update
+
                     case "update":
                     case "updatetemplate":
                         {
@@ -1796,8 +1746,7 @@ namespace DOL.GS.Commands
                             updateAllowed(item, client);
                             break;
                         }
-                        #endregion Update
-                        #region SaveUnique
+
                     case "saveunique":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -1857,8 +1806,7 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion SaveUnique
-                        #region Save / AddUnique
+
                     case "save":
                     case "addunique":
                         {
@@ -1992,8 +1940,7 @@ namespace DOL.GS.Commands
                         }
 
                         break;
-                        #endregion Save / AddUnique
-                        #region FindID
+
                     case "findid":
                         {
                             string name = string.Join(" ", args, 2, args.Length - 2);
@@ -2009,8 +1956,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion FindID
-                        #region FindName
+
                     case "findname":
                         {
                             string name = string.Join(" ", args, 2, args.Length - 2);
@@ -2026,8 +1972,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion FindName
-                        #region Load
+
                     case "load":
                         {
                             if (GameServer.Database.UpdateInCache<ItemTemplate>(args[2]))
@@ -2043,8 +1988,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion Load
-                        #region LoadPackage
+
                     case "loadpackage":
                         {
                             if (args[2] != string.Empty)
@@ -2079,16 +2023,14 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                        #endregion LoadPackage
-                        #region LoadArtifacts
+
                     case "loadartifacts":
                         {
                             DisplayMessage(client, "{0} Artifacts re-loaded.", DOL.GS.ArtifactMgr.LoadArtifacts());
                         }
 
                         break;
-                        #endregion LoadArtifacts
-                        #region LoadSpells
+
                     case "loadspells":
                         {
                             int slot = (int)eInventorySlot.LastBackpack;
@@ -2117,7 +2059,6 @@ namespace DOL.GS.Commands
                             LoadSpell(client, item.ProcSpellID1);
                             break;
                         }
-                        #endregion LoadSpells
                 }
             }
             catch

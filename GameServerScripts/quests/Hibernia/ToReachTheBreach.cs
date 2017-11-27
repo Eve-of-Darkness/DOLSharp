@@ -76,7 +76,6 @@ namespace DOL.GS.Quests.Hibernia
 
         private void Init()
         {
-            #region defineItems
             RecruitsIntelligentBelt = GameServer.Database.FindObjectByKey<ItemTemplate>("RecruitsIntelligentBelt");
             if (RecruitsIntelligentBelt == null)
             {
@@ -175,7 +174,6 @@ namespace DOL.GS.Quests.Hibernia
                 RecruitsPiousBelt.Bonus4Type = (int)eProperty.MaxHealth;
                 RecruitsPiousBelt.IsDropable = false;
             }
-            #endregion
 
             Level = 3;
             QuestGiver = Richael;
@@ -201,8 +199,6 @@ namespace DOL.GS.Quests.Hibernia
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Richael", eRealm.Hibernia);
 
@@ -250,11 +246,8 @@ namespace DOL.GS.Quests.Hibernia
                 Richael = npcs[0];
             }
 
-            #endregion
-            #region defineAreas
             Demons_Breach_Area = WorldMgr.GetRegion(Demons_Breach.RegionID).AddArea(new Area.Circle(string.Empty, Demons_Breach.X, Demons_Breach.Y, Demons_Breach.Z, 200));
             Demons_Breach_Area.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterDemonBreachArea));
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

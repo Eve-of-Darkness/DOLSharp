@@ -48,7 +48,6 @@ namespace DOL.GS.Commands
 
             switch (args[1].ToLower())
             {
-                #region Create
                 case "create":
                     {
                         if (args.Length < 4)
@@ -95,8 +94,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion Create
-                #region ChangePassword
+
                 case "changepassword":
                     {
                         if (args.Length < 4)
@@ -123,8 +121,7 @@ namespace DOL.GS.Commands
                     }
 
                     break;
-                #endregion ChangePassword
-                #region Delete
+
                 case "delete":
                     {
                         if (args.Length < 3)
@@ -151,8 +148,7 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "AdminCommands.Account.AccountDeleted", acc.Name));
                         return;
                     }
-                #endregion Delete
-                #region DeleteCharacter
+
                 case "deletecharacter":
                     {
                         if (args.Length < 3)
@@ -179,8 +175,7 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "AdminCommands.Account.CharacterDeleted", cha.Name));
                         return;
                     }
-                #endregion DeleteCharacter
-                #region MoveCharacter
+
                 case "movecharacter":
                     {
                         if (args.Length < 4)
@@ -262,8 +257,7 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "AdminCommands.Account.CharacterMovedToAccount", cha.Name, acc.Name));
                         return;
                     }
-                #endregion MoveCharacter
-                #region Status
+
                 case "status":
                     {
                         if (args.Length < 4)
@@ -296,8 +290,7 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion Status
-                #region Unban
+
                 case "unban":
                     {
                         if (args.Length < 3)
@@ -330,8 +323,7 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, "Account " + accountname + " unbanned!");
                         return;
                     }
-                #endregion Unban
-                #region AccountName
+
                 case "accountname":
                     {
                         if (args.Length < 3)
@@ -354,7 +346,6 @@ namespace DOL.GS.Commands
 
                         return;
                     }
-                #endregion AccountName
             }
         }
 

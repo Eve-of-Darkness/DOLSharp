@@ -72,8 +72,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
-
             // item db check
             RecruitsShortSword = GameServer.Database.FindObjectByKey<ItemTemplate>("k109_recruits_short_sword");
             if (RecruitsShortSword == null)
@@ -272,7 +270,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(RecruitsStaff);
             }
-            #endregion
 
             ItemTemplate rhedasword = new ItemTemplate();
             rhedasword.Weight = 0;
@@ -307,8 +304,6 @@ namespace DOL.GS.Quests.Albion
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Rheda", eRealm.Albion);
 
@@ -354,8 +349,6 @@ namespace DOL.GS.Quests.Albion
             {
                 Rheda = npcs[0];
             }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

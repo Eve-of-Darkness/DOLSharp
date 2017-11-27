@@ -94,8 +94,6 @@ namespace DOL.GS.PacketHandler
             _udpSendBuffer = client.Server.AcquirePacketBuffer();
         }
 
-        #region Last Packets
-
         /// <summary>
         /// The count of last sent/received packets to keep.
         /// </summary>
@@ -134,8 +132,6 @@ namespace DOL.GS.PacketHandler
                 return _lastPackets.ToArray();
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Gets the encoding for this processor
@@ -300,8 +296,6 @@ namespace DOL.GS.PacketHandler
             _client.Server.ReleasePacketBuffer(tcp);
             _client.Server.ReleasePacketBuffer(udp);
         }
-
-        #region TCP
 
         /// <summary>
         /// Holds the TCP send buffer
@@ -549,10 +543,6 @@ namespace DOL.GS.PacketHandler
             SendTCP((byte[])packet.GetBuffer().Clone());
         }
 
-        #endregion
-
-        #region UDP
-
         /// <summary>
         /// Holds the UDP send buffer
         /// </summary>
@@ -743,8 +733,6 @@ namespace DOL.GS.PacketHandler
         {
             SendUDP((byte[])packet.GetBuffer().Clone(), false);
         }
-
-        #endregion
 
         /// <summary>
         /// Called when the client receives bytes

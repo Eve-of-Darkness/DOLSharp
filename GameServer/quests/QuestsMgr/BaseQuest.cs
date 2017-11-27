@@ -302,8 +302,6 @@ namespace DOL.GS.Quests
             return 0;
         }
 
-        #region World Item Interaction
-
         protected struct QuestStepInteraction
         {
             public string ObjectName { get; set; }
@@ -378,8 +376,5 @@ namespace DOL.GS.Quests
             // this is needed in order to support both Base and Reward quests
             Log.Error("Override OnObjectInteract to advance goal progress");
         }
-
-        #endregion World Item Interaction
-
     }
 }

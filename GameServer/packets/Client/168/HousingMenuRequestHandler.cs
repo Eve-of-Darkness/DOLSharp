@@ -23,8 +23,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.HouseMenuRequest, "Handles housing menu requests", eClientStatus.PlayerInGame)]
     public class HousingMenuRequestHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int housenumber = packet.ReadShort();
@@ -141,7 +139,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                     break;
             }
         }
-
-        #endregion
     }
 }

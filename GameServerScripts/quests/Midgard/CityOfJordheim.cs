@@ -161,8 +161,6 @@ namespace DOL.GS.Quests.Midgard
    * Just examples, do anything you like and feel comfortable with :)
    */
 
-            #region defineNPCs
-
             dalikor = GetDalikor();
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Jarl Yuliwyf", eRealm.Midgard);
@@ -238,10 +236,6 @@ namespace DOL.GS.Quests.Midgard
             {
                 harlfug = npcs[0];
             }
-
-            #endregion
-
-            #region defineItems
 
             ticketToMularn = CreateTicketTo("Mularn", "hs_src_mularn");
 
@@ -489,8 +483,6 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(recruitsBracer);
                 }
             }
-
-            #endregion
 
             /* Now we add some hooks to the npc we found.
             * Actually, we want to know when a player interacts with him.

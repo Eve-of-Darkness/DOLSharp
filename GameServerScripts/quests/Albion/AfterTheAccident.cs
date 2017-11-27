@@ -62,8 +62,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
-
             // Recruit's Necklace of Might
             RecruitsNecklaceofMight = GameServer.Database.FindObjectByKey<ItemTemplate>("recruits_necklace_of_might");
             if (RecruitsNecklaceofMight == null)
@@ -184,8 +182,6 @@ namespace DOL.GS.Quests.Albion
                 GameServer.Database.AddObject(PunySkeletonSkull);
             }
 
-            #endregion
-
             QuestGiver = SirPrescott;
             Rewards.Experience = 22;
             Rewards.MoneyPercent = 10;
@@ -209,8 +205,6 @@ namespace DOL.GS.Quests.Albion
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Sir Prescott", eRealm.Albion);
 
@@ -263,8 +257,6 @@ namespace DOL.GS.Quests.Albion
             {
                 SirPrescott = npcs[0];
             }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

@@ -106,8 +106,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
             npcs = WorldMgr.GetObjectsByName<GameNPC>("Pedra", (eRealm)2);
             if (npcs.Length == 0)
@@ -199,10 +198,6 @@ namespace DOL.GS.Quests.Midgard
                 Kedra = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
         marinefungus = GameServer.Database.FindObjectByKey<ItemTemplate>("marinefungus");
             if (marinefungus == null)
             {
@@ -282,14 +277,6 @@ namespace DOL.GS.Quests.Midgard
                 }
             }
 
-            #endregion
-
-            #region defineAreas
-
-        #endregion
-
-        #region defineQuestParts
-
         QuestBuilder builder = QuestMgr.GetBuilder(typeof(badfood));
             QuestBehaviour a;
             a = builder.CreateBehaviour(Pedra,-1);
@@ -343,9 +330,7 @@ namespace DOL.GS.Quests.Midgard
             a.AddAction(eActionType.TakeItem,marinefungus,null);
             AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             Pedra.AddQuestToGive(typeof(badfood));

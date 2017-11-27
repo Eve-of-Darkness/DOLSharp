@@ -45,7 +45,6 @@ namespace DOL.GS.Commands
 
             switch (args[1])
             {
-                #region Single
                 case "single":
                     {
                         if (args.Length < 3)
@@ -69,9 +68,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Single
 
-                #region Single Account
                 case "singleaccount":
                     {
                         if (args.Length < 3)
@@ -95,9 +92,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion
 
-                #region Remove
                 case "remove":
                     {
                         if (args.Length < 2)
@@ -127,9 +122,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Remove
 
-                #region Remove Account
                 case "removeaccount":
                     {
                         if (args.Length < 2)
@@ -159,9 +152,7 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Remove
 
-                #region Default
                 default:
                     {
                         uint plvl = 1;
@@ -195,7 +186,6 @@ namespace DOL.GS.Commands
 
                         break;
                     }
-                #endregion Default
             }
         }
     }

@@ -41,8 +41,6 @@ namespace DOL.GS.Collections
         private int BUCKET_NUMBER = 6;
         private int BUCKET_LIST_SIZE = 3;
 
-        #region Constructors
-
         public Hashtable() {
             Init();
         }
@@ -93,8 +91,6 @@ namespace DOL.GS.Collections
 
             Init();
         }
-
-        #endregion
 
         private void Init() {
             int totalSlots = BUCKET_NUMBER * BUCKET_LIST_SIZE;
@@ -390,7 +386,6 @@ namespace DOL.GS.Collections
             return new DictionaryEntryEnumerator(this);
         }
 
-        #region Iterators
         private class DictionaryEntryEnumerator : IEnumerator {
             protected Hashtable table = null;
             protected int currentBucketNumber = 0;
@@ -447,7 +442,5 @@ namespace DOL.GS.Collections
                 }
             }
         }
-
-        #endregion
     }
 }

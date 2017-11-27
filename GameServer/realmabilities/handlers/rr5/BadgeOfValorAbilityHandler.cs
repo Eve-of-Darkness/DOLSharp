@@ -12,7 +12,6 @@ namespace DOL.GS.RealmAbilities
 
         public override void Execute(GameLiving living)
         {
-            #region preCheck
             if (CheckPreconditions(living, DEAD | SITTING | MEZZED | STUNNED))
             {
                 return;
@@ -24,8 +23,6 @@ namespace DOL.GS.RealmAbilities
 
                 return;
             }
-
-            #endregion
 
             // send spelleffect
             foreach (GamePlayer visPlayer in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))

@@ -59,7 +59,6 @@ namespace DOL.GS.Commands
 
             switch (args[1])
             {
-                #region Create
                 case "create":
                     {
                         if (args.Length < 3)
@@ -161,8 +160,7 @@ namespace DOL.GS.Commands
                     } 
 
 break;
-                #endregion Create
-                #region Move
+
                 case "move":
                     {
                         GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
@@ -192,8 +190,7 @@ break;
                     } 
 
 break;
-                #endregion
-                #region Rotate
+
                 case "rotate":
                     {
                         try
@@ -222,8 +219,7 @@ break;
                     } 
 
 break;
-                #endregion
-                #region Skin
+
                 case "skin":
                     {
                         if (args.Length < 3)
@@ -269,8 +265,7 @@ break;
                     } 
 
 break;
-                #endregion Skin
-                #region Delete
+
                 case "delete":
                     {
                         GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
@@ -287,8 +282,7 @@ break;
                     } 
 
 break;
-                #endregion Delete
-                #region Save
+
                 case "save":
                     {
                         GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
@@ -309,8 +303,7 @@ break;
                     } 
 
 break;
-                #endregion Save
-                #region Reload
+
                 case "reload":
                     {
 
@@ -336,14 +329,12 @@ break;
                         client.Out.SendMessage("Component Reloaded", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         break;
                     }
-                #endregion Reload
-                #region Default
+
                 default:
                     {
                         DisplaySyntax(client);
                         return;
                     }
-                #endregion Default
             }
         }
 

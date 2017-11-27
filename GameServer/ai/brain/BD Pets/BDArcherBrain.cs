@@ -38,8 +38,6 @@ namespace DOL.AI.Brain
         /// <param name="owner"></param>
         public BDArcherBrain(GameLiving owner) : base(owner) { }
 
-        #region AI
-
         /// <summary>
         /// No Abilities or spells
         /// </summary>
@@ -56,7 +54,5 @@ namespace DOL.AI.Brain
             Body.SwitchWeapon(GameLiving.eActiveWeaponSlot.Distance);
             base.Attack(target);
         }
-
-        #endregion
     }
 }

@@ -11,8 +11,6 @@ namespace DOL.AI.Brain
 
         private GameLiving Body { get; set; }
 
-        #region IAttackBehaviour Members
-
         public void Attack(GameObject target)
         {
             Body.StartAttack(target);
@@ -22,7 +20,5 @@ namespace DOL.AI.Brain
         {
             Body.StopAttack();
         }
-
-        #endregion
     }
 }

@@ -70,8 +70,6 @@ namespace DOL.GS.Quests.Albion
 
         private void Init()
         {
-            #region defineItems
-
             // item db check - All my quests with Recruit newbie items make a seperate
             // item then the older quests.
             RecruitsQuiltedPants = GameServer.Database.FindObjectByKey<ItemTemplate>("k109_recruits_quilted_pants");
@@ -225,7 +223,6 @@ namespace DOL.GS.Quests.Albion
                 // line if you rather not modify your database
                     GameServer.Database.AddObject(RecruitsStuddedLegs);
             }
-            #endregion
 
             ItemTemplate spriggarnBlood = new ItemTemplate();
             spriggarnBlood.Weight = 0;
@@ -258,8 +255,6 @@ namespace DOL.GS.Quests.Albion
             {
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
-
-            #region defineNPCS
 
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "Alb.WhenBloodSpeaks.ScriptLoaded.Text1"), eRealm.Albion);
 
@@ -303,8 +298,6 @@ namespace DOL.GS.Quests.Albion
             {
                 MasterKless = npcs[0];
             }
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));

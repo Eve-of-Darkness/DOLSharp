@@ -23,8 +23,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.HouseDecorationRequest, "Handles housing decoration request", eClientStatus.PlayerInGame)]
     public class HousingDecorationRotateRequestHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             ushort housenumber = packet.ReadShort();
@@ -62,7 +60,5 @@ namespace DOL.GS.PacketHandler.Client.v168
             pak.WriteByte(0x01);
             client.Out.SendTCP(pak);
         }
-
-        #endregion
     }
 }

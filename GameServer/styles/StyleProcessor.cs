@@ -503,7 +503,6 @@ namespace DOL.GS.Styles
                         }
                     }
 
-                    #region StyleProcs
                     if (attackData.Style.Procs.Count > 0)
                     {
                         ISpellHandler effect;
@@ -569,9 +568,7 @@ namespace DOL.GS.Styles
                             }
                         }
                     }
-                    #endregion StyleProcs
 
-                    #region Animation
                     if (weapon != null)
                     {
                         attackData.AnimationId = (weapon.Hand != 1) ? attackData.Style.Icon : attackData.Style.TwoHandAnimation; // special animation for two-hand
@@ -584,7 +581,6 @@ namespace DOL.GS.Styles
                     {
                         attackData.AnimationId = attackData.Style.Icon;
                     }
-                    #endregion Animation
 
                     return true;
                 }

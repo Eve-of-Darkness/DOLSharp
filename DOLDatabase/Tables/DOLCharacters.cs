@@ -1873,8 +1873,6 @@ namespace DOL.Database
             set { m_playerTitleType = value; Dirty = true; }
         }
 
-        #region Statistics
-
         private int m_killsAlbionPlayers;
         private int m_killsMidgardPlayers;
         private int m_killsHiberniaPlayers;
@@ -2052,8 +2050,6 @@ namespace DOL.Database
             get { return m_killsEpicBoss; }
             set { m_killsEpicBoss = value; Dirty = true; }
         }
-
-        #endregion
 
         /// <summary>
         /// can gain experience points

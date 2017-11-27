@@ -38,8 +38,6 @@ namespace DOL.GS
         /// </summary>
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region members
-
         /// <summary>
         /// Dictionary to keep players and last CheckLos Ticks.
         /// </summary>
@@ -129,10 +127,6 @@ namespace DOL.GS
         /// Timer for pendings routines
         /// </summary>
         private System.Timers.Timer m_timerPending;
-
-        #endregion
-
-        #region params
 
         /// <summary>
         /// Default LoS Check Timeout in ms
@@ -334,10 +328,6 @@ namespace DOL.GS
         /// </summary>
         public const ushort LOSMGR_DEBUG_DEBUG = 3;
 
-        #endregion
-
-        #region constructor
-
         public LosCheckMgr()
         {
             int rndRange = LOSMGR_CLEANUP_FREQUENCY >> 3;
@@ -372,10 +362,6 @@ namespace DOL.GS
                 m_timerPending.Close();
             }
         }
-
-        #endregion
-
-        #region non-blocking LoS Checker
 
         /// <summary>
         /// Check LoS and wait for a reply before returning
@@ -675,10 +661,6 @@ namespace DOL.GS
 
             // Then wait for notify...
         }
-
-        #endregion
-
-        #region response handler
 
         /// <summary>
         /// LoS Responses are handled through this method
@@ -988,10 +970,6 @@ namespace DOL.GS
             ResponsesCache[new Tuple<GameObject, GameObject>(target, source)] = cacheValue;
         }
 
-        #endregion
-
-        #region utils
-
         /// <summary>
         /// Check if Object is from Gameplayer
         /// Depending on Serverproperties ALWAYS_CHECK_PET_LOS, Player Pets will be considered Mob or Players.
@@ -1274,9 +1252,6 @@ namespace DOL.GS
             // we don't have valid content
             throw new LosUnavailableException();
         }
-        #endregion
-
-        #region Cleanups
 
         /// <summary>
         /// Cleanup Routine called by timer.
@@ -1368,10 +1343,6 @@ namespace DOL.GS
             }
         }
 
-        #endregion
-
-        #region Pending Timed Checks
-
         /// <summary>
         /// Restart Pending Queries
         /// </summary>
@@ -1417,11 +1388,7 @@ namespace DOL.GS
                 }
             }
         }
-
-        #endregion
     }
-
-    #region Los Data Subclass
 
     /// <summary>
     /// Los Data container.
@@ -1492,18 +1459,12 @@ namespace DOL.GS
         }
     }
 
-    #endregion
-
-    #region ExceptionHandlers
     /// <summary>
     /// Object thrown when something went wrong in los checks.
     /// </summary>
     public class LosUnavailableException : Exception
     {
     }
-    #endregion
-
-    #region losResponse handler
 
     /// <summary>
     /// Default Class implementing IDOLEventHandler with a callback to replace old Los Check callbacks.
@@ -1537,6 +1498,4 @@ namespace DOL.GS
     }
 
     public delegate void LosMgrResponse(GamePlayer checker, GameObject source, GameObject target, bool losOK, EventArgs args, PropertyCollection tempProperties);
-
-    #endregion
 }

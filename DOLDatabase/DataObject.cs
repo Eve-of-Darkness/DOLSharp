@@ -126,8 +126,6 @@ namespace DOL.Database
             set { Dirty = true; }
         }
 
-        #region ICloneable Member
-
         /// <summary>
         /// Clone the current object and return the copy
         /// </summary>
@@ -138,8 +136,6 @@ namespace DOL.Database
             obj.ObjectId = IDGenerator.GenerateID();
             return obj;
         }
-
-        #endregion
 
         public override string ToString()
         {

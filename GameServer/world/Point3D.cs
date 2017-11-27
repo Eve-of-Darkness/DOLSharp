@@ -60,8 +60,6 @@ namespace DOL.GS
         {
         }
 
-        #region IPoint3D Members
-
         /// <summary>
         /// Z coord of this point
         /// </summary>
@@ -72,8 +70,6 @@ namespace DOL.GS
             base.Clear();
             Z = 0;
         }
-
-        #endregion
 
         /// <summary>
         /// Creates the string representation of this point

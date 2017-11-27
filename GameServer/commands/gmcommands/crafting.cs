@@ -45,7 +45,6 @@ namespace DOL.GS.Commands
 
             try
             {
-                #region List
                 if (args[1].ToLower() == "list")
                 {
                     List<string> list = new List<string>();
@@ -61,9 +60,6 @@ namespace DOL.GS.Commands
                     client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Crafting.SkillDescription"), list);
                     return;
                 }
-                #endregion List
-
-                #region Salvage
 
                 if (args[1].ToLower() == "salvageinfo")
                 {
@@ -201,8 +197,6 @@ namespace DOL.GS.Commands
                     return;
                 }
 
-                #endregion Salvage
-
                 GamePlayer target = null;
                 if ((client.Player.TargetObject != null) && (client.Player.TargetObject is GamePlayer))
                 {
@@ -216,7 +210,6 @@ namespace DOL.GS.Commands
 
                 switch (args[1].ToLower())
                 {
-                    #region Add
                     case "add":
                         {
                             eCraftingSkill craftingSkillID = eCraftingSkill.NoCrafting;
@@ -255,8 +248,7 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                    #endregion Add
-                    #region Change
+
                     case "change":
                         {
                             eCraftingSkill craftingSkillID = eCraftingSkill.NoCrafting;
@@ -306,14 +298,12 @@ namespace DOL.GS.Commands
 
                             break;
                         }
-                    #endregion Change
-                    #region Default
+
                     default:
                         {
                             DisplaySyntax(client);
                             break;
                         }
-                    #endregion Default
                 }
             }
             catch

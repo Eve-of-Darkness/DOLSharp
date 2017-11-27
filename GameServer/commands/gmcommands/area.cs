@@ -40,7 +40,6 @@ namespace DOL.GS.Commands
 
             switch (args[1].ToLower())
             {
-                #region Create
                 case "create":
                     {
                         if (args.Length != 7)
@@ -92,14 +91,12 @@ namespace DOL.GS.Commands
                         DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "GMCommands.Area.AreaCreated", area.Description, area.X, area.Z, area.Radius, area.CanBroadcast.ToString(), area.Sound));
                         break;
                     }
-                #endregion Create
-                #region Default
+
                 default:
                     {
                         DisplaySyntax(client);
                         break;
                     }
-                #endregion Default
             }
         }
     }

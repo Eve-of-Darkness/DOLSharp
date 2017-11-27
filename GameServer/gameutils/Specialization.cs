@@ -101,8 +101,6 @@ namespace DOL.GS
             get { return false; }
         }
 
-        #region Getters
-
         /// <summary>
         /// Default getter for SpellLines
         /// Retrieve spell line depending on advanced class and class hint
@@ -395,7 +393,6 @@ namespace DOL.GS
         {
             return Level;
         }
-        #endregion
     }
 
     public class UntrainableSpecialization : Specialization

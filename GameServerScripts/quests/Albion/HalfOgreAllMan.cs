@@ -155,8 +155,6 @@ namespace DOL.GS.Quests.Albion
             * Just examples, do anything you like and feel comfortable with :)
             */
 
-            #region defineNPCS
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Madissair", eRealm.Albion);
             if (npcs.Length == 0)
             {
@@ -336,10 +334,6 @@ namespace DOL.GS.Quests.Albion
                 serawen = npcs[0];
             }
 
-            #endregion
-
-            #region defineItems
-
             // item db check
             sealedLovePoem = GameServer.Database.FindObjectByKey<ItemTemplate>("sealed_love_poem");
             if (sealedLovePoem == null)
@@ -437,8 +431,6 @@ namespace DOL.GS.Quests.Albion
                     // line if you rather not modify your database
                         GameServer.Database.AddObject(adnilsMagicalOrb);
                 }
-
-                #endregion
 
                 /* Now we add some hooks to the npc we found.
                 * Actually, we want to know when a player interacts with him.

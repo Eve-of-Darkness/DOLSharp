@@ -25,9 +25,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.UseSkill, "Handles Player Use Skill Request.", eClientStatus.PlayerInGame)]
     public class UseSkillHandler : IPacketHandler
     {
-
-        #region IPacketHandler Members
-
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
             int flagSpeedData = packet.ReadShort();
@@ -36,10 +33,6 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             new UseSkillAction(client.Player, flagSpeedData, index, type).Start(1);
         }
-
-        #endregion
-
-        #region Nested type: UseSkillAction
 
         /// <summary>
         /// Handles player use skill actions
@@ -190,7 +183,5 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
         }
-
-        #endregion
     }
 }

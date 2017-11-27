@@ -70,8 +70,6 @@ namespace DOL.GS.Keeps
             m_hookpointTimer = new HookpointTimer(this, Component);
         }
 
-        #region properties
-
         // id <0x20=red,>0x20 - blue,>0x40 - green and yellow: 0x41(ballista),0x61(trebuchet),0x81(cauldron)
         private int m_index;
 
@@ -119,8 +117,6 @@ namespace DOL.GS.Keeps
                 }
             }
         }
-
-        #endregion
 
         private void ObjectDie(DOLEvent e, object sender, EventArgs arguments)
         {

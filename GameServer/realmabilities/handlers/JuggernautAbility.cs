@@ -24,7 +24,6 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            #region preCheck
             if (!living.IsAlive)
             {
                 player.Out.SendMessage("You cannot use this ability while dead!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -74,8 +73,6 @@ namespace DOL.GS.RealmAbilities
 
                 return;
             }
-
-            #endregion
 
             if (ServerProperties.Properties.USE_NEW_ACTIVES_RAS_SCALING)
             {

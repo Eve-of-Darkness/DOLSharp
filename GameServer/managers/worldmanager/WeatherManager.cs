@@ -215,7 +215,6 @@ namespace DOL.GS
             return true;
         }
 
-        #region Update Handlers
         /// <summary>
         /// Stop Weather from given Weather Object
         /// </summary>
@@ -293,9 +292,6 @@ namespace DOL.GS
                 player.Out.SendWeather(weather.CurrentPosition(SimpleScheduler.Ticks), weather.Width, weather.Speed, weather.FogDiffusion, weather.Intensity);
             }
         }
-        #endregion
-
-        #region Event Handlers
 
         /// <summary>
         /// Weather Tick happen when Default Timer is Off or When Weather is Finished.
@@ -378,9 +374,7 @@ namespace DOL.GS
                 SendWeatherUpdate(region.ID, args.Player);
             }
         }
-        #endregion
 
-        #region Registering
         /// <summary>
         /// Register a new Region to Weather Manager
         /// Should not be used Externally
@@ -461,6 +455,5 @@ namespace DOL.GS
                 }
             }
         }
-        #endregion
     }
 }

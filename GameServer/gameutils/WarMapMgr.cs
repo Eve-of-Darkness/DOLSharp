@@ -124,7 +124,6 @@ namespace DOL.GS
             {
                 long nftime = NFTime;
 
-                #region CalculFights
                 lock (m_fights)
                 {
                     IList<long> remove = new List<long>();
@@ -228,9 +227,7 @@ namespace DOL.GS
                         }
                     }
                 }
-                #endregion CalculFights
 
-                #region CalculGroups
                 lock (m_groups)
                 {
                     IList<string> remove = new List<string>();
@@ -330,7 +327,6 @@ namespace DOL.GS
                         }
                     }
                 }
-                #endregion CalculGroups
 
                 LastCalcul = nftime;
             }

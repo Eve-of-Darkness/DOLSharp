@@ -153,8 +153,6 @@ namespace DOL.GS.Keeps
             Ailinne_Arvakr_Hurbury = 7,
         }
 
-        #region Properties
-
         /// <summary>
         /// This hold all keep components
         /// </summary>
@@ -356,7 +354,6 @@ namespace DOL.GS.Keeps
             get { return 5000; }
         }
 
-        #region DBKeep Properties
         /// <summary>
         /// The Keep ID linked to the DBKeep
         /// </summary>
@@ -526,10 +523,6 @@ namespace DOL.GS.Keeps
             }
         }
 
-        #endregion
-
-        #endregion
-
         /// <summary>
         /// AbstractGameKeep constructor
         /// </summary>
@@ -546,8 +539,6 @@ namespace DOL.GS.Keeps
         {
             log.Debug("AbstractGameKeep destructor called for " + Name);
         }
-
-        #region LOAD/UNLOAD
 
         /// <summary>
         /// load keep from Db object and load keep component and object of keep
@@ -703,10 +694,6 @@ namespace DOL.GS.Keeps
                 comp.SaveIntoDatabase();
             }
         }
-
-        #endregion
-
-        #region Claim
 
         public virtual bool CheckForClaim(GamePlayer player)
         {
@@ -899,10 +886,6 @@ namespace DOL.GS.Keeps
             return 0;
         }
 
-        #endregion
-
-        #region Release
-
         public virtual bool CheckForRelease(GamePlayer player)
         {
             if (InCombat)
@@ -939,9 +922,6 @@ namespace DOL.GS.Keeps
 
             SaveIntoDatabase();
         }
-        #endregion
-
-        #region Upgrade
 
         /// <summary>
         /// upgrade keep to a target level
@@ -1212,9 +1192,6 @@ namespace DOL.GS.Keeps
             */
             return 0;
         }
-        #endregion
-
-        #region Reset
 
         /// <summary>
         /// reset the realm when the lord have been killed
@@ -1375,8 +1352,6 @@ namespace DOL.GS.Keeps
                 }
             }
         }
-
-        #endregion
 
         /// <summary>
         /// send keep init when player enter in region

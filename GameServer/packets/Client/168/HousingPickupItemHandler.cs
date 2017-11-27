@@ -27,8 +27,6 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandler(PacketHandlerType.TCP, eClientPackets.PlayerPickupHouseItem, "Handle Housing Pick Up Request.", eClientStatus.PlayerInGame)]
     public class HousingPickupItemHandler : IPacketHandler
     {
-        #region IPacketHandler Members
-
         /// <summary>
         /// Handle the packet
         /// </summary>
@@ -206,12 +204,8 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
         }
 
-        #endregion
-
         private static bool GetItemBack(InventoryItem item)
         {
-            #region item types
-
             switch (item.Object_Type)
             {
                 case (int)eObjectType.Axe:
@@ -243,8 +237,6 @@ namespace DOL.GS.PacketHandler.Client.v168
                 default:
                     return true;
             }
-
-            #endregion
         }
     }
 }

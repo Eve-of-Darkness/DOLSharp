@@ -31,7 +31,6 @@ namespace DOL.GS
     /// </summary>
     public static class GamePlayerUtils
     {
-        #region Spot and Area Description / Translation
         /// <summary>
         /// Get Spot Description Checking Any Area with Description or Zone Description
         /// </summary>
@@ -192,9 +191,7 @@ namespace DOL.GS
         {
             return player.GetTranslatedSpotDescription(WorldMgr.GetRegion((ushort)player.BindRegion), player.BindXpos, player.BindYpos, player.BindZpos);
         }
-        #endregion
 
-        #region player skills / bonuses
         /// <summary>
         /// Updates all disabled skills to player
         /// </summary>
@@ -430,6 +427,5 @@ namespace DOL.GS
 
             return string.Format("+{0}{1}{2}", iBonus, str, SkillBase.GetPropertyName((eProperty)iBonusType));
         }
-        #endregion
     }
 }

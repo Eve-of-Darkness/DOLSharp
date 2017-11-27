@@ -15,8 +15,6 @@ namespace DOL.GS.Commands
         "/email <address>")]
     public class EmailCommand : AbstractCommandHandler, ICommandHandler
     {
-        #region ICommandHandler Members
-
         public void OnCommand(GameClient client, string[] args)
         {
             if (IsSpammingCommand(client.Player, "email"))
@@ -72,8 +70,6 @@ namespace DOL.GS.Commands
                                        eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
-
-        #endregion
     }
 
     public class EmailSyntaxValidator

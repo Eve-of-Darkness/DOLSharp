@@ -108,8 +108,6 @@ namespace DOL.GS.Quests.Albion
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region NPC Declarations
-
             GameNPC[] npcs = WorldMgr.GetObjectsByName<GameNPC>("Lidmann Halsey", eRealm.Albion);
 
             if (npcs.Length == 0)
@@ -176,11 +174,7 @@ namespace DOL.GS.Quests.Albion
             }
 
             // end npc
-            #endregion
 
-            #region Item Declarations
-
-            #region misc
             sealed_pouch = GameServer.Database.FindObjectByKey<ItemTemplate>("sealed_pouch");
             if (sealed_pouch == null)
             {
@@ -209,11 +203,9 @@ namespace DOL.GS.Quests.Albion
                     GameServer.Database.AddObject(sealed_pouch);
                 }
             }
-            #endregion
 
             // end item
             ItemTemplate i = null;
-            #region Mercenary
             MercenaryEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("MercenaryEpicBoots");
             if (MercenaryEpicBoots == null)
             {
@@ -460,8 +452,6 @@ namespace DOL.GS.Quests.Albion
 
                 MercenaryEpicArms = i;
             }
-            #endregion
-            #region Reaver
 
             // Reaver Epic Sleeves End
             ReaverEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("ReaverEpicBoots");
@@ -710,8 +700,7 @@ namespace DOL.GS.Quests.Albion
 
                 ReaverEpicArms = i;
             }
-            #endregion
-            #region Infiltrator
+
             InfiltratorEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("InfiltratorEpicBoots");
             if (InfiltratorEpicBoots == null)
             {
@@ -946,8 +935,7 @@ namespace DOL.GS.Quests.Albion
                     GameServer.Database.AddObject(InfiltratorEpicArms);
                 }
             }
-            #endregion
-            #region Cabalist
+
             CabalistEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("CabalistEpicBoots");
             if (CabalistEpicBoots == null)
             {
@@ -1192,8 +1180,7 @@ namespace DOL.GS.Quests.Albion
 
                 CabalistEpicArms = i;
             }
-            #endregion
-            #region Necromancer
+
             NecromancerEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("NecromancerEpicBoots");
             if (NecromancerEpicBoots == null)
             {
@@ -1442,8 +1429,7 @@ namespace DOL.GS.Quests.Albion
 
                 // Item Descriptions End
             }
-            #endregion
-            #region Heretic
+
             HereticEpicBoots = GameServer.Database.FindObjectByKey<ItemTemplate>("HereticEpicBoots");
             if (HereticEpicBoots == null)
             {
@@ -1730,9 +1716,6 @@ namespace DOL.GS.Quests.Albion
 
                 // Item Descriptions End
             }
-            #endregion
-
-            #endregion
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
@@ -2095,8 +2078,6 @@ namespace DOL.GS.Quests.Albion
             }
         }
 
-        #region Allakhazam Epic Source
-
         /*
         *#25 talk to Lidmann
         *#26 seek out Loken in Raumarik Loc 47k, 25k, 4k, and kill him purp and 2 blue adds
@@ -2122,7 +2103,5 @@ namespace DOL.GS.Quests.Albion
             *Shadow Shrouded Legs
             *Shadow Shrouded Sleeves
         */
-
-        #endregion
     }
 }

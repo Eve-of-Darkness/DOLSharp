@@ -106,8 +106,7 @@ namespace DOL.GS.Quests.Examples
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             }
 
-            #region defineNPCs
-            GameNPC[] npcs;
+        GameNPC[] npcs;
 
         npcs = WorldMgr.GetObjectsByName<GameNPC>("Sir Quait", (eRealm)1);
         if (npcs.Length == 0)
@@ -199,10 +198,6 @@ namespace DOL.GS.Quests.Examples
             EvilThiefoftheShadowclan = npcs[0];
         }
 
-        #endregion
-
-        #region defineItems
-
         SirQuaitsSword = GameServer.Database.FindObjectByKey<ItemTemplate>("SirQuaitsSword");
         if (SirQuaitsSword == null)
         {
@@ -279,15 +274,7 @@ namespace DOL.GS.Quests.Examples
                 GameServer.Database.AddObject(SirQuaitsSword);
             }
 
-            #endregion
-
-            #region defineAreas
-
-            #endregion
-
-            #region defineQuestParts
-
-            QuestBuilder builder = QuestMgr.GetBuilder(typeof(HelpSirQuait));
+        QuestBuilder builder = QuestMgr.GetBuilder(typeof(HelpSirQuait));
                 QuestBehaviour a;
                 a = builder.CreateBehaviour(SirQuait,-1);
                     a.AddTrigger(eTriggerType.Interact,null,SirQuait);
@@ -350,9 +337,7 @@ namespace DOL.GS.Quests.Examples
                 a.AddAction(eActionType.FinishQuest,typeof(HelpSirQuait),null);
                 AddBehaviour(a);
 
-            #endregion
-
-            // Custom Scriptloaded Code Begin
+        // Custom Scriptloaded Code Begin
 
             // Custom Scriptloaded Code End
             SirQuait.AddQuestToGive(typeof(HelpSirQuait));
